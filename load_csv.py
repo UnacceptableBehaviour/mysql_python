@@ -11,10 +11,15 @@ file_name = './static/sql_recipe_data.csv'
 with open(file_name) as csv_to_sql_file:    
     csv_reader = csv.DictReader(csv_to_sql_file, delimiter=',')    
     
+    pprint(csv_reader)
+    
     count = 0
     #pprint(csv_to_sql_file)
     
     list_of_keys = []
+    
+    for name in csv_reader.fieldnames:
+        print(f"N: {name} <")
     
     #for element in array_of_things:
     for row in csv_reader:        
@@ -23,19 +28,50 @@ with open(file_name) as csv_to_sql_file:
             print(f'\n{ len(row) }')
             print(f'Column names: { " | ".join(row) }')            
             pprint(row)
-            #count += 1
+            count += 1
             line = ''
             for col in row:
                 line = line + f", {col}"
                 list_of_keys.append(col)
             print(line)
+            print('- - - - - - - - - - - - - - - - - - - - - - - - LKS')
+            pprint(list_of_keys)
+            print('- - - - - - - - - - - - - - - - - - - - - - - - LKE')
             print(f'\n')
     
         #rcp_id,image_filename,recipe_title,txt_ingredient_file,n_En,n_Fa,n_Ca,n_Su,n_Pr,n_Sa
-        print(f'{row["rcp_id"].ljust(4)}{row["recipe_title"].ljust(30)}{row["n_En"].ljust(4)}')
+        print(f'{row["rcp_id"].ljust(4)}{row["recipe_title"].ljust(50)}{row["n_En"].ljust(4)}')
     
     
+    print("\n\nNOW FOR KEYS")
+    #csv_reader = csv.DictReader(csv_to_sql_file, delimiter=',')
+            
+    print(f"csv_reader: {csv_reader}")
+    pprint(csv_reader) 
+    
+    print('- - - - - - - - - - - - - - - - - - - - - - - - R2S')
+    pprint(list_of_keys)
+    print('- - - - - - - - - - - - - - - - - - - - - - - - R2M')
 
+    for col_key in csv_reader.fieldnames:
+        print(f"CK: {col_key} <")
+
+    print('- - - - - - - - - - - - - - - - - - - - - - - - R2E')
+    
+    
+    for new_row in csv_reader:
+        print(f"ROW: {new_row} <")
+
+        line = ''
+        
+        for col_key in csv_reader.fieldnames:
+            print(f"CK: {col_key} <")
+            print(line)
+            line = line + " " + new_row[col_key]
+
+        print(line)   
+
+    
 
 
 # def main():
