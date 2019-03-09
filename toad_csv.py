@@ -14,31 +14,46 @@ with open(file_name) as csv_to_sql_file:
     
     pprint(csv_reader)
     
-    for row in csv_reader:
-        #print(f"ROW: {row} <")
+    local_store = './static/'
+    image_dictionary = {}
+    text_dicionary = {}
 
+    entries = 0
+    
+    for row in csv_reader:
         line = ''
         
         for col_key in csv_reader.fieldnames:
-            #print(f"CK: {col_key} <")
-            #print(line)
+
+            if col_key == 'image_filename':
+                image_dictionary[entries] = row[col_key]
+                continue
+
+            if col_key == 'txt_ingredient_file':
+                text_dicionary[entries] = row[col_key]
+                continue
+
             line = line + " " + row[col_key]
 
-        print(line)   
-
-    # print image files    
-    # doesn't execute - StopIteration
-    for row in csv_reader:
-        #print(f"ROW: {row} <")
-
-        line = ''
+        print(line)
         
-        for col_key in csv_reader.fieldnames:
-            #print(f"CK: {col_key} <")
-            #print(line)
-            line = line + " " + row[col_key]
+        entries +=1
+        
 
-        print(line)   
+    entries -= 1
+    
+    print("image_dictionary")
+    pprint(image_dictionary)
+    
+    # for image in range(0,entries):                   # repeat - refactor
+    #     print(f"{image_dictionary[image]}")
+
+    
+    print("text_dicionary")
+    pprint(text_dicionary)
+    
+    # for text in range(0,entries):
+    #     print(f"{text_dicionary[text]}")
 
     
 
