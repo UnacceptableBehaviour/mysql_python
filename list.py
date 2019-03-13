@@ -45,7 +45,7 @@ def main():
     
     print(f"\n\nProcess Query {formatted_text}")
         
-    print(f"\n\nHello World > {engine}" <)
+    print(f"\n\nHello World > {engine} <")
 
 
 if __name__ == '__main__':
