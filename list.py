@@ -1,10 +1,18 @@
 #! /usr/bin/env python
 
+# loads csv file from server and loads into database LIVE
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+# sessions
+# https://docs.sqlalchemy.org/en/latest/orm/session_basics.html
+
 
 # giza a look
 from pprint import pprint
+# for regex
+import re
 
 import urllib.parse                     # sed to parse passwords into url format
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
@@ -48,7 +56,44 @@ pprint(engine)
 # you can use the depth parameter to limit how many levels it goes down
 #pprint(engine, depth=2)
 
-
+def create_entry_in_db(db, table, entry):
+    print(f"----- list.py: create_entry_in_db ------------------------------------------------------------ ")
+    print(f"----- table:{table} <> recpipe:{entry['title']} ------------------------------------------------------------ ")
+    
+    sql_string = f"INSERT INTO {table}"
+    fields = "("
+    data =  "("
+    for header in entry:
+        print(f"{header} = {entry[header]} - class:{entry[header].__class__.__name__}")
+        fields = fields + f"{header}, "
+        
+        if header == 'rcp_id' or header == 'serving_size':
+            print(f"{header} is an INT NUMBER")
+            data = data + f"{entry[header]}, "        
+        
+        elif re.match(r'n_\w+', header ):
+            print(f"{header} is a NUMBER")
+            data = data + f"{entry[header]}, "
+        
+        else:
+            print(f"{header} is a STRING")
+            data = data + f"'{entry[header]}', "
+    
+    
+    data = data.rstrip(', ') + ")"
+    
+    fields = fields.rstrip(', ') + ")"
+    
+    sql_string = f"{sql_string} {fields} VALUES {data};"
+    
+    print(sql_string)
+    db.execute(sql_string)
+    db.commit()
+    
+    #INSERT INTO recipes (rcp_id, image_filename, recipe_title, txt_ingredient_file, n_En, n_Fa, n_Fs, n_Fm, n_Fp, n_Fo3, n_Ca, n_Su, n_Fb, n_St, n_Pr, n_Sa, n_Al, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
+    #INSERT INTO recipes (rcp_id, image_filename, recipe_title, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
+    #INSERT INTO recipes (rcp_id, image, title, text_file, n_En, n_Fa, serving_size) VALUES (0, '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', 137, 6.97, 466)
+    #INSERT INTO recipes (rcp_id, image, title, text_file) VALUES (0, '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt');
 
 def main():
     # execute this query
@@ -75,6 +120,22 @@ def main():
     sql_dict = get_csv_from_server_as_disctionary(url_file)
 
     print(sql_dict.__class__.__name__)
+    
+    info = {}
+
+    for entry in sql_dict:
+        print(f"> > > > ENTRY:{entry} * * * * * * * * * * * * * * * * ")
+        #pprint(sql_dict[entry])
+        
+        for key in sql_dict[entry]:
+            #print(f"{key} = {sql_dict[entry][key]}")
+            info[key] = sql_dict[entry][key]
+        
+        # should put some exception handling around this    
+        create_entry_in_db(db, 'recipes', info)
+        
+    
+    
 
 
 if __name__ == '__main__':

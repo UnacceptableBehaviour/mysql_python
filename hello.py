@@ -31,10 +31,41 @@ def hello_world():
         formatted_text = formatted_text + f" | {line.ndb_no} | {line.nutr_no} | {line.nutr_val} | {line.deriv_cd} | <br>"
     
     print(f"\n\nProcess Query {formatted_text}")
+
+    return render_template('data_return.html', lines=db_lines)
+
+    #return f"Processed Query:<br>{formatted_text} <br>END"
     
-    return f"Processed Query:<br>{formatted_text} <br>END"
-    
-    
+@app.route('/buton_1', methods=["GET", "POST"])
+def button_1():
+    return render_template('data_return.html', lines=[f"BUTTON 1"])
+    #return f"<h1>BUTTON 1</h1>"
+
+@app.route('/buton_2', methods=["GET", "POST"])
+def button_2():
+    return render_template('data_return.html', lines=[f"BUTTON 2"])
+
+
+@app.route('/buton_3', methods=["GET", "POST"])
+def button_3():    
+    return render_template('data_return.html', lines=[f"BUTTON 3"])
+
+@app.route('/buton_4', methods=["GET", "POST"])
+def button_4():    
+    return render_template('data_return.html', lines=[f"BUTTON 4"])
+
+@app.route('/buton_5', methods=["GET", "POST"])
+def button_5():    
+    return render_template('data_return.html', lines=[f"BUTTON 5"])
+
+@app.route('/buton_6', methods=["GET", "POST"])
+def button_6():    
+    return render_template('data_return.html', lines=[f"BUTTON 6"])
+
+@app.route('/buton_7', methods=["GET", "POST"])
+def button_7():    
+    return render_template('data_return.html', lines=[f"BUTTON 7"])
+
 
 
 

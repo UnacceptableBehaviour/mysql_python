@@ -45,11 +45,12 @@ def get_csv_from_server_as_disctionary(url):
         entries = 0
         
         for row in csv_reader:
-            line = ''
-                        
+            line = ''                
+            entry = {}                          # create a new dictionary for each entry
+            
             for col_key in csv_reader.fieldnames:
                 
-                entry[col_key] = row[col_key]
+                entry[col_key] = row[col_key]   # create and info dictionary
                 
                 if col_key == 'image_filename':
                     image_dictionary[entries] = row[col_key]
@@ -61,13 +62,15 @@ def get_csv_from_server_as_disctionary(url):
     
                 line = line + f" {col_key}:" + row[col_key]
     
-            print(line)
-            
+            #print(f"\n> > {entries}")
+            #print(line)                        
             sql_dict[entries] = entry
+            #print(f"\n> > {entries}")
+            #print(sql_dict[entries])                        
             
             entries +=1
 
-    pprint(sql_dict)
+    pprint(sql_dict[0])
     
     print("----- reponse ------------------------------------------------------------")
     
