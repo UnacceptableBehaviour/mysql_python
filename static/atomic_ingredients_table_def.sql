@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS atomic_ingredients (
   servings DECIMAL(9,2) DEFAULT NULL,
   density DECIMAL(9,2) DEFAULT NULL,
   serving_size DECIMAL(9,2) DEFAULT NULL,
+  atomic BOOLEAN DEFAULT TRUE,
 
   image_file VARCHAR(100) DEFAULT NULL,
   text_file VARCHAR(100) DEFAULT NULL,

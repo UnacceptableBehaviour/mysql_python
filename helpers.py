@@ -16,7 +16,9 @@ import urllib.request
 # urllib.request.urlretrieve ("http://192.168.0.8:8000/static/sql_recipe_data.csv", "sql_recipe_data.csv")
 # url = urllib.parse.quote(url, safe='/:')  # make sure files w/ spaces OK
 
+ATOMIC_INDEX = 0
 SERVING_INDEX = 2
+INGREDIENT_INDEX = 3
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -135,15 +137,9 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         log_exception("\n** BAD TEMPLATE **\n", f"\n{recipe_text}\n")
     
     return recipe_info
-                
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#
-# load a text file from server - convert into partial recipe dictionary
-#                              - ingredients, yield & servings
-#
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):    
-    recipe_info = {}
+
+def get_recipe_file_contents_from_asset_server(recipe_text_filename):
+    recipe_text = 'FILE ACCESS ERROR: NO FILE or NO DATA IN FILE'
     
     print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
     base_url = 'http://192.168.0.8:8000/static/recipe/'
@@ -174,7 +170,7 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
             print(f"File NOT PRESENT: {file_info}")
             return
     
-        recipe_text = f.read()    
+        recipe_text = f.read()
         f.close()
     
     except Exception as e:
@@ -183,11 +179,57 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
         recipe_text = f"---- for the missing recipe (1)\n100\t ingredients\n  Total (0g)"
         
     finally:
-        print(f"RETRIEVED URL: finally segment") 
+        print(f"RETRIEVED URL: finally segment")
         
+    return recipe_text
+
+
+# def recursively_mark_ingredients_list_w_subcomponents
+# 
+#     # pull relevant item from a multi component recipe
+#     # scan through templatyes in the recipe
+#     for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
+#         component_text = m.group(1)
+#         print(component_text)
+#         
+#         # create a dictionary for each recipe / subcoponent        
+#         recipe_dict = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename)
+#         
+#         # collect components together and return a list of recipes
+#         component_list.append(recipe_dict)
+#     
+#     return recipe_info
+
+
+# def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, recipe_name):
+#     # find headline (recipe_name) recipe in list
+#     for rcp in recipies_and_subcomponents:
+#         if rcp['ri_name'] == recipe_name:
+#             ingredients_list = rcp['ingredients']
+#             break
+#     
+#     # iterate through its ingredients and see if they exist in the list (as a sub component / sub recipe)
+#     for i in ingredients_list:
+#         if i[]
+#     
+#     # if so call this function again passing in the subcomponent as the head
+    
+    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# load a text file from asset server
+#                  - convert into partial recipe dictionary
+#                  - ingredients, yield & servings
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):    
+    recipe_info = {}
+    recipies_and_subcomponents = []
+        
+    recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
     
     # other items are sub components and should be stored in the db too 
-    
+
     # pull relevant item from a multi component recipe
     # scan through templatyes in the recipe
     for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
@@ -202,6 +244,7 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
             break
     
     return recipe_info
+
 
 
 def create_recipe_info_dictionary(sql_dict, ri_id):

@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS recipes (
   servings DECIMAL(9,2) DEFAULT NULL,
   density DECIMAL(9,2) DEFAULT NULL,
   serving_size DECIMAL(9,2) DEFAULT NULL,
-
+  atomic  BOOLEAN DEFAULT FALSE,
+  
   ingredients     VARCHAR(150) ARRAY,
 
   image_file VARCHAR(100) DEFAULT NULL,

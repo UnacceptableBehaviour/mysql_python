@@ -152,38 +152,35 @@ def create_entry_in_db(db, table, entry):
     #INSERT INTO recipes (rcp_id, image, title, text_file, n_En, n_Fa, serving_size) VALUES (0, '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', 137, 6.97, 466)
     #INSERT INTO recipes (rcp_id, image, title, text_file) VALUES (0, '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt');
 
+def create_table_in_database_from_sql_template(data_base, template_file):
+    create_table_sql_command = ''
+    
+    with open(template_file) as sql_template:
+        create_table_sql_command = sql_template.read()
+        
+    db_lines = data_base.execute(create_table_sql_command)    
+    data_base.commit()
+    
+    return(db_lines)
+
+
+
 def main():
     # execute this query
     # SELECT ndb_no, nutr_no, nutr_val, deriv_cd FROM nutrientdata ORDER BY nutr_val LIMIT 10;
-    #db_lines = db.execute("SELECT ndb_no, nutr_no, nutr_val, deriv_cd FROM nutrientdata ORDER BY nutr_val LIMIT 10;").fetchall()
-    
+    #db_lines = db.execute("SELECT ndb_no, nutr_no, nutr_val, deriv_cd FROM nutrientdata ORDER BY nutr_val LIMIT 10;").fetchall()    
     #db_lines = db.execute("SELECT * FROM INFORMATION_SCHEMA.TABLES").fetchall()
-    #db_lines = db.execute("SHOW TABLES").fetchall() #msyql
-    
+    #db_lines = db.execute("SHOW TABLES").fetchall() #msyql    
     #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine 
     
-    
+    # create recipes table
     sql_t_recipes_file = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_table_def.sql'    
-    create_table_sql_command = ''
-    
-    with open(sql_t_recipes_file) as sql_template:
-        create_table_sql_command = sql_template.read()
-        
-    db_lines = db.execute(create_table_sql_command)    
-    db.commit()
-    
+    db_lines = create_table_in_database_from_sql_template(db, sql_t_recipes_file)        
     print(db_lines)
-
-    # next table
+    
+    # create ingredients table
     sql_t_atomic_i_file = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/atomic_ingredients_table_def.sql'
-    create_table_sql_command = ''
-    
-    with open(sql_t_atomic_i_file) as sql_template:
-        create_table_sql_command = sql_template.read()
-        
-    db_lines = db.execute(create_table_sql_command)    
-    db.commit()
-    
+    db_lines = create_table_in_database_from_sql_template(db, sql_t_atomic_i_file)        
     print(db_lines)
 
     formatted_text = "\n"
