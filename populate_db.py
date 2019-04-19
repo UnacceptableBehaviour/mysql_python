@@ -77,11 +77,36 @@ pprint(engine)
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - E")
 
 
+def create_sql_insert_ingredients_array_text(ingredients):
+    # '{    {"0", "250", "(0)", "cheese"},          # 0 - atomic
+    #       {"0", "110", "(0)", "rice"},
+    #       {"1", "110", "(0)", "turkey mix"},      # 1 - sc - subcomponent
+    #       {"0", "20", "(0)", "pepper"},
+    #       {"0", "20", "(0)", "salt"},
+    #       {"0", "55", "(1)", "eggs"}
+    #   }'
+    
+    sql_insert = "'{"
+    
+    for line in ingredients:
+        sql_insert = sql_insert + "{"
+        for i in line:
+            sql_insert = sql_insert + f'"{i}", '
+        
+        sql_insert = sql_insert.rstrip(', ')             # remove trainling comma
+        sql_insert = sql_insert + "}, "
+    
+    sql_insert = sql_insert.rstrip(', ')                 # remove trainling comma
+    sql_insert = sql_insert + "}', "
+    
+    return sql_insert
 
 
 def create_entry_in_db(db, table, entry):
+
     print(f"----- list.py: create_entry_in_db ------------------------------------------------------------ ")
-    print(f"----- table:{table} <> recpipe:{entry['ri_name']} ------------------------------------------------------------ ")
+    print(f"----- table:{table} <> recipe: {entry['ri_name']} -------------------------------------------- ")
+    print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
     
     sql_string = f"INSERT INTO {table}"
     fields = "("
@@ -93,11 +118,20 @@ def create_entry_in_db(db, table, entry):
         if header == 'ri_id' or header == 'serving_size':
             print(f"{header} is an INT NUMBER")
             data = data + f"{entry[header]}, "        
-        
+                
         elif re.match(r'n_\w+', header ):
             print(f"{header} is a NUMBER")
             data = data + f"{entry[header]}, "
         
+        elif header == 'ingredients':
+            print(f"{header} is a LIST of ingredients")
+            ingredients_insert_text = create_sql_insert_ingredients_array_text(entry[header])
+            data = data + ingredients_insert_text
+            pprint(entry[header])
+            print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
+        elif header == 'yield':
+            print(f"{header} is a NUMBER in g")            
+            data = data + f"{entry[header].rstrip('g')}, "
         else:
             print(f"{header} is a STRING")
             data = data + f"'{entry[header]}', "
@@ -110,8 +144,8 @@ def create_entry_in_db(db, table, entry):
     sql_string = f"{sql_string} {fields} VALUES {data};"
     
     print(sql_string)
-    #db.execute(sql_string)
-    #db.commit()
+    db.execute(sql_string)
+    db.commit()
     
     #INSERT INTO recipes (rcp_id, image_filename, recipe_title, txt_ingredient_file, n_En, n_Fa, n_Fs, n_Fm, n_Fp, n_Fo3, n_Ca, n_Su, n_Fb, n_St, n_Pr, n_Sa, n_Al, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
     #INSERT INTO recipes (rcp_id, image_filename, recipe_title, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
@@ -186,14 +220,12 @@ def main():
         pprint(recipe)
         print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
         
-        for key in sql_dict[entry]:
-            print(f"{key} = {sql_dict[entry][key]}")
-            info[key] = sql_dict[entry][key]
+        # for key in sql_dict[entry]:
+        #     print(f"{key} = {sql_dict[entry][key]}")
+        #     info[key] = sql_dict[entry][key]
         
         # should put some exception handling around this    
-        create_entry_in_db(db, 'recipes', info)
-        
-        quit()
+        create_entry_in_db(db, 'recipes', recipe)        
     
     
 

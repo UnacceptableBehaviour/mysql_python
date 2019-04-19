@@ -16,6 +16,8 @@ import urllib.request
 # urllib.request.urlretrieve ("http://192.168.0.8:8000/static/sql_recipe_data.csv", "sql_recipe_data.csv")
 # url = urllib.parse.quote(url, safe='/:')  # make sure files w/ spaces OK
 
+SERVING_INDEX = 2
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # load a csv file into a list of dictionaries
@@ -75,6 +77,65 @@ def log_exception(message, exception):
     print("------ caught exception rectrieving url - - - - - - < E")
     return 0
 
+
+
+def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt'):
+    recipe_info = None    
+    
+    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
+    if (match):
+        # Matches
+        # 1 - name
+        # 2 - servings
+        # 3 - ingredients
+        # 4 - yield
+        #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
+        
+        # easy to detect failure in the data
+        recipe_info = {
+            'ri_name':"Initialised as NO MATCH",
+            'ingredients':"Pure green",
+            'servings': 0,
+            'yield': '0g'
+        }
+    
+        recipe_info['ri_name'] = match.group(1).strip()
+        recipe_info['servings'] = match.group(2).strip()
+        recipe_info['yield'] = match.group(4).strip()
+        
+        # fix broken lines before processing
+        # the return group is split mid line - this is used to fix that
+        i_list = (''.join( match.group(3).strip() ) ).split("\n")
+        
+        # remove comments (after #) from ingredients in recipe: 10g allspice     # woa that's gonna be strong!
+        for index, line in enumerate(i_list):
+            i_list[index] = ( re.sub('#.*', '', line) ).strip()
+            
+        # shold check db to find subcomponents
+        for index, line in enumerate(i_list):
+            print(f"SERVING_INDEX ERROR: {dbg_file_name} <\n{index} - {line} <")
+            i_list[index] = list( filter(None, line.split("\t")) )
+            i_list[index].insert(0,0)                                   # indicates atmonic ingredient            
+            if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)                
+                i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
+        
+        
+        print(f"NAME: {match.group(1).strip()}")
+        print(f"SERVINGS: ({match.group(2).strip()})")
+        print(f"INGREDIENTS:\n")
+        pprint(i_list)
+        print(f"YIELD: {match.group(4).strip()}")
+        
+        recipe_info['ingredients'] = i_list
+        
+    else:
+        msg = f"BAD TEMPLATE IN {dbg_file_name}\n{recipe_text}"
+        print(f"{msg} \n< - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = < < !!")        
+        # raise exception here
+        log_exception("\n** BAD TEMPLATE **\n", f"\n{recipe_text}\n")
+    
+    return recipe_info
+                
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # load a text file from server - convert into partial recipe dictionary
@@ -93,6 +154,7 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
     # url = url.replace(" ", "%20")          # WORKS 
     # OUT http://192.168.0.8:8000/static/recipe/20190228_163410_monkfish%20and%20red%20pepper%20skewers.txt
 
+    # get recipe text from assest server
     url = urllib.parse.quote(url, safe='/:')  # WORKS - likely more robust
     print(url)
     
@@ -122,61 +184,22 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
         
     finally:
         print(f"RETRIEVED URL: finally segment") 
+        
     
-    #recipe_name = re.match(r'\d{8}_\d{6}_(.*?).txt',recipe_text_filename).group(1)
+    # other items are sub components and should be stored in the db too 
     
     # pull relevant item from a multi component recipe
+    # scan through templatyes in the recipe
     for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
         recipe_text = m.group(1)
         print(recipe_text)
         
-        match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
-        if match and (match.group(1) == recipe_name):
-            # Matches
-            # 1 - name
-            # 2 - portions
-            # 3 - ingredients
-            # 4 - yield
-            #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
-            
-            # easy to detect failure in the data
-            recipe_info = {
-                'ri_name':"Initialised as NO MATCH",
-                'ingredients':"Pure green",
-                'portions': 0,
-                'yield': '0g'
-            }
+        # create a dictionary for each recipe / subcoponent        
+        recipe_info = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename)
         
-            if (match):
-                recipe_info['ri_name'] = match.group(1).strip()
-                recipe_info['portions'] = match.group(2).strip()
-                recipe_info['yield'] = match.group(4).strip()
-                
-                # the return group is split mid line - this is used to fix that
-                i_list = (''.join( match.group(3).strip() ) ).split("\n")
-                
-                # remove comments (after #) from ingredients in recipe: 10g allspice     # woa that's gonna be strong!
-                for index, line in enumerate(i_list):
-                    i_list[index] = ( re.sub('#.*', '', line) ).strip()
-                    
-                
-                for index, line in enumerate(i_list):                
-                    i_list[index] = list( filter(None, line.split("\t")) )
-                
-                
-                print(f"NAME: {match.group(1).strip()}")
-                print(f"PORTIONS: ({match.group(2).strip()})")
-                print(f"INGREDIENTS:\n")
-                pprint(i_list)
-                print(f"YIELD: {match.group(4).strip()}")
-                
-                recipe_info['ingredients'] = i_list
-                
-            else:
-                msg = f"BAD TEMPLATE IN {recipe_text_filename}"
-                print(f"{msg} < - = - = - = - = - = - = - = - = - = - = < < !!")        
-                # raise exception here
-                log_exception(msg, e)
+        # collect components together and return a list of recipes
+        if recipe_info['ri_name'] == recipe_name:
+            break
     
     return recipe_info
 
