@@ -230,35 +230,54 @@ def get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
-    found = False
+    found = None
     
     for recipe in recipies_and_subcomponents:
         if recipe['ri_name'] == ingredient[INGREDIENT_INDEX]:
-            found = True
+            found = recipe
     
     return found
     
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# typical recipe
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#{'ingredients': [[1, '250g', '(0)', 'cauliflower'],    # sublist
+#                 [1, '125g', '(0)', 'grapes'],
+#                 [1, '200g', '(4)', 'tangerines'],
+#                 [1, '55g', '(0)', 'dates'],
+#                 [1, '8g', '(0)', 'coriander'],
+#                 [1, '8g', '(0)', 'mint'],
+#                 [1, '4g', '(0)', 'chillies'],
+#   sub_comp >    [0, '45g', '(0)', 'pear and vanilla reduction lite'],
+#                 [1, '2g', '(0)', 'salt'],
+#                 [1, '2g', '(0)', 'black pepper'],
+#                 [1, '30g', '(0)', 'flaked almonds']],
+#  'ri_name': 'cauliflower california',
+#  'atomic' : 0
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient):
+
+    recipe_dict['atomic'] = 0    
+    print(f"\tFOUND: {recipe_dict['ri_name']} <")
     
-# 
-# def mark_subcomponents(recipies_and_subcomponents, sub_list);
-#    # {'ingredients': [[1, '250g', '(0)', 'cauliflower'],    # sublist
-#    #                  [1, '125g', '(0)', 'grapes'],
-#    #                  [1, '200g', '(4)', 'tangerines'],
-#    #                  [1, '55g', '(0)', 'dates'],
-#    #                  [1, '8g', '(0)', 'coriander'],
-#    #                  [1, '8g', '(0)', 'mint'],
-#    #                  [1, '4g', '(0)', 'chillies'],
-#    #                  [1, '45g', '(0)', 'pear and vanilla reduction lite'],
-#    #                  [1, '2g', '(0)', 'salt'],
-#    #                  [1, '2g', '(0)', 'black pepper'],
-#    #                  [1, '30g', '(0)', 'flaked almonds']],
-#    #   'ri_name': 'cauliflower california',
-#     
-#     for index, ingredient in enumerate(sub_list):
-#         if ingredient_is_in(ingredient, recipies_and_subcomponents):  # found subcomponent 
-#             sublist[index][ATOMIC_INDEX] = 0  # [1, '200g', '(4)', 'tangerines'],
-#             mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[])
-                                            
+    # iterate through its ingredients and see if there is an entry for
+    # that ingredient in the headline recipe ingredients list
+    # if so it's a subcoponent, mark it and search it too                   *
+    
+    for i2, ingredient in enumerate(recipe_dict['ingredients']):
+        print(f"\t\ti2: {ingredient} <")
+
+        recipe_is_a_subcomponent = ingredient_in_recipe_list(ingredient, recipies_and_subcomponents)
+
+        if recipe_is_a_subcomponent:        # found a subcomponent
+            print(f"\t\t\tSUB MARKED: {recipe_is_a_subcomponent['ri_name']} <")
+
+            # mark ATOMIC 0 - false            
+            recipe_dict['ingredients'][i2][ATOMIC_INDEX] = 0
+            
+            # check it's ingredients for sub components            
+            mark_subcomponents(recipies_and_subcomponents, recipe_is_a_subcomponent, ingredient)
+            print(f"\t\t\tend of SC --< {recipe_is_a_subcomponent['ri_name']}")
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -271,25 +290,9 @@ def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, headl
         print(f"r_&_sc: {rcp['ri_name']} <")
         # look for headline recipe and start there
         if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
-            recipies_and_subcomponents[i1]['atomic'] = 0
-            print(f"\tFOUND: {rcp['ri_name']} <")
-            # iterate through its ingredients and see if there is an entry for
-            # that ingredient in the headline recipe ingredients list
-            # if so it's a subcoponent, mark it and search it too                   *
-            for i2, ingredient in enumerate(recipies_and_subcomponents[i1]['ingredients']):
-                print(f"\t\ti2: {ingredient} <")
-                                                                          # iterare ^
-                # call              recipies_and_subcomponents      ,       list                                                                      
-                if ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
-                    # found a subcomponent
-                    # mark ATOMIC 0 - false
-                    recipies_and_subcomponents[i1]['ingredients'][i2][ATOMIC_INDEX] = 0
+            mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[i1], headline_recipe_name)
 
-                    # # call              recipies_and_subcomponents      ,       list                                                                      
-                    # if ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
-                    #     # found a subcomponent
-                    #     # mark ATOMIC 0 - false
-                    #     recipies_and_subcomponents[i1]['ingredients_list'][i2][ATOMIC_INDEX] = 0
+
                     
     print("== EXIT: mark_ingredients_as_atomic_or_subcompnents -      -      -      -      -      -      |")
     # if so call this function again passing in the subcomponent as the head
