@@ -26,7 +26,7 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 print("----- list.py ------------------------------------------------------------ importing")
 
-from helpers import get_csv_from_server_as_disctionary, get_recipe_ingredients_and_yield, create_recipe_info_dictionary, inc_recipe_counter, log_exception
+from helpers import get_csv_from_server_as_disctionary, get_recipe_ingredients_and_yield, inc_recipe_counter, log_exception, create_list_of_recipe_and_components_for_recipe_id, create_list_of_recipe_and_components_for_recipe_id_depracated
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -208,21 +208,35 @@ def main():
         print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")
         
         pprint(sql_dict[entry])
-        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M")
+        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
         
-        ri_id = int(sql_dict[entry]['ri_id'])
+        sql_row = sql_dict[entry]
         
-        recipe = create_recipe_info_dictionary(sql_dict, ri_id)        
+        ri_id = int(sql_row['ri_id'])
         
-        pprint(recipe)
+        print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
+        pprint(sql_row)
+        # create list of recipes (headline & sub components) to add into database
+        #recipes_from_id = create_list_of_recipe_and_components_for_recipe_id_depracated(sql_dict, ri_id)
+        recipes_from_id = create_list_of_recipe_and_components_for_recipe_id(sql_row)
+        
+        headline_recipe = ''
+        
+        # for recipe in recipes_from_id:
+        #     if 'ri_id' in recipe:                                  # create an empty dictionary - make more robust
+        #         if int(recipe['ri_id']) == ri_id:
+        #             headline_recipe = recipe
+        #             break
+            
+        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
+        pprint(headline_recipe)
         print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
         
-        # for key in sql_dict[entry]:
-        #     print(f"{key} = {sql_dict[entry][key]}")
-        #     info[key] = sql_dict[entry][key]
-        
         # should put some exception handling around this    
-        create_entry_in_db(db, 'recipes', recipe)        
+        #for recipe in recipes_from_id:
+            #create_entry_in_db(db, 'recipes', recipe)
+        if ri_id == 13:
+            break
     
     
 

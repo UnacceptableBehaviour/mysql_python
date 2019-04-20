@@ -16,9 +16,11 @@ import urllib.request
 # urllib.request.urlretrieve ("http://192.168.0.8:8000/static/sql_recipe_data.csv", "sql_recipe_data.csv")
 # url = urllib.parse.quote(url, safe='/:')  # make sure files w/ spaces OK
 
-ATOMIC_INDEX = 0
+# indexes for ingredients row
+ATOMIC_INDEX = 0                    # default value is 1 - TRUE
 SERVING_INDEX = 2
 INGREDIENT_INDEX = 3
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -115,9 +117,11 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             
         # shold check db to find subcomponents
         for index, line in enumerate(i_list):
-            print(f"SERVING_INDEX ERROR: {dbg_file_name} <\n{index} - {line} <")
             i_list[index] = list( filter(None, line.split("\t")) )
-            i_list[index].insert(0,0)                                   # indicates atmonic ingredient            
+            
+            # default to ATOMIC until subcomponent found
+            i_list[index].insert(ATOMIC_INDEX,1)                                   # indicates atmonic ingredient            
+            
             if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)                
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
         
@@ -184,37 +188,108 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
     return recipe_text
 
 
-# def recursively_mark_ingredients_list_w_subcomponents
-# 
-#     # pull relevant item from a multi component recipe
-#     # scan through templatyes in the recipe
-#     for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
-#         component_text = m.group(1)
-#         print(component_text)
-#         
-#         # create a dictionary for each recipe / subcoponent        
-#         recipe_dict = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename)
-#         
-#         # collect components together and return a list of recipes
-#         component_list.append(recipe_dict)
-#     
-#     return recipe_info
+    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# load a text file from asset server
+#                  - convert into partial recipe dictionary
+#                  - ingredients, yield & servings
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name):    
+    recipe_info = {}
+    recipies_and_subcomponents = []
+        
+    recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
+        
+    # pull relevant item from a multi component recipe
+    # scan through templatyes in the recipe
+    for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
+        recipe_text = m.group(1)
+        print(recipe_text)
+        
+        # create a dictionary for each recipe / subcoponent        
+        recipe_info = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename)
+        
+        # collect components together and return a list of recipes
+        recipies_and_subcomponents.append(recipe_info)
+    
+    return recipies_and_subcomponents
 
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, recipe_name):
+#     
 #     # find headline (recipe_name) recipe in list
 #     for rcp in recipies_and_subcomponents:
 #         if rcp['ri_name'] == recipe_name:
-#             ingredients_list = rcp['ingredients']
-#             break
-#     
-#     # iterate through its ingredients and see if they exist in the list (as a sub component / sub recipe)
+#             
+#                 
+#     # iterate through its ingredients and see if there is an entry for that ingredient
+#     # in the headline recipe ingredients list
+#     # if so it's a subcoponent, mark it and search it too
 #     for i in ingredients_list:
-#         if i[]
 #     
 #     # if so call this function again passing in the subcomponent as the head
+# 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# creates recipe dictionaries based on the csv column headers
+# and ingredients in the text files
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def create_list_of_recipe_and_components_for_recipe_id(sql_row):
+        
+    recipe_text_filename = sql_row['text_file']
+    recipe_name = sql_row['ri_name']
+    
+    components = get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name)
+
+    print(f"LIST:{type(components)} - - - - - - - - - - - - - - B E F O R E <*|*>")
+    
+    for r in components:
+        print("r in components - - - - - - < S ")
+        pprint(r)
+        print("r in components - - - - - - < E ")
+
+    print(f" - - 'ri_name's - - ")
+    
+    print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <S")
+   # mark_ingredients_as_atomic_or_subcompnents(components, recipe_name)
+    print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
     
     
+    print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
+    
+    for r in components:
+        print("r in components - - - - - - < S ")
+        pprint(r)
+        print("r in components - - - - - - < E ")
+
+    print(f" - - 'ri_name's - - ")
+
+
+    return components
+
+
+
+
+
+
+
+# creates recipe dictionaries based on the csv column headers
+# and ingredients in the text files
+def create_list_of_recipe_and_components_for_recipe_id_depracated(sql_dict, ri_id):
+    
+    components = []
+    
+    components.append( create_recipe_info_dictionary(sql_dict, ri_id) )
+    
+    return components
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # load a text file from asset server
@@ -245,10 +320,10 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
     
     return recipe_info
 
-
-
 def create_recipe_info_dictionary(sql_dict, ri_id):
-    info = sql_dict[ri_id]
+    
+    info = sql_dict[ri_id]                  # 
+    
     updated_info = {'ingredients':[]}
     
     # get ingredients from text file while learning templates  . . 
