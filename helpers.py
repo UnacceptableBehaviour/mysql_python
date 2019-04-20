@@ -117,7 +117,15 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             
         # shold check db to find subcomponents
         for index, line in enumerate(i_list):
-            i_list[index] = list( filter(None, line.split("\t")) )
+            # split using tabs, remove white space, remove blanks
+            line = line.split("\t")
+            
+            # use list comprehension to run function on each line_item
+            # turn result into an list with [ ]  [contents of list]
+            line = [line_item.strip() for line_item in line]
+            
+            # strip blanks out list() same as [] < assumption
+            i_list[index] = list( filter(None, line) )
             
             # default to ATOMIC until subcomponent found
             i_list[index].insert(ATOMIC_INDEX,1)                                   # indicates atmonic ingredient            
@@ -221,20 +229,71 @@ def get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, recipe_name):
-#     
-#     # find headline (recipe_name) recipe in list
-#     for rcp in recipies_and_subcomponents:
-#         if rcp['ri_name'] == recipe_name:
-#             
-#                 
-#     # iterate through its ingredients and see if there is an entry for that ingredient
-#     # in the headline recipe ingredients list
-#     # if so it's a subcoponent, mark it and search it too
-#     for i in ingredients_list:
-#     
-#     # if so call this function again passing in the subcomponent as the head
+def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
+    found = False
+    
+    for recipe in recipies_and_subcomponents:
+        if recipe['ri_name'] == ingredient[INGREDIENT_INDEX]:
+            found = True
+    
+    return found
+    
+    
 # 
+# def mark_subcomponents(recipies_and_subcomponents, sub_list);
+#    # {'ingredients': [[1, '250g', '(0)', 'cauliflower'],    # sublist
+#    #                  [1, '125g', '(0)', 'grapes'],
+#    #                  [1, '200g', '(4)', 'tangerines'],
+#    #                  [1, '55g', '(0)', 'dates'],
+#    #                  [1, '8g', '(0)', 'coriander'],
+#    #                  [1, '8g', '(0)', 'mint'],
+#    #                  [1, '4g', '(0)', 'chillies'],
+#    #                  [1, '45g', '(0)', 'pear and vanilla reduction lite'],
+#    #                  [1, '2g', '(0)', 'salt'],
+#    #                  [1, '2g', '(0)', 'black pepper'],
+#    #                  [1, '30g', '(0)', 'flaked almonds']],
+#    #   'ri_name': 'cauliflower california',
+#     
+#     for index, ingredient in enumerate(sub_list):
+#         if ingredient_is_in(ingredient, recipies_and_subcomponents):  # found subcomponent 
+#             sublist[index][ATOMIC_INDEX] = 0  # [1, '200g', '(4)', 'tangerines'],
+#             mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[])
+                                            
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, headline_recipe_name):
+    
+    print("== ENTER: mark_ingredients_as_atomic_or_subcompnents -      -      -      -      -      -     |")
+    # find headline (recipe_name) recipe in list
+    for i1, rcp in enumerate(recipies_and_subcomponents):
+        print(f"r_&_sc: {rcp['ri_name']} <")
+        # look for headline recipe and start there
+        if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
+            recipies_and_subcomponents[i1]['atomic'] = 0
+            print(f"\tFOUND: {rcp['ri_name']} <")
+            # iterate through its ingredients and see if there is an entry for
+            # that ingredient in the headline recipe ingredients list
+            # if so it's a subcoponent, mark it and search it too                   *
+            for i2, ingredient in enumerate(recipies_and_subcomponents[i1]['ingredients']):
+                print(f"\t\ti2: {ingredient} <")
+                                                                          # iterare ^
+                # call              recipies_and_subcomponents      ,       list                                                                      
+                if ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
+                    # found a subcomponent
+                    # mark ATOMIC 0 - false
+                    recipies_and_subcomponents[i1]['ingredients'][i2][ATOMIC_INDEX] = 0
+
+                    # # call              recipies_and_subcomponents      ,       list                                                                      
+                    # if ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
+                    #     # found a subcomponent
+                    #     # mark ATOMIC 0 - false
+                    #     recipies_and_subcomponents[i1]['ingredients_list'][i2][ATOMIC_INDEX] = 0
+                    
+    print("== EXIT: mark_ingredients_as_atomic_or_subcompnents -      -      -      -      -      -      |")
+    # if so call this function again passing in the subcomponent as the head
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # creates recipe dictionaries based on the csv column headers
@@ -257,7 +316,7 @@ def create_list_of_recipe_and_components_for_recipe_id(sql_row):
     print(f" - - 'ri_name's - - ")
     
     print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <S")
-   # mark_ingredients_as_atomic_or_subcompnents(components, recipe_name)
+    mark_ingredients_as_atomic_or_subcompnents(components, recipe_name)
     print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
     
     
