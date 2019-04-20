@@ -234,9 +234,7 @@ def main():
         
         # should put some exception handling around this    
         #for recipe in recipes_from_id:
-            #create_entry_in_db(db, 'recipes', recipe)
-        if ri_id == 13:
-            break
+         #   create_entry_in_db(db, 'recipes', recipe)
     
     
 
