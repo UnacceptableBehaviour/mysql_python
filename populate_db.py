@@ -26,7 +26,10 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 print("----- list.py ------------------------------------------------------------ importing")
 
-from helpers import get_csv_from_server_as_disctionary, get_recipe_ingredients_and_yield, inc_recipe_counter, log_exception, create_list_of_recipes_and_components_from_recipe_id, create_list_of_recipes_and_components_from_recipe_id_depracated
+# from helpers import get_csv_from_server_as_disctionary, inc_recipe_counter, log_exception, create_list_of_recipes_and_components_from_recipe_id
+
+from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary
+
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -217,7 +220,7 @@ def main():
         print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
         pprint(sql_row)
         # create list of recipes (headline & sub components) to add into database
-        #recipes_from_id = create_list_of_recipes_and_components_from_recipe_id_depracated(sql_dict, ri_id)
+        
         recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
         
         headline_recipe = ''
