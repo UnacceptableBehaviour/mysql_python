@@ -204,7 +204,7 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 #                  - ingredients, yield & servings
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name):    
+def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name):    
     recipe_info = {}
     recipies_and_subcomponents = []
         
@@ -245,16 +245,19 @@ def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
 #                 [1, '125g', '(0)', 'grapes'],
 #                 [1, '200g', '(4)', 'tangerines'],
 #                 [1, '55g', '(0)', 'dates'],
-#                 [1, '8g', '(0)', 'coriander'],
+#   atomic >-------1, '8g', '(0)', 'coriander'],
 #                 [1, '8g', '(0)', 'mint'],
 #                 [1, '4g', '(0)', 'chillies'],
-#   sub_comp >    [0, '45g', '(0)', 'pear and vanilla reduction lite'],
+#   sub_comp >-----0, '45g', '(0)', 'pear and vanilla reduction lite'],
 #                 [1, '2g', '(0)', 'salt'],
 #                 [1, '2g', '(0)', 'black pepper'],
 #                 [1, '30g', '(0)', 'flaked almonds']],
 #  'ri_name': 'cauliflower california',
 #  'atomic' : 0
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# scans through the list of ingredients looking for subcompnents
+# marks with atomic (index 0) with a 0 to indicate a subcomponent
+# then recurive calls on that subcompnent to process its ingredients
 def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient):
 
     recipe_dict['atomic'] = 0    
@@ -282,9 +285,9 @@ def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredien
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, headline_recipe_name):
+def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcomponents, headline_recipe_name):
     
-    print("== ENTER: mark_ingredients_as_atomic_or_subcompnents -      -      -      -      -      -     |")
+    print("== ENTER: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -     |")
     # find headline (recipe_name) recipe in list
     for i1, rcp in enumerate(recipies_and_subcomponents):
         print(f"r_&_sc: {rcp['ri_name']} <")
@@ -294,20 +297,54 @@ def mark_ingredients_as_atomic_or_subcompnents(recipies_and_subcomponents, headl
 
 
                     
-    print("== EXIT: mark_ingredients_as_atomic_or_subcompnents -      -      -      -      -      -      |")
+    print("== EXIT: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -      |")
     # if so call this function again passing in the subcomponent as the head
+
+
+
+def is_recipe_in_nutrion_database(ri_name):
+    return None
+
+def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row=''):
+    
+    db_id = int(sql_row['ri_id']) * 100
+        
+    for i, r in enumerate(components):
+        db_id += 1
+        #print(f"merging:{r['ri_name']}")
+        #pprint(sql_row)
+        
+        nutri_dict = is_recipe_in_nutrion_database(r['ri_name'])
+                
+        # merge data from relevant source
+        if nutri_dict:
+            components[i] = {**r, **nutri_dict}            
+        
+        elif r['ri_name'] == sql_row['ri_name']:            
+            components[i] = {**r, **sql_row}
+            
+        else:
+            print(f">{r['ri_name']}< NOT PRESENT IN Nutrient Database * * *")
+        
+        components[i]['ri_id'] = db_id
+        #pprint(components[i])
+        #print(f"merged:{r['ri_name']} ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^")
+        
+            
+    return components   # redundant?
+
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # creates recipe dictionaries based on the csv column headers
 # and ingredients in the text files
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def create_list_of_recipe_and_components_for_recipe_id(sql_row):
+def create_list_of_recipes_and_components_from_recipe_id(sql_row):
         
     recipe_text_filename = sql_row['text_file']
     recipe_name = sql_row['ri_name']
     
-    components = get_recipe_ingredients_and_yields_for_file(recipe_text_filename, recipe_name)
+    components = get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name)
 
     print(f"LIST:{type(components)} - - - - - - - - - - - - - - B E F O R E <*|*>")
     
@@ -319,9 +356,22 @@ def create_list_of_recipe_and_components_for_recipe_id(sql_row):
     print(f" - - 'ri_name's - - ")
     
     print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <S")
-    mark_ingredients_as_atomic_or_subcompnents(components, recipe_name)
+    mark_ingredients_as_subcomponents_or_leave_as_atomic(components, recipe_name)
     print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
     
+    
+    print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
+    
+    for r in components:
+        print("r in components - - - - - - < S ")
+        pprint(r)
+        print("r in components - - - - - - < E ")
+
+    print(f" - - 'ri_name's - - ")
+
+    print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <S {len(components)}")
+    merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row)
+    print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
     
     print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
     
@@ -343,11 +393,11 @@ def create_list_of_recipe_and_components_for_recipe_id(sql_row):
 
 # creates recipe dictionaries based on the csv column headers
 # and ingredients in the text files
-def create_list_of_recipe_and_components_for_recipe_id_depracated(sql_dict, ri_id):
+def create_list_of_recipes_and_components_from_recipe_id_depracated(sql_dict, ri_id):
     
     components = []
     
-    components.append( create_recipe_info_dictionary(sql_dict, ri_id) )
+    components.append( merge_csv_nutrition_and_ingredient_from_text_recipe_into_dictionary(sql_dict, ri_id) )
     
     return components
 
@@ -382,7 +432,7 @@ def get_recipe_ingredients_and_yield(recipe_text_filename, recipe_name):
     
     return recipe_info
 
-def create_recipe_info_dictionary(sql_dict, ri_id):
+def merge_csv_nutrition_and_ingredient_from_text_recipe_into_dictionary(sql_dict, ri_id):
     
     info = sql_dict[ri_id]                  # 
     
@@ -411,7 +461,7 @@ def create_recipe_info_dictionary(sql_dict, ri_id):
         print(f"\n>------------------------------ MERGED < E")          
         
     except Exception as e:
-        log_exception(f"create_recipe_info_dictionary: {ri_id}", e)        
+        log_exception(f"merge_csv_nutrition_and_ingredient_from_text_recipe_into_dictionary: {ri_id}", e)        
         
     finally:
         print(f"createD recipe_info_dictionary: {ri_id}") 
