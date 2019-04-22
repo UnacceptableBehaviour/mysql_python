@@ -414,17 +414,27 @@ def inc_recipe_counter(max_id):
 
 
 
-
-
+def qty_to_float(qty):
+    qty = qty.lower().replace('ml','g')      # QUICK HACK to GET POC - CUE DENSITY POLICE
+    qty = round( float( qty.replace('g','') ), 2)
+    return qty
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # scans through the list of ingredients looking for subcomponents
 # retrive ingredients and add them to headline recipe
 # then recurive calls on that subcompnent to process its ingredients
-def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_list):
-    print("== ADD SUBC_BITS < < S")
-    pprint(recipe_dict)
-    print("== ADD SUBC_BITS < < E")
+def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_list, qty=0):
+    
+    if qty == 0:
+        qty = qty_to_float( recipe_dict['yield'] )      # if passing in a recipe with no qty assume making 1 of them
+        
+    multiplier = (qty / qty_to_float( recipe_dict['yield'] ))
+
+    # print("== ADD SUBC_BITS < < S")
+    # pprint(recipe_dict)
+    # print(f"mult {multiplier}")
+    # print(f"qty {qty}")        
+    # print("== ADD SUBC_BITS < < E")
     
     # iterate through its ingredients and looking for subcomponents
     for i, ingredient in enumerate(recipe_dict['ingredients']):        
@@ -432,11 +442,11 @@ def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_l
         recipe_is_a_subcomponent = ingredient_in_recipe_list(ingredient, recipies_and_subcomponents)
     
         if recipe_is_a_subcomponent:        # found a subcomponent
-            add_subcomponents_ingredients(recipies_and_subcomponents, recipe_is_a_subcomponent, new_list)
+            add_subcomponents_ingredients(recipies_and_subcomponents, recipe_is_a_subcomponent, new_list, qty_to_float(ingredient[QTY_IN_G_INDEX]) )
             #print(f"\t\t\tend of SC --< {recipe_is_a_subcomponent['ri_name']}")            
             
         else:
-            new_list = update_ingredients_list(new_list, ingredient)
+            new_list = update_ingredients_list(new_list, ingredient, multiplier)
 
     return
 
@@ -446,23 +456,25 @@ def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_l
  #                 [1, '60g', '(0)', 'carrots'],
  #                 [1, '2g', '(0)', 'aromat'],
  #                 [1, '10g', '(0)', 'spring onion'],
-def update_ingredients_list(master, new_item):
-    # print(f"\n-\nmaster class:{type(master)}")
-    # pprint(master)
-    # print(f"new_item class:{type(new_item)}")
-    # pprint(new_item)
-    # print(f"new_item class:{type(new_item)}\n-\n")
+def update_ingredients_list(master, new_item, multiplier):
     
-
-    # all ingredients in g - remove
+    # all ingredients in g - remove    
+    qty = qty_to_float( new_item[QTY_IN_G_INDEX] ) * multiplier
     
-    qty = new_item[QTY_IN_G_INDEX].lower().replace('ml','g')      # QUICK HACK to GET POC - CUE DENSITY POLICE
-    qty = round( float( qty.replace('g','') ), 2)
     ingredient = new_item[INGREDIENT_INDEX]
+    
     if ingredient in master:
         master[ingredient] += qty
     else:
         master[ingredient] = qty        
+
+    # print(f"\n-\nmaster class:{type(master)}")
+    # pprint(master)
+    # print(f"new_item class:{type(new_item)}")
+    # pprint(new_item)
+    # print(f"mult {multiplier}")
+    # print(f"qty {qty}")    
+    # print(f"new_item class:{type(new_item)}\n-\n")
     
     return master
     
@@ -491,6 +503,24 @@ def explode_ingredients_in_recipe(recipies_and_subcomponents, headline_recipe_na
             print("== E X P L O D I N G:  ------------new_list------------<S")
             pprint(new_ingredients)
             print("== E X P L O D I N G:  ------------new_list------------<E")
+            
+            #pprint(new_ingredients.first())
+            
+            # construct ingredients list: i_dict = { 'ingredients' : [] }
+            i_list = []            
+            
+            for build_ingredients, qty in new_ingredients.items():
+                i_list.append([1, f"{round(qty,2)}g", '(0)', build_ingredients])
+            
+            #pprint(i_list)
+            
+            recipies_and_subcomponents[i]['ingredients'] = i_list
+            #print(recipies_and_subcomponents) #['ingredients'] = i_list
+            print(f"i: {i}")
+            
+            print("== EXPL HEADLINE EXPLODED < < S")
+            pprint(recipies_and_subcomponents[i])
+            print("== EXPL HEADLINE EXPLODED < < E")            
                     
     print("== E X P L O D I N G:  explode_ingredients_in_recipe      -      -      -      -      -      -     |E")
 

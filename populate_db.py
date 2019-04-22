@@ -244,21 +244,24 @@ def main():
     
     print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
     
+    r_no = 7
+    
     for entry in sql_dict:
-        if int(entry) != 13:
-            continue
+        #if int(entry) != r_no:
+        #    continue
 
         sql_row = sql_dict[entry]    
                 
         exploded = create_exploded_recipe(sql_row)
-        
-        if int(entry) == 13:
-            break
-        
+                
         #print(f"> > > > E X P L O D  E D: {exploded['ri_name']} {type(exploded)} <    <    <    <    <    <    <    <    <     *")        
-        #pprint(exploded)
-        #for recipe in recipes_from_id:
-        #    create_entry_in_db(db, 'recipes', recipe)
+        pprint(exploded)
+        
+        #if int(entry) == r_no:
+        #    break
+        
+        for ex_rcp in exploded:
+            create_entry_in_db(db, 'exploded', ex_rcp )
 
 
 if __name__ == '__main__':
