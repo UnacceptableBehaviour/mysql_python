@@ -5,6 +5,7 @@
 import csv
 import itertools
 import re
+import copy                 # copy.deepcopy()
 from pathlib import Path
 
 from pprint import pprint # giza a look
@@ -18,6 +19,7 @@ import urllib.request
 
 # indexes for ingredients row
 ATOMIC_INDEX = 0                    # default value is 1 - TRUE
+QTY_IN_G_INDEX = 1
 SERVING_INDEX = 2
 INGREDIENT_INDEX = 3
 
@@ -291,11 +293,10 @@ def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcompone
     # find headline (recipe_name) recipe in list
     for i1, rcp in enumerate(recipies_and_subcomponents):
         print(f"r_&_sc: {rcp['ri_name']} <")
+        
         # look for headline recipe and start there
         if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
             mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[i1], headline_recipe_name)
-
-
                     
     print("== EXIT: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -      |")
     # if so call this function again passing in the subcomponent as the head
@@ -329,9 +330,6 @@ def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql
         components[i]['ri_id'] = db_id
         #pprint(components[i])
         #print(f"merged:{r['ri_name']} ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^")
-        
-            
-    return components   # redundant?
 
 
 
@@ -414,6 +412,106 @@ def inc_recipe_counter(max_id):
     return count
 
 
+
+
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# scans through the list of ingredients looking for subcomponents
+# retrive ingredients and add them to headline recipe
+# then recurive calls on that subcompnent to process its ingredients
+def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_list):
+    print("== ADD SUBC_BITS < < S")
+    pprint(recipe_dict)
+    print("== ADD SUBC_BITS < < E")
+    
+    # iterate through its ingredients and looking for subcomponents
+    for i, ingredient in enumerate(recipe_dict['ingredients']):        
+        
+        recipe_is_a_subcomponent = ingredient_in_recipe_list(ingredient, recipies_and_subcomponents)
+    
+        if recipe_is_a_subcomponent:        # found a subcomponent
+            add_subcomponents_ingredients(recipies_and_subcomponents, recipe_is_a_subcomponent, new_list)
+            #print(f"\t\t\tend of SC --< {recipe_is_a_subcomponent['ri_name']}")            
+            
+        else:
+            new_list = update_ingredients_list(new_list, ingredient)
+
+    return
+
+
+ # 'ingredients': [[1, '70g', '(0)', 'roast brisket'],
+ #                 [1, '20g', '(0)', 'green pepper'],
+ #                 [1, '60g', '(0)', 'carrots'],
+ #                 [1, '2g', '(0)', 'aromat'],
+ #                 [1, '10g', '(0)', 'spring onion'],
+def update_ingredients_list(master, new_item):
+    # print(f"\n-\nmaster class:{type(master)}")
+    # pprint(master)
+    # print(f"new_item class:{type(new_item)}")
+    # pprint(new_item)
+    # print(f"new_item class:{type(new_item)}\n-\n")
+    
+
+    # all ingredients in g - remove
+    
+    qty = new_item[QTY_IN_G_INDEX].lower().replace('ml','g')      # QUICK HACK to GET POC - CUE DENSITY POLICE
+    qty = round( float( qty.replace('g','') ), 2)
+    ingredient = new_item[INGREDIENT_INDEX]
+    if ingredient in master:
+        master[ingredient] += qty
+    else:
+        master[ingredient] = qty        
+    
+    return master
+    
+    
+                
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def explode_ingredients_in_recipe(recipies_and_subcomponents, headline_recipe_name):
+    
+    print("== E X P L O D I N G:  explode_ingredients_in_recipe      -      -      -      -      -      -     |S - - - - - -")
+    # find headline (recipe_name) recipe in list
+    for i, rcp in enumerate(recipies_and_subcomponents):
+        
+        # look for headline recipe and start there
+        if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
+            #new_ingredients = copy.deepcopy(recipies_and_subcomponents[i]['ingredients'])
+            #pprint(new_ingredients)
+            new_ingredients = {}
+            print("== EXPL HEADLINE < < S")
+            pprint(recipies_and_subcomponents[i])
+            print("== EXPL HEADLINE < < E")
+            
+            add_subcomponents_ingredients(recipies_and_subcomponents, recipies_and_subcomponents[i], new_ingredients)
+            print("== E X P L O D I N G:  ------------new_list------------<S")
+            pprint(new_ingredients)
+            print("== E X P L O D I N G:  ------------new_list------------<E")
+                    
+    print("== E X P L O D I N G:  explode_ingredients_in_recipe      -      -      -      -      -      -     |E")
+
+
+def create_exploded_recipe(sql_row):
+    recipe_text_filename = sql_row['text_file']
+    recipe_name = sql_row['ri_name']
+        
+    print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - S")
+
+    components = get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name)
+
+    mark_ingredients_as_subcomponents_or_leave_as_atomic(components, recipe_name)
+    
+    explode_ingredients_in_recipe(components, recipe_name)
+
+    merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row)
+
+    print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - E")
+
+    return components
 
     
 if __name__ == '__main__':

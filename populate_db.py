@@ -28,7 +28,7 @@ print("----- list.py -----------------------------------------------------------
 
 # from helpers import get_csv_from_server_as_disctionary, inc_recipe_counter, log_exception, create_list_of_recipes_and_components_from_recipe_id
 
-from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary
+from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
 
 
 # Relative '.' import only works if it's inside a package being imported
@@ -177,13 +177,18 @@ def main():
     #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine 
     
     # create recipes table
-    sql_t_recipes_file = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_table_def.sql'    
-    db_lines = create_table_in_database_from_sql_template(db, sql_t_recipes_file)        
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_table_def.sql'    
+    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
+    print(db_lines)
+
+    # create exploded recipes table
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_exploded_table_def.sql'
+    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
     
     # create ingredients table
-    sql_t_atomic_i_file = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/atomic_ingredients_table_def.sql'
-    db_lines = create_table_in_database_from_sql_template(db, sql_t_atomic_i_file)        
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/atomic_ingredients_table_def.sql'
+    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
 
     formatted_text = "\n"
@@ -203,27 +208,25 @@ def main():
     sql_dict = get_csv_from_server_as_disctionary(url_file)
 
     print(sql_dict.__class__.__name__)
-    
-    info = {}
 
-    for entry in sql_dict:
-        print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
-        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")
-        
-        pprint(sql_dict[entry])
-        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
-        
-        sql_row = sql_dict[entry]
-        
-        ri_id = int(sql_row['ri_id'])
-        
-        print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
-        pprint(sql_row)
-        # create list of recipes (headline & sub components) to add into database
-        
-        recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
-        
-        headline_recipe = ''
+    # for entry in sql_dict:
+    #     print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
+    #     print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")
+    #     
+    #     pprint(sql_dict[entry])
+    #     print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
+    #     
+    #     sql_row = sql_dict[entry]
+    #     
+    #     #ri_id = int(sql_row['ri_id'])
+    #     
+    #     print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
+    #     pprint(sql_row)
+    #     # create list of recipes (headline & sub components) to add into database
+    #     
+    #     recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
+    #     
+    #     headline_recipe = ''
         
         # for recipe in recipes_from_id:
         #     if 'ri_id' in recipe:                                  # create an empty dictionary - make more robust
@@ -231,15 +234,31 @@ def main():
         #             headline_recipe = recipe
         #             break
             
-        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
-        pprint(headline_recipe)
-        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
+        #print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
+        #pprint(headline_recipe)
+        #print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
         
         # should put some exception handling around this    
-        for recipe in recipes_from_id:
-            create_entry_in_db(db, 'recipes', recipe)
+        #for recipe in recipes_from_id:
+        #    create_entry_in_db(db, 'recipes', recipe)
     
+    print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
     
+    for entry in sql_dict:
+        if int(entry) != 13:
+            continue
+
+        sql_row = sql_dict[entry]    
+                
+        exploded = create_exploded_recipe(sql_row)
+        
+        if int(entry) == 13:
+            break
+        
+        #print(f"> > > > E X P L O D  E D: {exploded['ri_name']} {type(exploded)} <    <    <    <    <    <    <    <    <     *")        
+        #pprint(exploded)
+        #for recipe in recipes_from_id:
+        #    create_entry_in_db(db, 'recipes', recipe)
 
 
 if __name__ == '__main__':
