@@ -1,0 +1,34 @@
+{% block content %}
+<div>    
+    <!-- if re-writing in JS . . ?
+    <script>      
+      var info_t = {{ info|tojson }};                       // convert info using tojson filter      
+      console.log(`recipe_t JS ${info_t['ri_name']} - inline CONCLUDED`);  // sanity check      
+    </script>
+    -->
+       
+    {% if recipe_image != '' %}
+      <img id='recipe_image' src="http://192.168.0.8:8000/static/recipe/{{info['image_file']}}">
+    {% else %}
+      <img id='recipe_image' src="http://192.168.0.8:8000/static/recipe/awesome_sauce_landing_page_QR_code.png">
+    {% endif %}
+    
+    <h2>{{ info['ri_name'] }}</h2>    
+    
+    <h3>Ingredients</h3>
+    
+    <table>
+        {% for tuple in info['ingredients'] %}
+        <tr>
+            <!--td>{{tuple[0]}}</td-->
+            <td>{{tuple[1]}}</td>
+            <td>{{tuple[2]}}</td>
+            <td>{{tuple[3]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+                
+    {% include 'nutrient_traffic_lights.html' %}
+    
+</div>
+{% endblock %}

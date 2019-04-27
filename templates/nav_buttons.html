@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
         <title>Picker Integration</title>
         <style>
-            #bt_gallery, #bt_home, #bt_nutes {
+            #bt_gallery, #bt_home, #bt_nutes, #bt_db_recipe {
                 background-color: #8BCE51
             }
         </style>
@@ -25,11 +25,11 @@
     <body>
 
         <button id='bt_home'>
-            <a href="{{url_for('hello_world')}}">HOME</a>
+            <a href="{{url_for('db_hello_world')}}">HOME</a>
         </button>
 
         <button id='bt_gallery'>
-            <a href="{{url_for('gallery')}}">GALLERY</a>
+            <a href="{{url_for('db_gallery')}}">GALLERY</a>
         </button>
 
         <button>
@@ -55,12 +55,12 @@
         </button>
 
         <button id='bt_nutes'>
-            <a href="{{url_for('nutrients')}}">Nutrient Table</a>
+            <a href="{{url_for('db_nutrients')}}">Nutrient Table</a>
         </button>
 
 
-        <button>
-            <a href="{{url_for('button_7')}}">RECIPE</a>
+        <button id='bt_db_recipe'>
+            <a href="{{url_for('db_recipe_page')}}">RECIPE</a>
         </button>
 
         {% block content %}

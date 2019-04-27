@@ -3,6 +3,10 @@
 from flask import Flask, render_template, request
 app = Flask(__name__)
 
+# dev remove
+from helpers import get_csv_from_server_as_disctionary #, create_recipe_info_dictionary
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -25,7 +29,7 @@ db = scoped_session(sessionmaker(bind=engine))
 # run 'populate_db.py'
 # each app.route is an endpoint
 @app.route('/')
-def hello_world():
+def db_hello_world():
     # execute this query
     # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
     db_lines = db.execute("SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';").fetchall()
@@ -46,8 +50,8 @@ def hello_world():
     #return f"Processed Query:<br>{formatted_text} <br>END"
 
 
-@app.route('/gallery')
-def gallery():
+@app.route('/db_gallery')
+def db_gallery():
     # execute this query
     # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
     
@@ -99,8 +103,8 @@ def button_4():
 def button_5():    
     return render_template('data_return.html', lines=[f"BUTTON 5"])
 
-@app.route('/nutrients', methods=["GET", "POST"])
-def nutrients():    
+@app.route('/db_nutrients', methods=["GET", "POST"])
+def db_nutrients():    
     headline_py = 'Nutrients from PostgreSQL'
     info = {}   # test undefined
     #  // struct / JSON
@@ -151,6 +155,61 @@ def nutrients():
     #return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=info)
     return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=nutrients)
     #return render_template('data_return.html', lines=[f"BUTTON 7"])
+
+
+@app.route('/db_recipe_page')
+def db_recipe_page():
+
+    sql_dict = get_csv_from_server_as_disctionary()    
+    # ri_id = 23
+    # updated_info = create_recipe_info_dictionary(sql_dict, 23)
+    # 
+    headline_py = f"Recipe Page"
+
+    updated_info = {}   # test undefined
+    #  // struct / JSON
+    # updated_info = {
+    #   'ri_id': 6,
+    #   'ri_name': 'Light Apricot Cous Cous',
+    #   'n_En': 154.0,
+    #   'n_Fa': 3.12,
+    #   'n_Fs': 1.33,
+    #   'n_Su': 2.93,
+    #   'n_Sa': 0.58,
+    #   'serving_size': 190.0
+    #   'ingredients' : ['10g', 'chicken stock cube'], ['20g', '(2)', 'cherry tomatoes'], ['10g', 'spring onion'], ['1g', 'coriander'], ['274g', 'water']]
+    # };
+    
+    #info = get_nutrients_per_serving()
+    fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size', 'ingredients', 'image_file']    
+    qry_string = ', '.join(fields)
+    ri_id = 3301
+
+    #db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
+    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = 3301;").fetchall()
+    
+    for line in db_lines:
+        rcp = {}        
+        for index, content in enumerate(line):
+            #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
+            type_string = str(type(content))
+    
+            if type_string == "<class 'decimal.Decimal'>":                
+                rcp[fields[index]] = round(float(content),2)
+    
+            else:
+                rcp[fields[index]] = content
+    
+        updated_info = rcp
+    
+    pprint(db_lines)
+        
+    recipes = []
+        
+    #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)
+    #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)
+    return render_template("recipe_page.html", headline=headline_py, info=updated_info)
+
 
 @app.route('/buton_7', methods=["GET", "POST"])
 def button_7():    

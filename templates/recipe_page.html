@@ -1,0 +1,11 @@
+{% extends 'nav_buttons.html' %}
+
+{% block content %}
+
+    {% include 'recipe_t.html' %}
+    
+    <br>
+
+    <p>{{ info['ri_id'] }} : {{ info['ri_name'] }} - Serving size {{ info['serving_size'] }}g </p>
+
+{% endblock %}
