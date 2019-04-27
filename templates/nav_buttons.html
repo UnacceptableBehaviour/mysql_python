@@ -12,13 +12,24 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
         <title>Picker Integration</title>
+        <style>
+            #bt_gallery, #bt_home, #bt_nutes {
+                background-color: #8BCE51
+            }
+        </style>
+        {% block header %}
+        {% endblock%}
 
     </head>
 
     <body>
 
-        <button>
+        <button id='bt_home'>
             <a href="{{url_for('hello_world')}}">HOME</a>
+        </button>
+
+        <button id='bt_gallery'>
+            <a href="{{url_for('gallery')}}">GALLERY</a>
         </button>
 
         <button>
@@ -43,8 +54,8 @@
             <a href="{{url_for('button_5')}}">Add Ingredients</a>
         </button>
 
-        <button>
-            <a href="{{url_for('button_6')}}">Nutrient Table</a>
+        <button id='bt_nutes'>
+            <a href="{{url_for('nutrients')}}">Nutrient Table</a>
         </button>
 
 

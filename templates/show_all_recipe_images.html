@@ -1,0 +1,21 @@
+{% extends 'nav_buttons.html' %}
+{% block header %}
+<link rel="stylesheet" href="{{ url_for( 'static', filename='gallery.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container"> 
+    {% for recipe in recipes %}
+    
+    <p>{{ recipe['ri_id'] }} - {{ recipe['ri_name'] }} - {{ recipe['image_file'] }}</p>
+    <div class="gallery_image">
+        
+        <image src="http://192.168.0.8:8000/static/recipe/{{ recipe['image_file'] }}">
+    </div>
+    <br>
+    {% endfor %}
+</div>
+
+{% endblock %}
+

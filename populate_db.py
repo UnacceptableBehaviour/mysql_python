@@ -71,7 +71,7 @@ db = scoped_session(sessionmaker(bind=engine))
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
 
-#population_data = subprocess.check_output(['populate_asset_server.rb'])
+population_data = subprocess.check_output(['populate_asset_server.rb'])
 print('COMMENTED OUT - NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <')
 
 #pprint(population_data)

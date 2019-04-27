@@ -1,0 +1,23 @@
+
+<style>
+            
+    .container {
+        background-color: black;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center
+    }
+    
+    .container > div {
+        background-color: black;
+        font-size: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: auto;
+        margin-top: auto;
+        padding:  3px;
+        width:  280;
+        align-content: center;
+    }
+    
+</style>
