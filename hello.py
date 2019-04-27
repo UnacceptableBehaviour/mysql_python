@@ -99,74 +99,51 @@ def button_4():
 def button_5():    
     return render_template('data_return.html', lines=[f"BUTTON 5"])
 
-@app.route('/buton_6', methods=["GET", "POST"])
+@app.route('/nutrients', methods=["GET", "POST"])
 def nutrients():    
     headline_py = 'Nutrients from PostgreSQL'
     info = {}   # test undefined
     #  // struct / JSON
-    nutrients = {
-      'ri_id': 6,
-      'ri_name': 'Light Apricot Cous Cous',
-      'n_En': 154.0,
-      'n_Fa': 3.12,
-      'n_Fs': 1.33,
-      'n_Su': 2.93,
-      'n_Sa': 0.58,
-      'serving_size': 190.0
-    };
+    # nutrients = {
+    #   'ri_id': 6,
+    #   'ri_name': 'Light Apricot Cous Cous',
+    #   'n_En': 154.0,
+    #   'n_Fa': 3.12,
+    #   'n_Fs': 1.33,
+    #   'n_Su': 2.93,
+    #   'n_Sa': 0.58,
+    #   'serving_size': 190.0
+    # };
     
     #info = get_nutrients_per_serving()
     fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
     qry_string = ', '.join(fields)
 
-    #db_lines = db.execute("SELECT ri_id, ri_name, image_file FROM exploded WHERE image_file <> '';").fetchall()
     db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
         
     recipes = []
-    
-    
+        
     for line in db_lines:
         rcp = {}        
         for index, content in enumerate(line):
-            print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )
-            
+            #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
             type_string = str(type(content))
 
-            if type_string == "<class 'decimal.Decimal'>":
-                
+            if type_string == "<class 'decimal.Decimal'>":                
                 rcp[fields[index]] = round(float(content),2)
-
-                # print("--WTF-------------")
-                # bl = (type_string == "<class 'decimal.Decimal'>")
-                # pprint(bl)
-                # print("^-bool-^")
-                # pprint(type_string)
-                # pprint("<class 'decimal.Decimal'>")
-                # pprint(str(type(content)))
-                # pprint(type(content))
-                # pprint(content)
-                # pprint(str(content))
-                # pprint(int(content))
-                # pprint(round(float(content),2))
-                # print("--WTF-------------")
 
             else:
                 rcp[fields[index]] = content
 
-                #print(f"GP-X{content} - {str(type(content))} - TS:{type_string}")
-
-
-
-
-        print( f"\nQRY Line{line}" )                    
         nutrients = rcp
-        pprint(nutrients)
-        print("----------------------^^")
-
         recipes.append(rcp)
+        
+        #print( f"\nQRY Line{line}" )                    
+        #pprint(nutrients)
+        #print("----------------------^^")
 
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(recipes)
+    pprint(recipes[4])
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
     
 
