@@ -18,6 +18,11 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 import re
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# to UPDATE ASSET SERVER and postgreSQL DB with current assets
+# run 'populate_db.py'
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # default
 #engine = db.create_engine('dialect+driver://user:pass@host:port/db')
 #engine = create_engine('mysql://root:meepmeep@localhost:3306/nutridb_sr25_sanitized')
@@ -25,8 +30,7 @@ engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # dat
 db = scoped_session(sessionmaker(bind=engine))
 
 
-# to update asset server and postgreSQL db with current assets
-# run 'populate_db.py'
+
 # each app.route is an endpoint
 @app.route('/')
 def db_hello_world():
@@ -222,7 +226,7 @@ if __name__ == '__main__':
     # https://pythonprogramminglanguage.com/flask-hello-world/
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-    app.run(host='0.0.0.0', port=50001)
+    app.run(host='0.0.0.0', port=50015)
     
     # Note for deployment:
     # http://flask.pocoo.org/docs/1.0/deploying/#deployment
