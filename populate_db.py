@@ -71,7 +71,7 @@ db = scoped_session(sessionmaker(bind=engine))
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
 
-population_data = subprocess.check_output(['populate_asset_server.rb'])
+#population_data = subprocess.check_output(['populate_asset_server.rb'])
 print('COMMENTED OUT - NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <')
 
 #pprint(population_data)
@@ -167,6 +167,18 @@ def create_table_in_database_from_sql_template(data_base, template_file):
     return(db_lines)
 
 
+def drop_tables_for_fresh_start(data_base, tables):
+        
+    for table in tables:
+        sql_command = f"DROP TABLE IF EXISTS {table};"
+        
+        print(f"SQL cmd: {sql_command} <")
+
+        data_base.execute(sql_command)    
+        data_base.commit()
+    
+    return
+
 
 def main():
     # execute this query
@@ -174,7 +186,14 @@ def main():
     #db_lines = db.execute("SELECT ndb_no, nutr_no, nutr_val, deriv_cd FROM nutrientdata ORDER BY nutr_val LIMIT 10;").fetchall()    
     #db_lines = db.execute("SELECT * FROM INFORMATION_SCHEMA.TABLES").fetchall()
     #db_lines = db.execute("SHOW TABLES").fetchall() #msyql    
-    #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine 
+    #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine
+    
+    force_complete_rebuid = True #False
+    
+    if (force_complete_rebuid == True):
+        # DROP TABLES
+        drop_tables_for_fresh_start(db, ['recipes','exploded','atomic_ingredients'])
+    
     
     # create recipes table
     sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_table_def.sql'    

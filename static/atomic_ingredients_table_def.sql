@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS atomic_ingredients (
   serving_size DECIMAL(9,2) DEFAULT NULL,
   atomic BOOLEAN DEFAULT TRUE,
 
+  allergens       VARCHAR(150) ARRAY,
+  tags            VARCHAR(150) ARRAY,
+  user_tags       VARCHAR(150) ARRAY,  
+  
   image_file VARCHAR(100) DEFAULT NULL,
   text_file VARCHAR(100) DEFAULT NULL,
   external_data_ref VARCHAR(150) ARRAY,

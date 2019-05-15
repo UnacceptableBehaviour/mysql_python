@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS recipes (
   atomic  BOOLEAN DEFAULT FALSE,
   
   ingredients     VARCHAR(150) ARRAY,
+  allergens       VARCHAR(150) ARRAY,
+  tags            VARCHAR(150) ARRAY,
+  user_tags       VARCHAR(150) ARRAY,
 
   image_file VARCHAR(100) DEFAULT NULL,
   text_file VARCHAR(100) DEFAULT NULL,
