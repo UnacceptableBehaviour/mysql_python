@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+# Quick note on generating a call graph - darwin / osx
+	# $ pip install pycallgraph
+	# $ brew install graphviz
+	# $ pycallgraph --include "helpers.*" graphviz -- ./populate_db.py
+	# # http://pycallgraph.slowchop.com/en/master/guide/command_line_usage.html
+
 # helper functions
 
 import csv
@@ -87,6 +93,9 @@ def log_exception(message, exception):
 
 def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt'):
     recipe_info = None    
+    
+    # allergens & tags below recipe
+    # ^-+- for the chicken beetroot w broccoli and greens \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)tags:(.*?)$
     
     match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
@@ -198,7 +207,12 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
     return recipe_text
 
 
-    
+# (^-+- for the.*?Total \(.*?\)).*?(allergens:.*?tags:.*?$)* NO
+# (^-+- for the.*?Total) \(.*?\) RECIPE
+# ((^-+- for the.*?Total) \(.*?\)).*?(allergens:.*?$.*?tags:.*?$)   RECIPE w/ allergens following
+# ((^-+- for the.*?Total) \(.*?\)).*?((allergens:(.*?)$.*?tags:(.*?)$)) RECIPE capture allergens & tags
+# (^-+- for the.*?(tags:.*?$))  simplified RECIPE w tags
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # load a text file from asset server
@@ -206,16 +220,47 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 #                  - ingredients, yield & servings
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name):    
+def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name):
+    recipe_without_tags = {}
     recipe_info = {}
     recipies_and_subcomponents = []
         
-    recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
+    orig_recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
+    print("------------------------------------------------------------ ORIGINAL --------")
+    print("------------------------------------------------------------------------------")
+    print(orig_recipe_text)
+    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")    
+    
+    # create list of recipes - these have optionally listed tags: & allergens: fields
+    for m in re.finditer( r'(^-+- for the (.*?) \(.*?Total \(.*?\))', orig_recipe_text, re.MULTILINE | re.DOTALL ):    
+        recipe_without_tags[m.group(2)] = m.group(1)
+
+    # add optionally listed tags: & allergens: fields to recipes found
+    recipe_title = ''
+    for line in iter(orig_recipe_text.splitlines()):
+        print(f"L: {line}")
+        # check for start of recipe
+        m = re.match( r'(^-+- for the (.*?) \()', line)
+        if m:
+            recipe_title = m.group(2)
+            print(f"RECORDING R:{recipe_title} <")
+            continue
         
-    # pull relevant item from a multi component recipe
-    # scan through templatyes in the recipe
-    for m in re.finditer( r'(^-+- for the.*?Total \(.*?\))', recipe_text, re.MULTILINE | re.DOTALL ):
-        recipe_text = m.group(1)
+        m = re.match( r'((^tags:)|(^allergens:))', line)
+        if m:
+            recipe_without_tags[recipe_title] += f"\n{line}"
+            print(f"APPENDED R:{recipe_title} < {line}")
+        
+    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==E")
+    
+    pprint(recipe_without_tags)    
+    
+    # for key in dict.iterkeys(): ...
+    # for value in dict.itervalues(): ...
+    # for key, value in dict.iteritems(): ...
+    #
+    # recipe_without_tags now has tags!
+    for title, recipe_text in recipe_without_tags.items():
         print(recipe_text)
         
         # create a dictionary for each recipe / subcoponent        
@@ -224,8 +269,10 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
         # collect components together and return a list of recipes
         recipies_and_subcomponents.append(recipe_info)
     
-    return recipies_and_subcomponents
+    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==EE")
 
+    
+    return recipies_and_subcomponents
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -451,11 +498,7 @@ def add_subcomponents_ingredients(recipies_and_subcomponents, recipe_dict, new_l
     return
 
 
- # 'ingredients': [[1, '70g', '(0)', 'roast brisket'],
- #                 [1, '20g', '(0)', 'green pepper'],
- #                 [1, '60g', '(0)', 'carrots'],
- #                 [1, '2g', '(0)', 'aromat'],
- #                 [1, '10g', '(0)', 'spring onion'],
+
 def update_ingredients_list(master, new_item, multiplier):
     
     # all ingredients in g - remove    
@@ -541,16 +584,17 @@ def create_exploded_recipe(sql_row):
 
     print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - E")
 
+    # this shoul return top level component only! Rest is polution.
     return components
 
     
 if __name__ == '__main__':
-    print("-----  get CSV ------------------------------------S")
-    fetch_file = 'http://192.168.0.8:8000/static/sql_recipe_data.csv'
-    get_csv_from_server_as_disctionary(fetch_file)
-    print("-----  get CSV ------------------------------------E")
+    # print("-----  get CSV ------------------------------------S")
+    # fetch_file = 'http://192.168.0.8:8000/static/sql_recipe_data.csv'
+    # get_csv_from_server_as_disctionary(fetch_file)
+    # print("-----  get CSV ------------------------------------E")
 
-    recipe_text = '20190228_163410_monkfish and red pepper skewers.txt'
+    recipe_text = '20190103_170558_chicken beetroot w broccoli and greens.txt'
     #recipe_text = '20190109_143622_crabcakes.txt'
     #urllib.request = 'http://192.168.0.8:8000/static/recipe/20190109_143622_crabcakes.txt'
-    get_recipe_ingredients_and_yield(recipe_text,'crabcakes')
+    get_recipe_ingredients_and_yields_from_file_test(recipe_text,'chicken beetroot w broccoli and greens')

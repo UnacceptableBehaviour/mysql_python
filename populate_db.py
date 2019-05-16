@@ -210,64 +210,59 @@ def main():
     db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
 
-    formatted_text = "\n"
-    
-    # for line in db_lines:
-    #     #print(f" | {line.ndb_no} | {line.nutr_no} | {line.nutr_val} | {line.deriv_cd} | ")
-    #     #formatted_text = formatted_text + f" | {line.ndb_no} | {line.nutr_no} | {line.nutr_val} | {line.deriv_cd} | \n"
-    #     print(line)
-    # 
-    # print(f"\n\nProcess Query {formatted_text}")
-    #     
-    # print(f"\n\nHello World > {engine} <")
 
     # http-server -p 8000 --cors
-    url_file = 'http://192.168.0.8:8000/static/sql_recipe_data.csv'
+    # url_file = 'http://192.168.0.8:8000/static/sql_recipe_data.csv'
+    url_file = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'
     
     sql_dict = get_csv_from_server_as_disctionary(url_file)
 
     print(sql_dict.__class__.__name__)
 
-    # for entry in sql_dict:
-    #     print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
-    #     print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")
-    #     
-    #     pprint(sql_dict[entry])
-    #     print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
-    #     
-    #     sql_row = sql_dict[entry]
-    #     
-    #     #ri_id = int(sql_row['ri_id'])
-    #     
-    #     print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
-    #     pprint(sql_row)
-    #     # create list of recipes (headline & sub components) to add into database
-    #     
-    #     recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
-    #     
-    #     headline_recipe = ''
-        
-        # for recipe in recipes_from_id:
-        #     if 'ri_id' in recipe:                                  # create an empty dictionary - make more robust
-        #         if int(recipe['ri_id']) == ri_id:
-        #             headline_recipe = recipe
-        #             break
-            
-        #print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
-        #pprint(headline_recipe)
-        #print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
-        
-        # should put some exception handling around this    
-        #for recipe in recipes_from_id:
-        #    create_entry_in_db(db, 'recipes', recipe)
-    
-    print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
-    
-    r_no = 7
-    
+
+
+    #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
+    #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
+    # go through the CSV file of rows of recipes - parse and load data 
     for entry in sql_dict:
-        #if int(entry) != r_no:
-        #    continue
+        print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
+        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")        
+        pprint(sql_dict[entry])
+        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
+        
+        sql_row = sql_dict[entry]
+        
+        ri_id = int(sql_row['ri_id'])   # TOP level / master recipe ID - the ID in the CSV row!
+        
+        print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
+        pprint(sql_row)
+        # create list of recipes (headline & sub components) to add into database
+        
+        recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
+        
+        headline_recipe = ''
+        
+        for recipe in recipes_from_id:
+            if 'ri_id' in recipe:                            # create an empty dictionary - make more robust
+                if int(recipe['ri_id']) == ri_id:
+                    headline_recipe = recipe
+                    break
+            
+        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
+        pprint(headline_recipe)
+        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
+        
+        #should put some exception handling around this    
+        for recipe in recipes_from_id:
+           create_entry_in_db(db, 'recipes', recipe)
+
+    
+    #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
+    #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
+    print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
+    #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
+
+    for entry in sql_dict:
 
         sql_row = sql_dict[entry]    
                 
@@ -275,9 +270,6 @@ def main():
                 
         #print(f"> > > > E X P L O D  E D: {exploded['ri_name']} {type(exploded)} <    <    <    <    <    <    <    <    <     *")        
         pprint(exploded)
-        
-        #if int(entry) == r_no:
-        #    break
         
         for ex_rcp in exploded:
             create_entry_in_db(db, 'exploded', ex_rcp )
