@@ -1,5 +1,34 @@
 #! /usr/bin/env python
 
+
+
+# add profiling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
+# for globbing filter - include / exclude sections of call graph to focus
+from pycallgraph import Config
+from pycallgraph import GlobbingFilter
+
+config = Config(max_depth=4)
+config.trace_filter = GlobbingFilter(
+exclude=[
+     'urllib.*',
+#     'pprint.*',
+#     'http.*',
+#     #'pycallgraph.*',
+#     #'*.secret_function',
+],
+include=[
+#    '*',
+    'helpers.*',
+    'populate_db.*',
+])
+
+# profiling output into PNG format image - not searchable
+graphviz = GraphvizOutput(output_file='filter_A.png')
+# add profiling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 # loads csv file from server and loads into database LIVE
 
 # refresh the asset server with any new data
@@ -68,18 +97,22 @@ print("----- list.py -----------------------------------------------------------
 engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
 #engine = create_engine('postgresql://simon:@localhost:5432/simon')  # database name different 
 db = scoped_session(sessionmaker(bind=engine))
+pprint(engine)
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
 
-#population_data = subprocess.check_output(['populate_asset_server.rb'])
-print('COMMENTED OUT - NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <')
+force_complete_rebuid = True #False
 
-#pprint(population_data)
-pprint(engine)
+if ( force_complete_rebuid == True ):
+    population_data = subprocess.check_output(['populate_asset_server.rb'])
+    print(population_data)
+else:
+    print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuid = False')
+
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - E")
 
-
+# insert array of arrays
 def create_sql_insert_ingredients_array_text(ingredients):
     # '{    {"0", "250", "(0)", "cheese"},          # 0 - atomic
     #       {"0", "110", "(0)", "rice"},
@@ -105,11 +138,28 @@ def create_sql_insert_ingredients_array_text(ingredients):
     return sql_insert
 
 
+# insert array of strings
+def create_sql_insert_tags_array_text(tags):
+    # '{"veggie", "beef", "s&c", "fish"}'
+    
+    sql_insert = "'{"
+    
+    for tag in tags:
+        sql_insert = sql_insert + f'"{tag}", '
+            
+    sql_insert = sql_insert.rstrip(', ')             # remove trainling comma
+    sql_insert = sql_insert + "}', "                 # close SQL array parenthesis    
+    
+    return sql_insert
+
+
 def create_entry_in_db(db, table, entry):
 
     print(f"----- list.py: create_entry_in_db ------------------------------------------------------------ ")
     print(f"----- table:{table} <> recipe: {entry['ri_name']} -------------------------------------------- ")
     print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
+    print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
+    print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
     
     sql_string = f"INSERT INTO {table}"
     fields = "("
@@ -132,9 +182,16 @@ def create_entry_in_db(db, table, entry):
             data = data + ingredients_insert_text
             pprint(entry[header])
             print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
+        
         elif header == 'yield':
             print(f"{header} is a NUMBER in g")            
             data = data + f"{entry[header].rstrip('g')}, "
+        
+        elif header == 'allergens' or header == 'tags':
+            print(f"{header} is a LIST of tags / strings")
+            tag_to_insert = create_sql_insert_tags_array_text(entry[header])
+            data = data + tag_to_insert
+            
         else:
             print(f"{header} is a STRING")
             data = data + f"'{entry[header]}', "
@@ -188,9 +245,9 @@ def main():
     #db_lines = db.execute("SHOW TABLES").fetchall() #msyql    
     #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine
     
-    force_complete_rebuid = True #False
+    force_drop_tables = True # False
     
-    if (force_complete_rebuid == True):
+    if (force_drop_tables == True or force_complete_rebuid == True):
         # DROP TABLES
         drop_tables_for_fresh_start(db, ['recipes','exploded','atomic_ingredients'])
     
@@ -277,3 +334,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # with PyCallGraph(output=graphviz, config=config):
+    #     main()

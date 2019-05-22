@@ -91,29 +91,58 @@ def log_exception(message, exception):
 
 
 
+# (^-+- for the.*?Total \(.*?\)).*?(allergens:.*?tags:.*?$)* NO
+# (^-+- for the.*?Total) \(.*?\) RECIPE
+# ((^-+- for the.*?Total) \(.*?\)).*?(allergens:.*?$.*?tags:.*?$)   RECIPE w/ allergens following
+# ((^-+- for the.*?Total) \(.*?\)).*?((allergens:(.*?)$.*?tags:(.*?)$)) RECIPE capture allergens & tags
+# (^-+- for the.*?(tags:.*?$))  simplified RECIPE w tags
+
 def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt'):
     recipe_info = None    
     
-    # allergens & tags below recipe
-    # ^-+- for the chicken beetroot w broccoli and greens \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)tags:(.*?)$
+    # REGEX: allergens & tags below recipe
+    # ^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)$.*?tags:(.*?)$
+    #ant_regex = re.compile(r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)$.*?tags:(.*?)$')
     
-    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
+    # REGEX: recipe 
+    # ^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)
+    #recipe_regex = re.compile(r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)')
+        
+    #ant_regex.search( recipe_text, re.MULTILINE | re.DOTALL )
+    #match = ant_regex
+    
+    
+    # try 'allergens & tags below recipe' match first since 'recipe' will match both
+    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)$.*?tags:(.*?)$', recipe_text, re.MULTILINE | re.DOTALL )
+    we_have_tags = True
+    
+    if (match == None):
+        match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
+        we_have_tags = False
+        #recipe_regex.search( recipe_text, re.MULTILINE | re.DOTALL )
+        #match = recipe_regex
+
+    #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
         # Matches
         # 1 - name
         # 2 - servings
         # 3 - ingredients
         # 4 - yield
-        #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
+        # 5 - allergens
+        # 6 - tags
         
         # easy to detect failure in the data
         recipe_info = {
             'ri_name':"Initialised as NO MATCH",
             'ingredients':"Pure green",
+            'allergens': [ 'none_listed' ],
+            'tags': [ 'none_listed' ],
             'servings': 0,
             'yield': '0g'
         }
-    
+        #recipe_info['allergens'] = [ 'none_listed' ]
+        #recipe_info['tags'] = [ 'none_listed' ]
         recipe_info['ri_name'] = match.group(1).strip()
         recipe_info['servings'] = match.group(2).strip()
         recipe_info['yield'] = match.group(4).strip()
@@ -143,13 +172,27 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             
             if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)                
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
+
         
+        # create tag & allergens entries, populate them if they exist
+        if we_have_tags:            
+            recipe_info['allergens'] = [ a.strip() for a in match.group(5).strip().rstrip(",").split(',') ]    # create list of strings
+            recipe_info['tags'] = [ a.strip() for a in match.group(6).strip().rstrip(",").split(',') ]                
+
+        # TODO remove after schema redisgn
+        if recipe_info['allergens'][0] == "":
+            recipe_info['allergens'] = [ 'none_listed' ]
+        if recipe_info['tags'][0] == "":
+            recipe_info['tags'] = [ 'none_listed' ]        
+
         
         print(f"NAME: {match.group(1).strip()}")
         print(f"SERVINGS: ({match.group(2).strip()})")
         print(f"INGREDIENTS:\n")
         pprint(i_list)
         print(f"YIELD: {match.group(4).strip()}")
+        print(f"ALLERGENS: {' '.join(recipe_info['allergens'])}")
+        print(f"TAGS: {' '.join(recipe_info['tags'])}")
         
         recipe_info['ingredients'] = i_list
         
@@ -207,11 +250,6 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
     return recipe_text
 
 
-# (^-+- for the.*?Total \(.*?\)).*?(allergens:.*?tags:.*?$)* NO
-# (^-+- for the.*?Total) \(.*?\) RECIPE
-# ((^-+- for the.*?Total) \(.*?\)).*?(allergens:.*?$.*?tags:.*?$)   RECIPE w/ allergens following
-# ((^-+- for the.*?Total) \(.*?\)).*?((allergens:(.*?)$.*?tags:(.*?)$)) RECIPE capture allergens & tags
-# (^-+- for the.*?(tags:.*?$))  simplified RECIPE w tags
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -228,14 +266,18 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
     orig_recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
     print("------------------------------------------------------------ ORIGINAL --------")
     print("------------------------------------------------------------------------------")
+    # this text may have multiple components, only one of which might have tags!
     print(orig_recipe_text)
     print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")    
     
     # create list of recipes - these have optionally listed tags: & allergens: fields
     for m in re.finditer( r'(^-+- for the (.*?) \(.*?Total \(.*?\))', orig_recipe_text, re.MULTILINE | re.DOTALL ):    
         recipe_without_tags[m.group(2)] = m.group(1)
+        #                    name         whole component / recipe
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     # add optionally listed tags: & allergens: fields to recipes found
+    # go through recipe line by aline and pull out tags & allergens
     recipe_title = ''
     for line in iter(orig_recipe_text.splitlines()):
         print(f"L: {line}")
@@ -337,8 +379,10 @@ def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredien
 def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcomponents, headline_recipe_name):
     
     print("== ENTER: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -     |")
+    pprint(recipies_and_subcomponents)
+    
     # find headline (recipe_name) recipe in list
-    for i1, rcp in enumerate(recipies_and_subcomponents):
+    for i1, rcp in enumerate(recipies_and_subcomponents):                
         print(f"r_&_sc: {rcp['ri_name']} <")
         
         # look for headline recipe and start there
