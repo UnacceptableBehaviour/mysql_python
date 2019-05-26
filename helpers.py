@@ -631,6 +631,31 @@ def create_exploded_recipe(sql_row):
     # this shoul return top level component only! Rest is polution.
     return components
 
+
+def get_nutirents_for_redipe_id(db, ri_id):
+
+    fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
+    qry_string = ', '.join(fields)
+
+    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE ri_id={ri_id};").fetchall()
+    
+    # dont need this for single ID since all info on one query line
+    for line in db_lines:
+        rcp = {}        
+        for index, content in enumerate(line):
+            print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
+            type_string = str(type(content))
+
+            if type_string == "<class 'decimal.Decimal'>":                
+                rcp[fields[index]] = round(float(content),2)
+
+            else:
+                rcp[fields[index]] = content
+
+        nutrients = rcp
+
+    return nutrients
+
     
 if __name__ == '__main__':
     # print("-----  get CSV ------------------------------------S")

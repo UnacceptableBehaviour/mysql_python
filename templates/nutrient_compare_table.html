@@ -1,0 +1,135 @@
+<body>
+  <script>      
+    var info_t0 = {{ info_0|tojson }};       // convert info using tojson filter      
+    console.log(`recipe_t JS ${info_t0['ri_name']} - inline CONCLUDED`);  // sanity check      
+    var info_t1 = {{ info_1|tojson }};      // convert info using tojson filter      
+    console.log(`recipe_t JS ${info_t1['ri_name']} - inline CONCLUDED`);  // sanity check    
+  </script>
+
+  
+  <!--<div class="container">-->
+    <div id="nutri_taffic_table_main_compare" class="card card-body">  
+      <table class='nutri_taffic_table_compare' style="text-align:center;" >
+          <tr>              
+              <td id='traffic_title_0' colspan="3">left . . </td>
+              <td id='traffic_title_m'></td>
+              <td id='traffic_title_1' colspan="3">right . . </td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_en_0" id="t_energy_ri_0">YY%</td>
+              <td class="t_lgt_en_0" id="t_energy_hml_0">XX</td>
+              <td class="t_lgt_en_0" id="t_energy_qty_0">QTY</td>
+              <td class="t_lgt_en_m" id='t_energy_ttl'>ENERGY</td>
+              <td class="t_lgt_en_1" id="t_energy_qty_1">QTY</td>
+              <td class="t_lgt_en_1" id="t_energy_hml_1">XX</td>
+              <td class="t_lgt_en_1" id="t_energy_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_fa_0" id="t_fat_ri_0">YY%</td>
+              <td class="t_lgt_fa_0" id="t_fat_hml_0">XX</td>
+              <td class="t_lgt_fa_0" id="t_fat_qty_0">QTY</td>
+              <td class="t_lgt_fa_m" id='t_fat_ttl'>FAT</td>
+              <td class="t_lgt_fa_1" id="t_fat_qty_1">QTY</td>
+              <td class="t_lgt_fa_1" id="t_fat_hml_1">XX</td>
+              <td class="t_lgt_fa_1" id="t_fat_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_fs_0" id="t_saturates_ri_0">YY%</td>
+              <td class="t_lgt_fs_0" id="t_saturates_hml_0">XX</td>
+              <td class="t_lgt_fs_0" id="t_saturates_qty_0">QTY</td>
+              <td class="t_lgt_fs_m" id='t_saturates_ttl'>SATURATES</td>
+              <td class="t_lgt_fs_1" id="t_saturates_qty_1">QTY</td>
+              <td class="t_lgt_fs_1" id="t_saturates_hml_1">XX</td>
+              <td class="t_lgt_fs_1" id="t_saturates_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_su_0" id="t_sugars_ri_0">YY%</td>
+              <td class="t_lgt_su_0" id="t_sugars_hml_0">XX</td>
+              <td class="t_lgt_su_0" id="t_sugars_qty_0">QTY</td>
+              <td class="t_lgt_su_m" id='t_sugars_ttl'>SUGARS</td>
+              <td class="t_lgt_su_1" id="t_sugars_qty_1">QTY</td>
+              <td class="t_lgt_su_1" id="t_sugars_hml_1">XX</td>
+              <td class="t_lgt_su_1" id="t_sugars_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_sa_0" id="t_salt_ri_0">YY%</td>
+              <td class="t_lgt_sa_0" id="t_salt_hml_0">XX</td>
+              <td class="t_lgt_sa_0" id="t_salt_qty_0">QTY</td>
+              <td class="t_lgt_sa_m" id='t_salt_ttl'>SALT</td>
+              <td class="t_lgt_sa_1" id="t_salt_qty_1">QTY</td>
+              <td class="t_lgt_sa_1" id="t_salt_hml_1">XX</td>
+              <td class="t_lgt_sa_1" id="t_salt_ri_1">YY%</td>
+          </tr>
+      </table>
+      <div class="row">
+        <div class="col-lg-12">
+          <button id='b_spin_l' class="btn btn-secondary">SPIN</button>
+          <button id='b_spin_r' class="btn btn-secondary float-right">SPIN</button>
+        </div>
+      </div>
+    </div>
+  <!--</div> from <div class="container">-->
+
+  <div class="container">
+    <div id="nutri_taffic_table_main_compare" class="card card-body">  
+      <table class='nutri_taffic_table_compare' style="text-align:center;" >
+          <tr>              
+              <td id='traffic_title_0' colspan="3">left . . </td>
+              <td id='traffic_title_m'></td>
+              <td id='traffic_title_1' colspan="3">right . . </td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_en_0" id="t_energy_ri_0">YY%</td>
+              <td class="t_lgt_en_0" id="t_energy_hml_0">XX</td>
+              <td class="t_lgt_en_0" id="t_energy_qty_0">QTY</td>
+              <td class="t_lgt_en_m" id='t_energy_ttl'>ENERGY</td>
+              <td class="t_lgt_en_1" id="t_energy_qty_1">QTY</td>
+              <td class="t_lgt_en_1" id="t_energy_hml_1">XX</td>
+              <td class="t_lgt_en_1" id="t_energy_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_fa_0" id="t_fat_ri_0">YY%</td>
+              <td class="t_lgt_fa_0" id="t_fat_hml_0">XX</td>
+              <td class="t_lgt_fa_0" id="t_fat_qty_0">QTY</td>
+              <td class="t_lgt_fa_m" id='t_fat_ttl'>FAT</td>
+              <td class="t_lgt_fa_1" id="t_fat_qty_1">QTY</td>
+              <td class="t_lgt_fa_1" id="t_fat_hml_1">XX</td>
+              <td class="t_lgt_fa_1" id="t_fat_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_fs_0" id="t_saturates_ri_0">YY%</td>
+              <td class="t_lgt_fs_0" id="t_saturates_hml_0">XX</td>
+              <td class="t_lgt_fs_0" id="t_saturates_qty_0">QTY</td>
+              <td class="t_lgt_fs_m" id='t_saturates_ttl'>SATURATES</td>
+              <td class="t_lgt_fs_1" id="t_saturates_qty_1">QTY</td>
+              <td class="t_lgt_fs_1" id="t_saturates_hml_1">XX</td>
+              <td class="t_lgt_fs_1" id="t_saturates_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_su_0" id="t_sugars_ri_0">YY%</td>
+              <td class="t_lgt_su_0" id="t_sugars_hml_0">XX</td>
+              <td class="t_lgt_su_0" id="t_sugars_qty_0">QTY</td>
+              <td class="t_lgt_su_m" id='t_sugars_ttl'>SUGARS</td>
+              <td class="t_lgt_su_1" id="t_sugars_qty_1">QTY</td>
+              <td class="t_lgt_su_1" id="t_sugars_hml_1">XX</td>
+              <td class="t_lgt_su_1" id="t_sugars_ri_1">YY%</td>
+          </tr>
+          <tr class='nutr_type'>
+              <td class="t_lgt_sa_0" id="t_salt_ri_0">YY%</td>
+              <td class="t_lgt_sa_0" id="t_salt_hml_0">XX</td>
+              <td class="t_lgt_sa_0" id="t_salt_qty_0">QTY</td>
+              <td class="t_lgt_sa_m" id='t_salt_ttl'>SALT</td>
+              <td class="t_lgt_sa_1" id="t_salt_qty_1">QTY</td>
+              <td class="t_lgt_sa_1" id="t_salt_hml_1">XX</td>
+              <td class="t_lgt_sa_1" id="t_salt_ri_1">YY%</td>
+          </tr>
+      </table>
+      <div class="btn-group" id="compare_table_btns"> <!-- https://www.w3schools.com/bootstrap/bootstrap_button_groups.asp -->
+        <button id='b_update_0'>UPDATE</button>
+      </div>      
+    </div>
+  </div>
+
+  <script src='static/nutrient_traffic_lights_compare.js'></script>
+
+</body>

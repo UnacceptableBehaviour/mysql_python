@@ -1,38 +1,35 @@
 {% extends 'nav_buttons.html' %}
 {% block header %}
 
-<link rel="stylesheet" href="{{ url_for( 'static', filename='gallery.css') }}" >
-<script>  </script>
-<!--style>
-    .container {
-        background-color: black;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center
-    }
-    
-    .container > div {
-        background-color: black;
-        font-size: 20px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: auto;
-        margin-top: auto;
-        padding:  3px;
-        width:  280;
-        align-content: center;
-    }
-</style-->
+
+
 {% endblock %}
 
 {% block content %}
 
-<h2>boostrap - container wrap not working some CSS issue to fix!</h2>
+<h2>boostrap 4 - display recipes as cards</h2>
 
-<div class="container"> 
-    {% for recipe in recipes %}        
-    <div class="gallery_image"> <image src="http://192.168.0.8:8000/static/recipe/{{ recipe['image_file'] }}"> </div>
-    {% endfor %}
+<div class="container-fluid padding">
+    <div class="row padding">
+        <!--  -->
+        <!-- <div class="card-columns"> -->        
+        <!-- <div class="card-deck"> -->
+        <!-- <div class="card-group"> good way to compare recipes? -->
+        <div class="card-columns">
+            {% for recipe in recipes %}
+            <!-- <div class="col-md-12"> </div>-->
+                <!-- <div class="card" style="width:180px"> -->
+                <div class="card">
+                    <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipe['image_file']}}"></img>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe['ri_name'] }} <a href="#" class="btn btn-outline-secondary float-right">Show!</a> </h5>
+                        <p class="card-text">Description of theis lovely recipe - Learn how to prepare fish for sushi and for cooking. What to look for when selecting, fish types and appropriate cooking methods. Starting with a whole salmon and preparing it 5 ways.</p>                    
+                    </div>
+                </div>
+            
+            {% endfor %}            
+        </div>
+    </div>
 </div>
 
 {% endblock %}

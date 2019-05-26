@@ -4,7 +4,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 # dev remove
-from helpers import get_csv_from_server_as_disctionary #, create_recipe_info_dictionary
+from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
 
 
 from sqlalchemy import create_engine
@@ -159,6 +159,31 @@ def db_nutrients():
     #return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=info)
     return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=nutrients)
     #return render_template('data_return.html', lines=[f"BUTTON 7"])
+
+
+@app.route('/db_nutrients_compare')
+def db_nutrients_compare():
+    BEEF_BRISKET_BROTH = 3402
+    LEMON_GRASS_CHICKEN = 2001
+    
+    nutrients_0 = get_nutirents_for_redipe_id(db, BEEF_BRISKET_BROTH)
+    nutrients_1 = get_nutirents_for_redipe_id(db, LEMON_GRASS_CHICKEN)
+
+    # nutrients_0 = {
+    #   'ri_id': 6,
+    #   'ri_name': 'Light Apricot Cous Cous',
+    #   'n_En': 154.0,
+    #   'n_Fa': 3.12,
+    #   'n_Fs': 1.33,
+    #   'n_Su': 2.93,
+    #   'n_Sa': 0.58,
+    #   'serving_size': 190.0
+    # };
+        
+    headline_py = "Compare Nutrients"
+    return render_template("nutrient_compare_page.html", headline=headline_py, info_0=nutrients_0, info_1=nutrients_1)
+
+
 
 
 @app.route('/db_recipe_page')

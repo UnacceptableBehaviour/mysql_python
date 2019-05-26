@@ -44,18 +44,20 @@ function format_nutrition_table_column_colours(nut_qty, column, lower_threshold,
   
 }
 
-function fill_and_format_nutrients(nutrients){
+function fill_and_format_nutrients(nutrients_0, nutrients_1){
               
-  document.getElementById('traffic_title').textContent = `${nutrients.ri_name} - Nutrition per ${ Math.round(nutrients.serving_size) }g serving`;                        
+  document.getElementById('traffic_title_0').textContent = `Serving: ${ Math.round(nutrients_0.serving_size) }g`;
+  document.getElementById('traffic_title_1').textContent = `Serving: ${ Math.round(nutrients_1.serving_size) }g`;
   
-  const multiplier = parseFloat(nutrients.serving_size)/100.0  // EG x1.6 got a serving size of 160g
+  const multiplier = parseFloat(nutrients_0.serving_size)/100.0  // EG x1.6 got a serving size of 160g
+  const multiplier_0 = parseFloat(nutrients_0.serving_size)/100.0  // EG x1.6 got a serving size of 160g
+  const multiplier_1 = parseFloat(nutrients_1.serving_size)/100.0  // EG x1.6 got a serving size of 160g
   
   // lower & upper thresholds are per 100g
   // displayed numbers are numbers per serving!
   // there should be a liquids version of this too!
   // carbs ref = 260g
   // protein ref = 50g
-  // https://en.wikipedia.org/wiki/Reference_Daily_Intake
   var nut_cols = {
     n_En:{column_class: "t_lgt_en", lower:0, upper:5000, rda:2000, id_qty:'t_energy_qty', id_hml:'t_energy_hml', id_ri:'t_energy_ri'},
     n_Fa:{column_class: "t_lgt_fa", lower:3.0, upper:17.5, rda:70, id_qty:'t_fat_qty', id_hml:'t_fat_hml', id_ri:'t_fat_ri'},
@@ -63,22 +65,40 @@ function fill_and_format_nutrients(nutrients){
     n_Su:{column_class: "t_lgt_su", lower:5.0, upper:22.5, rda:90, id_qty:'t_sugars_qty', id_hml:'t_sugars_hml', id_ri:'t_sugars_ri'},
     n_Sa:{column_class: "t_lgt_sa", lower:0.3, upper:1.5, rda:6,   id_qty:'t_salt_qty', id_hml:'t_salt_hml', id_ri:'t_salt_ri'}
   };
-
+  
+  // code adapted from single table - need a reftactor
+  // fill in left table
   for (var col in nut_cols) {
     // nut_qty, column, lower_threshold, upper_threshold, rda, id_hml, id_ri
     console.log(col);              
-    console.log(`${col} nut_qty:${nutrients[col]} column_class:${nut_cols[col].column_class} lower:${nut_cols[col].lower} upper:${nut_cols[col].upper} rda:${nut_cols[col].rda} id_qty:${nut_cols[col].id_qty} id_hml:${nut_cols[col].id_hml} id_ri:${nut_cols[col].id_ri} `);              
-    format_nutrition_table_column_colours(nutrients[col],
-                                          nut_cols[col].column_class,
+    console.log(`${col} nut_qty:${nutrients_0[col]} column_class:${nut_cols[col].column_class} lower:${nut_cols[col].lower} upper:${nut_cols[col].upper} rda:${nut_cols[col].rda} id_qty:${nut_cols[col].id_qty} id_hml:${nut_cols[col].id_hml} id_ri:${nut_cols[col].id_ri} `);              
+    format_nutrition_table_column_colours(nutrients_0[col],
+                                          `${nut_cols[col].column_class}_0`,
                                           nut_cols[col].lower,
                                           nut_cols[col].upper,
                                           nut_cols[col].rda,
-                                          nut_cols[col].id_qty,
-                                          nut_cols[col].id_hml,
-                                          nut_cols[col].id_ri,
-                                          multiplier );
+                                          `${nut_cols[col].id_qty}_0`,
+                                          `${nut_cols[col].id_hml}_0`,
+                                          `${nut_cols[col].id_ri}_0`,
+                                          multiplier_0 );
   }
-
+  
+  // replace _0 with _1 - ooooh wiffy code!
+  for (var col in nut_cols) {
+    // nut_qty, column, lower_threshold, upper_threshold, rda, id_hml, id_ri
+    console.log(col);              
+    console.log(`${col} nut_qty:${nutrients_1[col]} column_class:${nut_cols[col].column_class} lower:${nut_cols[col].lower} upper:${nut_cols[col].upper} rda:${nut_cols[col].rda} id_qty:${nut_cols[col].id_qty} id_hml:${nut_cols[col].id_hml} id_ri:${nut_cols[col].id_ri} `);              
+    format_nutrition_table_column_colours(nutrients_1[col],
+                                          `${nut_cols[col].column_class}_1`,
+                                          nut_cols[col].lower,
+                                          nut_cols[col].upper,
+                                          nut_cols[col].rda,
+                                          `${nut_cols[col].id_qty}_1`,
+                                          `${nut_cols[col].id_hml}_1`,
+                                          `${nut_cols[col].id_ri}_1`,
+                                          multiplier_1 );
+  }
+  
 }
 
 
@@ -98,13 +118,14 @@ function fill_in_nutrients_table() {
   //};
   //fill_and_format_nutrients(nutrients);
   
-  fill_and_format_nutrients(info_t);      // info_t passed in through Jinja filter
+  fill_and_format_nutrients(info_t0, info_t1);      // info_t0 passed in through Jinja filter
   
   // make
 
 
   console.log('PAGE_LOADED:' + create_timestamp());    
-  display_template_params();
+  //display_template_params(0);
+  //display_template_params(1);
 }
 
 function create_timestamp(){
@@ -116,25 +137,41 @@ function create_timestamp(){
   return date_time;
 }
 
-function display_template_params(){
-  console.log("display_template_params: ");
-  console.log(`DATA FROM TEMPLATE - a: ${info_t['ri_id']}`);  
+function display_template_params(recipe_col){
+  console.log(`display_template_params: ${recipe_col}`);
+  
+  if (recipe_col === 0) {
 
-  for (var key in info_t) {
-    console.log(`${key} - ${info_t[key]}`);
+    console.log(`DATA FROM TEMPLATE - a: ${info_t0['ri_id']}`);  
+
+    for (var key in info_t0) {
+      console.log(`${key} - ${info_t0[key]}`);
+    }    
+
   }
 
+  if (recipe_col === 1) {
+
+    console.log(`DATA FROM TEMPLATE - a: ${info_t1['ri_id']}`);  
+
+    for (var key in info_t1) {
+      console.log(`${key} - ${info_t1[key]}`);
+    }    
+
+  }
+  
+  
 }
 
 // attach an event listener to nutrient table
-document.querySelector('#nutri_taffic_table_main').addEventListener('load', fill_in_nutrients_table);
+document.querySelector('#nutri_taffic_table_main_compare').addEventListener('load', fill_in_nutrients_table);
+
+// attach an event listener to the left button
+document.querySelector('#b_update_0').addEventListener('mousedown', display_template_params(0));
+
 
 // attach an event listener to the button
-document.querySelector('#b_update').addEventListener('mousedown', display_template_params);
-
-
-// attach an event listener to the button
-document.querySelector('#b_update').addEventListener('click', fill_in_nutrients_table);
+document.querySelector('#b_update_0').addEventListener('click', fill_in_nutrients_table);
 
 // create a button element (not yet inserted into DOM)
 var clear_button = document.createElement('button');
@@ -149,7 +186,9 @@ clear_button.appendChild(document.createTextNode('CLEAR TABLE'));
 //  <button id='b_update'>UPDATE</button>
 //</div>
 // select tag div class .btn-group     add node to DOM
-document.querySelector('div.btn-group').appendChild(clear_button);
+// document.querySelector('div.btn-group').appendChild(clear_button);
+document.querySelector('#compare_table_btns').appendChild(clear_button);
+
 
 // to put NEW button first
 //document.getElementById('b_update').insertBefore(clear_button);               // NO
@@ -214,7 +253,7 @@ function clear_table_colours(){
 
 ///////// 1
 // see if we have valid data and fire from here!
-//if (info_t['ri_id'] != undefined) {
+//if (info_t0['ri_id'] != undefined) {
 //  fill_in_nutrients_table();
 //}
 

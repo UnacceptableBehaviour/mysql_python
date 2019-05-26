@@ -1,23 +1,43 @@
 
 <style>
-            
-    .container {
-        background-color: black;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center
+
+.card-columns {
+    column-count: 5;
+}
+
+/*
+https://stackoverflow.com/questions/34140793/bootstrap-4-responsive-cards-in-card-columns
+@media (min-width: 34em) {
+    .card-columns {
+        -webkit-column-count: 2;
+        -moz-column-count: 2;
+        column-count: 2;
     }
-    
-    .container > div {
-        background-color: black;
-        font-size: 20px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: auto;
-        margin-top: auto;
-        padding:  3px;
-        width:  280;
-        align-content: center;
+}
+
+@media (min-width: 48em) {
+    .card-columns {
+        -webkit-column-count: 3;
+        -moz-column-count: 3;
+        column-count: 3;
     }
-    
+}
+
+@media (min-width: 62em) {
+    .card-columns {
+        -webkit-column-count: 4;
+        -moz-column-count: 4;
+        column-count: 4;
+    }
+}
+
+@media (min-width: 75em) {
+    .card-columns {
+        -webkit-column-count: 5;
+        -moz-column-count: 5;
+        column-count: 5;
+    }
+}
+*/
+
 </style>

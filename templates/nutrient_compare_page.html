@@ -1,0 +1,14 @@
+{% extends 'nav_buttons.html' %}
+
+{% block content %}
+
+    <h1>{{ headline }}</h1>
+
+    {% include 'nutrient_compare_table.html' %}
+    
+    <br>
+
+    <p>{{ info_0['ri_id'] }} : {{ info_0['ri_name'] }} - Serving size {{ info_0['serving_size'] }}g </p>
+    <p>{{ info_1['ri_id'] }} : {{ info_1['ri_name'] }} - Serving size {{ info_1['serving_size'] }}g </p>
+
+{% endblock %}
