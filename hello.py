@@ -186,8 +186,19 @@ def db_nutrients_compare():
 
 
 
-@app.route('/db_recipe_page')
+@app.route('/db_recipe_page', methods=["GET", "POST"])
 def db_recipe_page():
+    
+    incoming_dict = request.args.to_dict()
+    
+    if request.method =='GET':
+        print("GET                            - - - < db_recipe_page")
+        pprint(request.args.to_dict())        
+        
+    if request.method =='POST':
+        print("POST                            - - - < db_recipe_page")
+        pprint(request.args.to_dict())
+
 
     sql_dict = get_csv_from_server_as_disctionary()    
     # ri_id = 23
@@ -212,10 +223,10 @@ def db_recipe_page():
     #info = get_nutrients_per_serving()
     fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size', 'ingredients', 'image_file']    
     qry_string = ', '.join(fields)
-    ri_id = 3301
+    ri_id = 2601
 
     #db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
-    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = 3301;").fetchall()
+    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = {3301};").fetchall()
     
     for line in db_lines:
         rcp = {}        
