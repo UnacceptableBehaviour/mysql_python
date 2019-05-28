@@ -189,11 +189,15 @@ def db_nutrients_compare():
 @app.route('/db_recipe_page', methods=["GET", "POST"])
 def db_recipe_page():
     
+    ri_id = 2403 # loaded by GET below
+    
     incoming_dict = request.args.to_dict()
     
     if request.method =='GET':
-        print("GET                            - - - < db_recipe_page")
-        pprint(request.args.to_dict())        
+        print("GET                            - - - < db_recipe_page")        
+        pprint(incoming_dict)
+        if 'text' in incoming_dict:
+            ri_id = int(incoming_dict['text'])
         
     if request.method =='POST':
         print("POST                            - - - < db_recipe_page")
@@ -223,15 +227,20 @@ def db_recipe_page():
     #info = get_nutrients_per_serving()
     fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size', 'ingredients', 'image_file']    
     qry_string = ', '.join(fields)
-    ri_id = 2601
-
+    #ri_id = 2403 # loaded by GET
+    
+    #sql_query = f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = {ri_id};"
+    sql_query = f"SELECT {qry_string} FROM recipes WHERE image_file <> '' AND ri_id = {ri_id};"
+    #sql_query = f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_name LIKE '%crab cakes mango salsa%';"
+    
     #db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
-    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = {3301};").fetchall()
+    db_lines = db.execute(sql_query).fetchall()
     
     for line in db_lines:
         rcp = {}        
         for index, content in enumerate(line):
-            #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
+            #print( f"\n--->? QRY Line{line}\nT: {type(line)}" )
+            #print( f"\nC:{content} - {type(content)}<" )            
             type_string = str(type(content))
     
             if type_string == "<class 'decimal.Decimal'>":                
