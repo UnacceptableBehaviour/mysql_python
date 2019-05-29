@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-
+from helpers_db import get_gallery_info_for_display_as_list_of_dicts
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -204,56 +204,8 @@ def db_recipe_page():
         pprint(request.args.to_dict())
 
 
-    sql_dict = get_csv_from_server_as_disctionary()    
-    # ri_id = 23
-    # updated_info = create_recipe_info_dictionary(sql_dict, 23)
-    # 
-    headline_py = f"Recipe Page"
+    
 
-    updated_info = {}   # test undefined
-    #  // struct / JSON
-    # updated_info = {
-    #   'ri_id': 6,
-    #   'ri_name': 'Light Apricot Cous Cous',
-    #   'n_En': 154.0,
-    #   'n_Fa': 3.12,
-    #   'n_Fs': 1.33,
-    #   'n_Su': 2.93,
-    #   'n_Sa': 0.58,
-    #   'serving_size': 190.0
-    #   'ingredients' : ['10g', 'chicken stock cube'], ['20g', '(2)', 'cherry tomatoes'], ['10g', 'spring onion'], ['1g', 'coriander'], ['274g', 'water']]
-    # };
-    
-    #info = get_nutrients_per_serving()
-    fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size', 'ingredients', 'image_file']    
-    qry_string = ', '.join(fields)
-    #ri_id = 2403 # loaded by GET
-    
-    #sql_query = f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_id = {ri_id};"
-    sql_query = f"SELECT {qry_string} FROM recipes WHERE image_file <> '' AND ri_id = {ri_id};"
-    #sql_query = f"SELECT {qry_string} FROM exploded WHERE image_file <> '' AND ri_name LIKE '%crab cakes mango salsa%';"
-    
-    #db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
-    db_lines = db.execute(sql_query).fetchall()
-    
-    for line in db_lines:
-        rcp = {}        
-        for index, content in enumerate(line):
-            #print( f"\n--->? QRY Line{line}\nT: {type(line)}" )
-            #print( f"\nC:{content} - {type(content)}<" )            
-            type_string = str(type(content))
-    
-            if type_string == "<class 'decimal.Decimal'>":                
-                rcp[fields[index]] = round(float(content),2)
-    
-            else:
-                rcp[fields[index]] = content
-    
-        updated_info = rcp
-    
-    pprint(db_lines)
-        
-    recipes = []
         
     #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)
     #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)

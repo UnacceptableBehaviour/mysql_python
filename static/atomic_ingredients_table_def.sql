@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS atomic_ingredients (
   
   image_file VARCHAR(100) DEFAULT NULL,
   text_file VARCHAR(100) DEFAULT NULL,
+  ri_desc VARCHAR(500) DEFAULT NULL,
   external_data_ref VARCHAR(150) ARRAY,
   
   n_En DECIMAL(9,2) DEFAULT NULL,
