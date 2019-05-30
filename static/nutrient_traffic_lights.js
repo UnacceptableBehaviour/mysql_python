@@ -87,6 +87,7 @@ function fill_in_nutrients_table() {
 
   console.log('PAGE_LOADED _S: ' + create_timestamp());
   
+  // add name into the nutrinfo dictionary before passing
   recipes[0]['nutrinfo']['ri_name'] = recipes[0]['ri_name']
   
   display_template_params();

@@ -162,9 +162,11 @@ def db_recipe_page():
 
     headline_py = "single recipe page"
     
-    updated_info = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
     
-    return render_template("recipe_page.html", headline=headline_py, info=updated_info)
+    recipes = [recipe]
+    
+    return render_template("recipe_page.html", headline=headline_py, recipes=recipes)
 
 
 @app.route('/buton_7', methods=["GET", "POST"])
