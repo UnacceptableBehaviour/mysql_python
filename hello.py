@@ -5,8 +5,8 @@ app = Flask(__name__)
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
-
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts
+                       
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -97,56 +97,18 @@ def button_5():
 @app.route('/db_nutrients', methods=["GET", "POST"])
 def db_nutrients():    
     headline_py = 'Nutrients from PostgreSQL'
-    # info = {}   # test undefined
-    # #  // struct / JSON
-    # # nutrients = {
-    # #   'ri_id': 6,
-    # #   'ri_name': 'Light Apricot Cous Cous',
-    # #   'n_En': 154.0,
-    # #   'n_Fa': 3.12,
-    # #   'n_Fs': 1.33,
-    # #   'n_Su': 2.93,
-    # #   'n_Sa': 0.58,
-    # #   'serving_size': 190.0
-    # # };
-    # 
-    # #info = get_nutrients_per_serving()
-    # fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
-    # qry_string = ', '.join(fields)
-    # 
-    # db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
-    #     
-    # recipes = []
-    #     
-    # for line in db_lines:
-    #     rcp = {}        
-    #     for index, content in enumerate(line):
-    #         #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
-    #         type_string = str(type(content))
-    # 
-    #         if type_string == "<class 'decimal.Decimal'>":                
-    #             rcp[fields[index]] = round(float(content),2)
-    # 
-    #         else:
-    #             rcp[fields[index]] = content
-    # 
-    #     nutrients = rcp
-    #     recipes.append(rcp)
-    #     
-    #     #print( f"\nQRY Line{line}" )                    
-    #     #pprint(nutrients)
-    #     #print("----------------------^^")
     
     ri_id = 3301
 
     recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
 
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(recipe['nutrinfo'])
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+    recipes = [recipe]
+
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
+    pprint(recipes)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")    
     
-    return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=recipe['nutrinfo'])
-    
+    return render_template("nutrient_traffic_lights_page.html", headline=headline_py, recipes=recipes)
 
 
 @app.route('/db_nutrients_compare')
@@ -167,9 +129,16 @@ def db_nutrients_compare():
     #   'n_Sa': 0.58,
     #   'serving_size': 190.0
     # };
-        
-    headline_py = "Compare Nutrients"
-    return render_template("nutrient_compare_page.html", headline=headline_py, info_0=nutrients_0, info_1=nutrients_1)
+
+    recipes = get_recipes_for_display_as_list_of_dicts( [BEEF_BRISKET_BROTH, LEMON_GRASS_CHICKEN] )
+    
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
+    pprint(recipes)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+    
+    headline_py = "Compare Nutrients fetch from DB"
+    
+    return render_template("nutrient_compare_page.html", headline=headline_py, recipes=recipes)
 
 
 

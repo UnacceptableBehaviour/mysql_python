@@ -126,8 +126,8 @@ def return_recipe_dictionary():
             'yield': '0g',
             'units': 'g',
             'density': 1,            
-            'n_en':0, 'n_fa':0, 'n_fs':0, 'n_fm':0, 'n_fp':0, 'n_fo3':0, 'n_ca':0,
-            'n_su':0, 'n_fb':0, 'n_st':0, 'n_pr':0, 'n_sa':0, 'n_al':0
+            'n_En':0, 'n_Fa':0, 'n_Fs':0, 'n_Fm':0, 'n_Fp':0, 'n_Fo3':0, 'n_Ca':0,
+            'n_Su':0, 'n_Fb':0, 'n_St':0, 'n_Pr':0, 'n_Sa':0, 'n_Al':0
         },
 
         # components:   name, ingredients           Subcomponents & ingredients
@@ -142,7 +142,9 @@ def return_recipe_dictionary():
 #
 # re-design schema to get rid of arrays - this will do to learn HTML/CSS/JS for now
 #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # interface to DB
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
     
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------S:{ri_id}")
@@ -155,14 +157,13 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
     # components:   name, ingredients           Subcomponents & ingredients
     # tags:         tags, allergens, user_tags  Simplify classification
     # -
-    #nutrinfo_dict_keys = ['servings','serving_size','yield','units','density','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al']
     nutrinfo_dict_keys = [ k for k, v in updated_info['nutrinfo'].items() ]
     
     # query db - the index from fields is used to retrive and alocate data to correct dictionary entry - -
     if fields == None:
         fields = ['id','ri_id','ri_name','yield','units','servings','density','serving_size',
                   'atomic','ingredients','allergens','tags','user_tags','image_file','text_file',
-                  'n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al']
+                  'n_En','n_Fa','n_Fs','n_Fm','n_Fp','n_Fo3','n_Ca','n_Su','n_Fb','n_St','n_Pr','n_Sa','n_Al']
 
     qry_string = ', '.join(fields)
     
@@ -200,20 +201,26 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
     return updated_info
 
-
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# get more than one recipe, for comparison for example
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
     recipe_list = []
     
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
+        
         recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
+        
         print(f"got: {recipe['ri_name']}")
+        
         recipe_list.append( recipe )
 
     return recipe_list
 
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
     

@@ -1,9 +1,8 @@
 <body>
   <script>      
-    var info_t0 = {{ info_0|tojson }};       // convert info using tojson filter      
-    console.log(`recipe_t JS ${info_t0['ri_name']} - inline CONCLUDED`);  // sanity check      
-    var info_t1 = {{ info_1|tojson }};      // convert info using tojson filter      
-    console.log(`recipe_t JS ${info_t1['ri_name']} - inline CONCLUDED`);  // sanity check    
+    var recipes = {{ recipes|tojson }};       // convert info using tojson filter      
+    console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check      
+    console.log(`recipe_t JS ${recipes[1]['ri_name']} - inline CONCLUDED`);  // sanity check      
   </script>
 
   

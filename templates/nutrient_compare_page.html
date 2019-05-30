@@ -8,7 +8,7 @@
     
     <br>
 
-    <p>{{ info_0['ri_id'] }} : {{ info_0['ri_name'] }} - Serving size {{ info_0['serving_size'] }}g </p>
-    <p>{{ info_1['ri_id'] }} : {{ info_1['ri_name'] }} - Serving size {{ info_1['serving_size'] }}g </p>
+    <p>{{ recipes[0]['ri_id'] }} : {{ recipes[0]['ri_name'] }} - Serving size {{ recipes[0]['nutrinfo']['serving_size'] }}g </p>
+    <p>{{ recipes[1]['ri_id'] }} : {{ recipes[1]['ri_name'] }} - Serving size {{ recipes[1]['nutrinfo']['serving_size'] }}g </p>
 
 {% endblock %}

@@ -44,11 +44,11 @@ function format_nutrition_table_column_colours(nut_qty, column, lower_threshold,
   
 }
 
-function fill_and_format_nutrients(nutrients){
-              
-  document.getElementById('traffic_title').textContent = `${nutrients.ri_name} - Nutrition per ${ Math.round(nutrients.serving_size) }g serving`;                        
+function fill_and_format_nutrients(nutrients_0, nutrients_1=''){
+
+  document.getElementById('traffic_title').textContent = `${nutrients_0.ri_name} - Nutrition per ${ Math.round(nutrients_0.serving_size) }g serving`;                        
   
-  const multiplier = parseFloat(nutrients.serving_size)/100.0  // EG x1.6 got a serving size of 160g
+  const multiplier = parseFloat(nutrients_0.serving_size)/100.0  // EG x1.6 got a serving size of 160g
   
   // lower & upper thresholds are per 100g
   // displayed numbers are numbers per serving!
@@ -67,8 +67,8 @@ function fill_and_format_nutrients(nutrients){
   for (var col in nut_cols) {
     // nut_qty, column, lower_threshold, upper_threshold, rda, id_hml, id_ri
     console.log(col);              
-    console.log(`${col} nut_qty:${nutrients[col]} column_class:${nut_cols[col].column_class} lower:${nut_cols[col].lower} upper:${nut_cols[col].upper} rda:${nut_cols[col].rda} id_qty:${nut_cols[col].id_qty} id_hml:${nut_cols[col].id_hml} id_ri:${nut_cols[col].id_ri} `);              
-    format_nutrition_table_column_colours(nutrients[col],
+    console.log(`${col} nut_qty:${nutrients_0[col]} column_class:${nut_cols[col].column_class} lower:${nut_cols[col].lower} upper:${nut_cols[col].upper} rda:${nut_cols[col].rda} id_qty:${nut_cols[col].id_qty} id_hml:${nut_cols[col].id_hml} id_ri:${nut_cols[col].id_ri} `);              
+    format_nutrition_table_column_colours(nutrients_0[col],
                                           nut_cols[col].column_class,
                                           nut_cols[col].lower,
                                           nut_cols[col].upper,
@@ -84,27 +84,35 @@ function fill_and_format_nutrients(nutrients){
 
 // pass a nutrints object in to function and let the helpers to the rest!
 function fill_in_nutrients_table() {
+
+  console.log('PAGE_LOADED _S: ' + create_timestamp());
   
+  recipes[0]['nutrinfo']['ri_name'] = recipes[0]['ri_name']
+  
+  display_template_params();
+  
+  // list of recipes passed in - for a single table where concerned only with recipe[0]
   // struct / JSON
-  //nutrients = {
+  //recipe = {
   //  ri_id: 6,
   //  ri_name: 'Light Apricot Cous Cous',
-  //  n_En: 154.0,
-  //  n_Fa: 3.12,
-  //  n_Fs: 1.33,
-  //  n_Su: 2.93,
-  //  n_Sa: 0.58,
-  //  serving_size: 190.0
-  //};
-  //fill_and_format_nutrients(nutrients);
+  //  nutrients = {
+  //    n_En: 154.0,
+  //    n_Fa: 3.12,
+  //    n_Fs: 1.33,
+  //    n_Su: 2.93,
+  //    n_Sa: 0.58,
+  //    serving_size: 190.0
+  //  };
+  //}
+  //fill_and_format_nutrients(nutrients_0, recipe['ri_name']);
   
-  fill_and_format_nutrients(info_t);      // info_t passed in through Jinja filter
+  fill_and_format_nutrients(recipes[0]['nutrinfo']);      // recipes passed in through Jinja filter
   
   // make
 
 
-  console.log('PAGE_LOADED:' + create_timestamp());    
-  display_template_params();
+  console.log('PAGE_LOADED _E: ' + create_timestamp());  
 }
 
 function create_timestamp(){
@@ -117,14 +125,33 @@ function create_timestamp(){
 }
 
 function display_template_params(){
-  console.log("display_template_params: ");
-  console.log(`DATA FROM TEMPLATE - a: ${info_t['ri_id']}`);  
+  
+  console.log("display_template_params S: ");
+  console.log(`recipes.length: ${recipes.length} <`);
+  //console.log(`DATA FROM TEMPLATE - a: ${recipes[0]['ri_id']}`);  
 
-  for (var key in info_t) {
-    console.log(`${key} - ${info_t[key]}`);
+  if (recipes) {
+   
+    recipes.forEach( function(recipe){        
+
+        var str = JSON.stringify(recipe, null, 2);      
+
+        console.log(str);
+
+      }
+ 
+    );
+    
+  }
+  else {
+    console.log("recipes not valid");
   }
 
+  console.log("display_template_params E: ");
+
 }
+
+
 
 // attach an event listener to nutrient table
 document.querySelector('#nutri_taffic_table_main').addEventListener('load', fill_in_nutrients_table);
@@ -214,7 +241,7 @@ function clear_table_colours(){
 
 ///////// 1
 // see if we have valid data and fire from here!
-//if (info_t['ri_id'] != undefined) {
+//if (recipes[0]['ri_id'] != undefined) {
 //  fill_in_nutrients_table();
 //}
 
