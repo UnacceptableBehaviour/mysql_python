@@ -116,7 +116,7 @@ def return_recipe_dictionary():
         'ri_name':'none_listed',
         'image_file':'none_listed',
         'text_file':'none_listed',
-        'desc': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
+        'ri_desc': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
         'atomic': 1,
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
@@ -214,7 +214,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
     return recipe_list
 
 
-def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids):
+def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
     
     fields = ['ri_id', 'ri_name', 'image_file']
@@ -234,8 +234,14 @@ def get_ingredients_as_text_list(ri_id):
     
     return ingredients
     
+# get_next_page_recipe_ids()    
+def get_all_recipe_ids():
     
-
+    db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE image_file <> '';").fetchall()                
+    
+    ids = [ int( str(line).lstrip('(').rstrip(',)') )  for line in db_lines ]
+    
+    return ids
 
 
     
@@ -258,60 +264,3 @@ if __name__ == '__main__':
        print(f"-----  recipe: {r['ri_name']} ------------------------------------S")
     
     print("-----  get recipes in display format ------------------------------------E2")
-
-
-
-
-
-
-# def process_recipe_query_into_dict(qry_line=None):
-#     recipes = []
-#     ri_id = 2403 # test_ids = [1304,2403,402]
-#     
-#     print("----- QUERY: helper_db_class_db ------------------------------------S")
-#     updated_info = return_recipe_dictionary()
-#     #pprint(updated_info)
-#     
-#     # fields super sections
-#     # header:       name image desc             EG gallery
-#     # nutrinfo:     nurients, servings, etc     Traffic Lights & Nutrition    
-#     # components:   name, ingredients           Subcomponents & ingredients
-#     # tags:         tags, allergens, user_tags  Simplify classification
-#     # -
-#     #nutrinfo_dict_keys = ['servings','serving_size','yield','units','density','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al']
-#     nutrinfo_dict_keys = [ k for k, v in updated_info['nutrinfo'].items() ]
-#     
-#     fields = ['id','ri_id','ri_name','yield','units','servings','density','serving_size',
-#               'atomic','ingredients','allergens','tags','user_tags','image_file','text_file',
-#               'n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al']
-#     qry_string = ', '.join(fields)
-#     sql_query = f"SELECT {qry_string} FROM recipes WHERE image_file <> '' AND ri_id = {ri_id};"
-#     db_lines = helper_db_class_db.execute(sql_query).fetchall()
-#     pprint(db_lines)
-#     print("----- QUERY: helper_db_class_db ------------------------------------S")        
-#         
-#     for line in db_lines:
-#         rcp = {}        
-#         for index, content in enumerate(line):
-#             #print( f"\n--->? QRY Line{line}\nT: {type(line)}" )
-#             #print( f"\nC:{content} - {type(content)}<" )
-#             
-#             if content == None: continue            # leave defaults in place
-#             
-#             type_string = str(type(content))            
-#             
-#             if type_string == "<class 'decimal.Decimal'>":
-#                 # if has a nutrinfo key insert the index into the nutrinfo dict
-#                 if fields[index] in nutrinfo_dict_keys:
-#                     updated_info['nutrinfo'][fields[index]] = round(float(content),2)
-#                 else:
-#                     updated_info[fields[index]] = round(float(content),2)
-#     
-#             else:
-#                 # if has a nutrinfo key insert the index into the nutrinfo dict
-#                 if fields[index] in nutrinfo_dict_keys:
-#                     updated_info['nutrinfo'][fields[index]] = content
-#                 else:
-#                     updated_info[fields[index]] = content
-# 
-#     return updated_info

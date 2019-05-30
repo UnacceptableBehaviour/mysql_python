@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_gallery_info_for_display_as_list_of_dicts
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -59,23 +59,10 @@ def db_gallery():
     # execute this query
     # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
     
-    fields = ['ri_id', 'ri_name', 'image_file']
+    # do this in pages when larger db - use JS to reload
+    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
     
-    db_lines = db.execute("SELECT ri_id, ri_name, image_file FROM exploded WHERE image_file <> '';").fetchall()
-    #db_lines = db.execute("SELECT * FROM exploded WHERE image_file <> '';").fetchall()
-        
-    recipes = []
-    
-    for line in db_lines:
-        rcp = {}        
-        for index, content in enumerate(line):        
-            rcp[fields[index]] = content            
-
-        print( f"\nQRY Line{line}" )            
-        pprint(rcp)
-        print("----------------------^^")
-
-        recipes.append(rcp)
+    recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
 
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
     pprint(recipes)
@@ -110,55 +97,56 @@ def button_5():
 @app.route('/db_nutrients', methods=["GET", "POST"])
 def db_nutrients():    
     headline_py = 'Nutrients from PostgreSQL'
-    info = {}   # test undefined
-    #  // struct / JSON
-    # nutrients = {
-    #   'ri_id': 6,
-    #   'ri_name': 'Light Apricot Cous Cous',
-    #   'n_En': 154.0,
-    #   'n_Fa': 3.12,
-    #   'n_Fs': 1.33,
-    #   'n_Su': 2.93,
-    #   'n_Sa': 0.58,
-    #   'serving_size': 190.0
-    # };
+    # info = {}   # test undefined
+    # #  // struct / JSON
+    # # nutrients = {
+    # #   'ri_id': 6,
+    # #   'ri_name': 'Light Apricot Cous Cous',
+    # #   'n_En': 154.0,
+    # #   'n_Fa': 3.12,
+    # #   'n_Fs': 1.33,
+    # #   'n_Su': 2.93,
+    # #   'n_Sa': 0.58,
+    # #   'serving_size': 190.0
+    # # };
+    # 
+    # #info = get_nutrients_per_serving()
+    # fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
+    # qry_string = ', '.join(fields)
+    # 
+    # db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
+    #     
+    # recipes = []
+    #     
+    # for line in db_lines:
+    #     rcp = {}        
+    #     for index, content in enumerate(line):
+    #         #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
+    #         type_string = str(type(content))
+    # 
+    #         if type_string == "<class 'decimal.Decimal'>":                
+    #             rcp[fields[index]] = round(float(content),2)
+    # 
+    #         else:
+    #             rcp[fields[index]] = content
+    # 
+    #     nutrients = rcp
+    #     recipes.append(rcp)
+    #     
+    #     #print( f"\nQRY Line{line}" )                    
+    #     #pprint(nutrients)
+    #     #print("----------------------^^")
     
-    #info = get_nutrients_per_serving()
-    fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
-    qry_string = ', '.join(fields)
+    ri_id = 3301
 
-    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';").fetchall()
-        
-    recipes = []
-        
-    for line in db_lines:
-        rcp = {}        
-        for index, content in enumerate(line):
-            #print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )            
-            type_string = str(type(content))
-
-            if type_string == "<class 'decimal.Decimal'>":                
-                rcp[fields[index]] = round(float(content),2)
-
-            else:
-                rcp[fields[index]] = content
-
-        nutrients = rcp
-        recipes.append(rcp)
-        
-        #print( f"\nQRY Line{line}" )                    
-        #pprint(nutrients)
-        #print("----------------------^^")
+    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
 
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(recipes[4])
+    pprint(recipe['nutrinfo'])
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
     
-
+    return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=recipe['nutrinfo'])
     
-    #return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=info)
-    return render_template("nutrient_traffic_lights_page.html", headline=headline_py, info=nutrients)
-    #return render_template('data_return.html', lines=[f"BUTTON 7"])
 
 
 @app.route('/db_nutrients_compare')
@@ -203,12 +191,10 @@ def db_recipe_page():
         print("POST                            - - - < db_recipe_page")
         pprint(request.args.to_dict())
 
-
+    headline_py = "single recipe page"
     
-
-        
-    #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)
-    #return render_template("recipe_page.html", headline=headline_py, info=updated_info, image_dict=sql_dict)
+    updated_info = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    
     return render_template("recipe_page.html", headline=headline_py, info=updated_info)
 
 
