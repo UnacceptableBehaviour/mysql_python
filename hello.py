@@ -71,6 +71,68 @@ def db_gallery():
     #return render_template('data_return.html', lines=db_lines)
     return render_template('gallery.html', recipes=recipes)
 
+
+@app.route('/twonky_donuts', methods=["GET", "POST"])
+def buttons_inputs():
+    headline_py = "Sending data back . . ."
+    recipes = []
+    data = {}
+    rx = '*'
+    rxD = '*'
+    arr_get = ['A','B','C','D']
+    arr_post = ['L','M','N','O']
+        
+    incoming_dict = request.args.to_dict()          # for method=GET - contents of query string which is part of URL after question mark 
+    print(f">-----> requesting: {type(request)}")
+    pprint(incoming_dict)
+    
+    if request.method =='GET':
+        #rx = request.form["var_in_url_g"]
+        rx = request.form.get("var_in_url_g") # NO WORK - USE dictionary for GET - this for POST only?
+        
+        if 'var_in_url_g' in incoming_dict:
+            rxD = incoming_dict['var_in_url_g']
+        
+        bt_val = request.form.get("button_p")
+
+        for key, val in incoming_dict.items():
+            print(f"GET k: {key} - v: {val} <")
+            if re.match(r'btn_arr_', key):
+                print("MATCH")
+                data['button_keypad_GET'] = arr_get[int(val)]     # you can only press one button at a time!
+        
+        print(f"GET request.form.get: {rx}")
+        print(f"GET rxD = incoming_dict['var_in_url_p']: {rxD}")
+        print(f"GET request.form.get( button_g ): {bt_val}")
+        pprint(incoming_dict)
+
+
+    if request.method =='POST':
+        rx = request.form
+        
+        for key, val in request.form.items():
+            print(f"POST k: {key} - v: {val} <")
+            if re.match(r'btn_arr_', key):
+                print("MATCH")
+                data['button_keypad_POST'] = arr_post[int(val)]     # you can only press one button at a time!
+
+        #if 'var_in_url_p' in incoming_dict:         # use for GET
+        #    rxD = incoming_dict['var_in_url_p']
+        
+        bt_val = request.form.get("button_p")
+        
+        print(f"POST request.form: {type(rx)}")
+        print(f"POST request.form: {rx}")
+        print(f"POST rxD = incoming_dict['var_in_url_p']: {rxD}")
+        print(f"POST request.form.get( button_p ): {bt_val}")
+        pprint(incoming_dict)
+        
+    data['data'] = f"POST: {rx} - dict:{rxD}"
+    
+    print(f">-----> rendering: {data}")
+    
+    return render_template('buttons_and_inputs.html', headline=headline_py, data=data, recipes=recipes)
+
     
 @app.route('/buton_1', methods=["GET", "POST"])
 def button_1():
@@ -142,11 +204,17 @@ def db_nutrients_compare():
 
 
 
-
 @app.route('/db_recipe_page', methods=["GET", "POST"])
 def db_recipe_page():
     
-    ri_id = 2403 # loaded by GET below
+    if request.method =='POST':    
+        for key, val in request.form.items():
+            print(f"POST k: {key} - v: {val} <")
+            if re.match(r'gallery_button_', key):
+                ri_id = int(val)
+    
+    else:
+        ri_id = 2403 # loaded by GET below
     
     incoming_dict = request.args.to_dict()
     

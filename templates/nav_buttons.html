@@ -38,6 +38,10 @@
             <a href="{{url_for('db_gallery')}}">GALLERY</a>
         </button>
 
+        <button id='bt_inputs'>
+            <a href="{{url_for('buttons_inputs')}}">BUTTONS</a>
+        </button>
+
         <button>
             <a href="{{url_for('button_1')}}">WITH INGREDIENT</a>
         </button>
@@ -72,29 +76,6 @@
         <button id='bt_db_recipe'>
             <a href="{{url_for('db_recipe_page')}}">RECIPE</a>
         </button>
-
-        <button id='bt_db_recipe' action="{{url_for('db_recipe_page')}}" method="post">
-            <a href="{{url_for('db_recipe_page')}}">R_ID=2601</a>
-            <input type="text" name="2601"><br>
-            <input type="submit" value="Submit">
-        </button>        
-
-        <button id='bt_db_recipe'>
-            <a href="{{url_for('db_recipe_page')}}" method="GET"><input type="submit" value="2601">R_ID - SUBMITS but NO data</a>
-        </button>
-
-        <button id='bt_db_recipe' method="GET">
-            <a href="{{url_for('db_recipe_page')}}" ><input type="submit" value="2601">R_ID - SUBMITs</a>
-        </button>
-        
-        <form action={{url_for('db_recipe_page')}} method="GET"><input name="text"><input type="submit" value="WORKS"></form>
-        
-        <button action={{url_for('db_recipe_page')}} method="GET"><input name="text"><input type="submit" value="Echo"></button>
-        
-        <button action={{url_for('db_recipe_page')}} method="GET">
-            <input type="submit" name="open" value="Open">
-        </button>
-        <input action={{url_for('db_recipe_page')}} method="GET" type="submit" name="close" value="Close">
 
         {% block content %}
         {% endblock %}

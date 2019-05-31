@@ -1,0 +1,77 @@
+{% extends 'nav_buttons.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<h1>{{headline}}</h1>
+
+<h3>INPUT WAS [ {{data['data']}} ]</h3>
+
+<hr>
+<div class="container-fluid padding">
+        
+    <h3>Form send string</h3>
+
+    <form action={{url_for('buttons_inputs')}} method='POST'> <!-- POST method - NOT visible in url -->
+        FORM DISPLAY TEXT POST<input type="text" name='var_in_url_p'>
+        <button type="submit" value='post_2' name='button_p'>POST</button>
+    </form>
+
+    <form action={{url_for('buttons_inputs')}} method='GET'> <!-- default method - visible in url -->
+        FORM DISPLAY TEXT GET<input type="text" name='var_in_url_g'>
+        <button type="submit" value='get_1' name='button_g'>GET</button>
+    </form>
+
+</div>
+<hr>
+<form action={{url_for('buttons_inputs')}} method='GET' >
+    <div class="container-fluid padding">
+        <!-- https://getbootstrap.com/docs/4.0/components/button-group/ -->
+        <h3>Button ARRAY send number</h3>        
+            <button class="btn btn-dark" type="submit" value='0' name='btn_arr_0'>A</button>
+            <button class="btn btn-dark" type="submit" value='1' name='btn_arr_1'>B</button>
+            <button class="btn btn-dark" type="submit" value='2' name='btn_arr_2'>C</button>
+            <button class="btn btn-dark" type="submit" value='3' name='btn_arr_3'>D</button>
+        
+        GET: YOU PRESSED {{ data['button_keypad_GET'] }}
+    </div>
+</form>
+<form action={{url_for('buttons_inputs')}} method='POST'>
+    <div class="container-fluid padding">
+        <!-- https://getbootstrap.com/docs/4.0/components/button-group/ -->    
+            <button class="btn btn-dark" type="submit" value='0' name='btn_arr_0p'>L</button>
+            <button class="btn btn-dark" type="submit" value='1' name='btn_arr_1p'>M</button>
+            <button class="btn btn-dark" type="submit" value='2' name='btn_arr_2p'>N</button>
+            <button class="btn btn-dark" type="submit" value='3' name='btn_arr_3p'>O</button>
+        
+        POST: YOU PRESSED {{ data['button_keypad_POST'] }}
+    </div>
+</form>
+<hr>
+<hr>
+<div class="container-fluid padding">
+    <div class="row padding">
+        <!--  -->
+        <h3>Radio Button send number</h3>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input type="checkbox" aria-label="Checkbox for following text input">
+            </div>
+          </div>
+          <input type="text" class="form-control" aria-label="Text input with checkbox">
+        </div>
+        
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+            <input type="radio" aria-label="Radio button for following text input">
+            </div>
+          </div>
+          <input type="text" class="form-control" aria-label="Text input with radio button">
+        </div>        
+    </div>
+</div>
+{% endblock %}
+
