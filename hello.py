@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter
                        
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -22,6 +22,14 @@ import re
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
 # run 'populate_db.py'
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# add persistence until sessions implemented
+data = {}
+data['tags'] = ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant']
+data['chosen_tag_filters'] = ['vegan', 'veggie', 'cbs']
+data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
+
+data['allergens'] = ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide']
 
 # default
 #engine = db.create_engine('dialect+driver://user:pass@host:port/db')
@@ -76,7 +84,6 @@ def db_gallery():
 def buttons_inputs():
     headline_py = "Sending data back . . ."
     recipes = []
-    data = {}
     rx = '*'
     rxD = '*'
     arr_get = ['A','B','C','D']
@@ -108,13 +115,37 @@ def buttons_inputs():
 
 
     if request.method =='POST':
-        rx = request.form
+        rx = request.form.items()
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
+        pprint(request.form)
+        print(f"rx['tag_btn_create']{type(rx)}")
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")         
         
         for key, val in request.form.items():
             print(f"POST k: {key} - v: {val} <")
+            
+            if key == 'tag_btn_create' and val != '':
+                print(f"MATCH - ADDING: {val} to TAGS")
+                new_tag = val.lower().replace(" ", "_")
+                data['tags'].append(new_tag)
+                data['chosen_tag_filters'].append(new_tag)
+                
+            
+            # process button array POST
             if re.match(r'btn_arr_', key):
-                print("MATCH")
+                print("MATCH - but ARR")
                 data['button_keypad_POST'] = arr_post[int(val)]     # you can only press one button at a time!
+            
+            # process TAG buttond
+            if re.match(r'tag_btn_', key):                
+                tag_filter = key.replace('tag_btn_', '')
+                toggle_filter(data['chosen_tag_filters'], tag_filter)
+                data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
+                print(f"MATCH - but TAG: {data['chosen_tag_filters_string']}")
+
+            
+            
+
 
         #if 'var_in_url_p' in incoming_dict:         # use for GET
         #    rxD = incoming_dict['var_in_url_p']
@@ -249,6 +280,7 @@ if __name__ == '__main__':
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
     app.run(host='0.0.0.0', port=50015)
+    #app.run(host='192.168.0.8', port=50015)
     
     # Note for deployment:
     # http://flask.pocoo.org/docs/1.0/deploying/#deployment

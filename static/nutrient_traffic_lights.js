@@ -147,8 +147,7 @@ function create_timestamp(){
 
 function display_template_params(){
 
-  console.log("COMPARE: display_template_params S: ");
-  console.log(`recipes.length: ${recipes.length} <`);  
+  console.log("COMPARE: display_template_params S: ");  
 
   if (recipes) {
    

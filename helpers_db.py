@@ -251,6 +251,16 @@ def get_all_recipe_ids():
     return ids
 
 
+
+def toggle_filter(filter_list, filter_name):
+    
+    if filter_name in filter_list:
+        filter_list.remove(filter_name)
+        return
+    else:
+        filter_list.append(filter_name)
+    
+
     
 if __name__ == '__main__':
     
