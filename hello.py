@@ -124,7 +124,7 @@ def buttons_inputs():
         for key, val in request.form.items():
             print(f"POST k: {key} - v: {val} <")
             
-            if key == 'tag_btn_create' and val != '':
+            if key == 'create_tag_button' and val != '':
                 print(f"MATCH - ADDING: {val} to TAGS")
                 new_tag = val.lower().replace(" ", "_")
                 data['tags'].append(new_tag)
