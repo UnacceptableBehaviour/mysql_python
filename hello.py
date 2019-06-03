@@ -6,7 +6,8 @@ app = Flask(__name__)
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter
-                       
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -174,10 +175,11 @@ def button_1():
 def button_2():
     return render_template('data_return.html', lines=[f"BUTTON 2"])
 
-
 @app.route('/buton_3', methods=["GET", "POST"])
-def button_3():    
-    return render_template('data_return.html', lines=[f"BUTTON 3"])
+def button_3():
+    headline_py = 'Page title . .'
+    recipes = []    
+    return render_template("data_return.html", headline=headline_py, recipes=recipes, lines=[f"BUTTON 3"])
 
 @app.route('/buton_4', methods=["GET", "POST"])
 def button_4():    
@@ -273,6 +275,13 @@ def button_7():
     return render_template('data_return.html', lines=[f"BUTTON 7"])
 
 
+@app.route('/diary_w_image', methods=["GET", "POST"])
+def diary_w_image_snap():
+    
+    headline_py = 'Record diary entry w/ image . .'
+    recipes = []
+    
+    return render_template("image_capture.html", headline=headline_py, recipes=recipes)
 
 
 if __name__ == '__main__':

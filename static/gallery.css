@@ -5,6 +5,14 @@
     column-count: 5;
 }
 
+.recip-star-up-rating {
+  color: gold;
+}
+
+.recip-star-down-rating {
+  color: #303030;
+}
+
 /*
 https://stackoverflow.com/questions/34140793/bootstrap-4-responsive-cards-in-card-columns
 @media (min-width: 34em) {

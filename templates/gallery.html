@@ -1,9 +1,11 @@
 {% extends 'nav_buttons.html' %}
+
 {% block header %}
+<link rel="stylesheet" href="{{ url_for( 'static', filename='gallery.css') }}">
 
-
-
+<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
 {% endblock %}
+
 
 {% block content %}
 
@@ -25,6 +27,12 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
                             <p class="card-text">{{ recipe_info['ri_desc'] }}</p>
+                            {% for stars in range(recipe_info['user_rating']) %}
+                            <i class="fa fa-star recip-star-up-rating"></i>
+                            {% endfor %}
+                            {% for stars in range(5 - recipe_info['user_rating']) %}
+                            <i class="fa fa-star recip-star-down-rating"></i>
+                            {% endfor %}
                             <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
                         </div>
                     </div>

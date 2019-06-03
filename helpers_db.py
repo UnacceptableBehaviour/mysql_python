@@ -14,6 +14,10 @@ import re
 import copy                 # copy.deepcopy()
 #from pathlib import Path
 
+# for gallery stars before actual data
+from random import random
+
+
 from pprint import pprint # giza a look
 
 print("----- helpers_db: attaching to DB ------------------------------------S")
@@ -118,6 +122,7 @@ def return_recipe_dictionary():
         'text_file':'none_listed',
         'ri_desc': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
         'atomic': 1,
+        'user_rating': 1,
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
         'nutrinfo': {
@@ -197,7 +202,10 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
                     updated_info['nutrinfo'][fields[index]] = content
                 else:
                     updated_info[fields[index]] = content
-
+    
+    user_R = int(random() * 5 ) + 1
+    updated_info['user_rating'] = user_R
+    
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
     return updated_info
 

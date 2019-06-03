@@ -1,0 +1,38 @@
+{% extends 'nav_buttons.html' %}
+
+{% block content %}
+<h2>{{headline}}</h2>
+
+<!--  -->
+<!-- Background -->
+<!-- 2016 https://www.html5rocks.com/en/tutorials/getusermedia/intro/ -->
+
+<!-- Tutorial -->
+<!-- https://blog.prototypr.io/make-a-camera-web-app-tutorial-part-1-ec284af8dddf -->
+
+<!-- Applying filters -->
+<!-- https://blog.teamtreehouse.com/accessing-the-device-camera-with-getusermedia -->
+
+<!-- JS Promises / streaming - more advanced -->
+<!-- https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Browser_compatibility -->
+
+<!-- https://blog.addpipe.com/correct-syntax-html-media-capture/ -->
+<!-- capturing image or video directly -->
+CAPTURE VIDEO<input type="file" name="video" accept="video/*" capture="capture">
+<br>
+<button type="submit" class="btn btn-outline-secondary">SNAP</button>
+<br>
+CAPTURE IMAGE<input type="file" name="video" accept="image/*" capture="capture">
+<br>
+<!-- getting file image -->
+IMAGE FILE<input type="file" name="video" accept="image/*" >
+<br>
+<!-- getting multiple file images -->    
+MULTIPLE FILES<input type="file" name="video" accept="image/*" capture="filesystem" multiple>
+<br>
+
+IMAGE & VIDEO<input type="file" name="video" accept="video/*,image/*" capture="capture">
+
+
+
+{% endblock %}
