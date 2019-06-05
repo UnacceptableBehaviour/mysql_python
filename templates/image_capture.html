@@ -32,7 +32,33 @@ MULTIPLE FILES<input type="file" name="video" accept="image/*" capture="filesyst
 <br>
 
 IMAGE & VIDEO<input type="file" name="video" accept="video/*,image/*" capture="capture">
+<hr>
+<hr>
+<video autoplay></video>
+<hr>
+<hr>
+<script>
+
+function hasGetUserMedia() {
+  return !!(navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia);
+}
+
+if (hasGetUserMedia()) {
+  // Good to go!
+} else {
+  // alert('getUserMedia() is not supported by your browser');
+}
 
 
+const constraints = {
+  video: true
+};
+
+const video = document.querySelector('video');
+
+navigator.mediaDevices.getUserMedia(constraints).then((stream) => {video.srcObject = stream});
+  
+</script>
 
 {% endblock %}

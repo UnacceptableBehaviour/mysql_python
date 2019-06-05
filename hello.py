@@ -288,8 +288,12 @@ if __name__ == '__main__':
     # https://pythonprogramminglanguage.com/flask-hello-world/
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-    app.run(host='0.0.0.0', port=50015)
-    #app.run(host='192.168.0.8', port=50015)
+    #app.run(host='0.0.0.0', port=50015)
+    
+    # setting up SSL for image capture:
+    # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
+    # pip install pyOpenSSL
+    app.run(host='192.168.0.8', port=50015, ssl_context='adhoc')
     
     # Note for deployment:
     # http://flask.pocoo.org/docs/1.0/deploying/#deployment
