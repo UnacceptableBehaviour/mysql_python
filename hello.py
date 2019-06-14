@@ -3,9 +3,23 @@
 from flask import Flask, render_template, request
 app = Flask(__name__)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# for file upload
+import os
+from flask import Flask, redirect, url_for #, flash # request, 
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = app.instance_path.replace('instance', 'static/uploads')
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 
 
 from sqlalchemy import create_engine
@@ -144,9 +158,6 @@ def buttons_inputs():
                 data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
                 print(f"MATCH - but TAG: {data['chosen_tag_filters_string']}")
 
-            
-            
-
 
         #if 'var_in_url_p' in incoming_dict:         # use for GET
         #    rxD = incoming_dict['var_in_url_p']
@@ -181,13 +192,90 @@ def button_3():
     recipes = []    
     return render_template("data_return.html", headline=headline_py, recipes=recipes, lines=[f"BUTTON 3"])
 
-@app.route('/buton_4', methods=["GET", "POST"])
-def button_4():    
-    return render_template('data_return.html', lines=[f"BUTTON 4"])
 
+
+        # TRACK ITEMS
 @app.route('/buton_5', methods=["GET", "POST"])
-def button_5():    
-    return render_template('data_return.html', lines=[f"BUTTON 5"])
+def track_items():
+    headline_py = 'track items..'
+    ri_id = 41
+    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    recipes = [recipe]        
+    
+    if request.method == 'POST':
+        print("* * * TRACKER: data POSTED:")
+        # check payload
+        # update DB
+    
+    else:
+        daily_tracker = return_recipe_dictionary()
+    
+        if len( daily_tracker['ingredients'] ) == 0:
+            print("* * * TRACKER EMPTY LOADING TEST DATA")
+            ri_id = 1501
+            daily_tracker = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    
+    return render_template('track_items.html', headline=headline_py, dtk=daily_tracker, recipes=recipes, lines=[f"BUTTON 5"])
+
+
+@app.route('/diary_w_image', methods=["GET", "POST"])
+def diary_w_image_snap():
+
+    headline_py = 'Record diary entry w/ image . .'
+    recipes = []
+    
+    return render_template("image_capture.html", headline=headline_py, recipes=recipes)
+
+
+# upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+@app.route('/uload_img_test', methods=["GET", "POST"])
+def upload_image_test():        
+
+    files = []
+
+    # snippet lifted from
+    # http://flask.pocoo.org/docs/0.12/patterns/fileuploads/
+    
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            #flash('No selected file')
+            return redirect(request.url)
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            
+            print(f"COPYING {filename} TO:")                        
+            full_filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print(full_filepath)
+            
+            file.save(full_filepath)
+            #os.rename("from","to")
+            
+            files.append(filename)
+            
+            for f in files:
+                print(f"FILE {f} **UPLOADED**")
+                print(f"# files: {len(files)}")
+            
+            #return redirect(url_for('upload_image_test', files=files))
+        
+    return render_template('upload_file.html', files=files)
+
+
+
 
 @app.route('/db_nutrients', methods=["GET", "POST"])
 def db_nutrients():    
@@ -275,13 +363,7 @@ def button_7():
     return render_template('data_return.html', lines=[f"BUTTON 7"])
 
 
-@app.route('/diary_w_image', methods=["GET", "POST"])
-def diary_w_image_snap():
-    
-    headline_py = 'Record diary entry w/ image . .'
-    recipes = []
-    
-    return render_template("image_capture.html", headline=headline_py, recipes=recipes)
+
 
 
 if __name__ == '__main__':

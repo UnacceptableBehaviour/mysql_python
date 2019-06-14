@@ -9,7 +9,6 @@ from pprint import pprint
 fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
 qry_string = ', '.join(fields)
 
-print 
 
 print(f"SELECT {qry_string} FROM exploded WHERE image_file <> '';")
 
@@ -50,3 +49,22 @@ recipe_info['allergens'] = [ a.strip() for a in match.group(1).split(',') ]
 recipe_info['tags'] = [ a.strip() for a in match.group(2).split(',') ]
 
 pprint(recipe_info)
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+# upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+fnames = ['.bashrc','ck.sre', 'double.jpg.monkey','double.monkey.jpg','imageone.jpg','hoot.txt','badboy_bubba']
+
+for f in fnames:
+  print("> - - \ ")
+  print(allowed_file(f))
+  print('.' in f)
+  if ('.' in f):
+    print(f.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS)
+    print(f.rsplit('.', 1))
+    print(f.rsplit('.', 1)[1])
+  print("> - - / ")

@@ -22,7 +22,7 @@ CAPTURE VIDEO<input type="file" name="video" accept="video/*" capture="capture">
 <br>
 <button type="submit" class="btn btn-outline-secondary">SNAP</button>
 <br>
-CAPTURE IMAGE<input type="file" name="video" accept="image/*" capture="capture">
+CAPTURE IMAGE<input id="image_input" type="file" name="video" accept="image/*" capture="capture">
 <br>
 <!-- getting file image -->
 IMAGE FILE<input type="file" name="video" accept="image/*" >
@@ -32,11 +32,29 @@ MULTIPLE FILES<input type="file" name="video" accept="image/*" capture="filesyst
 <br>
 
 IMAGE & VIDEO<input type="file" name="video" accept="video/*,image/*" capture="capture">
-<hr>
-<hr>
+
+<hr> <!--  -->    
+<p>
+<label for="profile_pic">Profile Pic: </label>
+<input multiple id="profile_pic" name="profile_pic" type="file">
+</p>
+
+<hr> <!--  -->    
+<p>
+<label for="pictures_upload">Pictures: </label>
+<input multiple id="pictures_upload" name="pictures[]" type="file">
+</p>
+
+<hr> <!--  -->    
+
+
+
+<hr> <!--  -->    
 <video autoplay></video>
 <hr>
 <hr>
+
+
 <script>
 
 function hasGetUserMedia() {

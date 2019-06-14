@@ -56,14 +56,6 @@
             <a href="{{url_for('button_3')}}">< 100cal / 100g</a>
         </button>
 
-        
-        <button>
-            <a href="{{url_for('button_4')}}">CREATE</a>
-        </button>        
-
-        <button>
-            <a href="{{url_for('button_5')}}">Add Ingredients</a>
-        </button>
 
         <button id='bt_nutes'>
             <a href="{{url_for('db_nutrients')}}">Nutrient Table</a>
@@ -80,6 +72,15 @@
         <button id='bt_db_snap'>
             <a href="{{url_for('diary_w_image_snap')}}">SNAP</a>
         </button>
+
+        <button>
+            <a href="{{url_for('track_items')}}">TRACK</a>
+        </button>
+
+        <button>
+            <a href="{{url_for('upload_image_test')}}">UPLOAD</a>
+        </button>        
+
 
         {% block content %}
         {% endblock %}

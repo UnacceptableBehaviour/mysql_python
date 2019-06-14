@@ -1,0 +1,27 @@
+{% extends 'nav_buttons.html' %}
+
+{% block header %}
+    <title>Upload new File</title>
+{% endblock %}
+
+{% block content %}
+
+    <h1>Upload new File</h1>
+
+    <form method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload></p>
+    </form>
+
+    UPLOADED:
+    <hr>
+    {% for filename in files %}    
+    <h4>{{filename}}</h4>
+    <img src='static/uploads/{{filename}}' width="100%" height="auto">
+    <hr>
+    {% endfor %}
+    {{files}}
+    <hr>
+    <img src='static/uploads/light_lunch.JPG' width="100%" height="auto">
+    <hr>
+{% endblock %}

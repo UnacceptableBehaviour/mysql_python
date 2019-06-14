@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<body>
   <script>      
     var recipes = {{ recipes|tojson }};       // convert info using tojson filter      
     console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check      
@@ -48,5 +45,3 @@
       <script src='static/nutrient_traffic_lights.js'></script>
     </div>
   <!--</div><div class="container">-->
-</body>
-</html>

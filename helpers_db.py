@@ -121,7 +121,7 @@ def return_recipe_dictionary():
         'image_file':'none_listed',
         'text_file':'none_listed',
         'ri_desc': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
-        'atomic': 1,
+        'atomic': 1,        # 0 if component / further recipe info available
         'user_rating': 1,
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
@@ -135,8 +135,12 @@ def return_recipe_dictionary():
             'n_Su':0, 'n_Fb':0, 'n_St':0, 'n_Pr':0, 'n_Sa':0, 'n_Al':0
         },
 
+        # FOR DISPLAY TO USER: ingredients set out in items to make
         # components:   name, ingredients           Subcomponents & ingredients
         'components': {},                    # 'component name': ingredients [or each component]
+                
+        # top level ingredients - look for sub component flags to dig deeper
+        'ingredients': [],
 
         # tags:         tags, allergens, user_tags  Simplify classification
         'allergens': [ 'none_listed' ],
