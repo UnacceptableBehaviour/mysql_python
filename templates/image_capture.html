@@ -22,11 +22,24 @@ CAPTURE VIDEO<input type="file" name="video" accept="video/*" capture="capture">
 <br>
 <button type="submit" class="btn btn-outline-secondary">SNAP</button>
 <br>
-CAPTURE IMAGE<input id="image_input" type="file" name="video" accept="image/*" capture="capture">
-<br>
-<!-- getting file image -->
-IMAGE FILE<input type="file" name="video" accept="image/*" >
-<br>
+
+
+<form method="POST" enctype="multipart/form-data" action="/diary_w_image">
+  CAPTURE IMAGE<input id="image_input" type="file" name="video" accept="image/*" capture="capture">
+  <br>
+  <!-- getting file image -->
+  IMAGE FILE<input type="file" name="video" accept="image/*" ><input type=submit value=Upload>
+</form>
+
+<hr> <!--  -->
+
+DISPLAYING: {{mobi}}
+<img src="{{mobi}}" width="100%" height="auto">
+<hr> <!--  -->    
+
+
+
+
 <!-- getting multiple file images -->    
 MULTIPLE FILES<input type="file" name="video" accept="image/*" capture="filesystem" multiple>
 <br>

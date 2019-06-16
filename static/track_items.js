@@ -1,13 +1,24 @@
+var nutri_table = document.getElementById('nutri_taffic_table_main');
+// remove servings & buttons from nutritable - makes no sense for tracker
+document.getElementById('traffic_title_0').remove();
+document.getElementById('b_update_0').remove();
+document.getElementById('b_clear').remove();
+
+
 var form = document.getElementById('addForm');
 var itemList = document.getElementById('items');
 var filter = document.getElementById('filter');
+
 
 // Form submit event
 form.addEventListener('submit', addItem);
 // Delete event
 itemList.addEventListener('click', removeItem);
+
 // Filter event
-filter.addEventListener('keyup', filterItems);
+// filter.addEventListener('keyup', filterItems);
+// addthis back when adding auto complete ingredients 
+
 
 // Add item
 function addItem(e){
@@ -38,6 +49,23 @@ function addItem(e){
   // Append li to list
   itemList.appendChild(li);
 }
+
+function factory_line_item(){
+  var line_item = {
+    qty: 0,
+    uints: 'g',
+    each: 0,
+    item: '',
+    time: new Date,
+    img_id: 0
+  }
+  
+  line_item
+}
+
+var undo_list = { 0: factory_line_item() }
+
+ 
 
 // Remove item
 function removeItem(e){

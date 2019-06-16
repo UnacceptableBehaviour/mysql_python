@@ -221,10 +221,23 @@ def track_items():
 @app.route('/diary_w_image', methods=["GET", "POST"])
 def diary_w_image_snap():
 
+    def_im = 'static/uploads/light_lunch.JPG'
     headline_py = 'Record diary entry w/ image . .'
     recipes = []
+    files = []
     
-    return render_template("image_capture.html", headline=headline_py, recipes=recipes)
+    if request.method == 'POST':
+        pprint(request)
+        #files = request.files['file']
+        
+    print("> > > - - \ ")
+    print(type(files))    
+    pprint(files)
+    #print(f"IMAGE FROM CAPTURE = {file[0]}")
+    print("> > > - - / ")
+    
+            
+    return render_template("image_capture.html", headline=headline_py, recipes=recipes, mobi=def_im)
 
 
 # upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -243,25 +256,29 @@ def upload_image_test():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
+            print('No file part')
             return redirect(request.url)
         
-        file = request.files['file']
+        rx_file = request.files['file']
+
+        if 'file_from_html' in request.files:
+            print('file_from_html in: request.files')
+            rx_file = request.files['file_from_html']
         
         # if user does not select file, browser also
         # submit a empty part without filename
-        if file.filename == '':
-            #flash('No selected file')
+        if rx_file.filename == '':
+            print('No selected file')
             return redirect(request.url)
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+        if rx_file and allowed_file(rx_file.filename):
+            filename = secure_filename(rx_file.filename)
             
             print(f"COPYING {filename} TO:")                        
             full_filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print(full_filepath)
             
-            file.save(full_filepath)
+            rx_file.save(full_filepath)
             #os.rename("from","to")
             
             files.append(filename)
@@ -371,11 +388,12 @@ if __name__ == '__main__':
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
     #app.run(host='0.0.0.0', port=50015)
+    app.run(host='192.168.0.8', port=50015 )
     
     # setting up SSL for image capture:
     # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
     # pip install pyOpenSSL
-    app.run(host='192.168.0.8', port=50015, ssl_context='adhoc')
+    #app.run(host='192.168.0.8', port=50015, ssl_context='adhoc')
     
     # Note for deployment:
     # http://flask.pocoo.org/docs/1.0/deploying/#deployment

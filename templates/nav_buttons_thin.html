@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        {% if doc_title %}
+        <title>{{ doc_title }}</title>
+        {% else %}
+        <title>database_tests</title>
+        {% endif %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>    
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Picker Integration</title>
+        <style>
+            #bt_home, #bt_nutes_compare {
+                background-color: #8BCE51;
+            }
+            #bt_gallery, #bt_db_recipe, #bt_nutes {
+                background-color: #B1D6E2;
+            }
+        </style>
+        <!--<link rel="stylesheet" href="static/style.css">-->
+        {% block header %}
+        {% endblock%}
+
+    </head>
+
+    <body>
+
+        <button id='bt_home'>
+            <a href="{{url_for('db_hello_world')}}">HOME</a>
+        </button>
+
+        <button>
+            <a href="{{url_for('track_items')}}">TRACK</a>
+        </button>
+        
+        <button id='bt_gallery'>
+            <a href="{{url_for('db_gallery')}}">GALLERY</a>
+        </button>
+
+        <button id='bt_db_snap'>
+            <a href="{{url_for('diary_w_image_snap')}}">SNAP</a>
+        </button>
+
+
+
+        {% block content %}
+        {% endblock %}
+
+    </body>
+</html>
+
+
