@@ -101,13 +101,14 @@ pprint(engine)
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
 
-force_complete_rebuid = True #False
+force_complete_rebuild = False
+#force_complete_rebuild = True
 
-if ( force_complete_rebuid == True ):
+if ( force_complete_rebuild == True ):
     population_data = subprocess.check_output(['populate_asset_server.rb'])
     print(population_data)
 else:
-    print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuid = False')
+    print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
 
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - E")
@@ -247,7 +248,7 @@ def main():
     
     force_drop_tables = True # False
     
-    if (force_drop_tables == True or force_complete_rebuid == True):
+    if (force_drop_tables == True or force_complete_rebuild == True):
         # DROP TABLES
         drop_tables_for_fresh_start(db, ['recipes','exploded','atomic_ingredients'])
     

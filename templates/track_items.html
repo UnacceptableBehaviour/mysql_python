@@ -3,34 +3,34 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>tracker</title>
+  <script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
+  <style>
+    <!-- use for media 560-800px or less -->
+    .list-group-item {          <!-- less space around text more on screen  -->
+      padding: .25rem .25rem;
+    }
+    .list-group-item-sub-text{  <!-- buttons all on same row - needs work -->
+      padding-left: 1.9rem;
+      padding-right: 5.25rem;
+      margin-bottom: -1.5rem;
+    }
+    .card-body {                <!-- scooch up towards top -->
+        padding: 0.2rem;  
+        padding-left: 0;
+        padding-right: 0;  
+    }    
+    .container {                <!-- scooch up to sides of screen -->
+        width: 100%;
+        padding-right: 0px;
+        padding-left: 0px;
+        margin-right: 0;
+        margin-left: 0;
+    }
+    .add_recipe {               <!-- button bg colour -->
+      background: #b8db0d
+    }
+  </style>
 </head>
-<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
-<style>
-<!-- use for media 560-800px or less -->
-.list-group-item {          <!-- less space around text more on screen  -->
-  padding: .25rem .25rem;
-}
-.list-group-item-sub-text{  <!-- buttons all on same row - needs work -->
-  padding-left: 1.9rem;
-  padding-right: 5.25rem;
-  margin-bottom: -1.5rem;
-}
-.card-body {                <!-- scooch up towards top -->
-    padding: 0.2rem;  
-    padding-left: 0;
-    padding-right: 0;  
-}    
-.container {                <!-- scooch up to sides of screen -->
-    width: 100%;
-    padding-right: 0px;
-    padding-left: 0px;
-    margin-right: 0;
-    margin-left: 0;
-}
-.add_recipe {               <!-- button bg colour -->
-  background: #b8db0d
-}
-</style>
 {% endblock %}
 
 {% block content %}
