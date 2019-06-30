@@ -26,11 +26,12 @@
                         <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipe_info['image_file']}}"></img>
                         <div class="card-body">
                             <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
-                            <p class="card-text">{{ recipe_info['ri_desc'] }}</p>
-                            {% for stars in range(recipe_info['user_rating']) %}
+                            <p class="card-text">{{ recipe_info['description'] }}</p>
+                            <!-- (recipe_info['user_rating']|int) unser_rating is a float use a filter to covert to int -->
+                            {% for stars in range((recipe_info['user_rating']|int)) %}
                             <i class="fa fa-star recip-star-up-rating"></i>
                             {% endfor %}
-                            {% for stars in range(5 - recipe_info['user_rating']) %}
+                            {% for stars in range(5 - (recipe_info['user_rating']|int)) %}
                             <i class="fa fa-star recip-star-down-rating"></i>
                             {% endfor %}
                             <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>

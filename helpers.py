@@ -113,7 +113,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
     
     
     # try 'allergens & tags below recipe' match first since 'recipe' will match both
-    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?allergens:(.*?)$.*?tags:(.*?)$', recipe_text, re.MULTILINE | re.DOTALL )
+    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?description:(.*?)$.*?stars:(.*?)$.*?allergens:(.*?)$.*?tags:(.*?)$', recipe_text, re.MULTILINE | re.DOTALL )
     we_have_tags = True
     
     if (match == None):
@@ -129,23 +129,26 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         # 2 - servings
         # 3 - ingredients
         # 4 - yield
-        # 5 - allergens
-        # 6 - tags
+        # 5 - description
+        # 6 - stars (user_rating)
+        # 7 - allergens
+        # 8 - tags
         
         # easy to detect failure in the data
         recipe_info = {
             'ri_name':"Initialised as NO MATCH",
             'ingredients':"Pure green",
+            'description':'invent_me',
+            'user_rating':0,
             'allergens': [ 'none_listed' ],
             'tags': [ 'none_listed' ],
             'servings': 0,
             'yield': '0g'
-        }
-        #recipe_info['allergens'] = [ 'none_listed' ]
-        #recipe_info['tags'] = [ 'none_listed' ]
+        }     
         recipe_info['ri_name'] = match.group(1).strip()
         recipe_info['servings'] = match.group(2).strip()
         recipe_info['yield'] = match.group(4).strip()
+
         
         # fix broken lines before processing
         # the return group is split mid line - this is used to fix that
@@ -175,9 +178,14 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
 
         
         # create tag & allergens entries, populate them if they exist
-        if we_have_tags:            
-            recipe_info['allergens'] = [ a.strip() for a in match.group(5).strip().rstrip(",").split(',') ]    # create list of strings
-            recipe_info['tags'] = [ a.strip() for a in match.group(6).strip().rstrip(",").split(',') ]                
+        if we_have_tags:
+            recipe_info['description'] = match.group(5).strip()
+            stars = match.group(6).strip()
+            if stars == '':
+                stars = 0
+            recipe_info['user_rating'] = int(stars)
+            recipe_info['allergens'] = [ a.strip() for a in match.group(7).strip().rstrip(",").split(',') ]    # create list of strings
+            recipe_info['tags'] = [ a.strip() for a in match.group(8).strip().rstrip(",").split(',') ]                
 
         # TODO remove after schema redisgn
         if recipe_info['allergens'][0] == "":
@@ -270,7 +278,7 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
     print(orig_recipe_text)
     print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")    
     
-    # create list of recipes - these have optionally listed tags: & allergens: fields
+    # create list of recipes - these have optionally listed fields - 'tags:', 'allergens:', 'notes:', 'description:', 'stars:' 
     for m in re.finditer( r'(^-+- for the (.*?) \(.*?Total \(.*?\))', orig_recipe_text, re.MULTILINE | re.DOTALL ):    
         recipe_without_tags[m.group(2)] = m.group(1)
         #                    name         whole component / recipe
@@ -288,7 +296,15 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
             print(f"RECORDING R:{recipe_title} <")
             continue
         
-        m = re.match( r'((^tags:)|(^allergens:))', line)
+        # ADD processing for:
+        # notes: // multiline - later
+        # description:
+        # stars:
+        # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, s&c, alcohol, celery, gluten, soya, sulphur_dioxide
+        # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, s&c, gluten_free, ns_pregnant, 
+        # type: amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+        
+        m = re.match( r'((^tags:)|(^allergens:)|(^description:)|(^stars:))', line)
         if m:
             recipe_without_tags[recipe_title] += f"\n{line}"
             print(f"APPENDED R:{recipe_title} < {line}")
@@ -628,7 +644,7 @@ def create_exploded_recipe(sql_row):
 
     print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - E")
 
-    # this shoul return top level component only! Rest is polution.
+    # this should return top level component only! Rest is polution.
     return components
 
 

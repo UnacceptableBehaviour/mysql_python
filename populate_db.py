@@ -102,7 +102,7 @@ pprint(engine)
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
 
 force_complete_rebuild = False
-#force_complete_rebuild = True
+force_complete_rebuild = True
 
 if ( force_complete_rebuild == True ):
     population_data = subprocess.check_output(['populate_asset_server.rb'])
@@ -159,6 +159,8 @@ def create_entry_in_db(db, table, entry):
     print(f"----- list.py: create_entry_in_db ------------------------------------------------------------ ")
     print(f"----- table:{table} <> recipe: {entry['ri_name']} -------------------------------------------- ")
     print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
+    print(f"----- description:{entry['description']} \n-------------------------------------------- ")
+    print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
     print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
     print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
     
@@ -176,7 +178,7 @@ def create_entry_in_db(db, table, entry):
         elif re.match(r'n_\w+', header ):
             print(f"{header} is a NUMBER")
             data = data + f"{entry[header]}, "
-        
+                
         elif header == 'ingredients':
             print(f"{header} is a LIST of ingredients")
             ingredients_insert_text = create_sql_insert_ingredients_array_text(entry[header])

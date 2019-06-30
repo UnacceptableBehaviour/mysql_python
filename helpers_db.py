@@ -120,7 +120,7 @@ def return_recipe_dictionary():
         'ri_name':'none_listed',
         'image_file':'none_listed',
         'text_file':'none_listed',
-        'ri_desc': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
+        'description': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
         'atomic': 1,        # 0 if component / further recipe info available
         'user_rating': 1,
 
@@ -207,8 +207,8 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
                 else:
                     updated_info[fields[index]] = content
     
-    user_R = int(random() * 5 ) + 1
-    updated_info['user_rating'] = user_R
+    #user_R = int(random() * 5 ) + 1
+    #updated_info['user_rating'] = user_R
     
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
     return updated_info
@@ -236,7 +236,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
     
-    fields = ['ri_id', 'ri_name', 'image_file']
+    fields = ['ri_id', 'ri_name', 'image_file', 'description', 'user_rating']
     
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
