@@ -27,7 +27,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
                             <p class="card-text">{{ recipe_info['description'] }}</p>
-                            <!-- (recipe_info['user_rating']|int) unser_rating is a float use a filter to covert to int -->
+                            <!-- (recipe_info['user_rating']|int) user_rating is a float use a filter to covert to int -->
                             {% for stars in range((recipe_info['user_rating']|int)) %}
                             <i class="fa fa-star recip-star-up-rating"></i>
                             {% endfor %}
