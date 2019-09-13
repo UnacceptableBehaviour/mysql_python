@@ -195,7 +195,7 @@ def button_3():
 
 
         # TRACK ITEMS
-@app.route('/buton_5', methods=["GET", "POST"])
+@app.route('/tracker', methods=["GET", "POST"])
 def track_items():
     headline_py = 'track items..'
     ri_id = 41
@@ -345,6 +345,7 @@ def db_nutrients_compare():
 @app.route('/db_recipe_page', methods=["GET", "POST"])
 def db_recipe_page():
     
+    # route from gallery or other recipe request routes
     if request.method =='POST':    
         for key, val in request.form.items():
             print(f"POST k: {key} - v: {val} <")
@@ -352,6 +353,7 @@ def db_recipe_page():
                 ri_id = int(val)
     
     else:
+        # default recipe
         ri_id = 2403 # loaded by GET below
     
     incoming_dict = request.args.to_dict()
@@ -371,6 +373,10 @@ def db_recipe_page():
     recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
     
     recipes = [recipe]
+    
+    print(f"- - RECIPE PAGE ID:{ri_id} - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
+    pprint(recipes)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
     
     return render_template("recipe_page.html", headline=headline_py, recipes=recipes)
 

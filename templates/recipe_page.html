@@ -1,11 +1,46 @@
 {% extends 'nav_buttons.html' %}
 
+{% block header %}
+    <!-- NO WORK - recipe.css not included ?? Works fine for gallery.html ??? -->
+    <!--<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='recipe.css') }}">-->
+
+    <!--<link rel="stylesheet" href="/static/recipe.css">    <!-- NO WORK not included -->
+    <!--<link rel="stylesheet" type="text/css" href="/static/recipe.css">  <!-- NO WORK not included -->
+    <!--<link rel="stylesheet" type="text/css" href="static/recipe.css">  <!-- NO WORK not included -->
+    
+    <!--<link rel= "stylesheet" type="text/css" href="{{ url_for('static',filename='static/recipe.css') }}">-->
+                                                                        <!-- NO WORK ^ extra static -->
+                                                                        
+    <!--<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='recipe.css') }}">-->
+
+    <!--<link rel="stylesheet" href="{{ url_for( 'static', filename='recipe.css') }}"> <!-- NO WORK not included -->
+
+    <!-- WORKS -->
+    <style>     
+    
+    .btn-group-xs > .btn, .btn-xs {
+      padding: .25rem .4rem;
+      font-size: .875rem;
+      line-height: .5;
+      border-radius: .2rem;
+    }
+        
+    </style>
+
+    <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->
+
+{% endblock %}
+
+
 {% block content %}
 
     {% include 'recipe_t.html' %}
     
     <br>
 
-    <p>{{ recipes[0]['ri_id'] }} : {{ recipes[0]['ri_name'] }} - Serving size {{ recipes[0]['serving_size'] }}g </p>
+    <p>{{ recipes[0]['ri_id'] }} : {{ recipes[0]['ri_name'] }} <br>
+    Serving size {{ recipes[0]['nutrinfo']['serving_size'] }}g <br>
+    Yield: {{ recipes[0]['nutrinfo']['yield'] }}g - Servings: {{ recipes[0]['nutrinfo']['servings'] }} 
+    </p>
 
 {% endblock %}

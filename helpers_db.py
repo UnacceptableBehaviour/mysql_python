@@ -17,6 +17,8 @@ import copy                 # copy.deepcopy()
 # for gallery stars before actual data
 from random import random
 
+import json                 # converting to json string from dict
+                            # converting to dict to json string
 
 from pprint import pprint # giza a look
 
@@ -293,3 +295,14 @@ if __name__ == '__main__':
        print(f"-----  recipe: {r['ri_name']} ------------------------------------S")
     
     print("-----  get recipes in display format ------------------------------------E2")
+
+    json_string_from_dict = json.dumps(return_recipe_dictionary(), indent=2, sort_keys=True )
+    print( json_string_from_dict )
+    
+    
+    
+    
+    
+    
+    
+    

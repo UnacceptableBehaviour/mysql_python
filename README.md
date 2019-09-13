@@ -25,7 +25,7 @@ $ populate_db.py                                # rebuild the DB from assest ser
 
 ** Note to force an asset server rebuild before rebuilding DB uncomment line: **
 ```
-force_complete_rebuid = True            # set flag true
+force_complete_rebuild = True            # set flag true
 executes:
 population_data = subprocess.check_output(['populate_asset_server.rb'])
                                         # and deletes tables in DB

@@ -17,16 +17,17 @@
                 <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
                 <div class="card-body">
                     <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">Learn how to prepare fish for sushi and for cooking. What to look for when selecting, fish types and appropriate cooking methods. Starting with a whole salmon and preparing it 5 ways.</p>
-                    <a href="#" class="btn btn-outline-secondary">Contents..</a>
-                    <h3 class="card-title">Ingredients</h3>    
+                    <p class="card-text">{{ recipes[0]['description'] }}</p>
+                    <h3 class="card-title">Ingredients
+                        <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
+                    </h3>    
                     <table class="card-text">
                       {% for tuple in recipes[0]['ingredients'] %}
                       <tr>
                           <!--td>{{tuple[0]}}</td-->
-                          <td>{{tuple[1]}}</td>
-                          <td>{{tuple[2]}}</td>
-                          <td>{{tuple[3]}}</td>
+                          <td>{{tuple[1]}}<a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+                          <td>{{tuple[2]}}<a class="btn btn-primary" href="#" role="button">expand</a></td>
+                          <td>{{tuple[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>
                       </tr>
                       {% endfor %}
                     </table>
@@ -42,12 +43,12 @@
 <div class="container-fluid padding">
 	<div class="row padding">
 
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
                 <div class="card-body">
                     <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">Learn how to prepare fish for sushi and for cooking. What to look for when selecting, fish types and appropriate cooking methods. Starting with a whole salmon and preparing it 5 ways.</p>                    
+                    <p class="card-text">{{ recipes[0]['description'] }}</p>
                     <h3 class="card-title">Ingredients
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
                     </h3>                                        
@@ -71,7 +72,7 @@
                 <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
                 <div class="card-body">
                     <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">Learn how to prepare fish for sushi and for cooking. What to look for when selecting, fish types and appropriate cooking methods. Starting with a whole salmon and preparing it 5 ways.</p>
+                    <p class="card-text">{{ recipes[0]['description'] }}</p>
                     <a href="#" class="btn btn-outline-secondary">Contents..</a>
                     <h3 class="card-title">Ingredients</h3>    
                     <table class="card-text">
