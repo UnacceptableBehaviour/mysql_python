@@ -22,12 +22,26 @@
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
                     </h3>    
                     <table class="card-text">
-                      {% for tuple in recipes[0]['ingredients'] %}
+                      {% for ingd_line in recipes[0]['ingredients'] %}
                       <tr>
-                          <!--td>{{tuple[0]}}</td-->
-                          <td>{{tuple[1]}}<a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
-                          <td>{{tuple[2]}}<a class="btn btn-primary" href="#" role="button">expand</a></td>
-                          <td>{{tuple[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+                          <!--td>{{ingd_line[0]}}</td-->
+                          <td>{{ingd_line[1]}}</td>
+							{% if ingd_line[2] == '(0)' %}
+								<td></td>
+							{% else %}
+								<td>{{ingd_line[2]}}</td>
+							{% endif %}                          
+						  <td>{{ingd_line[3]}}</td>
+						  <td>ATOMIC: {{ingd_line[0]}}</td>
+						  	{% if ingd_line[0] == '0' %}
+								<!--not an atomic engredient - expandable - add button-->
+								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+							{% else %}
+								<td>NB</td>
+							{% endif %}  
+						  
+						  <!--extra small button - relies on additional styling recipe.css-->
+						  <!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
                       </tr>
                       {% endfor %}
                     </table>
@@ -38,80 +52,5 @@
     </div>
 </div>
 
-<!--HACKING ABOUT-->
 
-<div class="container-fluid padding">
-	<div class="row padding">
-
-        <div class="col-md-12">
-            <div class="card">
-                <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
-                <div class="card-body">
-                    <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">{{ recipes[0]['description'] }}</p>
-                    <h3 class="card-title">Ingredients
-                        <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
-                    </h3>                                        
-                    <table class="card-text">
-                      {% for tuple in recipes[0]['ingredients'] %}
-                      <tr>
-                          <!--td>{{tuple[0]}}</td-->
-                          <td>{{tuple[1]}}</td>
-                          <td>{{tuple[2]}}</td>
-                          <td>{{tuple[3]}}</td>
-                      </tr>
-                      {% endfor %}
-                    </table>
-                </div>
-            </div>
-            {% include 'nutrient_traffic_lights.html' %}
-        </div>    
-
-        <div class="col-md-6">
-            <div class="card">
-                <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
-                <div class="card-body">
-                    <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">{{ recipes[0]['description'] }}</p>
-                    <a href="#" class="btn btn-outline-secondary">Contents..</a>
-                    <h3 class="card-title">Ingredients</h3>    
-                    <table class="card-text">
-                      {% for tuple in recipes[0]['ingredients'] %}
-                      <tr>
-                          <!--td>{{tuple[0]}}</td-->
-                          <td>{{tuple[1]}}</td>
-                          <td>{{tuple[2]}}</td>
-                          <td>{{tuple[3]}}</td>
-                      </tr>
-                      {% endfor %}
-                    </table>
-                </div>
-            </div>
-            {% include 'nutrient_traffic_lights.html' %}
-        </div>    
-
-	</div>
-</div>
-
-
-
-<div>
-    <div class="container-fluid padding">
-        <div class="row padding">            
-            {% if recipe_image != '' %}
-            <img id='recipe_image' class="img-fluid  w-100 h-100" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}">            
-            {% else %}
-            <img id='recipe_image' class="img-fluid w-100 h-100"  src="http://192.168.0.8:8000/static/recipe/awesome_sauce_landing_page_QR_code.png">
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="container-fluid padding">
-        <div class="row padding">
-            <h2 style="text-align:center;">recipe 2 with a  {{ recipes[0]['ri_name'] }} really really long name</h2>
-            <h2 style="text-align:center;">recipe 2 with a  {{ recipes[0]['ri_id'] }} really really long name</h2>
-            <h2 style="text-align:center;">bla {{ recipes[0]['ri_name'] }} bla</h2>
-        </div>
-    </div>
-</div>
 {% endblock %}
