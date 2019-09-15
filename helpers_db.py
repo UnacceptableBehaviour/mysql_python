@@ -136,18 +136,20 @@ def return_recipe_dictionary():
             'n_En':0, 'n_Fa':0, 'n_Fs':0, 'n_Fm':0, 'n_Fp':0, 'n_Fo3':0, 'n_Ca':0,
             'n_Su':0, 'n_Fb':0, 'n_St':0, 'n_Pr':0, 'n_Sa':0, 'n_Al':0
         },
-
-        # FOR DISPLAY TO USER: ingredients set out in items to make
-        # components:   name, ingredients           Subcomponents & ingredients
-        'components': {},                    # 'component name': ingredients [or each component]
                 
         # top level ingredients - look for sub component flags to dig deeper
         'ingredients': [],
+        'method': {},
 
         # tags:         tags, allergens, user_tags  Simplify classification
         'allergens': [ 'none_listed' ],
         'tags': [ 'none_listed' ],
         'user_tags': [ 'none_listed' ],
+        
+        # SUB COMPONENT RECIPES
+        # components:  { 'component name': recipe dictionary, . . . }
+        'components': {},
+        
     }
 
 #
@@ -156,9 +158,9 @@ def return_recipe_dictionary():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # interface to DB
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
+def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     
-    print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------S:{ri_id}")
+    print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------S:{ri_id_or_name}")
     updated_info = return_recipe_dictionary()
     #pprint(updated_info)
     
@@ -178,7 +180,16 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
 
     qry_string = ', '.join(fields)
     
-    sql_query = f"SELECT {qry_string} FROM recipes WHERE image_file <> '' AND ri_id = {ri_id};"
+    if type(ri_id_or_name).__name__ == 'str':
+        print(f"ri_id_or_name is a string [{ri_id_or_name}] - {type(ri_id_or_name).__name__} - {type(ri_id_or_name)}")
+        sql_query = f"SELECT {qry_string} FROM recipes WHERE ri_name ='{ri_id_or_name}';"
+        
+    elif type(ri_id_or_name).__name__ == 'int':
+        print(f"ri_id_or_name is an int [{ri_id_or_name}] - {type(ri_id_or_name).__name__} - {type(ri_id_or_name)}")
+        sql_query = f"SELECT {qry_string} FROM recipes WHERE ri_id = {ri_id_or_name};"
+    
+    else:
+        raise(TypeError, f"recipe ID should be a ri_name (str) or ri_id(int) - {ri_id_or_name}")
     
     db_lines = helper_db_class_db.execute(sql_query).fetchall()
     
@@ -214,6 +225,29 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id, fields=None):
     
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
     return updated_info
+
+# scan ingredients for subcomponents - recurse until ALL ATOMIC!
+# maybe 2 or 3 deep for all but most in depth recipes
+def get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id_or_name, fields=None):
+    
+    return_recipe = return_recipe_dictionary()
+    
+    # get base recipe
+    return_recipe.update( get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields) )
+    
+    # go through ingredients and load non-atomic (IE subcomponents) into components
+    for ingredient in return_recipe['ingredients']:
+        
+        if int(ingredient[ATOMIC_INDEX]) == 0:
+            
+            # NON atomic - fetch subcomponent
+            sub_component_name = ingredient[INGREDIENT_INDEX]
+        
+            #return_recipe['components'][sub_component_name] = get_single_recipe_from_db_for_display_as_dict(sub_component_name, fields)
+            return_recipe['components'][sub_component_name] = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(sub_component_name, fields)            
+     
+    return return_recipe    
+    
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # get more than one recipe, for comparison for example
@@ -282,24 +316,31 @@ if __name__ == '__main__':
     # "1304, 'jalapeno burger w cauliflower california'",
     # "2403, 'prawns w crab cakes mango salsa and salad'",
     test_ids = [1304,2403,402]
+    test_id = [1304]
     
     print("-----  attaching to DB ------------------------------------E")
 
     print("-----  get recipes in display format ------------------------------------S")
     
-    recipes = get_recipes_for_display_as_list_of_dicts( test_ids )
+    #recipes = get_recipes_for_display_as_list_of_dicts( test_ids )
         
-    print("-----  get recipes in display format ------------------------------------E1")
+    # print("-----  get recipes in display format ------------------------------------E1")
+    # 
+    # for r in recipes:
+    #    print(f"-----  recipe: {r['ri_name']} ------------------------------------S")
+    #    pprint(r)
+    # 
+    # print("-----  get recipes in display format ------------------------------------E2")
 
-    for r in recipes:
-       print(f"-----  recipe: {r['ri_name']} ------------------------------------S")
-    
-    print("-----  get recipes in display format ------------------------------------E2")
+    #pprint(get_single_recipe_from_db_for_display_as_dict(test_id[0]))
+    #pprint(get_single_recipe_from_db_for_display_as_dict('beef & jalapeno burger'))
 
-    json_string_from_dict = json.dumps(return_recipe_dictionary(), indent=2, sort_keys=True )
-    print( json_string_from_dict )
+    # display recipe dict
+    #json_string_from_dict = json.dumps(return_recipe_dictionary(), indent=2, sort_keys=True )
+    #print( json_string_from_dict )
+    print("-----  get subcomponents in display format ------------------------------------S")
     
-    
+    pprint( get_single_recipe_with_subcomponents_from_db_for_display_as_dict(test_id[0]) )
     
     
     

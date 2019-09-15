@@ -21,7 +21,7 @@
                     <h3 class="card-title">Ingredients
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
                     </h3>    
-                    <table class="card-text">
+                    <table class="card-text" width='100%'>
                       {% for ingd_line in recipes[0]['ingredients'] %}
                       <tr>
                           <!--td>{{ingd_line[0]}}</td-->
@@ -37,7 +37,7 @@
 								<!--not an atomic engredient - expandable - add button-->
 								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
 							{% else %}
-								<td>NB</td>
+								<td></td>
 							{% endif %}  
 						  
 						  <!--extra small button - relies on additional styling recipe.css-->

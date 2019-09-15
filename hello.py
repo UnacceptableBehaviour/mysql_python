@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict
 
 
 from sqlalchemy import create_engine
@@ -370,7 +370,8 @@ def db_recipe_page():
 
     headline_py = "single recipe page"
     
-    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    #recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    recipe = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id)
     
     recipes = [recipe]
     
