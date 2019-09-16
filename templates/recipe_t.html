@@ -21,7 +21,9 @@
                     <h3 class="card-title">Ingredients
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
                     </h3>    
-                    <table class="card-text" width='100%'>
+                    
+					<!--headline ingredients--> 
+					<table class="card-text" width='100%'>
                       {% for ingd_line in recipes[0]['ingredients'] %}
                       <tr>
                           <!--td>{{ingd_line[0]}}</td-->
@@ -44,6 +46,94 @@
 						  <!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
                       </tr>
                       {% endfor %}
+                    </table>
+
+					<br>
+					<h2>iterating dict without .items()</h2>
+					<table class="card-text" width='100%'>                      
+					  {% for cmp_name in recipes[0]['components'] %}
+						<tr><br></tr>
+						<tr>cmp_name</tr>
+						<tr><br></tr>
+						<tr>{{cmp_name}}</tr>
+						<tr><br></tr>
+						<tr>recipe</tr>
+						<tr><br></tr>
+						<tr>{{recipes[0]['components'][cmp_name]}}</tr>
+						<tr><br></tr>
+						<tr>- - - - - - -</tr>
+                      {% endfor %}
+                    </table>
+
+
+					<br>
+					<h2>iterating dict WITH .items()</h2>
+					<table class="card-text" width='100%'>
+                      {% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}					  
+						<tr><br></tr>
+						<tr>cmp_name</tr>
+						<tr><br></tr>
+						<tr>{{cmp_name}}</tr>
+						<tr><br></tr>
+						<tr>recipe</tr>
+						<tr><br></tr>
+						<tr>{{cmp_rcp}}</tr>
+						<tr><br></tr>
+						<tr>- - - - - - -</tr>
+                      {% endfor %}
+                    </table>
+					
+					<br>
+					<h2>iterating dict WITH .items()</h2>
+					<table class="card-text" width='100%'>
+                      {% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}					  
+						<tr><br></tr>
+						<tr>cmp_name</tr>
+						<tr><br></tr>
+						<tr>{{cmp_name}}</tr>
+						<tr><br></tr>
+						<tr>ingredients</tr>
+						<tr>{{cmp_rcp['ingredients']}}<br></tr>
+						<tr><br></tr>
+							{% for ingd_line in cmp_rcp['ingredients']%}
+								<tr>{{ingd_line}}</tr><br>								
+							{% endfor %}						
+						<tr><br></tr>
+						<tr>- - - - - - -</tr>
+                      {% endfor %}
+                    </table>					
+					
+					<br><br>First Draft<br><br>
+					
+					<!--headline components-->
+					<table class="card-text" width='100%'>
+						{{ recipes[0]['components'] }}
+						<!--{% for comp_name, comp_recipe in recipes[0]['components'].items() %}-->
+						<tr>{{comp_name}} - {{comp_recipe['ingredients'][0]}}</tr>
+						<tr><h5 class="card-title">{{comp_name}}</h3></tr>
+							{% for ingd_line in comp_recipe['ingredients'] %}
+							<tr>
+								<!--td>{{ingd_line[0]}}</td-->
+								<td>{{ingd_line[1]}}</td>
+								  {% if ingd_line[2] == '(0)' %}
+									  <td></td>
+								  {% else %}
+									  <td>{{ingd_line[2]}}</td>
+								  {% endif %}                          
+								<td>{{ingd_line[3]}}</td>
+								<td>ATOMIC: {{ingd_line[0]}}</td>
+								  {% if ingd_line[0] == '0' %}
+									  <!--not an atomic engredient - expandable - add button-->
+									  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+								  {% else %}
+									  <td></td>
+								  {% endif %}  
+								
+								<!--extra small button - relies on additional styling recipe.css-->
+								<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
+							</tr>
+							{% endfor %}
+						{% endfor %}						
                     </table>
                 </div>
             </div>
