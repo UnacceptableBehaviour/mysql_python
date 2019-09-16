@@ -13,6 +13,43 @@
 
 		
         <div class="col-md-12">
+			<div class="card">
+				outside table<br>
+				<table class="card-text" width='100%'>
+					table inner begins<br>
+					<tr><td colspan="4">tabel row</td></tr>
+					<tr>
+						<td>1</td>
+						<td>2</td>
+						<td>3</td>
+						<td>4</td>
+					</tr>
+					table outer begins
+				</table>
+				tables ends					
+			</div>
+			<div>
+				outside table<br>			<!-- text present but not inside table tags in chrome EXPECTED -->
+				<table width='100%'>
+					table inner begins<br>	<!-- text present but not inside table tags in chrome? ?? -->
+					<tr><td colspan="4">component title</td></tr>
+					<tr>
+						<td>qty</td>
+						<td>(servings)</td>
+						<td>ingredient</td>
+						<td>button</td>
+					</tr>
+					<tr><td colspan="4">component title 2</td></tr>
+					<tr>
+						<td>qty</td>
+						<td>(servings)</td>
+						<td>ingredient</td>
+						<td>button</td>
+					</tr>
+					table outer begins<br> <!--this text disapears - :/ - appears above table!! after table inner begins -->
+				</table>
+				tables ends					
+			</div>			
             <div class="card">
                 <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
                 <div class="card-body">
@@ -24,52 +61,32 @@
                     
 					<!--headline ingredients--> 
 					<table class="card-text" width='100%'>
-                      {% for ingd_line in recipes[0]['ingredients'] %}
-                      <tr>
-                          <!--td>{{ingd_line[0]}}</td-->
-                          <td>{{ingd_line[1]}}</td>
-							{% if ingd_line[2] == '(0)' %}
-								<td></td>
-							{% else %}
-								<td>{{ingd_line[2]}}</td>
-							{% endif %}                          
-						  <td>{{ingd_line[3]}}</td>
-						  <td>ATOMIC: {{ingd_line[0]}}</td>
-						  	{% if ingd_line[0] == '0' %}
-								<!--not an atomic engredient - expandable - add button-->
-								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
-							{% else %}
-								<td></td>
-							{% endif %}  
-						  
-						  <!--extra small button - relies on additional styling recipe.css-->
-						  <!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
-                      </tr>
-                      {% endfor %}
-                    </table>
-					
-					<br>
-					<h2>iterating dict WITH .items()</h2>
-					<table class="card-text" width='100%'>
-                      {% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}					  
-						<tr><br></tr>
-						<tr>cmp_name</tr>
-						<tr><br></tr>
-						<tr>{{cmp_name}}</tr>
-						<tr><br></tr>
-						<tr>ingredients</tr>
-						<tr>{{cmp_rcp['ingredients']}}<br></tr>
-						<tr><br></tr>
-							{% for ingd_line in cmp_rcp['ingredients']%}
-								<tr>{{ingd_line}}</tr><br>								
-							{% endfor %}						
-						<tr><br></tr>
-						<tr>- - - - - - -</tr>
-                      {% endfor %}
-                    </table>					
-
+						{% for ingd_line in recipes[0]['ingredients'] %}
+						<tr>
+							<!--td>{{ingd_line[0]}}</td-->
+							<td>{{ingd_line[1]}}</td>
+							  {% if ingd_line[2] == '(0)' %}
+								  <td></td>
+							  {% else %}
+								  <td>{{ingd_line[2]}}</td>
+							  {% endif %}                          
+							<td>{{ingd_line[3]}}</td>
+							<td>ATOMIC: {{ingd_line[0]}}</td>
+							  {% if ingd_line[0] == '0' %}
+								  <!--not an atomic engredient - expandable - add button-->
+								  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+							  {% else %}
+								  <td></td>
+							  {% endif %}  
+							
+							<!--extra small button - relies on additional styling recipe.css-->
+							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
+						</tr>
+						{% endfor %}
+					</table>								
                 </div>
             </div>
+
             {% include 'nutrient_traffic_lights.html' %}
         </div>    
     </div>
