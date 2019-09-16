@@ -55,9 +55,9 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
                     <p class="card-text">{{ recipes[0]['description'] }}</p>
-                    <h3 class="card-title">Ingredients
+                    <h4 class="card-title">components
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
-                    </h3>    
+                    </h4>    
                     
 					<!--headline ingredients--> 
 					<table class="card-text" width='100%'>
@@ -83,7 +83,25 @@
 							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
 						</tr>
 						{% endfor %}
-					</table>								
+					</table>
+					<br>
+                    <h5 class="card-title">ingredients</h5>    					
+					<table class="card-text" width='100%'>
+						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}					  
+						  <tr><td colspan="4"><h6>{{cmp_name}}</h6></td></tr>
+							  {% for ingd_line in cmp_rcp['ingredients']%}
+								  <tr><td colspan="4">{{ingd_line}}</td></tr>
+								  <tr>  <!--ingredient row items-->
+									  <td>{{ingd_line[1]}}</td>
+									  <td>{{ingd_line[2]}}</td>
+									  <td>{{ingd_line[3]}}</td>
+									  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
+								  </tr>
+							  {% endfor %}						
+						  <tr><td><br></td></tr>
+						  <tr><td>- - - - - - -</td></tr>
+						{% endfor %}
+					</table>
                 </div>
             </div>
 
