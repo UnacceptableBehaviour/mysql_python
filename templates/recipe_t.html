@@ -12,44 +12,8 @@
         </script>
 
 		
-        <div class="col-md-12">
-			<div class="card">
-				outside table<br>
-				<table class="card-text" width='100%'>
-					table inner begins<br>
-					<tr><td colspan="4">tabel row</td></tr>
-					<tr>
-						<td>1</td>
-						<td>2</td>
-						<td>3</td>
-						<td>4</td>
-					</tr>
-					table outer begins
-				</table>
-				tables ends					
-			</div>
-			<div>
-				outside table<br>			<!-- text present but not inside table tags in chrome EXPECTED -->
-				<table width='100%'>
-					table inner begins<br>	<!-- text present but not inside table tags in chrome? ?? -->
-					<tr><td colspan="4">component title</td></tr>
-					<tr>
-						<td>qty</td>
-						<td>(servings)</td>
-						<td>ingredient</td>
-						<td>button</td>
-					</tr>
-					<tr><td colspan="4">component title 2</td></tr>
-					<tr>
-						<td>qty</td>
-						<td>(servings)</td>
-						<td>ingredient</td>
-						<td>button</td>
-					</tr>
-					table outer begins<br> <!--this text disapears - :/ - appears above table!! after table inner begins -->
-				</table>
-				tables ends					
-			</div>			
+        <!--<div class="col-md-12">-->
+		<div>
             <div class="card">
                 <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
                 <div class="card-body">
@@ -57,49 +21,54 @@
                     <p class="card-text">{{ recipes[0]['description'] }}</p>
                     <h4 class="card-title">components
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
-                    </h4>    
+                    </h4>
+					<h5>(makes {{recipes[0]['nutrinfo']['yield']|int}}g / {{recipes[0]['nutrinfo']['servings']|int}} servings)</h6></h5>
                     
 					<!--headline ingredients--> 
 					<table class="card-text" width='100%'>
 						{% for ingd_line in recipes[0]['ingredients'] %}
-						<tr>
-							<!--td>{{ingd_line[0]}}</td-->
-							<td>{{ingd_line[1]}}</td>
-							  {% if ingd_line[2] == '(0)' %}
+						<tr>  <!--ingredient row items-->
+							<td>{{ingd_line[1]}}</td>			<!-- qty -->
+							  {% if ingd_line[2] == '(0)' %}	<!-- servings -->
 								  <td></td>
 							  {% else %}
 								  <td>{{ingd_line[2]}}</td>
 							  {% endif %}                          
-							<td>{{ingd_line[3]}}</td>
-							<td>ATOMIC: {{ingd_line[0]}}</td>
-							  {% if ingd_line[0] == '0' %}
-								  <!--not an atomic engredient - expandable - add button-->
-								  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">expand</a></td>
+							<td>{{ingd_line[3]}}</td>			<!-- ingredient -->
+							  {% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
 							  {% else %}
-								  <td></td>
-							  {% endif %}  
-							
+								<td></td>
+							  {% endif %}
 							<!--extra small button - relies on additional styling recipe.css-->
-							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
+							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->							  
 						</tr>
 						{% endfor %}
 					</table>
 					<br>
-                    <h5 class="card-title">ingredients</h5>    					
+					{% if recipes[0]['components']|length > 0 %}
+                    <h5 class="card-title">ingredients</h5>
+					{% endif %}
 					<table class="card-text" width='100%'>
-						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}					  
-						  <tr><td colspan="4"><h6>{{cmp_name}}</h6></td></tr>
-							  {% for ingd_line in cmp_rcp['ingredients']%}
-								  <tr><td colspan="4">{{ingd_line}}</td></tr>
+						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}	<!-- ingredients for each component -->				  
+						  <tr><td colspan="4"><h6><b>{{cmp_name}}</b> (makes {{cmp_rcp['nutrinfo']['yield']|int}}g / {{cmp_rcp['nutrinfo']['servings']|int}} servings)</h6></td></tr>
+							  {% for ingd_line in cmp_rcp['ingredients'] %}
 								  <tr>  <!--ingredient row items-->
-									  <td>{{ingd_line[1]}}</td>
-									  <td>{{ingd_line[2]}}</td>
-									  <td>{{ingd_line[3]}}</td>
-									  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
+									  <td>{{ingd_line[1]}}</td>			<!-- qty -->
+										{% if ingd_line[2] == '(0)' %}	<!-- servings -->
+											<td></td>
+										{% else %}
+											<td>{{ingd_line[2]}}</td>
+										{% endif %}                          
+									  <td>{{ingd_line[3]}}</td>			<!-- ingredient -->
+										{% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+										  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
+										{% else %}
+										  <td></td>
+										{% endif %} 
 								  </tr>
 							  {% endfor %}						
 						  <tr><td><br></td></tr>
-						  <tr><td>- - - - - - -</td></tr>
 						{% endfor %}
 					</table>
                 </div>

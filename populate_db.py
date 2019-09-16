@@ -187,7 +187,7 @@ def create_entry_in_db(db, table, entry):
             print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
         
         elif header == 'yield':
-            print(f"{header} is a NUMBER in g")            
+            print(f"{header} is a NUMBER in g")
             data = data + f"{entry[header].rstrip('g')}, "
         
         elif header == 'allergens' or header == 'tags':
