@@ -33,8 +33,17 @@ print("----- helpers_db: attaching to DB ------------------------------------E")
 
 
 # time helper function for time since epoch, day, 24hr clock
-#from helpers_tracker import nix_time_ms, day_from_nix_time, time24h_from_nix_time
-import helpers_tracker
+
+def nix_time_ms(dt=datetime.now()):
+    epoch = datetime.utcfromtimestamp(0)
+    return int( (dt - epoch).total_seconds() * 1000.0 )
+
+def day_from_nix_time(nix_time_ms):
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%a").lower()
+
+def time24h_from_nix_time(nix_time_ms):
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%H%M")
+
 
 
 # indexes for ingredients row
@@ -47,8 +56,8 @@ TRACK_NIX_TIME = 4
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings='(0)'):
-    timestamp = helpers_tracker.nix_time_ms()
+def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings=0):
+    timestamp = nix_time_ms()
     
     if atomic < 0:
         # look ingredient up in DB and see if we have a recipe (0)
@@ -58,7 +67,7 @@ def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings='(0)'):
     if len(ingredient) == 0:
         ingredient = "ingredient was blank!"
 
-    ingredient_list = [atomic, qty, servings, ingredient, timestamp]
+    ingredient_list = [str(atomic), qty, f"({servings})", ingredient, timestamp]
     
     pprint(ingredient_list)
     
@@ -139,7 +148,7 @@ def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings='(0)'):
 # 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def return_recipe_dictionary():
-    nix_time_in_ms = helpers_tracker.nix_time_ms()
+    nix_time_in_ms = nix_time_ms()
     
     return {
         # fields super sections
@@ -152,8 +161,8 @@ def return_recipe_dictionary():
         'atomic': 1,        # 0 if component / further recipe info available
         'user_rating': 1,
         'dt_date': nix_time_in_ms,
-        'dt_day': helpers_tracker.day_from_nix_time(nix_time_in_ms),
-        'dt_time': helpers_tracker.time24h_from_nix_time(nix_time_in_ms),
+        'dt_day': day_from_nix_time(nix_time_in_ms),
+        'dt_time': time24h_from_nix_time(nix_time_in_ms),
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
         'nutrinfo': {

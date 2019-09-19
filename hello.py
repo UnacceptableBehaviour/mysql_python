@@ -20,7 +20,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-
+from helpers_tracker import return_daily_tracker
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -200,9 +200,10 @@ def button_3():
 @app.route('/tracker', methods=["GET", "POST"])
 def track_items():
     headline_py = 'track items..'
-    ri_id = 41
-    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
-    recipes = [recipe]        
+    
+    
+    daily_tracker = return_daily_tracker()
+    recipes = [daily_tracker['dtk_rcp']]
     
     if request.method == 'POST':
         print("* * * TRACKER: data POSTED:")
@@ -210,23 +211,19 @@ def track_items():
         # update DB
     
     else:
-        daily_tracker = return_recipe_dictionary()
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'steak')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'after swim breakfast 20190913')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'pork stew and sweetheart cabbage noodles')
     
-        #add_ingredient_w_timestamp(recipe, atomic, qty_g, servings, ingredient)
-        add_ingredient_w_timestamp(daily_tracker, 1, '50g', 'bananas')
-        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
-        add_ingredient_w_timestamp(daily_tracker, 1, '180g', 'steak')
-        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
-        add_ingredient_w_timestamp(daily_tracker, 1, '50g', 'bananas')
-        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
-        
+    pprint(daily_tracker)
     
-        if len( daily_tracker['ingredients'] ) == 0:
-            print("* * * TRACKER EMPTY LOADING TEST DATA")
-            ri_id = 1501
-            daily_tracker = get_single_recipe_from_db_for_display_as_dict(ri_id)
-    
-    return render_template('track_items.html', headline=headline_py, dtk=daily_tracker, recipes=recipes, lines=[f"BUTTON 5"])
+    return render_template('track_items.html', headline=headline_py, daily_tracker=daily_tracker, recipes=recipes, lines=[f"BUTTON 5"])
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])

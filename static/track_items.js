@@ -5,21 +5,21 @@ document.getElementById('b_update_0').remove();
 document.getElementById('b_clear').remove();
 
 
-var form = document.getElementById('addForm');
-//var addItem = document.getElementById('add-item-button');
+//var form = document.getElementById('addForm');
+var addItemButton = document.getElementById('add-item-button');
+
 var itemList = document.getElementById('items');
 var filter = document.getElementById('filter');
 var undo = document.getElementById('undo-button');
 
 
 // Form submit event
-form.addEventListener('submit', addItem);
-//addItem.addEventListener('submit', addItem);
-
+addItemButton.addEventListener('click', addItem);
 // Delete event
 itemList.addEventListener('click', removeItem);
 // Undelete
 undo.addEventListener('click', undeleteListItem);
+
 
 // Filter event
 // filter.addEventListener('keyup', filterItems);
@@ -42,7 +42,8 @@ function addItem(e){
   console.log('>>');
   
   // Get input value
-  var newItem = document.getElementById('item').value;
+  var newItem = document.getElementById('addForm').value;
+  console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
   
   // Create new li element
   var li = document.createElement('li');
