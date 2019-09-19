@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
 
 
 from sqlalchemy import create_engine
@@ -45,6 +45,8 @@ data['chosen_tag_filters'] = ['vegan', 'veggie', 'cbs']
 data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
 
 data['allergens'] = ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide']
+
+
 
 # default
 #engine = db.create_engine('dialect+driver://user:pass@host:port/db')
@@ -209,6 +211,15 @@ def track_items():
     
     else:
         daily_tracker = return_recipe_dictionary()
+    
+        #add_ingredient_w_timestamp(recipe, atomic, qty_g, servings, ingredient)
+        add_ingredient_w_timestamp(daily_tracker, 1, '50g', 'bananas')
+        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
+        add_ingredient_w_timestamp(daily_tracker, 1, '180g', 'steak')
+        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
+        add_ingredient_w_timestamp(daily_tracker, 1, '50g', 'bananas')
+        add_ingredient_w_timestamp(daily_tracker, 0, '180g', 'coffee')
+        
     
         if len( daily_tracker['ingredients'] ) == 0:
             print("* * * TRACKER EMPTY LOADING TEST DATA")

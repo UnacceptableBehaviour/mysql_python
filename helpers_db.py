@@ -13,6 +13,8 @@ import itertools
 import re
 import copy                 # copy.deepcopy()
 #from pathlib import Path
+from datetime import datetime
+#datetime.now()
 
 # for gallery stars before actual data
 from random import random
@@ -29,16 +31,38 @@ engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # dat
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 
+
+# time helper function for time since epoch, day, 24hr clock
+#from helpers_tracker import nix_time_ms, day_from_nix_time, time24h_from_nix_time
+import helpers_tracker
+
+
 # indexes for ingredients row
 ATOMIC_INDEX = 0                    # default value is 1 - TRUE
 QTY_IN_G_INDEX = 1
 SERVING_INDEX = 2
 INGREDIENT_INDEX = 3
-
+TRACK_NIX_TIME = 4
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings='(0)'):
+    timestamp = helpers_tracker.nix_time_ms()
+    
+    if atomic < 0:
+        # look ingredient up in DB and see if we have a recipe (0)
+        # or if it's off the shelf (1)
+        atomic = -1 # not checked        
+
+    if len(ingredient) == 0:
+        ingredient = "ingredient was blank!"
+
+    ingredient_list = [atomic, qty, servings, ingredient, timestamp]
+    
+    pprint(ingredient_list)
+    
+    recipe['ingredients'].append(ingredient_list)
 
 
   
@@ -57,17 +81,17 @@ INGREDIENT_INDEX = 3
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # typical recipe
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#{'ingredients': [[1, '250g', '(0)', 'cauliflower'],    # sublist
-#                 [1, '125g', '(0)', 'grapes'],
-#                 [1, '200g', '(4)', 'tangerines'],
-#                 [1, '55g', '(0)', 'dates'],
-#   atomic >-------1, '8g', '(0)', 'coriander'],
-#                 [1, '8g', '(0)', 'mint'],
-#                 [1, '4g', '(0)', 'chillies'],
-#   sub_comp >-----0, '45g', '(0)', 'pear and vanilla reduction lite'],
-#                 [1, '2g', '(0)', 'salt'],
-#                 [1, '2g', '(0)', 'black pepper'],
-#                 [1, '30g', '(0)', 'flaked almonds']],
+#{'ingredients': [[1, '250g', '(0)', 'cauliflower', nix_time_in_ms],    # sublist
+#                 [1, '125g', '(0)', 'grapes', nix_time_in_ms],
+#                 [1, '200g', '(4)', 'tangerines', nix_time_in_ms],
+#                 [1, '55g', '(0)', 'dates', nix_time_in_ms],
+#   atomic >-------1, '8g', '(0)', 'coriander', nix_time_in_ms],
+#                 [1, '8g', '(0)', 'mint', nix_time_in_ms],
+#                 [1, '4g', '(0)', 'chillies', nix_time_in_ms],
+#   sub_comp >-----0, '45g', '(0)', 'pear and vanilla reduction lite', nix_time_in_ms],
+#                 [1, '2g', '(0)', 'salt', nix_time_in_ms],
+#                 [1, '2g', '(0)', 'black pepper', nix_time_in_ms],
+#                 [1, '30g', '(0)', 'flaked almonds', nix_time_in_ms]],
 #  'ri_name': 'cauliflower california',
 #  'atomic' : 0
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -115,6 +139,8 @@ INGREDIENT_INDEX = 3
 # 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def return_recipe_dictionary():
+    nix_time_in_ms = helpers_tracker.nix_time_ms()
+    
     return {
         # fields super sections
         # header:       name image desc             EG gallery          
@@ -125,6 +151,9 @@ def return_recipe_dictionary():
         'description': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
         'atomic': 1,        # 0 if component / further recipe info available
         'user_rating': 1,
+        'dt_date': nix_time_in_ms,
+        'dt_day': helpers_tracker.day_from_nix_time(nix_time_in_ms),
+        'dt_time': helpers_tracker.time24h_from_nix_time(nix_time_in_ms),
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
         'nutrinfo': {
@@ -309,6 +338,16 @@ def toggle_filter(filter_list, filter_name):
         filter_list.append(filter_name)
     
 
+
+class RecipeTracker:    
+    def __init__(self, recipe={}):
+        self.recipe = return_recipe_dictionary().update(recipe)
+
+    
+    
+
+
+
     
 if __name__ == '__main__':
     
@@ -342,8 +381,9 @@ if __name__ == '__main__':
     
     pprint( get_single_recipe_with_subcomponents_from_db_for_display_as_dict(test_id[0]) )
     
+    print("\n\n << RECIPE DICT >>\n\n")
+    pprint(return_recipe_dictionary())
     
-    
-    
+    pprint(RecipeTracker())
     
     
