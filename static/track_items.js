@@ -117,7 +117,7 @@ function splitLineIntoQtyAndIngredient(newItem){
   if (info !== null) {
     qty = parseInt(info[1]);
     breakDown.shift();
-    console.log(`qty ${qty}`);
+    console.log(`qty ${qty} - info:${info} len:${typeof(info)} type:${info.len}`);
     
     // see if next item is units
     info = breakDown[0].match(/\b(gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)\b/img);
