@@ -51,43 +51,138 @@ function isIngredientAtomic(i){
   return String(ATOMIC);
 }
 
+function loadServingModifierLUT(){
+  // load from DB
+  var lut = {
+    'onion': { 'small': 100.0, 'medium': 150.0, 'large': 200.0 },
+    'red onion' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0 },
+    'banana' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0 },
+    'red peppers': { 'small': 120.0, 'medium': 150.0, 'large': 180.0 },
+  };
+  
+  return lut;
+}
+
+function getServingWeight(qty, ingredient, modifier='medium'){
+  // get serving data for ingredient from LUT - TODO implement
+  
+  var servingModifierLUT = loadServingModifierLUT();
+  var qty = parseInt(qty);
+  var size = 0;
+  
+  // quit dirty bounds check
+  if (modifier === 'xs') { modifier='small'; };
+  if ( (modifier === 'xl') || (modifier === 'mahoosive') ) { modifier='large'; };
+  
+  
+  try{
+    size = servingModifierLUT[ingredient][modifier];  
+  }
+  catch(err){
+    conssole.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}`);
+    return 99999;     // it's BIG to notice somethings wrong!
+  }
+  
+  return qty * size;  
+}
+
+
 function splitLineIntoQtyAndIngredient(newItem){
+  // test cases
+  // qtyunit ingredient               6g wasabi
+  // qty unit ingredient              7 tsp sugar
+  // qty adjective ingredient         8 mediun onions
+  // qty ingredient ingredient        16 pork cheeks
+  // qty ingredient                   a banana
+  // qty ingredient ingredient        4 large red peppers
+  // qty unit ingredient              20g rosemary
+  // qty unit ingredient ingredient   10 cups chicken stock
+  // qtyunit ingredient ingredient    5cups gram flour
+  // qty unit ingredient ingredient   a medium chicken
+  
   // units: g kg kgs oz lb lbs tsp tbsp cup cups l each - I'm sure theres more but that will do for now!
   // match number with or without units at start of line
   // matches in order - put plurals 1st!
   // ^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)
   // /regex/i - insensitive - no need .toLowerCase()
+  var qty='99999', units=null, modifier=null, ingredient=newItem, servings='(0)';
   
-  // remove space before unit: 5 cups	chicken stock => 5cups chicken stock cube
-  // $& - matched substring
-  console.log('- - - - regex QTY - S');
-  if ( newItem.match(/(\s+?(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l))/i) ) {
-    unit_w_space = newItem.trim().match(/(\s+?(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l))/i)[1];
-    console.log(newItem);
-    console.log(unit_w_space)
-    newItem = newItem.trim().replace(unit_w_space, unit_w_space.trim() );
-    console.log(newItem);    
+  newItem = newItem.trim().replace(/^a/i, '1 ' );
+  
+  breakDown = newItem.split(' ');
+  
+  console.log(`- - - - regex QTY - S\n ${breakDown}`);
+
+  info = breakDown[0].match(/^([0-9\/\.]+)\b/img);       // Number on it's own 1, 1.2 1/2 1/4
+  if (info !== null) {
+    qty = parseInt(info[1]);
+    breakDown.shift();
+    console.log(`qty ${qty}`);
+    
+    // see if next item is units
+    info = breakDown[0].match(/\b(gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)\b/img);
+    if (info !== null) {
+      units = info[1];
+      breakDown.shift();
+      console.log(`units ${units}`);
+    }
+    
+    // or a modifier (adjective)
+    info = breakDown[0].match(/\b(xs|small|medium|large|xl|mahoosive)\b/img);
+    if (info !== null) {
+      modifier = info[1];
+      breakDown.shift();
+      console.log(`modifier ${modifier}`);
+    }
+    
+    ingredient = breakDown.join(' ');
+    console.log(`ingredient ${ingredient}`);
   }
   
-  var qty = '1';
-  var ingredient = newItem;
-  if ( newItem.match(/^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)/i) ) {
-    qty = newItem.match(/^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)/i)[1];
-    ingredient = newItem.replace(qty, '').trim()
+  
+  // may have started with 5g or 5 cups  
+  console.log('- - - - regex QTY+UNIT');
+  info = breakDown[0].match(/^([0-9\/\.]+)(gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)/i);
+  if (info !== null) { // 1 = qty  2 = units
+
+    qty = parseInt(info[1]);    
+    console.log(`qty ${qty}`);
+    
+    units = info[2];  
+    console.log(`units ${units}`);
+
+    breakDown.shift();
+
+    ingredient = breakDown.join(' ');
+    console.log(`ingredient ${ingredient}`);
+  }
+  
+  
+  // have no units - look item up and calculate/guess weight
+  if (units === null) { // generate weight in g from LUT
+    servings = `(${qty})`
+    console.log(`qty:${qty} - ingredient:${ingredient} - modifier:${modifier}`)
+    qty = getServingWeight(qty, ingredient, modifier)
+    units = 'g'
   }
 
-  console.log(qty);
-  console.log(ingredient);
+  // have no units - look item up and calculate/guess weight
+  if (units !== 'g') { // generate weight in g from volume LUT
+    // TODO - implement
+    //console.log(`qty:${qty} - ingredient:${ingredient} - modifier:${modifier}`)
+    //qty = getServingWeight(qty, ingredient, modifier)
+    //units = 'g'
+  }
+  
+  qtyUnits = `${qty}${units}`
+  
+  console.log([isIngredientAtomic(newItem), qtyUnits, servings, ingredient]);
   console.log('- - - - regex QTY - E');
   
-  return [qty, ingredient];
+  return [isIngredientAtomic(newItem), qtyUnits, servings, ingredient];
+  //return [qty, units, modifier, ingredient];
 }
 
-
-function getServings(qty, ingredient){
-  // get serving data for ingredient from LUT - TODO implement
-  return '(0)';
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // table building and helpers
@@ -140,22 +235,11 @@ String.prototype.ingtToClass = function(ingredient){
 // ['1', '180g', '(0)', 'steak', 1568927767066]
 function createTablelineHTML(ingredient_line_array){
   var but_delete = '<td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete">X</button></td>'; 
-  
-  console.log(ingredient_line_array[0]);
-  console.log(ingredient_line_array);
-
-  console.log(TRACK_NIX_TIME);
-  console.log(ingredient_line_array[0][TRACK_NIX_TIME]);
-  console.log(time4d_24h(ingredient_line_array[0][TRACK_NIX_TIME]));
-
     
   var time=''
   if (ingredient_line_array[TRACK_NIX_TIME] < 0) {
     time = '<td class="col-but-time"></td>'
   } else {
-    console.log(TRACK_NIX_TIME);
-    console.log(ingredient_line_array[TRACK_NIX_TIME]);
-    console.log(time4d_24h(ingredient_line_array[TRACK_NIX_TIME]));
     time = `<td class="col-but-time">${time4d_24h(ingredient_line_array[TRACK_NIX_TIME])}</td>`
   }
   
@@ -184,12 +268,7 @@ function createTablelineHTML(ingredient_line_array){
     but_more = but_explode;
     
   }
-  
-  console.log('TRACK_NIX_TIME = 4');
-  console.log(TRACK_NIX_TIME);
-  console.log(ingredient_line_array[TRACK_NIX_TIME]);
-  console.log(time4d_24h(ingredient_line_array[TRACK_NIX_TIME]));  
-  
+    
   return `<tr>${but_delete} ${time} ${qty} ${servings} ${item} ${but_photo} ${but_more}</tr>`
 }
 
@@ -283,11 +362,8 @@ function addItemToTable(e){
   var newItem = document.getElementById('addForm').value;
   console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
   
-  // break it into constituents
-  qni = splitLineIntoQtyAndIngredient(newItem);  
-  qty = qni[0];
-  ingredient = qni[1];
-  servings = getServings(qty, ingredient);
+  // break it into constituents  
+  ingredientLineArray = splitLineIntoQtyAndIngredient(newItem);  // return [qty, units, modifier, ingredient];
   
   // timestamp it if it's a tracker item
   var time = NO_TIME;
@@ -296,30 +372,21 @@ function addItemToTable(e){
     console.log(`* * * timeNixTimeInms(): ${time}  24H-${time4d_24h(time)}`)
   }
   
+  ingredientLineArray.push(time);
+  
   //atomic, qty,  sevings, item, timestamp
   // ['1', '180g', '(0)', 'steak', 1568927767066]
-  // create the ingredient line, add it to the table recipe (tracker / recipe or component)
   
-  // depends on the table? get relevant component['ingredients']  from table?
-  // TRACKER
-  console.log(`dtk['dtk_rcp']['ingredients'] - ${typeof(dtk['dtk_rcp']['ingredients'])}`);
-  console.log(dtk['dtk_rcp']['ingredients']);
-  
-  dtk['dtk_rcp']['ingredients'].push([isIngredientAtomic(newItem), qty, servings, ingredient, time]);
+  dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);
   
   // COMPONENT
-  //comonent array.append()
-  
-  // Create new table row      // arr.slice(-1) < return last element of array w/o removing it
-  //addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'].slice(-1)[0]);
-  lastIngredient = dtk['dtk_rcp']['ingredients'].length - 1;
 
   // all print exaclty the same thing
-  console.log( `dtk['dtk_rcp']['ingredients'].slice(-1)       - ${dtk['dtk_rcp']['ingredients'].slice(-1)}` );      // => [[ingredient_arr]]
-  console.log( `dtk['dtk_rcp']['ingredients'].slice(-1)[0]    - ${dtk['dtk_rcp']['ingredients'].slice(-1)[0]}` );   // => [ingredient_arr]
-  console.log( `dtk['dtk_rcp']['ingredients'][lastIngredient] - ${dtk['dtk_rcp']['ingredients'][lastIngredient]}` );// => [ingredient_arr]
+  console.log( `dtk['dtk_rcp'] ingredientLineArray - ${ingredientLineArray}` );      // => [[ingredient_arr]]
+  //console.log( `dtk['dtk_rcp']['ingredients'][lastIngredient] - ${dtk['dtk_rcp']['ingredients'][lastIngredient]}` );// => [ingredient_arr]
   
-  addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'][lastIngredient]);
+  //addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'][lastIngredient]);
+  addRowToTable( tableWithFocus, ingredientLineArray);
 
 }
 
