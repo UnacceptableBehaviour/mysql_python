@@ -5,18 +5,34 @@ document.getElementById('b_update_0').remove();
 document.getElementById('b_clear').remove();
 
 
+const ATOMIC_INDEX = 0;        // default value is 1 - TRUE
+const QTY_IN_G_INDEX = 1;
+const SERVING_INDEX = 2;
+const INGREDIENT_INDEX = 3;
+const TRACK_NIX_TIME = 4;
+const NO_TIME = -1;
+const ATOMIC = 1;
+const RCP_IN_DB = 0;
+
+// code review - mixed style! BAD
+// find out generally accepted coding style fro JS and redo JS files TODO
+
 
 var addItemButton = document.getElementById('add-item-button');
 
+
 var itemList = document.getElementById('items'); // depracated TODO - REMOVE
 var trackerTable = document.getElementById('table-tracked-items');
+var tableWithFocus = trackerTable;
 
 var filter = document.getElementById('filter');
 var undo = document.getElementById('undo-button');
 
-
 // Form submit event
 addItemButton.addEventListener('click', addItem);
+  //addItemToList(e);
+  //addItemToTable(e);
+
 // Delete event
 itemList.addEventListener('click', removeItem);
 // Undelete
@@ -27,6 +43,54 @@ undo.addEventListener('click', undeleteListItem);
 // filter.addEventListener('keyup', filterItems);
 // addthis back when adding auto complete ingredients 
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// ingredient line helpers
+function isIngredientAtomic(i){
+  // TODO check DB 
+  return String(ATOMIC);
+}
+
+function splitLineIntoQtyAndIngredient(newItem){
+  // units: g kg kgs oz lb lbs tsp tbsp cup cups l each - I'm sure theres more but that will do for now!
+  // match number with or without units at start of line
+  // matches in order - put plurals 1st!
+  // ^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)
+  // /regex/i - insensitive - no need .toLowerCase()
+  
+  // remove space before unit: 5 cups	chicken stock => 5cups chicken stock cube
+  // $& - matched substring
+  console.log('- - - - regex QTY - S');
+  if ( newItem.match(/(\s+?(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l))/i) ) {
+    unit_w_space = newItem.trim().match(/(\s+?(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l))/i)[1];
+    console.log(newItem);
+    console.log(unit_w_space)
+    newItem = newItem.trim().replace(unit_w_space, unit_w_space.trim() );
+    console.log(newItem);    
+  }
+  
+  var qty = '1';
+  var ingredient = newItem;
+  if ( newItem.match(/^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)/i) ) {
+    qty = newItem.match(/^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)/i)[1];
+    ingredient = newItem.replace(qty, '').trim()
+  }
+
+  console.log(qty);
+  console.log(ingredient);
+  console.log('- - - - regex QTY - E');
+  
+  return [qty, ingredient];
+}
+
+
+function getServings(qty, ingredient){
+  // get serving data for ingredient from LUT - TODO implement
+  return '(0)';
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// table building and helpers
 function pad(n) {
   n = parseInt(n);             // parseInt(n, 10) base 10
   return n<10 ? '0'+n : n;
@@ -37,12 +101,25 @@ function time4d_24h(timestamp){
   return `${pad(ts.getHours())}${pad(ts.getMinutes())}`;
 }
 
+function timeNixTimeInms(){
+  return (new Date()).getTime();
+}
 
-const ATOMIC_INDEX = 0;        // default value is 1 - TRUE
-const QTY_IN_G_INDEX = 1;
-const SERVING_INDEX = 2;
-const INGREDIENT_INDEX = 3;
-const TRACK_NIX_TIME = 4;
+//JS Regex
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+//Flags
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Advanced_searching_with_flags_2
+// my hot dog recipe => my-hot-dog-recipe
+String.prototype.ingtToClass = function(ingredient){
+  // remove punctuation
+  ingredient = ingredient.split(/[^a-zA-Z0-9\s]/).join('')
+
+  // replace sapce w/ hyphen
+  return ingredient.split(/\s+/).join('-')
+
+}
+
+
 
 //<tr>  <!--ingredient row items-->        
 //  <td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete">X</button></td><!--<button class="btn btn-danger btn-sm float-left delete">X</button>-->          
@@ -64,7 +141,23 @@ const TRACK_NIX_TIME = 4;
 function createTablelineHTML(ingredient_line_array){
   var but_delete = '<td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete">X</button></td>'; 
   
-  var time = `<td class="col-but-time">${time4d_24h(ingredient_line_array[TRACK_NIX_TIME])}</td>`
+  console.log(ingredient_line_array[0]);
+  console.log(ingredient_line_array);
+
+  console.log(TRACK_NIX_TIME);
+  console.log(ingredient_line_array[0][TRACK_NIX_TIME]);
+  console.log(time4d_24h(ingredient_line_array[0][TRACK_NIX_TIME]));
+
+    
+  var time=''
+  if (ingredient_line_array[TRACK_NIX_TIME] < 0) {
+    time = '<td class="col-but-time"></td>'
+  } else {
+    console.log(TRACK_NIX_TIME);
+    console.log(ingredient_line_array[TRACK_NIX_TIME]);
+    console.log(time4d_24h(ingredient_line_array[TRACK_NIX_TIME]));
+    time = `<td class="col-but-time">${time4d_24h(ingredient_line_array[TRACK_NIX_TIME])}</td>`
+  }
   
   var qty = `<td class="col-but-qty text-center">${ingredient_line_array[QTY_IN_G_INDEX]}</td>`
       
@@ -92,6 +185,11 @@ function createTablelineHTML(ingredient_line_array){
     
   }
   
+  console.log('TRACK_NIX_TIME = 4');
+  console.log(TRACK_NIX_TIME);
+  console.log(ingredient_line_array[TRACK_NIX_TIME]);
+  console.log(time4d_24h(ingredient_line_array[TRACK_NIX_TIME]));  
+  
   return `<tr>${but_delete} ${time} ${qty} ${servings} ${item} ${but_photo} ${but_more}</tr>`
 }
 
@@ -103,6 +201,7 @@ function addRowToTable(table, ingredient_array){
   
   console.log('- - - -');
   console.log(tbody);
+  console.log(ingredient_array);
   console.log('- - - -');
 
   var row = document.createElement('tr');
@@ -127,7 +226,7 @@ function buildTableFromDailyTracker(){
   // render selected version
   
   // get handle to table
-  table = document.getElementById('table-tracked-items')    
+  table = document.getElementById('table-tracked-items');
   
   console.log('> >  building table < < - - - - S');
   console.log(dtk);
@@ -141,8 +240,92 @@ function buildTableFromDailyTracker(){
   console.log('> >  building table < < - - - - E');
 }
 
-// Add item
+// a component is a sub recipe, a recipe for an item in an ingredients list
+function buildTableFromComponent(name, component){
+  // needs work for recipe page too - TODO CHECK & ingtegrate
+  
+  // create table
+  table = document.createElement('table');
+  table.className = 'tbl-ingredients'
+  table.setAttribute('id', name.ingtToClass)
+  
+  console.log(`> >  building table [${table.getAttribute('id')}] < < - - - - S`);
+  //console.log(dtk);
+  //console.log(dtk['dtk_rcp']['ingredients']);
+  //
+  //for (i_arr in dtk['dtk_rcp']['ingredients']){
+  //  console.log(i_arr);    
+  //  addRowToTable(table, dtk['dtk_rcp']['ingredients'][i_arr]);
+  //}
+  
+  console.log('> >  building table < < - - - - E');
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// buttons
+
 function addItem(e){
+  e.preventDefault();
+  addItemToList(e);
+  addItemToTable(e);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Add item to table
+function addItemToTable(e){
+  e.preventDefault();
+
+  console.log('e.target.id - table');
+  console.log(e.target.id);
+  console.log('>>');
+  
+  // Get input value
+  var newItem = document.getElementById('addForm').value;
+  console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
+  
+  // break it into constituents
+  qni = splitLineIntoQtyAndIngredient(newItem);  
+  qty = qni[0];
+  ingredient = qni[1];
+  servings = getServings(qty, ingredient);
+  
+  // timestamp it if it's a tracker item
+  var time = NO_TIME;
+  if (tableWithFocus === trackerTable) {
+    time = timeNixTimeInms();
+    console.log(`* * * timeNixTimeInms(): ${time}  24H-${time4d_24h(time)}`)
+  }
+  
+  //atomic, qty,  sevings, item, timestamp
+  // ['1', '180g', '(0)', 'steak', 1568927767066]
+  // create the ingredient line, add it to the table recipe (tracker / recipe or component)
+  
+  // depends on the table? get relevant component['ingredients']  from table?
+  // TRACKER
+  console.log(`dtk['dtk_rcp']['ingredients'] - ${typeof(dtk['dtk_rcp']['ingredients'])}`);
+  console.log(dtk['dtk_rcp']['ingredients']);
+  
+  dtk['dtk_rcp']['ingredients'].push([isIngredientAtomic(newItem), qty, servings, ingredient, time]);
+  
+  // COMPONENT
+  //comonent array.append()
+  
+  // Create new table row      // arr.slice(-1) < return last element of array w/o removing it
+  //addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'].slice(-1)[0]);
+  lastIngredient = dtk['dtk_rcp']['ingredients'].length - 1;
+
+  // all print exaclty the same thing
+  console.log( `dtk['dtk_rcp']['ingredients'].slice(-1)       - ${dtk['dtk_rcp']['ingredients'].slice(-1)}` );      // => [[ingredient_arr]]
+  console.log( `dtk['dtk_rcp']['ingredients'].slice(-1)[0]    - ${dtk['dtk_rcp']['ingredients'].slice(-1)[0]}` );   // => [ingredient_arr]
+  console.log( `dtk['dtk_rcp']['ingredients'][lastIngredient] - ${dtk['dtk_rcp']['ingredients'][lastIngredient]}` );// => [ingredient_arr]
+  
+  addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'][lastIngredient]);
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Add item to list
+function addItemToList(e){
   //<li class="list-group-item">
   //  <button class="btn btn-danger btn-sm float-left delete">X</button>
   //  <div class="list-group-item-sub-text">${added_item_text}</div>
@@ -152,7 +335,7 @@ function addItem(e){
   //`<li class="list-group-item"><button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">---- 30g smoked ham</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button></li>`
   e.preventDefault();
 
-  console.log('e.target.id');
+  console.log('e.target.id - list');
   console.log(e.target.id);
   console.log('>>');
   
@@ -201,9 +384,9 @@ function addItem(e){
 
   // Append li to list
   itemList.appendChild(li);
-  
-  buildTableFromDailyTracker()
+    
 }
+
 
 function factoryLineItem(){
   var line_item = {
@@ -265,3 +448,8 @@ function filterItems(e){
     }
   });
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// build tracker table
+buildTableFromDailyTracker()
+
