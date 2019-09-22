@@ -54,13 +54,70 @@ function isIngredientAtomic(i){
 function loadServingModifierLUT(){
   // load from DB
   var lut = {
-    'onion': { 'small': 100.0, 'medium': 150.0, 'large': 200.0 },
-    'red onion' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0 },
-    'banana' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0 },
-    'red peppers': { 'small': 120.0, 'medium': 150.0, 'large': 180.0 },
+    'onions': { 'small': 100.0, 'medium': 150.0, 'large': 200.0, 'density': 1.0 },
+    'red onions' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0, 'density': 1.0 },
+    'bananas' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
+    'red peppers': { 'small': 120.0, 'medium': 150.0, 'large': 180.0, 'density': 1.0 },
+    'pork cheeks': { 'small': 70.0, 'medium': 83.0, 'large': 96.0, 'density': 1.0 },
+    'chicken': { 'small': 1350.0, 'medium': 1600.0, 'large': 1900.0, 'density': 1.0 },
+    'chickens': { 'small': 1350.0, 'medium': 1600.0, 'large': 1900.0, 'density': 1.0 },
+    'whole chicken': { 'small': 1350.0, 'medium': 1600.0, 'large': 1900.0, 'density': 1.0 },
+    'alcohol': { 'density': 0.79 },
+    'veg oil': { 'density': 0.93 },
+    'lard': { 'density': 0.82 },
   };
   
   return lut;
+}
+
+function loadUnitsToVolume() {
+  unitsToVolume = { // 1 cm3 of water density = 1.0
+    'gs': 1.0,
+    'g': 1.0,
+    'mls': 1.0,
+    'ml': 1.0,
+    'm': 1.0,
+    'kgs': 1000.0,
+    'kg': 1000.0,
+    'oz': 28.35, 
+    'lbs': 453.59,
+    'lb': 453.59,
+    'tsp': 5.0,
+    'tbsp': 15.0,
+    'cups': 236.6,  // us cups - bonkers
+    'cup': 236.6,
+    'ls': 1000.0,
+    'l': 1000.0,    
+  };
+  
+  return unitsToVolume;
+}
+
+function convertToGrams(qty, units, ingredient){
+  
+  // 1 cup of veg oil
+  // vol of unit * ingredient[density] 
+
+  // load ingredient density info from DB
+  var servingModifierLUT = loadServingModifierLUT();
+
+  // load volume of units info from DB
+  var unitsToVolume = loadUnitsToVolume();
+  
+  try{
+    if ( servingModifierLUT[ingredient] === undefined) {
+      return qty * unitsToVolume[units] * 1.0;      
+    } else {
+      return qty * unitsToVolume[units] * servingModifierLUT[ingredient]['density'];  
+    }    
+  }
+  catch(err){
+    console.log(`**** WARNING: convertToGrams - DB lookup MISS: qty:${qty} units:${units} ingredient:${ingredient} vol:${unitsToVolume[units]}`);
+    return 99999;     // it's BIG to notice somethings wrong!
+  }
+  
+  
+  
 }
 
 function getServingWeight(qty, ingredient, modifier='medium'){
@@ -69,17 +126,26 @@ function getServingWeight(qty, ingredient, modifier='medium'){
   var servingModifierLUT = loadServingModifierLUT();
   var qty = parseInt(qty);
   var size = 0;
+  var validModifers = ['xs', 'small', 'medium', 'large', 'xl', 'mahoosive']
+  
+  if ( !validModifers.includes(modifier) ){
+    modifier='medium';
+  };
   
   // quit dirty bounds check
-  if (modifier === 'xs') { modifier='small'; };
-  if ( (modifier === 'xl') || (modifier === 'mahoosive') ) { modifier='large'; };
+  if (modifier === 'xs')
+    { modifier = 'small'; };
+    
+  if ( (modifier === 'xl') || (modifier === 'mahoosive') )
+    { modifier = 'large'; };
   
   
-  try{
-    size = servingModifierLUT[ingredient][modifier];  
+  try{    
+    size = servingModifierLUT[ingredient][modifier];
+    console.log(`*> servingModifierLUT: ${modifier} ${ingredient} = ${size} <`);
   }
   catch(err){
-    conssole.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}`);
+    console.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}`);
     return 99999;     // it's BIG to notice somethings wrong!
   }
   
@@ -103,46 +169,52 @@ function splitLineIntoQtyAndIngredient(newItem){
   // units: g kg kgs oz lb lbs tsp tbsp cup cups l each - I'm sure theres more but that will do for now!
   // match number with or without units at start of line
   // matches in order - put plurals 1st!
-  // ^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)*)
+  // ^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|ls|l)*)      // generate using loadUnitsToVolume().keys - DRY
   // /regex/i - insensitive - no need .toLowerCase()
-  var qty='99999', units=null, modifier=null, ingredient=newItem, servings='(0)';
+  var qty='99999', units=null, modifier='', ingredient=newItem, servings='(0)';
   
+  
+  // replace line starting a with one - a chicken - 1 (unlucky) chicken
   newItem = newItem.trim().replace(/^a/i, '1 ' );
+
   
-  breakDown = newItem.split(' ');
+  // split entry into separate items, and discard blanks
+  breakDown = newItem.split(' ').filter(function (i) { return ((i != "") && (i != null)); }); // remove empty, null and undefined;
   
+  // what we got
   console.log(`- - - - regex QTY - S\n ${breakDown}`);
 
-  info = breakDown[0].match(/^([0-9\/\.]+)\b/img);       // Number on it's own 1, 1.2 1/2 1/4
+  // case: non adjacent qty units - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  info = breakDown[0].match(/^([0-9\/\.]+)\b/i);       // Number on it's own 1, 1.2 1/2 1/4
   if (info !== null) {
-    qty = parseInt(info[1]);
+    qty = parseInt(info[1]);  
     breakDown.shift();
-    console.log(`qty ${qty} - info:${info} len:${typeof(info)} type:${info.len}`);
-    
+    console.log(`breakDown[0] ${breakDown[0]} - qty ${qty} - info:${info} type:${typeof(info)} len:${info.length}`);
+        
     // see if next item is units
-    info = breakDown[0].match(/\b(gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)\b/img);
-    if (info !== null) {
+    info = breakDown[0].match(/\b(gs|g|mls|ml|m|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|ls|l)\b/i);  // generate using loadUnitsToVolume().keys - DRY
+    if (info !== null) {      
       units = info[1];
+      console.log(`breakDown[0] ${breakDown[0]} - units ${units} - info:${info} type:${typeof(info)} len:${info.length}`);
       breakDown.shift();
-      console.log(`units ${units}`);
     }
     
     // or a modifier (adjective)
-    info = breakDown[0].match(/\b(xs|small|medium|large|xl|mahoosive)\b/img);
+    info = breakDown[0].match(/\b(xs|small|medium|large|xl|mahoosive)\b/i);
     if (info !== null) {
       modifier = info[1];
+      console.log(`breakDown[0] ${breakDown[0]} - modifier ${modifier} - info:${info} type:${typeof(info)} len:${info.length}`);
       breakDown.shift();
-      console.log(`modifier ${modifier}`);
     }
     
     ingredient = breakDown.join(' ');
     console.log(`ingredient ${ingredient}`);
   }
   
-  
+  // case: adjacent qty units - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // may have started with 5g or 5 cups  
   console.log('- - - - regex QTY+UNIT');
-  info = breakDown[0].match(/^([0-9\/\.]+)(gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|l)/i);
+  info = breakDown[0].match(/^([0-9\/\.]+)(gs|g|mls|ml|m|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|ls|l)/i); // generate using loadUnitsToVolume().keys - DRY
   if (info !== null) { // 1 = qty  2 = units
 
     qty = parseInt(info[1]);    
@@ -160,18 +232,18 @@ function splitLineIntoQtyAndIngredient(newItem){
   
   // have no units - look item up and calculate/guess weight
   if (units === null) { // generate weight in g from LUT
-    servings = `(${qty})`
-    console.log(`qty:${qty} - ingredient:${ingredient} - modifier:${modifier}`)
-    qty = getServingWeight(qty, ingredient, modifier)
-    units = 'g'
+    servings = `(${qty})`;
+    console.log(`qty:${qty} - units:${units} - ingredient:${ingredient} - modifier:${modifier}`);
+    qty = getServingWeight(qty, ingredient, modifier);
+    units = 'g';
   }
+    
 
-  // have no units - look item up and calculate/guess weight
+  // units not in grams - convert unit
   if (units !== 'g') { // generate weight in g from volume LUT
     // TODO - implement
-    //console.log(`qty:${qty} - ingredient:${ingredient} - modifier:${modifier}`)
-    //qty = getServingWeight(qty, ingredient, modifier)
-    //units = 'g'
+    qty = convertToGrams(qty, units, ingredient);
+    units = 'g'
   }
   
   qtyUnits = `${qty}${units}`
@@ -179,7 +251,7 @@ function splitLineIntoQtyAndIngredient(newItem){
   console.log([isIngredientAtomic(newItem), qtyUnits, servings, ingredient]);
   console.log('- - - - regex QTY - E');
   
-  return [isIngredientAtomic(newItem), qtyUnits, servings, ingredient];
+  return [isIngredientAtomic(newItem), qtyUnits, servings, (`${modifier} ${ingredient}`).trim()];
   //return [qty, units, modifier, ingredient];
 }
 
@@ -520,3 +592,20 @@ function filterItems(e){
 // build tracker table
 buildTableFromDailyTracker()
 
+
+var array = [0, 1, null, 2, "", 3, undefined, 3,,,,,, 4,, 4,, 5,, 6,,,,];
+
+// remove empty, null and undefined
+var filtered = array.filter(function (i) { return ((i != "") && (i != null)); }); // remove empty, null and undefined
+
+console.log(filtered);
+
+console.log( convertToGrams(100, 'g', 'veg oil') );
+console.log( convertToGrams(100, 'g', 'water') );
+console.log( convertToGrams(6, 'g', 'wasabi') );
+console.log( convertToGrams(7, 'tsp', 'sugar') );
+console.log( convertToGrams(10, 'cups', 'chicken stock') );
+//8 medium onions
+//16 pork cheeks
+//1/4 banana
+//4 large red peppers
