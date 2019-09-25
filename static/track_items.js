@@ -10,6 +10,8 @@ const QTY_IN_G_INDEX = 1;
 const SERVING_INDEX = 2;
 const INGREDIENT_INDEX = 3;
 const TRACK_NIX_TIME = 4;
+const IMG_ID = 5;
+const HTML_ID = 6;
 const NO_TIME = -1;
 const ATOMIC = 1;
 const RCP_IN_DB = 0;
@@ -20,6 +22,7 @@ const RCP_IN_DB = 0;
 
 var addItemButton = document.getElementById('add-item-button');
 
+var inputForm = document.getElementById('addForm');
 
 var itemList = document.getElementById('items'); // depracated TODO - REMOVE
 var trackerTable = document.getElementById('table-tracked-items');
@@ -31,10 +34,11 @@ var undo = document.getElementById('undo-button');
 // Form submit event
 addItemButton.addEventListener('click', addItem);
   //addItemToList(e);
-  //addItemToTable(e);
+  //addItemToTableFromForm(e);
 
 // Delete event
-itemList.addEventListener('click', removeItem);
+itemList.addEventListener('click', removeListItem);
+trackerTable.addEventListener('click', removeTableItem);
 // Undelete
 undo.addEventListener('click', undeleteListItem);
 
@@ -43,9 +47,11 @@ undo.addEventListener('click', undeleteListItem);
 // filter.addEventListener('keyup', filterItems);
 // addthis back when adding auto complete ingredients 
 
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // ingredient line helpers
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 function isIngredientAtomic(i){
   // TODO check DB 
   return String(ATOMIC);
@@ -120,14 +126,13 @@ function convertToGrams(qty, units, ingredient){
   
 }
 
+// get serving data for ingredient from LUT
 function getServingWeight(qty, ingredient, modifier='medium'){
-  // get serving data for ingredient from LUT - TODO implement
   
-  var servingModifierLUT = loadServingModifierLUT();
+  var servingModifierLUT = loadServingModifierLUT(); // TODO implement DB table
   var qty = parseInt(qty);
   var size = 0;
-  var validModifers = ['xs', 'small', 'medium', 'large', 'xl', 'mahoosive']
-  
+  var validModifers = ['xs', 'small', 'medium', 'large', 'xl', 'mahoosive'];
   if ( !validModifers.includes(modifier) ){
     modifier='medium';
   };
@@ -240,8 +245,7 @@ function splitLineIntoQtyAndIngredient(newItem){
     
 
   // units not in grams - convert unit
-  if (units !== 'g') { // generate weight in g from volume LUT
-    // TODO - implement
+  if (units !== 'g') { // generate weight in g from volume LUT    
     qty = convertToGrams(qty, units, ingredient);
     units = 'g'
   }
@@ -257,7 +261,10 @@ function splitLineIntoQtyAndIngredient(newItem){
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // table building and helpers
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 function pad(n) {
   n = parseInt(n);             // parseInt(n, 10) base 10
   return n<10 ? '0'+n : n;
@@ -277,15 +284,34 @@ function timeNixTimeInms(){
 //Flags
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Advanced_searching_with_flags_2
 // my hot dog recipe => my-hot-dog-recipe
-String.prototype.ingtToClass = function(ingredient){
+String.prototype.ingtToClass = function(){
+  
   // remove punctuation
-  ingredient = ingredient.split(/[^a-zA-Z0-9\s]/).join('')
-
+  var ingredientTagId = this.split(/[^a-zA-Z0-9\s]/).join('');
+  
+  ingredientTagId = ingredientTagId.split(/\s+/).join('-');
+  
+  console.log(`ingredient to tag ID: ${ingredientTagId}`);
+  
   // replace sapce w/ hyphen
-  return ingredient.split(/\s+/).join('-')
+  return ingredientTagId;
 
 }
 
+// create line ID, add it to line
+function idFromIngredient(ingredientLineArray){
+  // timestamp-ingredient_name
+  var id = `ts${ ingredientLineArray[TRACK_NIX_TIME] }-${ ingredientLineArray[INGREDIENT_INDEX].ingtToClass() }`
+  
+  console.log(`HTML_ID: ${id}`);
+  
+  // if already defined use the original tag id
+  if (ingredientLineArray[HTML_ID] === null) {
+    ingredientLineArray[HTML_ID] = id;
+  }
+  
+  
+}
 
 
 //<tr>  <!--ingredient row items-->        
@@ -355,7 +381,11 @@ function addRowToTable(table, ingredient_array){
   console.log(ingredient_array);
   console.log('- - - -');
 
+  // create html ID for it
+  idFromIngredient(ingredient_array);
+  
   var row = document.createElement('tr');
+  row.setAttribute('id', ingredient_array[HTML_ID]);
   
   createdHTML = createTablelineHTML(ingredient_array)
   
@@ -393,12 +423,15 @@ function buildTableFromDailyTracker(){
 
 // a component is a sub recipe, a recipe for an item in an ingredients list
 function buildTableFromComponent(name, component){
-  // needs work for recipe page too - TODO CHECK & ingtegrate
+  // needs to work for recipe page too - TODO CHECK & ingtegrate
   
   // create table
   table = document.createElement('table');
   table.className = 'tbl-ingredients'
   table.setAttribute('id', name.ingtToClass)
+  // <tbody>
+  
+  // TODO - implement 
   
   console.log(`> >  building table [${table.getAttribute('id')}] < < - - - - S`);
   //console.log(dtk);
@@ -417,13 +450,12 @@ function buildTableFromComponent(name, component){
 
 function addItem(e){
   e.preventDefault();
-  addItemToList(e);
-  addItemToTable(e);
+  addItemToTableFromForm(e);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Add item to table
-function addItemToTable(e){
+function addItemToTableFromForm(e){
   e.preventDefault();
 
   console.log('e.target.id - table');
@@ -431,22 +463,18 @@ function addItemToTable(e){
   console.log('>>');
   
   // Get input value
-  var newItem = document.getElementById('addForm').value;
+  var newItem = inputForm.value;
+  inputForm.value = null;
+
   console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
   
   // break it into constituents  
   ingredientLineArray = splitLineIntoQtyAndIngredient(newItem);  // return [qty, units, modifier, ingredient];
   
-  // timestamp it if it's a tracker item
-  var time = NO_TIME;
-  if (tableWithFocus === trackerTable) {
-    time = timeNixTimeInms();
-    console.log(`* * * timeNixTimeInms(): ${time}  24H-${time4d_24h(time)}`)
-  }
+  // timestamp it 
+  ingredientLineArray[TRACK_NIX_TIME] = timeNixTimeInms();  
   
-  ingredientLineArray.push(time);
-  
-  //atomic, qty,  sevings, item, timestamp
+  //atomic, qty,  sevings, item, timestamp, img_id, html_id
   // ['1', '180g', '(0)', 'steak', 1568927767066]
   
   dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);
@@ -463,7 +491,7 @@ function addItemToTable(e){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Add item to list
+// Add item to list - depracated - TODO REMOVE ALL REFS
 function addItemToList(e){
   //<li class="list-group-item">
   //  <button class="btn btn-danger btn-sm float-left delete">X</button>
@@ -479,7 +507,9 @@ function addItemToList(e){
   console.log('>>');
   
   // Get input value
-  var newItem = document.getElementById('addForm').value;
+  var newItem = inputForm.value;
+  inputForm.value = null;
+
   console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
   
   // Create new li element
@@ -544,15 +574,27 @@ function factoryLineItem(){
 // parse entry into factoryline
 var undoList = [];
 
+// delete item from tracker/component table
+function removeTableItem(e) {
+  
+}
+
 // Remove item
-function removeItem(e){
-  if(e.target.classList.contains('delete')){
+function removeListItem(e){
+  
+  if(e.target.classList.contains('delete')){ // clicked on a delete button
+    
     var li = e.target.parentElement;        // parent of button = <li>text & buttons</li>
     var preceeding = li.previousElementSibling;
+    if (preceeding === null) { // element at top of list
+      preceeding = itemList;
+    }
+    console.log(`delete: preceeding=${preceeding}`);
     undoList.push([preceeding, li])
     itemList.removeChild(li);
     console.log(undoList);
   }
+  
 }
 
 // this needs to understan original oder in list but for now just tack it back on the end!
