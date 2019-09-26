@@ -213,10 +213,10 @@ def track_items():
     else:
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'steak')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'steak')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'after swim breakfast 20190913')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'pork stew and sweetheart cabbage noodles')

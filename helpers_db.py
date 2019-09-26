@@ -54,11 +54,23 @@ INGREDIENT_INDEX = 3
 TRACK_NIX_TIME = 4
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#
+# using decorators to implement static vars
+# https://stackoverflow.com/questions/279561/what-is-the-python-equivalent-of-static-variables-inside-a-function
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings=0):
-    timestamp = nix_time_ms()
-    
+
+    # for dev - adding a bunch of ingredients needs to have non identical timestamp
+    timestamp = nix_time_ms()                                               #
+    static_ts = add_ingredient_w_timestamp.last_time_stamp # readabiliy     #
+                                                                            #
+    if (static_ts >= timestamp):                                            #
+        static_ts += 1                                                      #
+        timestamp = static_ts                                               #
+                                                                            #
+        add_ingredient_w_timestamp.last_time_stamp = static_ts              #
+                                                                            #
+    # stop duplicate timestamps - - - - - - - - - - - - - - - - - - - - - - # 
+
     if atomic < 0:
         # look ingredient up in DB and see if we have a recipe (0)
         # or if it's off the shelf (1)
@@ -73,7 +85,9 @@ def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings=0):
     
     recipe['ingredients'].append(ingredient_list)
 
-
+# stops duplicate stamps - - - - dev only!
+# add attribute that holds last timestamp
+add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
   
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #

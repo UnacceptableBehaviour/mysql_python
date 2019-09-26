@@ -33,12 +33,11 @@ var undo = document.getElementById('undo-button');
 
 // Form submit event
 addItemButton.addEventListener('click', addItem);
-  //addItemToList(e);
   //addItemToTableFromForm(e);
 
 // Delete event
 itemList.addEventListener('click', removeListItem);
-trackerTable.addEventListener('click', removeTableItem);
+trackerTable.addEventListener('click', clickHandler);    // TODO - listen to the whole <div> with component tables
 // Undelete
 undo.addEventListener('click', undeleteListItem);
 
@@ -62,6 +61,7 @@ function loadServingModifierLUT(){
   var lut = {
     'onions': { 'small': 100.0, 'medium': 150.0, 'large': 200.0, 'density': 1.0 },
     'red onions' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0, 'density': 1.0 },
+    'banana' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
     'bananas' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
     'red peppers': { 'small': 120.0, 'medium': 150.0, 'large': 180.0, 'density': 1.0 },
     'pork cheeks': { 'small': 70.0, 'medium': 83.0, 'large': 96.0, 'density': 1.0 },
@@ -303,14 +303,16 @@ function idFromIngredient(ingredientLineArray){
   // timestamp-ingredient_name
   var id = `ts${ ingredientLineArray[TRACK_NIX_TIME] }-${ ingredientLineArray[INGREDIENT_INDEX].ingtToClass() }`
   
-  console.log(`HTML_ID: ${id}`);
-  
   // if already defined use the original tag id
-  if (ingredientLineArray[HTML_ID] === null) {
-    ingredientLineArray[HTML_ID] = id;
+  if (ingredientLineArray[HTML_ID] !== undefined) {
+    console.log(`ORIGINAL HTML_ID: ${ingredientLineArray[HTML_ID]}`);
+    return ingredientLineArray[HTML_ID];
+  
+  } else {
+    console.log(`NEW HTML_ID: ${id}`);
+    return id;  
+  
   }
-  
-  
 }
 
 
@@ -380,9 +382,6 @@ function addRowToTable(table, ingredient_array){
   console.log(tbody);
   console.log(ingredient_array);
   console.log('- - - -');
-
-  // create html ID for it
-  idFromIngredient(ingredient_array);
   
   var row = document.createElement('tr');
   row.setAttribute('id', ingredient_array[HTML_ID]);
@@ -413,8 +412,20 @@ function buildTableFromDailyTracker(){
   console.log(dtk);
   console.log(dtk['dtk_rcp']['ingredients']);
   
+  
+  // should already be present in save tracker data
+  // timestamp it - TODO remove
+  var bootstrapTimestamp = timeNixTimeInms();  
+      
   for (i_arr in dtk['dtk_rcp']['ingredients']){
-    console.log(i_arr);    
+    console.log(i_arr);
+    // add sequential unique timestamp to bootstrap - TODO remove
+    bootstrapTimestamp += 1;
+        
+    // create html ID for it
+    dtk['dtk_rcp']['ingredients'][i_arr][HTML_ID] = idFromIngredient(dtk['dtk_rcp']['ingredients'][i_arr]);
+    
+    // add it to table
     addRowToTable(table, dtk['dtk_rcp']['ingredients'][i_arr]);
   }
   
@@ -446,6 +457,7 @@ function buildTableFromComponent(name, component){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // buttons
 
 function addItem(e){
@@ -473,11 +485,15 @@ function addItemToTableFromForm(e){
   
   // timestamp it 
   ingredientLineArray[TRACK_NIX_TIME] = timeNixTimeInms();  
+    
+  // create html ID for it
+  ingredientLineArray[HTML_ID] = idFromIngredient(ingredientLineArray);
   
   //atomic, qty,  sevings, item, timestamp, img_id, html_id
-  // ['1', '180g', '(0)', 'steak', 1568927767066]
+  // ['1', '180g', '(0)', 'steak', 1568927767066, tag_id]
   
   dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);
+  
   
   // COMPONENT
 
@@ -488,114 +504,124 @@ function addItemToTableFromForm(e){
   //addRowToTable( tableWithFocus, dtk['dtk_rcp']['ingredients'][lastIngredient]);
   addRowToTable( tableWithFocus, ingredientLineArray);
 
+  console.log(dtk['dtk_rcp']['ingredients']);
+  
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Add item to list - depracated - TODO REMOVE ALL REFS
-function addItemToList(e){
-  //<li class="list-group-item">
-  //  <button class="btn btn-danger btn-sm float-left delete">X</button>
-  //  <div class="list-group-item-sub-text">${added_item_text}</div>
-  //  <button class="btn btn-default btn-sm float-right add-recipe">Rcp</button>
-  //  <button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button>
-  //</li>
-  //`<li class="list-group-item"><button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">---- 30g smoked ham</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button></li>`
-  e.preventDefault();
+//
+//function factoryLineItem(){
+//  var line_item = {
+//    qty: 0,
+//    uints: 'g',
+//    each: 0,
+//    item: '',
+//    time: new Date,
+//    img_id: 0,
+//    html_id: ''
+//  }
+//  
+//  line_item
+//}
 
-  console.log('e.target.id - list');
-  console.log(e.target.id);
-  console.log('>>');
-  
-  // Get input value
-  var newItem = inputForm.value;
-  inputForm.value = null;
 
-  console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
-  
-  // Create new li element
-  var li = document.createElement('li');
-  var row = document.createElement('tr');
-  
-  //// Add class
-  li.className = 'list-group-item';
+// find parent table body from row element, get id
+function scanAncestorsForTag(elementNode, tag){
 
-  var now = new Date;
-  var eaten_at = '2409';// time4d_24h(now);
-  
-  li.innerHTML = `<button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">${eaten_at} ${newItem}</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button>`
-  
-  console.log(eaten_at);
-  console.log(newItem);
-  console.log((new Date).getHours());         // 8
-  console.log(pad((new Date).getHours()));    // 08
-  console.log((new Date).getMinutes());       // 59
-  console.log((new Date));                    // Fri Sep 20 2019 08:59:42 GMT+0100 (British Summer Time)
-  console.log(new Date(1568927767066));       // from timestamp - Thu Sep 19 2019 22:16:07 GMT+0100 (British Summer Time)
-  
-  //// Add text node with input value
-  //li.appendChild(document.createTextNode(newItem));
-  //
-  //// Create del button element
-  //var deleteBtn = document.createElement('button');
-  //
-  //// Add classes to del button
-  //deleteBtn.className = 'btn btn-danger btn-sm float-right delete';
-  //
-  //// Append text node
-  //deleteBtn.appendChild(document.createTextNode('X'));
-  //
-  //// Append button to li
-  //li.appendChild(deleteBtn);
-  //
-  //// Create new li element  
-  //var li = document.createElement('li');  // list element
-  //var row = document.createElement('tr'); // table row element etc
+  while(elementNode){
 
-  // Append li to list
-  itemList.appendChild(li);
+    elementNode = elementNode.parentNode;
     
-}
+    if (elementNode.tagName.toLowerCase() === tag) {
+      console.log(`FOUND ancestor ${tag}`);
+      console.log(elementNode);
+      return elementNode;
+    }    
 
-
-function factoryLineItem(){
-  var line_item = {
-    qty: 0,
-    uints: 'g',
-    each: 0,
-    item: '',
-    time: new Date,
-    img_id: 0
   }
-  
-  line_item
 }
 
 // var undoList = { 0: factory_line_item() }
 // parse entry into factoryline
 var undoList = [];
 
-// delete item from tracker/component table
-function removeTableItem(e) {
+function getComponentRef(tableId){
+  var componentRef = dtk['dtk_rcp'];
   
+  console.log(`COMPONENT_REF from tableId<${tableId}>\n${componentRef}`);
+  
+  return componentRef;
 }
 
-// Remove item
-function removeListItem(e){
-  
-  if(e.target.classList.contains('delete')){ // clicked on a delete button
+function removeItemFromComponent(dtk, tableId, elementId){
+  var undoItem = { 'prevSib': 0, 'nextSib': 0, 'lineArr': [] };
+
+  undoItem['prevSib'] = document.getElementById(elementId).previousSibling;
+  undoItem['nextSib'] = document.getElementById(elementId).nextSibling;
+
+  //                               component   ingredient/item
+  //                                    |        |
+  // idendify item in component from tableId, rowId
+  // tableId: table-tracked-items - daily tracker
+  // tableId: other - recipe or component being edited/created
     
-    var li = e.target.parentElement;        // parent of button = <li>text & buttons</li>
-    var preceeding = li.previousElementSibling;
-    if (preceeding === null) { // element at top of list
-      preceeding = itemList;
+  recipeTracker = getComponentRef(tableId);
+  // copy it to return for undo
+  console.log(`recipeTracker: deleting ${elementId} ---- S`);
+  console.log(recipeTracker['ingredients']);
+  
+  // go through rowna find the item to remove
+  for (var item = 0; item < recipeTracker['ingredients'].length; item++){
+  
+    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${elementId}`)
+  
+    if (recipeTracker['ingredients'][item][HTML_ID] === elementId) { //got it
+      
+      // remove it from ingredients & store it in undo list
+      undoItem['lineArr'] = recipeTracker['ingredients'].splice(item, 1); // 3rd optional parameter can swap in            
+      
+      break;
     }
-    console.log(`delete: preceeding=${preceeding}`);
-    undoList.push([preceeding, li])
-    itemList.removeChild(li);
-    console.log(undoList);
+    
+  }
+  console.log(`pSib: ${undoItem['prevSib']} >-D`);
+  console.log(`elem: ${document.getElementById(elementId)} - ${elementId}`)
+  console.log(`nSib: ${undoItem['nextSib']} >-D`);
+  console.log(`deleted: ${undoItem['lineArr']} >-D`);
+  console.log(`recipeTracker: deleting ${elementId} ---- E`);
+    
+  // return it
+  return undoItem;
+}
+
+
+
+// delete item from tracker/component table
+function clickHandler(e) {
+
+  if (e.target.classList.contains('delete')) { // clicked on a delete button  
+    
+    // identify element to delete from buttons parent row (td.parent)
+    var tableRow = scanAncestorsForTag(e.target, 'tr');   
+    var elementId = tableRow.getAttribute('id');
+    
+    var tableBody = scanAncestorsForTag(e.target, 'tbody');
+    
+    // get table id from element parents - get id
+    var table = scanAncestorsForTag(tableRow, 'table');
+    var tableId =  table.getAttribute('id');
+    
+    // remove item from model - use tag id
+    // undo item should contain doubley linked row refs - before & after silings
+    // store item to delet in undo list
+    //undoList.push( removeItemFromComponent(dtk['dtk_rcp'], tableId, elementId) );
+    undoList.push( removeItemFromComponent(dtk['dtk_rcp'], 'table-tracked-items', elementId) );
+        
+    // remove item from table
+    tableBody.removeChild(tableRow);
   }
   
 }
+
 
 // this needs to understan original oder in list but for now just tack it back on the end!
 function undeleteListItem(e){
