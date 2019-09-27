@@ -413,6 +413,16 @@ function buildTableFromDailyTracker(){
   // get handle to table
   table = document.getElementById('table-tracked-items');
   
+  // check if there's a tbody element - create if not
+  if (table.getElementsByTagName("tbody")[0]) {
+    console.log(`<tbody> present in [${table.getAttribute('id')}]`);
+  } else {
+    table.appendChild(document.createElement('tbody'));
+    console.log(`<tbody> ADDED [${table.getAttribute('id')}]`);
+  }
+  
+  
+  
   console.log('> >  building table < < - - - - S');
   console.log(dtk);
   console.log(dtk['dtk_rcp']['ingredients']);
@@ -634,6 +644,7 @@ function clickHandler(e) {
     // undo item should contain doubley linked row refs - before & after silings
     // store item to delete in undo list
     //undoList.push( removeItemFromComponent(dtk['dtk_rcp'], tableId, elementId) );
+    
     undoList.push( removeItemFromComponent(dtk['dtk_rcp'], 'table-tracked-items', elementId) );
     console.log(`UNDO < Item: ${undoList[undoList.length-1]['itemElement'].getAttribute('id')} <`);
         
@@ -709,40 +720,94 @@ function undeleteItemFromComponent(e){
     success = true; return success;
   }
   
-  
-  // insert 
-  //parentNode.insertBefore(newNode, referenceNode);
-  
-  // insert after previous sibling
-  
-
-  
   return success;
 }
+
+// LOAD STORE
+var lastSavedFile = '';
+var username = 'kepler';
+
+if (typeof(Storage) !== "undefined") {
+  lastSavedFile = window.localStorage.getItem('lastSavedFile'); // key = 'lastSavedFile'
+  console.log(`LASTSAVED FILENAME = ${lastSavedFile} <<`);
+} else {
+  console.log(`NO LOCAL STORAGE SUPPORT <<`);
+}
+
 
 // store dtk object to ssm / 'disc' / nvm 
 function saveDailyTrackerToLocalStorage(){
 
-  debugOutputDiv.innerHTML = 'Saving . . '
+  // dtk[username]_[timestamp].JSON  
+  var fileName = `dtk_${dtk['dtk_rcp']['dt_date']}_${username}`;
     
+  if (lastSavedFile === null){
+    lastSavedFile = fileName;
+    window.localStorage.setItem( 'lastSavedFile', JSON.stringify(lastSavedFile) );
+  }
+  
+  window.localStorage.setItem( fileName, JSON.stringify(dtk) );
+
+  debugOutputDiv.innerHTML = `Saving . . ${fileName}`;
+  
+  // POST to server too.
 }
 
-// create object from JSON string, func can be used for further conversion
-// JSON.parse(string, function)
 
+// JSON.parse(string, function)
+    // create object from JSON string, func can be used for further conversion
+  
 // JSON.stringify(obj, replacer, space)  // space - tab spaces, replacer filter function
-// var obj = { "name":"John", "age":30, "city":"New York"};
-// var myJSON = JSON.stringify(obj);
+    // var obj = { "name":"John", "age":30, "city":"New York"};
+    // var myJSON = JSON.stringify(obj);
 
 // load dtk object to ssm / 'disc' / nvm 
 function loadDailyTrackerFromLocalStorage(){
 
-  //dailyTrackeAsHTML = function(){ }
-  var dailyTrackeAsHTML = JSON.stringify(dtk['dtk_rcp']['ingredients']);
+  // clear current tracker table
+  tbody = trackerTable.getElementsByTagName("tbody")[0];  
+  trackerTable.removeChild(tbody);
   
-  console.log(dtk['dtk_rcp']['ingredients'])
+  //dtkLocal = JSON.parse(lastSavedFile);
   
-  //debugOutputDiv.innerHTML = dailyTrackeAsHTML // 'Loading . . '  
+    // compare to dtk - select most recent
+  
+  // https://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
+  
+  lastSavedFile = window.localStorage.getItem('lastSavedFile');
+  console.log(`Loading LASTSAVED FILENAME = ${lastSavedFile} <<`);
+  console.log(typeof(lastSavedFile));
+  console.log(lastSavedFile);
+  console.log('dtk_1569518507217_kepler');
+  console.log(typeof('dtk_1569518507217_kepler'));
+  //dtk = JSON.parse( window.localStorage.getItem('dtk_1569518507217_kepler') ); // key = content of lastSavedFile
+  //dtk = JSON.parse( window.localStorage.getItem(lastSavedFile); // key = content of lastSavedFile
+  console.log(`Loading DTK = ${dtk} <<\n<<\n<<\n<<`);
+  
+  if (lastSavedFile === 'dtk_1569518507217_kepler') {
+    console.log(`${lastSavedFile} === 'dtk_1569518507217_kepler'`);
+    console.log(typeof(lastSavedFile));
+  } else {
+    console.log(`${lastSavedFile} !== 'dtk_1569518507217_kepler'`);
+    console.log(typeof(lastSavedFile));
+  }
+  
+  
+
+  // 'iterating' thouugh local storage
+  for (var i = 0; i < localStorage.length; i++){
+    if (lastSavedFile === localStorage.key(i)) {
+      dtk = JSON.parse( localStorage.getItem(localStorage.key(i)) );
+      console.log( `GOT IT:: ${localStorage.key(i)} <` );
+    }
+    console.log( `lsKey: ${localStorage.key(i)} <` );
+    console.log( localStorage.getItem(localStorage.key(i)) );    
+  }  
+  
+  
+  
+  // rebuild it from dtk
+  buildTableFromDailyTracker();
     
 }
 
@@ -769,7 +834,7 @@ function loadDailyTrackerFromLocalStorage(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // build tracker table
-buildTableFromDailyTracker()
+buildTableFromDailyTracker();
 
 
 var array = [0, 1, null, 2, "", 3, undefined, 3,,,,,, 4,, 4,, 5,, 6,,,,];
