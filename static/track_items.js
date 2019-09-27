@@ -563,6 +563,7 @@ function removeItemFromComponent(dtk, tableId, elementId){
   // keep and incase need to undo!
   var undoItem = { 'prevSib':     null,
                    'itemElement': document.getElementById(elementId),
+                   'lineArr':     null,
                    'nextSib':     null,
                    'parent':      tableId };  
 
@@ -595,7 +596,9 @@ function removeItemFromComponent(dtk, tableId, elementId){
     if (recipeTracker['ingredients'][item][HTML_ID] === elementId) { //got it
       
       // remove it from ingredients & store it in undo list
-      undoItem['lineArr'] = recipeTracker['ingredients'].splice(item, 1); // 3rd optional parameter can swap in            
+      undoItem['lineArr'] = recipeTracker['ingredients'].splice(item, 1)[0]; // 3rd optional parameter can swap in            
+      
+      console.log(`'lineArr': [${undoItem['lineArr'].length}] ${undoItem['lineArr']}`);
       
       break;
     }
@@ -632,6 +635,7 @@ function clickHandler(e) {
     // store item to delete in undo list
     //undoList.push( removeItemFromComponent(dtk['dtk_rcp'], tableId, elementId) );
     undoList.push( removeItemFromComponent(dtk['dtk_rcp'], 'table-tracked-items', elementId) );
+    console.log(`UNDO < Item: ${undoList[undoList.length-1]['itemElement'].getAttribute('id')} <`);
         
     // remove item from table
     tableBody.removeChild(tableRow);
@@ -639,7 +643,12 @@ function clickHandler(e) {
   
 }
 
-// this feels very cumbersomb! 
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+// this feels very cumbersomb! and not very DRY
 // pop() from the deleted stack and re-insert into model
 function undeleteItemFromComponent(e){
   var success = false;
@@ -659,8 +668,12 @@ function undeleteItemFromComponent(e){
     
     if (recipeTracker['ingredients'][item][HTML_ID] === undoItem['prevSib']) { //got it
       
-      // remove it from ingredients & store it in undo list
+      // add it to ingredients & update table
       recipeTracker['ingredients'].splice(item+1, 0, undoItem['lineArr']);
+      
+      // update table - insertAfter(newNode, referenceNode)      
+      refNode = document.getElementById(undoItem['prevSib']);
+      insertAfter(undoItem['itemElement'], refNode);
       
       success = true; return success;
     }    
@@ -673,9 +686,14 @@ function undeleteItemFromComponent(e){
     
     if (recipeTracker['ingredients'][item][HTML_ID] === undoItem['nextSib']) { //got it
       
-      // remove it from ingredients & store it in undo list
+      // add it to ingredients & update table
       recipeTracker['ingredients'].splice(item, 0, undoItem['lineArr']);
-      
+
+      // update table - insertBefore
+      // parentNode.insertBefore(newNode, referenceNode);
+      refNode = document.getElementById(undoItem['nextSib']); 
+      refNode.parentNode.insertBefore(undoItem['itemElement'], refNode);
+            
       success = true; return success;
     }    
   }  
@@ -683,32 +701,21 @@ function undeleteItemFromComponent(e){
   // didn't find that? insert at begining
   if (recipeTracker['ingredients'].length === 0) {    
     recipeTracker['ingredients'][0] = undoItem['lineArr'];
+    
+    // update empty table with a row
+    table = document.getElementById(undoItem['parent']);
+    addRowToTable(table, undoItem['lineArr']);
+    
     success = true; return success;
   }
   
-  // either re-insert the node in the relevant if statement
-  // or rebuild the table
-  //buildTableFromDailyTracker();
   
   // insert 
   //parentNode.insertBefore(newNode, referenceNode);
   
   // insert after previous sibling
   
-  
-  //// insert before next sibling
-  //undoItem['parent'].insertBefore()
-  //
-  //// append child to parent - was last to be deleted - so no siblings
-  //
-  //undoItem['prevSib']
-  //undoItem['parent']
-  //undoItem['nextSib']
-  //
-  //insertAfter = undoItem['prevSib']
-  //undoPair[0].after(undoPair[1]);
-  //
-  //console.log(undoList);
+
   
   return success;
 }
