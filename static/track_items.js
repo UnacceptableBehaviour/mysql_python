@@ -21,25 +21,30 @@ const RCP_IN_DB = 0;
 
 
 var addItemButton = document.getElementById('add-item-button');
-
 var inputForm = document.getElementById('addForm');
-
-var itemList = document.getElementById('items'); // depracated TODO - REMOVE
-var trackerTable = document.getElementById('table-tracked-items');
-var tableWithFocus = trackerTable;
-
-var filter = document.getElementById('filter');
-var undo = document.getElementById('undo-button');
-
 // Form submit event
 addItemButton.addEventListener('click', addItem);
   //addItemToTableFromForm(e);
 
+var trackerTable = document.getElementById('table-tracked-items');
+var tableWithFocus = trackerTable;
+var allTrackerTables = document.getElementById('all-tables-div');
+
+var filter = document.getElementById('filter');
+var undoButton = document.getElementById('undo-button');
+
+var saveDTKbutton = document.getElementById('but-save-dtk');
+saveDTKbutton.addEventListener('click', saveDailyTrackerToLocalStorage);
+
+var loadDTKbutton = document.getElementById('but-load-dtk');
+loadDTKbutton.addEventListener('click', loadDailyTrackerFromLocalStorage);
+
+var debugOutputDiv = document.getElementById('store-display');
+
 // Delete event
-itemList.addEventListener('click', removeListItem);
-trackerTable.addEventListener('click', clickHandler);    // TODO - listen to the whole <div> with component tables
+allTrackerTables.addEventListener('click', clickHandler);
 // Undelete
-undo.addEventListener('click', undeleteListItem);
+undoButton.addEventListener('click', undeleteItemFromComponent);
 
 
 // Filter event
@@ -553,11 +558,19 @@ function getComponentRef(tableId){
 }
 
 function removeItemFromComponent(dtk, tableId, elementId){
-  var undoItem = { 'prevSib': 0, 'nextSib': 0, 'lineArr': [] };
+  var undoItem = {};
 
-  undoItem['prevSib'] = document.getElementById(elementId).previousSibling;
-  undoItem['nextSib'] = document.getElementById(elementId).nextSibling;
-
+  //undoItem['prevSib'] = document.getElementById(elementId).previousSibling;
+  //undoItem['nextSib'] = document.getElementById(elementId).nextSibling;
+  //undoItem['parent'] = document.getElementById(elementId).parentNode;
+  
+  undoItem['prevSib'] = document.getElementById(elementId).previousSibling.getAttribute('id');
+  undoItem['nextSib'] = document.getElementById(elementId).nextSibling.getAttribute('id');
+  undoItem['parent'] = tableId;
+  
+  // keep and incase need to undo!
+  undoItem['itemElement'] = document.getElementById(elementId);
+  
   //                               component   ingredient/item
   //                                    |        |
   // idendify item in component from tableId, rowId
@@ -570,9 +583,9 @@ function removeItemFromComponent(dtk, tableId, elementId){
   console.log(recipeTracker['ingredients']);
   
   // go through rowna find the item to remove
-  for (var item = 0; item < recipeTracker['ingredients'].length; item++){
+  for (var item = 0; item < recipeTracker['ingredients'].length; item++) {
   
-    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${elementId}`)
+    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${elementId}`);
   
     if (recipeTracker['ingredients'][item][HTML_ID] === elementId) { //got it
       
@@ -594,7 +607,6 @@ function removeItemFromComponent(dtk, tableId, elementId){
 }
 
 
-
 // delete item from tracker/component table
 function clickHandler(e) {
 
@@ -612,7 +624,7 @@ function clickHandler(e) {
     
     // remove item from model - use tag id
     // undo item should contain doubley linked row refs - before & after silings
-    // store item to delet in undo list
+    // store item to delete in undo list
     //undoList.push( removeItemFromComponent(dtk['dtk_rcp'], tableId, elementId) );
     undoList.push( removeItemFromComponent(dtk['dtk_rcp'], 'table-tracked-items', elementId) );
         
@@ -622,39 +634,114 @@ function clickHandler(e) {
   
 }
 
-
-// this needs to understan original oder in list but for now just tack it back on the end!
-function undeleteListItem(e){
-  if (undoList.length === 0) { return; }
+// this feels very cumbersomb! 
+// pop() from the deleted stack and re-insert into model
+function undeleteItemFromComponent(e){
+  var success = false;
+  if (undoList.length === 0) { success = true; return success; }
+      
+  var undoItem = undoList.pop();
   
-  console.log(undoList);
+  recipeTracker = getComponentRef(undoItem['parent']);
+    
+  console.log(`recipeTracker: restoring ${undoItem['lineArr'][HTML_ID]} ---- S`);
+  console.log(recipeTracker['ingredients']);
   
-  //itemList.appendChild(undoList.pop()[1]);
-  var undoPair = undoList.pop();
+  // go through insert after previous sibling - if it exists
+  for (var item = 0; item < recipeTracker['ingredients'].length; item++) {
   
-  undoPair[0].after(undoPair[1]);
+    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${undoItem['prevSib']}`);
+    
+    if (recipeTracker['ingredients'][item][HTML_ID] === undoItem['prevSib']) { //got it
+      
+      // remove it from ingredients & store it in undo list
+      recipeTracker['ingredients'].splice(item+1, 0, undoItem['lineArr']);
+      
+      success = true; return success;
+    }    
+  }
   
-  console.log(undoList);
+  // didn't find it? try nextSibling - undoItem['nextSib']
+  for (var item = 0; item < recipeTracker['ingredients'].length; item++) {
+  
+    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${undoItem['nextSib']}`);
+    
+    if (recipeTracker['ingredients'][item][HTML_ID] === undoItem['nextSib']) { //got it
+      
+      // remove it from ingredients & store it in undo list
+      recipeTracker['ingredients'].splice(item, 0, undoItem['lineArr']);
+      
+      success = true; return success;
+    }    
+  }  
+  
+  // didn't find that? insert at begining
+  if (recipeTracker['ingredients'].length === 0) {    
+    recipeTracker['ingredients'][0] = undoItem['lineArr'];
+    success = true; return success;
+  }
+  
+  // either re-insert the node in the relevant if statement
+  // or rebuild the table
+  //buildTableFromDailyTracker();
+  
+  // insert 
+  //parentNode.insertBefore(newNode, referenceNode);
+  
+  // insert after previous sibling
+  
+  
+  //// insert before next sibling
+  //undoItem['parent'].insertBefore()
+  //
+  //// append child to parent - was last to be deleted - so no siblings
+  //
+  //undoItem['prevSib']
+  //undoItem['parent']
+  //undoItem['nextSib']
+  //
+  //insertAfter = undoItem['prevSib']
+  //undoPair[0].after(undoPair[1]);
+  //
+  //console.log(undoList);
+  
+  return success;
 }
 
-// Filter Items
-function filterItems(e){
-  // convert text to lowercase
-  var text = e.target.value.toLowerCase();
-  
-  // Get lis
-  var items = itemList.getElementsByTagName('li');
-  
-  // Convert to an array
-  Array.from(items).forEach(function(item){
-    var itemName = item.firstChild.textContent;
-    if(itemName.toLowerCase().indexOf(text) != -1){
-      item.style.display = 'block';
-    } else {
-      item.style.display = 'none';
-    }
-  });
+// store dtk object to ssm / 'disc' / nvm 
+function saveDailyTrackerToLocalStorage(){
+
+  debugOutputDiv.innerHTML = 'Saving . . '
+    
 }
+
+// load dtk object to ssm / 'disc' / nvm 
+function loadDailyTrackerFromLocalStorage(){
+
+  debugOutputDiv.innerHTML = 'Loading . . '
+    
+}
+
+
+
+//// Filter Items
+//function filterItems(e){
+//  // convert text to lowercase
+//  var text = e.target.value.toLowerCase();
+//  
+//  // Get lis
+//  var items = itemList.getElementsByTagName('li');
+//  
+//  // Convert to an array
+//  Array.from(items).forEach( function(item){
+//    var itemName = item.firstChild.textContent;
+//    if(itemName.toLowerCase().indexOf(text) != -1){
+//      item.style.display = 'block';
+//    } else {
+//      item.style.display = 'none';
+//    }
+//  });
+//}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // build tracker table

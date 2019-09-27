@@ -102,26 +102,25 @@
         </div>
       </div>
     
-  <!--    <div class='input-group'>
-        <button id='undo-button' class='btn btn-outline-secondary'>UNDO</button>
-        <form id="addForm" class="form-inline mb-3">
-          <input type="text" placeholder="add next item..." class="form-control" id="item">            
-          <input id='add-item-button' type="submit" class="btn btn-dark" value="Add">
-        </form>
-      </div>-->
-      <h4 class="title">today:</h4>
-      <h5 class="title">build w/ JS v3:</h5>
-      <table id="table-tracked-items" class="card-text tbl-ingredients" width='100%'><tbody></tbody></table>
-      <br>      
-      <h5 class="title">manual v1:</h5>
-      <ul id="items" class="list-group">
-        <li class="list-group-item"><button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">0700 120g watermelon</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button></li>
-        <li class="list-group-item"><button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">---- 30g sweetheart cabbage noodle broth</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button></li>
-        <li class="list-group-item"><button class="btn btn-danger btn-sm float-left delete">X</button><div class="list-group-item-sub-text">---- 30g smoked ham</div><button class="btn btn-default btn-sm float-right add-recipe">Rcp</button><button class="btn btn-secondary btn-sm float-right snapshot"><i class="fas fa-camera"></i></button></li>
-      </ul>
-      <br>
+      <div id='all-tables-div'>
+        <h4 class="title">today:</h4>
+        <h5 class="title">build w/ JS v3:</h5>
+        <table id="table-tracked-items" class="card-text tbl-ingredients" width='100%'><tbody></tbody></table>
+      </div>
     </div>
   </div>
+  <br>
+  <div id='save-load-but' class="container">
+    <div class="btn-group float-right" role="group" aria-label="Basic example">
+      <button id='but-load-dtk' type="button" class="btn btn-outline-secondary">Load</button>        
+      <button id='but-c' type="button" class="btn btn-secondary">C</button>
+      <button id='but-save-dtk'type="button" class="btn btn-outline-secondary">Store</button>
+    </div
+  </div>
+  <div class="container">
+    <div id='store-display'>TEST TEXT</div>
+  </div>
+
 
   <script src="static/track_items.js"></script>
   
