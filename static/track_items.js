@@ -41,7 +41,7 @@ loadDTKbutton.addEventListener('click', loadDailyTrackerFromLocalStorage);
 
 var debugOutputDiv = document.getElementById('store-display');
 
-// Delete event
+// row buttons: delete, add image, build recipe
 allTrackerTables.addEventListener('click', clickHandler);
 // Undelete
 undoButton.addEventListener('click', undeleteItemFromComponent);
@@ -552,24 +552,27 @@ var undoList = [];
 function getComponentRef(tableId){
   var componentRef = dtk['dtk_rcp'];
   
-  console.log(`COMPONENT_REF from tableId<${tableId}>\n${componentRef}`);
+  console.log(`COMPONENT_REF from tableId<${tableId}> - - - - - < <`);
+  console.log(`COMPONENT_REF ${componentRef['ri_name']} <`);
   
   return componentRef;
 }
 
 function removeItemFromComponent(dtk, tableId, elementId){
-  var undoItem = {};
-
-  //undoItem['prevSib'] = document.getElementById(elementId).previousSibling;
-  //undoItem['nextSib'] = document.getElementById(elementId).nextSibling;
-  //undoItem['parent'] = document.getElementById(elementId).parentNode;
-  
-  undoItem['prevSib'] = document.getElementById(elementId).previousSibling.getAttribute('id');
-  undoItem['nextSib'] = document.getElementById(elementId).nextSibling.getAttribute('id');
-  undoItem['parent'] = tableId;
   
   // keep and incase need to undo!
-  undoItem['itemElement'] = document.getElementById(elementId);
+  var undoItem = { 'prevSib':     null,
+                   'itemElement': document.getElementById(elementId),
+                   'nextSib':     null,
+                   'parent':      tableId };  
+
+  // check if 1st node => NO previous sibling
+  prevNode = document.getElementById(elementId).previousSibling;  
+  if (prevNode) { undoItem['prevSib'] = prevNode.getAttribute('id'); }
+  
+  // check if Last node => NO next sibling
+  nextNode = document.getElementById(elementId).nextSibling;
+  if (nextNode) { undoItem['nextSib'] = nextNode.getAttribute('id'); }
   
   //                               component   ingredient/item
   //                                    |        |
@@ -577,15 +580,17 @@ function removeItemFromComponent(dtk, tableId, elementId){
   // tableId: table-tracked-items - daily tracker
   // tableId: other - recipe or component being edited/created
     
+  // de-reference table - simplify code below  
   recipeTracker = getComponentRef(tableId);
-  // copy it to return for undo
-  console.log(`recipeTracker: deleting ${elementId} ---- S`);
-  console.log(recipeTracker['ingredients']);
   
-  // go through rowna find the item to remove
+  // copy it to return for undo
+  //console.log(`recipeTracker: deleting ${elementId} ---- S`);
+  //console.log(recipeTracker['ingredients']);
+  
+  // go through items find the item to remove
   for (var item = 0; item < recipeTracker['ingredients'].length; item++) {
   
-    console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${elementId}`);
+    //console.log(`c: ${recipeTracker['ingredients'][item][HTML_ID]} === ${elementId}`);
   
     if (recipeTracker['ingredients'][item][HTML_ID] === elementId) { //got it
       
@@ -596,10 +601,10 @@ function removeItemFromComponent(dtk, tableId, elementId){
     }
     
   }
-  console.log(`pSib: ${undoItem['prevSib']} >-D`);
-  console.log(`elem: ${document.getElementById(elementId)} - ${elementId}`)
-  console.log(`nSib: ${undoItem['nextSib']} >-D`);
-  console.log(`deleted: ${undoItem['lineArr']} >-D`);
+  //console.log(`pSib: ${undoItem['prevSib']} >-D`);
+  //console.log(`elem: ${document.getElementById(elementId)} - ${elementId}`)
+  //console.log(`nSib: ${undoItem['nextSib']} >-D`);
+  //console.log(`deleted: ${undoItem['lineArr']} >-D`);
   console.log(`recipeTracker: deleting ${elementId} ---- E`);
     
   // return it
@@ -715,10 +720,22 @@ function saveDailyTrackerToLocalStorage(){
     
 }
 
+// create object from JSON string, func can be used for further conversion
+// JSON.parse(string, function)
+
+// JSON.stringify(obj, replacer, space)  // space - tab spaces, replacer filter function
+// var obj = { "name":"John", "age":30, "city":"New York"};
+// var myJSON = JSON.stringify(obj);
+
 // load dtk object to ssm / 'disc' / nvm 
 function loadDailyTrackerFromLocalStorage(){
 
-  debugOutputDiv.innerHTML = 'Loading . . '
+  //dailyTrackeAsHTML = function(){ }
+  var dailyTrackeAsHTML = JSON.stringify(dtk['dtk_rcp']['ingredients']);
+  
+  console.log(dtk['dtk_rcp']['ingredients'])
+  
+  //debugOutputDiv.innerHTML = dailyTrackeAsHTML // 'Loading . . '  
     
 }
 
