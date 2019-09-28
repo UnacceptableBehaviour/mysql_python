@@ -33,13 +33,22 @@ var allTrackerTables = document.getElementById('all-tables-div');
 var filter = document.getElementById('filter');
 var undoButton = document.getElementById('undo-button');
 
+// DEBUG/DEV BUTTONS
 var saveDTKbutton = document.getElementById('but-save-dtk');
 saveDTKbutton.addEventListener('click', saveDailyTrackerToLocalStorage);
-
+//-
 var loadDTKbutton = document.getElementById('but-load-dtk');
 loadDTKbutton.addEventListener('click', loadDailyTrackerFromLocalStorage);
-
+//-
+var clearLocalStorageButton = document.getElementById('but-c');
+clearLocalStorageButton.addEventListener('click', clearLocalStorage);
+//-
+var listLocalStorageButton = document.getElementById('but-l');
+listLocalStorageButton.addEventListener('click', listLocalStorageKeys);
+//-
 var debugOutputDiv = document.getElementById('store-display');
+
+
 
 // row buttons: delete, add image, build recipe
 allTrackerTables.addEventListener('click', clickHandler);
@@ -660,6 +669,7 @@ function insertAfter(newNode, referenceNode) {
 }
 
 // this feels very cumbersomb! and not very DRY
+// TODO - REFACTOR
 // pop() from the deleted stack and re-insert into model
 function undeleteItemFromComponent(e){
   var success = false;
@@ -723,9 +733,34 @@ function undeleteItemFromComponent(e){
   return success;
 }
 
-// LOAD STORE
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// LOAD STORE / Local storage
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// local storage API
+// setItem(): Add key and value to localStorage
+// getItem(): Retrieve a value by the key from localStorage
+// removeItem(): Remove an item by key from localStorage
+// clear(): Clear all localStorage
+// key(): Passed a number to retrieve nth key of a localStorage
+// Pattern:
+// https://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
+// https://blog.logrocket.com/the-complete-guide-to-using-localstorage-in-javascript-apps-ba44edb53a36/
+// https://mathiasbynens.be/notes/localstorage-pattern
+
+function detectPlatfornUUID(){
+  
+  console.log('DEVICE ID:');
+  console.log(navigator.userAgent);
+  console.log('DEVICE ID:');
+  
+  return '_genericDevice';
+}
+
 var lastSavedFile = '';
 var username = 'kepler';
+var device = detectPlatfornUUID();
 
 if (typeof(Storage) !== "undefined") {
   lastSavedFile = window.localStorage.getItem('lastSavedFile'); // key = 'lastSavedFile'
@@ -737,20 +772,48 @@ if (typeof(Storage) !== "undefined") {
 
 // store dtk object to ssm / 'disc' / nvm 
 function saveDailyTrackerToLocalStorage(){
-
-  // dtk[username]_[timestamp].JSON  
-  var fileName = `dtk_${dtk['dtk_rcp']['dt_date']}_${username}`;
-    
+  // dtk_[timestamp]_[username].JSON  
+  var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ username }_${ device }`;
+  
+  // TODO -   
   if (lastSavedFile === null){
-    lastSavedFile = fileName;
-    window.localStorage.setItem( 'lastSavedFile', JSON.stringify(lastSavedFile) );
+    lastSavedFile = fileName;         // result in the '"lastSavedFile"' bug!
+                                      //            vs  'lastSavedFile' key issue
+                                                    // this is already a string!
+    //window.localStorage.setItem( 'lastSavedFile', JSON.stringify(lastSavedFile) );
+    window.localStorage.setItem( 'lastSavedFile', lastSavedFile );
   }
+  window.localStorage.setItem( 'lastSavedFile', lastSavedFile );
   
   window.localStorage.setItem( fileName, JSON.stringify(dtk) );
 
   debugOutputDiv.innerHTML = `Saving . . ${fileName}`;
   
   // POST to server too.
+}
+
+
+function clearLocalStorage() {
+  var retVal = localStorage.clear();
+  console.log(`localStorage.cleared >${retVal}<`);
+}
+
+function listLocalStorageKeys(withContents = false) {
+  // 'iterating' though local storage
+  
+  console.log( `>- - - - - listLocalStorageKeys: [${localStorage.length}] (${typeof(localStorage)}) <` );
+  console.log(`DEVICE: ${detectPlatfornUUID()}`);
+  for (var i = 0; i < localStorage.length; i++){
+    if (lastSavedFile === localStorage.key(i)) {
+      dtk = JSON.parse( localStorage.getItem(localStorage.key(i)) );
+      console.log( `GOT IT:: ${localStorage.key(i)} <` );
+    }
+    console.log(`>- - - - - - - - - - - - ls keys [${i}] \\\\ `);
+    console.log( `lsKey: ${localStorage.key(i)} <` );
+    if (withContents) console.log( localStorage.getItem(localStorage.key(i)) );
+    console.log('>- - - - - - ');
+  }
+  console.log('>- - - - - - - - - - - - ls keys // ');
 }
 
 
@@ -767,48 +830,19 @@ function loadDailyTrackerFromLocalStorage(){
   // clear current tracker table
   tbody = trackerTable.getElementsByTagName("tbody")[0];  
   trackerTable.removeChild(tbody);
-  
-  //dtkLocal = JSON.parse(lastSavedFile);
+
+  // load last saved
+  lastSavedFile = window.localStorage.getItem('lastSavedFile');  
+  dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) ); // key = content of lastSavedFile
   
     // compare to dtk - select most recent
-  
-  // https://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
-  
-  lastSavedFile = window.localStorage.getItem('lastSavedFile');
-  console.log(`Loading LASTSAVED FILENAME = ${lastSavedFile} <<`);
-  console.log(typeof(lastSavedFile));
-  console.log(lastSavedFile);
-  console.log('dtk_1569518507217_kepler');
-  console.log(typeof('dtk_1569518507217_kepler'));
-  //dtk = JSON.parse( window.localStorage.getItem('dtk_1569518507217_kepler') ); // key = content of lastSavedFile
-  //dtk = JSON.parse( window.localStorage.getItem(lastSavedFile); // key = content of lastSavedFile
-  console.log(`Loading DTK = ${dtk} <<\n<<\n<<\n<<`);
-  
-  if (lastSavedFile === 'dtk_1569518507217_kepler') {
-    console.log(`${lastSavedFile} === 'dtk_1569518507217_kepler'`);
-    console.log(typeof(lastSavedFile));
-  } else {
-    console.log(`${lastSavedFile} !== 'dtk_1569518507217_kepler'`);
-    console.log(typeof(lastSavedFile));
-  }
-  
-  
 
-  // 'iterating' thouugh local storage
-  for (var i = 0; i < localStorage.length; i++){
-    if (lastSavedFile === localStorage.key(i)) {
-      dtk = JSON.parse( localStorage.getItem(localStorage.key(i)) );
-      console.log( `GOT IT:: ${localStorage.key(i)} <` );
-    }
-    console.log( `lsKey: ${localStorage.key(i)} <` );
-    console.log( localStorage.getItem(localStorage.key(i)) );    
-  }  
-  
-  
-  
+  dtk = dtkLocal
+
+  console.log(`Loaded DTK = ${dtk} <<\n<<\n<<\n<<`);
+    
   // rebuild it from dtk
   buildTableFromDailyTracker();
-    
 }
 
 
