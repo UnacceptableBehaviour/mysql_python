@@ -43,6 +43,9 @@ loadDTKbutton.addEventListener('click', loadDailyTrackerFromLocalStorage);
 var clearLocalStorageButton = document.getElementById('but-c');
 clearLocalStorageButton.addEventListener('click', clearLocalStorage);
 //-
+var postDTKdataToServer = document.getElementById('but-p');
+postDTKdataToServer.addEventListener('click', fetchUpdateDailyTrackerNutrients);
+//-
 var listLocalStorageButton = document.getElementById('but-l');
 listLocalStorageButton.addEventListener('click', listLocalStorageKeys);
 //-
@@ -847,6 +850,54 @@ function loadDailyTrackerFromLocalStorage(){
     
   // rebuild it from dtk
   buildTableFromDailyTracker();
+}
+
+function fetchUpdateDailyTrackerNutrients() {
+  
+  fetch( '/tracker', {
+    method: 'POST',                                             // method (default is GET)
+    headers: {'Content-Type': 'application/json' },             // JSON
+    body: JSON.stringify( { 'user':userUUID, 'dtk':dtk } )      // Payload        
+
+  }).then( function(response) {
+    
+    console.log("  - - - -|- - - - response")
+    console.log(response);
+    console.log("  - - - -|- - - -")
+    console.log(typeof(response))
+    console.log("  - - - -|- - - -")
+    
+    //return response.text();
+    return response.json();
+  
+  }).then( function(data) {
+    
+    // iterator 1
+    text = 'iterator 1 style - - - - - - - - - - - - - - - - - - - - '
+    console.log(`POST response: ${text} - ${typeof(data)} - ${data.length} <`);
+    Object.entries(data).forEach(        
+        ([key, value]) => {
+          console.log('====================');
+          console.log(key, value);
+        }
+    );
+    
+    // iterator 2
+    text = 'iterator 2 style- - - - - - - - - - - - - - - - - - - - '
+    console.log(`POST response: ${text} - ${typeof(data)} - ${data.length} <`);
+    console.log(`POST response: \n ${data}`);
+    
+    // gor through object keys - list of outstanting file by category
+    for (const [key, value] of Object.entries(data)) {
+        console.log('====================');
+        console.log(key, value);                
+    }
+    console.log('====================');
+    
+    dtk_status = 'badonkadonk'                     // that's gotta be good right?
+    console.log(`DTK returned: ${dtk_status}`);    // should read "POST response: OK"
+  });
+  
 }
 
 

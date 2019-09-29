@@ -33,6 +33,8 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 import re
 
+import json
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
 # run 'populate_db.py'
@@ -200,15 +202,43 @@ def button_3():
 @app.route('/tracker', methods=["GET", "POST"])
 def track_items():
     headline_py = 'track items..'
-    
-    
+        
     daily_tracker = return_daily_tracker()
     recipes = [daily_tracker['dtk_rcp']]
     
     if request.method == 'POST':
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
         print("* * * TRACKER: data POSTED:")
         # check payload
+        tracker_post = request.get_json() # parse JSON into DICT
+        if ('dtk' in tracker_post):
+            dtk_data = tracker_post['dtk']
+        
+        pprint(dtk_data)
         # update DB
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
+        # call data processing update nutrinfo
+        dtk_data['dtk_rcp']['nutrinfo'].update( {'density': 1,
+                                                'n_Al': 0,
+                                                'n_Ca': 0,
+                                                'n_En': 550,
+                                                'n_Fa': 15.0,
+                                                'n_Fb': 0,
+                                                'n_Fm': 0,
+                                                'n_Fo3': 10.0,
+                                                'n_Fp': 0,
+                                                'n_Fs': 5,
+                                                'n_Pr': 0,
+                                                'n_Sa': 2,
+                                                'n_St': 2,
+                                                'n_Su': 12,
+                                                'serving_size': 150,
+                                                'servings': 2,
+                                                'units': 'g',
+                                                'yield': '300g'} )
+            
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")         
+        return json.dumps(dtk_data), 200
     
     else:
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
