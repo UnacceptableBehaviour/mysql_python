@@ -254,6 +254,7 @@ def track_items():
     pprint(daily_tracker)
     
     return render_template('track_items.html', headline=headline_py, daily_tracker=daily_tracker, recipes=recipes, lines=[f"BUTTON 5"])
+    #return render_template('track_items.html', headline=headline_py, daily_tracker=daily_tracker, lines=[f"BUTTON 5"])
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])
