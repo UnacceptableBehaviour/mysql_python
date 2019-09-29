@@ -373,8 +373,11 @@ def db_recipe_page():
             ri_id = int(incoming_dict['text'])
         
     if request.method =='POST':
-        print("POST                            - - - < db_recipe_page")
+        print("POST                            - - - < db_recipe_page - S = = = =*=*")
         pprint(request.args.to_dict())
+        print("POST                            - - - < db_recipe_page - M = = = =*=*")
+        pprint(request)
+        print("POST                            - - - < db_recipe_page - E = = = =*=*")
 
     headline_py = "single recipe page"
     

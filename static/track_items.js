@@ -749,18 +749,22 @@ function undeleteItemFromComponent(e){
 // https://blog.logrocket.com/the-complete-guide-to-using-localstorage-in-javascript-apps-ba44edb53a36/
 // https://mathiasbynens.be/notes/localstorage-pattern
 
-function detectPlatfornUUID(){
+                               // various device & display detect
+function getPlatformInfo(){ // https://stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-mobile-device
   
   console.log('DEVICE ID:');
   console.log(navigator.userAgent);
   console.log('DEVICE ID:');
-  
+  // Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+  // AppleWebKit/537.36 (KHTML, like Gecko)
+  // Chrome/76.0.3809.100
+  // Safari/537.36
   return '_genericDevice';
 }
 
 var lastSavedFile = '';
-var username = 'kepler';
-var device = detectPlatfornUUID();
+var userUUID = '57dfe4d9497ce6ddeebe46a9de344a7d39e8f543';
+var deviceInfo = getPlatformInfo();
 
 if (typeof(Storage) !== "undefined") {
   lastSavedFile = window.localStorage.getItem('lastSavedFile'); // key = 'lastSavedFile'
@@ -772,8 +776,8 @@ if (typeof(Storage) !== "undefined") {
 
 // store dtk object to ssm / 'disc' / nvm 
 function saveDailyTrackerToLocalStorage(){
-  // dtk_[timestamp]_[username].JSON  
-  var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ username }_${ device }`;
+  // dtk_[timestamp]_[userUUID].JSON  
+  var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ userUUID }_${ deviceInfo }`;
   
   // TODO -   
   if (lastSavedFile === null){
@@ -802,7 +806,7 @@ function listLocalStorageKeys(withContents = false) {
   // 'iterating' though local storage
   
   console.log( `>- - - - - listLocalStorageKeys: [${localStorage.length}] (${typeof(localStorage)}) <` );
-  console.log(`DEVICE: ${detectPlatfornUUID()}`);
+  console.log(`DEVICE: ${getPlatformInfo()}`);
   for (var i = 0; i < localStorage.length; i++){
     if (lastSavedFile === localStorage.key(i)) {
       dtk = JSON.parse( localStorage.getItem(localStorage.key(i)) );
