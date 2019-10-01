@@ -31,9 +31,9 @@ from pprint import pprint
 import urllib.parse
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
-import re
-
-import json
+import re           # regex
+import json         # JSON tools
+import subprocess   # exec CLI commands
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
@@ -217,7 +217,18 @@ def track_items():
         pprint(dtk_data)
         # update DB
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
-        # call data processing update nutrinfo
+        # export DTK to /scratch/___LAB_RECIPE_SMALLEST_1DAY.txt for PROCESSING
+        # as nutridoc entry
+        
+        # fire up ccm_nutridoc_web.rb PROCESS DTK data
+        arg1 = '88.0'
+        arg2 = "file=./scratch/___LAB_RECIPE_SMALLEST_1DAY.txt"
+        subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
+        
+        # import RESULT from /scratch/z_product_nutrition_info_autogen_day_cal.txt'
+        
+        # merge nutrinfo into DTK and send it back!
+        # /Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_autogen_day_cal.txt
         dtk_data['dtk_rcp']['nutrinfo'].update( {'density': 1,
                                                 'n_Al': 0,
                                                 'n_Ca': 0,
