@@ -219,7 +219,7 @@ def track_items():
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
         # export DTK for PROCESSING
         # as nutridoc entry
-        post_DTK_info_for_processing(dtk_data['dtk_rcp'])
+        post_DTK_info_for_processing(dtk_data)
         
         # fire up ccm_nutridoc_web.rb PROCESS DTK data
         arg1 = f"{dtk_data['dtk_weight']}"

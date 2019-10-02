@@ -52,6 +52,8 @@ QTY_IN_G_INDEX = 1
 SERVING_INDEX = 2
 INGREDIENT_INDEX = 3
 TRACK_NIX_TIME = 4
+IMAGE_INDEX = 5
+HTML_ID = 6
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # using decorators to implement static vars

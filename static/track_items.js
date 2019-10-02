@@ -287,6 +287,7 @@ function pad(n) {
   return n<10 ? '0'+n : n;
 }
 
+// TODO - make time functions aware - include GMT offset
 function time4d_24h(timestamp){
   ts = new Date(timestamp);
   return `${pad(ts.getHours())}${pad(ts.getMinutes())}`;
@@ -295,6 +296,21 @@ function time4d_24h(timestamp){
 function timeNixTimeInms(){
   return (new Date()).getTime();
 }
+
+// create_daily_tracker_name_from_nix_time - python vs
+// return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
+//
+// 1569665275998ms to '2019 calories month 09 thu 26'
+function createDailyTrackerNameFromNixTime( nix_time_ms = timeNixTimeInms() ){
+  date = new Date(nix_time_ms);
+  dayNumToDay3L = ['sun','mon','tue','wed','thu','fri','sat'];  // day of week    0-6
+  dateDD    = pad(date.getDate());                              // day of month   1-31
+  yearYYYY  = date.getFullYear(); 
+  monthMM   = pad(date.getMonth()+1);                           // month of year  0-11
+  dayDDD    = dayNumToDay3L[date.getDay()]
+  return `${yearYYYY} calories month ${monthMM} ${dayDDD} ${dateDD}`;
+}
+
 
 //JS Regex
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
@@ -852,7 +868,15 @@ function loadDailyTrackerFromLocalStorage(){
   buildTableFromDailyTracker();
 }
 
+// post DTK for processing to...
+// fetch Nutrients
 function fetchUpdateDailyTrackerNutrients() {
+  
+  // TODO - careful think about where/when to set this - new recipe vs daily tracker
+  //dtk['dtk_rcp']['ri_name'] = createDailyTrackerNameFromNixTime();
+  //console.log("--------> dtk['dtk_rcp']['ri_name']");
+  //console.log(dtk['dtk_rcp']['ri_name']);
+  //console.log("--------> dtk['dtk_rcp']['ri_name']");
   
   fetch( '/tracker', {
     method: 'POST',                                             // method (default is GET)
@@ -951,3 +975,6 @@ console.log( convertToGrams(10, 'cups', 'chicken stock') );
 //16 pork cheeks
 //1/4 banana
 //4 large red peppers
+
+console.log("createDailyTrackerNameFromNixTime");
+console.log(createDailyTrackerNameFromNixTime());
