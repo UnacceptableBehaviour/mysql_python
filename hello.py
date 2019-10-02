@@ -20,7 +20,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-from helpers_tracker import return_daily_tracker
+from helpers_tracker import return_daily_tracker, post_DTK_info_for_processing, post_interface_file, get_DTK_info_from_processing
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -217,37 +217,24 @@ def track_items():
         pprint(dtk_data)
         # update DB
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
-        # export DTK to /scratch/___LAB_RECIPE_SMALLEST_1DAY.txt for PROCESSING
+        # export DTK for PROCESSING
         # as nutridoc entry
+        post_DTK_info_for_processing(dtk_data['dtk_rcp'])
         
         # fire up ccm_nutridoc_web.rb PROCESS DTK data
-        arg1 = '88.0'
-        arg2 = "file=./scratch/___LAB_RECIPE_SMALLEST_1DAY.txt"
-        subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
+        arg1 = f"{dtk_data['dtk_weight']}"
+        arg2 = f"file={post_interface_file()}"
+        data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
         
-        # import RESULT from /scratch/z_product_nutrition_info_autogen_day_cal.txt'
+        # import RESULT: just get nutrinfo for daily tracke for now.
+        # will expect a fully processed DTK including subcomponents
+        # TODO
+        nutridata = get_DTK_info_from_processing()
+        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
         
-        # merge nutrinfo into DTK and send it back!
-        # /Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_autogen_day_cal.txt
-        dtk_data['dtk_rcp']['nutrinfo'].update( {'density': 1,
-                                                'n_Al': 0,
-                                                'n_Ca': 0,
-                                                'n_En': 550,
-                                                'n_Fa': 15.0,
-                                                'n_Fb': 0,
-                                                'n_Fm': 0,
-                                                'n_Fo3': 10.0,
-                                                'n_Fp': 0,
-                                                'n_Fs': 5,
-                                                'n_Pr': 0,
-                                                'n_Sa': 2,
-                                                'n_St': 2,
-                                                'n_Su': 12,
-                                                'serving_size': 150,
-                                                'servings': 2,
-                                                'units': 'g',
-                                                'yield': '300g'} )
-            
+        # merge nutrinfo into DTK and send it back!        
+        dtk_data['dtk_rcp']['nutrinfo'].update( nutridata )
+        pprint(dtk_data)    
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")         
         return json.dumps(dtk_data), 200
     
