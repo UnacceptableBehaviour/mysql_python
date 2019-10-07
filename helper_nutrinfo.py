@@ -74,14 +74,17 @@ class Nutrients:
         if type(nutri_dict).__name__ != 'dict':
             nutri_dict = {}
 
+        # normalise DTK
+        normalise = 1.0         # leave non DTK alone
+
         # scan for nutrients
-        nut2ObjLUT = Nutrients.match_lookup
+        nut2ObjLUT = Nutrients.match_lookup                
 
         # match groups
         # 1 ingredient name
         # 2 servings / source < assumes nutirnt data is per 100g
         # 3 nutrients
-        # 4 yield
+        # 4 yield (weight of ingredient providing calories)
         for m in re.finditer(r'^-+ for the nutrition information(.*?)\((.*?)\)$(.*?)Total \((.*?)\)', text_data, re.MULTILINE | re.DOTALL ):
             nutridict_for_pass = {}
             name = m.group(1).strip()
@@ -101,9 +104,10 @@ class Nutrients:
             elif ('ndb_no=' in m.group(2) ):                    # cross reference in place of per 100g
                 nutridict_for_pass['serving_size'] = 100.0
                 nutridict_for_pass['x_ref'] = m.group(2)
-            elif (m.group(2).replace('per ', '') == m.group(4)):                    # yield and serving same
-                nutridict_for_pass['serving_size'] = nutridict_for_pass['yield']
+            elif (m.group(2).replace('per ', '') == m.group(4)):                  # yield and serving same. .
+                nutridict_for_pass['serving_size'] = nutridict_for_pass['yield']  # need to normalise nutrients to 100g
                 nutridict_for_pass['servings'] = 1.0
+                normalise = 100.0 / nutridict_for_pass['serving_size']
             
             #print(f"\n\n** {name} - {m.group(2)} \n {m.group(3)} \n {m.group(4)} \n--")
             
@@ -116,14 +120,14 @@ class Nutrients:
                 pair = [ item.strip() for item in line.split() ]    # split line by white space, strip excess space off                
                 #pprint(pair)
                 try:
-                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1])
+                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1]) * normalise
                 except KeyError:
                     Nutrients.log_nutridata_key_errors.append(pair[0])
                 except ValueError:
                     if (',' in pair[1]): pair[1] = pair[1].replace(',','.')
                     if (pair[1] == '.'): pair[1] = '0.0'
                     if ('g' in pair[1]): pair[1] = pair[1].replace('g','')
-                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1])
+                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1]) * normalise
                     
             # TODO 
             # insert = Nutrients(name, nutridict_for_pass)

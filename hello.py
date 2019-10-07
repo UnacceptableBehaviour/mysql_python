@@ -232,6 +232,12 @@ def track_items():
         nutridata = get_DTK_info_from_processing(dtk_data)
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
         
+        # TODO - 1st
+        # Make robust - if a single item is NO NUTIRIENT DATA
+        # nothing is returned because DTK infor for day FAILS
+        # Highlight missing items, but total the known ones
+        
+        
         # merge nutrinfo into DTK and send it back!        
         dtk_data['dtk_rcp']['nutrinfo'].update( nutridata )
         pprint(dtk_data)    
@@ -241,11 +247,11 @@ def track_items():
     else:
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'steak')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'ribeye steak')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'after swim breakfast 20190913')
         add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
+        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'cauliflower cheese royale')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'pork stew and sweetheart cabbage noodles')
     
