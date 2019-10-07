@@ -226,10 +226,10 @@ def track_items():
         arg2 = f"file={post_interface_file()}"
         data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
         
-        # import RESULT: just get nutrinfo for daily tracke for now.
+        # import RESULT: just get nutrinfo for daily tracker for now.
         # will expect a fully processed DTK including subcomponents
         # TODO
-        nutridata = get_DTK_info_from_processing()
+        nutridata = get_DTK_info_from_processing(dtk_data)
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
         
         # merge nutrinfo into DTK and send it back!        

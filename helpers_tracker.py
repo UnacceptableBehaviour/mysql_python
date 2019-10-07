@@ -5,6 +5,7 @@
 from pprint import pprint
 from datetime import datetime
 import helpers_db
+from helper_nutrinfo import iface_files, i_db
 
 
 # tracker class should inherit from Recipe & extend with simple biometrics
@@ -26,10 +27,10 @@ def return_daily_tracker():
     return dtk
 
 def post_interface_file():
-    return './scratch/___LAB_RECIPE_SMALLEST_DTK_TEST.txt'
+    return iface_files['dtk_recipe_txt']    
 
 def get_interface_file():
-    return './scratch/z_product_nutrition_info_autogen_day_cal.txt'
+    return iface_files['dtk_nutrients_txt']
 
 
 # take dtk object and convert to daily tracker human readable record
@@ -148,31 +149,35 @@ def post_DTK_info_for_processing(dtk):
         i_face_out.write(dtk_spec)
         i_face_out.close()
         
-def get_DTK_info_from_processing():
+def get_DTK_info_from_processing(dtk):
+    # just loaf info for dtk
+    search_name = dtk['dtk_rcp']['ri_name']
+    
+    dtk_nut_dict = {}
+    
     # load nutrinfo
-    with open(get_interface_file(), 'r') as i_face_in:
-        # process incoming DTK nutrinfo into DTK JSON
-        i_face_in.close()
-        
-        
-    return {'density': 1,
-            'n_Al': 0,
-            'n_Ca': 0,
-            'n_En': 100,
-            'n_Fa': 15.0,
-            'n_Fb': 0,
-            'n_Fm': 0,
-            'n_Fo3': 10.0,
-            'n_Fp': 0,
-            'n_Fs': 5,
-            'n_Pr': 0,
-            'n_Sa': 2,
-            'n_St': 2,
-            'n_Su': 12,
-            'serving_size': 200,
-            'servings': 2,
-            'units': 'g',
-            'yield': '400g'}
+    i_db.loadNutrientsFromTextFile(iface_files['dtk_nutrients_txt'], dtk_nut_dict)
+    
+    return dtk_nut_dict[search_name]
+                
+    # return {'density': 1,
+    #         'n_Al': 0,
+    #         'n_Ca': 0,
+    #         'n_En': 100,
+    #         'n_Fa': 15.0,
+    #         'n_Fb': 0,
+    #         'n_Fm': 0,
+    #         'n_Fo3': 10.0,
+    #         'n_Fp': 0,
+    #         'n_Fs': 5,
+    #         'n_Pr': 0,
+    #         'n_Sa': 2,
+    #         'n_St': 2,
+    #         'n_Su': 12,
+    #         'serving_size': 200,
+    #         'servings': 2,
+    #         'units': 'g',
+    #         'yield': '400g'}
 
 
 # testing         
