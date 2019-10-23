@@ -146,7 +146,7 @@ class Nutrients:
         
 
 class NutriDictError(Exception):
-    '''Move this and other error classes to separate file: exceptions.py'''
+    '''TODO Move this and other error classes to separate file: exceptions.py'''
     pass
 
 class AccessError(NutriDictError):

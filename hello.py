@@ -98,6 +98,10 @@ def db_gallery():
     #return render_template('data_return.html', lines=db_lines)
     return render_template('gallery.html', recipes=recipes)
 
+@app.route('/weigh_in')
+def weigh_in():
+    daily_tracker = return_daily_tracker()
+    return render_template('weigh_in_t.html', daily_tracker=daily_tracker)
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
 def buttons_inputs():

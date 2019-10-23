@@ -1,0 +1,60 @@
+<!--
+TODO - change all files to this format _t for the 'super' tmeplate file
+                                   and _page for the content 
+-->
+
+{% block content %}
+
+<h3>weigh in page</h3>
+
+
+<div class="input-group">
+  <input id='weight-in-weight-inrow' type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+  <div class="input-group-append">
+    <button type="button" class="btn btn-outline-secondary">Kg</button>
+    <!--<div>Kg</div>-->
+    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(449px, 38px, 0px);">
+      <a class="dropdown-item" href="#">Kg</a>
+      <a class="dropdown-item" href="#">lbs</a>
+    </div>
+  </div>
+
+
+</div>
+
+<br>
+<div class="input-group">
+  <input id='weight-in-pc-fat-inrow' type="text" class="form-control" placeholder='fat percentage'>
+</div>
+<br>
+<div class="input-group">  
+  <input id='weight-in-pc-water-inrow' type="text" class="form-control" placeholder='water percentage'>
+</div>
+
+
+<br><br><br><br>
+<h6>weigh in page - single row version</h6>
+
+<div class="input-group">
+  <input id='weight-in-weight-inrow' type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+  <div class="input-group-append">
+    <button type="button" class="btn btn-outline-secondary">Kg</button>
+    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(449px, 38px, 0px);">
+      <a class="dropdown-item" href="#">Kg</a>
+      <a class="dropdown-item" href="#">lbs</a>
+    </div>
+  </div>
+
+  <input id='weight-in-pc-fat-inrow' type="text" placeholder='fat percentage'>
+  
+  <input id='weight-in-pc-water-inrow' type="text" placeholder='water percentage'>
+
+</div>
+
+{% endblock %}

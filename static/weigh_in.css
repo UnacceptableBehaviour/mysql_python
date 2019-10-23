@@ -1,0 +1,14 @@
+<style>
+  /*    tag
+      . class
+      # id
+      TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
+  */
+  #debug-weigh-in-table {
+    width: 80%;
+  }
+  #debug-weigh-in-table td {
+    text-align: center;
+  }
+
+</style>
