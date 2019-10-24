@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>      
+          var dtk = {{ daily_tracker|tojson }}
+          console.log(`user=: ${dtk['dtk_rcp']['ri_name']} - inline`);  // sanity check
+          console.log(dtk);  // sanity check
+          console.log(`weight_in_t.html - inline CONCLUDED`);  // sanity check
+          
+      </script>
+    </head>
+</html>    

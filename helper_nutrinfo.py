@@ -5,15 +5,7 @@ import re
 import sys
 import json
 from pprint import pprint 
-
-
-iface_files = {}
-
-config_file = './scratch/config_files.json'
-with open(config_file, 'r') as f:
-    json_config = f.read()
-    iface_files = json.loads(json_config)
-    print(f"Config files LOADED ({iface_files.__len__()})")
+from config_files import iface_files
             
 
 class Nutrients:

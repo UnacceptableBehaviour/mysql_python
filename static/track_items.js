@@ -93,6 +93,7 @@ function loadServingModifierLUT(){
   return lut;
 }
 
+
 function loadUnitsToVolume() {
   unitsToVolume = { // 1 cm3 of water density = 1.0
     'gs': 1.0,
@@ -297,8 +298,6 @@ function timeNixTimeInms(){
   return (new Date()).getTime();
 }
 
-// create_daily_tracker_name_from_nix_time - python vs
-// return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
 //
 // 1569665275998ms to '2019 calories month 09 thu 26'
 function createDailyTrackerNameFromNixTime( nix_time_ms = timeNixTimeInms() ){

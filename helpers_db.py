@@ -12,7 +12,7 @@
 import itertools
 import re
 import copy                 # copy.deepcopy()
-#from pathlib import Path
+
 from datetime import datetime
 #datetime.now()
 
@@ -31,6 +31,10 @@ engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # dat
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 
+# stub files for data
+from config_files import get_file_for_data_set #, iface_files
+
+import uuid
 
 # time helper function for time since epoch, day, 24hr clock
 
@@ -342,6 +346,7 @@ def get_ingredients_as_text_list(ri_id):
     ingredients = []
     
     return ingredients
+
     
 # get_next_page_recipe_ids()    
 def get_all_recipe_ids():
@@ -353,7 +358,6 @@ def get_all_recipe_ids():
     return ids
 
 
-
 def toggle_filter(filter_list, filter_name):
     
     if filter_name in filter_list:
@@ -363,13 +367,143 @@ def toggle_filter(filter_list, filter_name):
         filter_list.append(filter_name)
     
 
-
+# TODO - Implement - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class RecipeTracker:    
     def __init__(self, recipe={}):
         self.recipe = return_recipe_dictionary().update(recipe)
 
+# TODO - implement DB DTK LOAD/STORE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# for now - load data from JSON files - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+
+
+def create_daily_tracker_name_from_nix_time(nix_time_ms = nix_time_ms()):
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
+
+def bootstrap_daily_tracker_create(name):
+    dtk = { 'dtk_user_info': get_user_info_dict(name),
+            'dtk_rcp':    return_recipe_dictionary(),
+            'dtk_weight': 102.7,
+            'dtk_pc_fat': 36.2,
+            'dtk_pc_h2o': 46.4  }
     
+    dtk['dtk_rcp']['ri_name'] = create_daily_tracker_name_from_nix_time()
     
+    return dtk
+# 
+# def create_daily_tracker_name_from_nix_time(nix_time_ms = helpers_db.nix_time_ms()):
+#     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
+# 
+# def bootstrap_daily_tracker_create(name):
+#     dtk = { 'dtk_user_info': helpers_db.get_user_info_dict(name),
+#             'dtk_rcp':    helpers_db.return_recipe_dictionary(),
+#             'dtk_weight': 102.7,
+#             'dtk_pc_fat': 36.2,
+#             'dtk_pc_h2o': 46.4  }
+#     
+#     dtk['dtk_rcp']['ri_name'] = create_daily_tracker_name_from_nix_time()
+#     
+#     return dtk
+
+
+def commit_dict_to_DB(db, data_set):
+    '''
+    commit data for key data_set - if no file - create it
+    -
+    set of user data
+    set of dtk data for each use
+    data_set key must be in .json config_file (config.py) 
+    '''
+    database_file = get_file_for_data_set(data_set)
+    
+    with open(database_file, 'w') as f:
+        pprint(db)
+        db_as_json = json.dumps(db)
+        f.write(db_as_json)
+    
+    # if database_file.exists():
+    #     with open(database_file, 'w') as f:
+    #         f.write(db)
+    # else:
+    #     with open(database_file, 'w') as f:
+    #         f.write(db)
+        
+    
+
+def load_dict_data_from_DB(data_set):
+    '''
+    load data for key: data_set - if no file - create it
+    -
+    set of user data
+    set of dtk data for each use
+    data_set key must be in .json config_file (config.py) 
+    '''    
+    database_file = get_file_for_data_set(data_set)
+            
+    if database_file.exists():
+        with open(database_file, 'r') as f:
+            json_db = f.read()
+            db = json.loads(json_db)
+            print(f"DTK database LOADED ({db.__len__()})")
+    else:
+        db = {}  # create a blank file
+        commit_dict_to_DB(db, data_set)
+            
+    return db
+      
+      
+def get_user_info_dict(name):
+    # https://docs.python.org/3/library/uuid.html
+    # maybe use domain version, have a think
+    return { 'UUID': str(uuid.uuid4()),
+             'name': name }
+
+
+
+
+# private
+daily_tracker_db = load_dict_data_from_DB('dtk_database')
+user_db = load_dict_data_from_DB('user_database')
+
+def commit_DTK_DB():
+    commit_dict_to_DB(daily_tracker_db, 'dtk_database')
+
+def commit_User_DB():
+    commit_dict_to_DB(user_db, 'user_database')
+
+
+
+def get_daily_tracker(userUUID):
+    try:
+        return daily_tracker_db[userUUID]
+    except KeyError:
+        return None
+    
+def store_daily_tracker(dtk):
+    try:
+        daily_tracker_db[str(dtk['dtk_user_info']['UUID'])] = dtk
+        return True
+    except KeyError:
+        print("** W A R N I N G ** Failed to Store DTK data:")
+        pprint(dtk)
+        raise("Failed to Store DTK data:")
+
+
+
+# TODO - implement DB DTK LOAD/STORE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# for now - load data from JSON files - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -410,5 +544,40 @@ if __name__ == '__main__':
     pprint(return_recipe_dictionary())
     
     pprint(RecipeTracker())
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
+    # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior    #
+    day = datetime.now().strftime("%d") # day number                                    #
+    day = datetime.now().strftime("%a").lower() # day 3 letter                          #
+    time = datetime.now().strftime("%H%M").lower() # 4 digit 24hr clock                 #
+    #time_since_epoch = nix_time_ms(datetime.now())                                     #
+    time_since_epoch = nix_time_ms()                                                    #
+    day_from_nx = day_from_nix_time(time_since_epoch)                                   #
+    time24_from_nx = time24h_from_nix_time(time_since_epoch)                            #
+                                                                                        #
+    print(day, time, time_since_epoch, day_from_nx)                                     #
+    print(type(datetime.now()))                                                         #
+    print(create_daily_tracker_name_from_nix_time(nix_time_ms()))                       #
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
     
-    
+    # search  notes
+    # return_daily_tracker - hello.py
+    # iface_files - push into config.py use
+    print("- - - USER / UUID - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    user = 'Simon'
+    user_info = get_user_info_dict(user)
+    user_db[user_info['UUID']] = user_info['name']
+    user_info = get_user_info_dict('Susan')
+    user_db[user_info['UUID']] = user_info['name']    
+    pprint(user_db)
+    print("- - - boot DTK - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")    
+    test_dtk = bootstrap_daily_tracker_create(user)
+    pprint(test_dtk)
+    print("- - - WRITE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    store_daily_tracker(test_dtk)
+    print("- - - READ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    test_dtk_read = get_daily_tracker(test_dtk['dtk_user_info']['UUID'])    
+    pprint(test_dtk_read)
+    print("- - - COMMIT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    commit_DTK_DB()
+    commit_User_DB()

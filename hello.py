@@ -76,10 +76,19 @@ def db_hello_world():
     
     #return render_template('data_return.html', lines=db_lines)
     return render_template('show_all_recipe_images.html', recipes=db_lines)
-    
-    
     #return f"Processed Query:<br>{formatted_text} <br>END"
 
+
+@app.route('/synch_n_route', methods=["GET", "POST"])
+def query_status_w_js():
+    # load most recet dtk post for user (dtk - daily tracker)
+    # render blank html, with simple JS to POST status
+    # post user, device, dt_date from dtk in local storage on device
+    # compare to data for user on server
+    # if dt_date on device is before 5AM today (set by user) store the dtk
+    daily_tracker = return_daily_tracker()
+    
+    return render_template('quick_synch.html', daily_tracker=daily_tracker)
 
 @app.route('/db_gallery')
 def db_gallery():
