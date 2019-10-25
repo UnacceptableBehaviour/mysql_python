@@ -32,21 +32,67 @@ helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 
 # stub files for data
-from config_files import get_file_for_data_set #, iface_files
+from config_files import get_file_for_data_set 
 
 import uuid
 
 # time helper function for time since epoch, day, 24hr clock
-
+# https://www.techatbloomberg.com/blog/work-dates-time-python/ < overview timezones
 def nix_time_ms(dt=datetime.now()):
-    epoch = datetime.utcfromtimestamp(0)
-    return int( (dt - epoch).total_seconds() * 1000.0 )
+    epoch = datetime.utcfromtimestamp(0)                    #                ms 1572029735987
+    return int( (dt - epoch).total_seconds() * 1000.0 )     # total_seconds() > 1572029735.987234
 
 def day_from_nix_time(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%a").lower()
 
 def time24h_from_nix_time(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%H%M")
+
+def hr_readable_from_nix(nix_time_ms):
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d %H%M")
+
+
+# %Y 2049 year
+# %m month
+# %d 05 day 0pad
+# %H 09 hours 24h 0pad
+# %m 05 minutes 0pad
+# get rollover 5AM time as nix time
+# https://docs.python.org/3.5/library/datetime.html#datetime.datetime.replace
+#
+# time_in_the_AM_to_rollover 24h 4 digit string 5am = '0500'
+def roll_over_from_nix_time(nix_ts, time_in_the_AM_to_rollover='0500'):
+    ONE_DAY_IN_MS = 24*60*60*1000
+    
+    if len(time_in_the_AM_to_rollover) == 4:
+        h = int(time_in_the_AM_to_rollover[0:2])
+        m = int(time_in_the_AM_to_rollover[2:4])
+    else:
+        h=5
+        m=0
+
+    nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS     # this takes care of rollover, last day of month / year etc
+                                                        # set hours minute to the rollover time-------\
+    dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m)  # <<|  
+    
+    rollover_nix_time_ms = nix_time_ms(dt_rollover)
+    
+    nix_ts_hr = hr_readable_from_nix(nix_ts)
+    
+    print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts_plus_1_day} - <{rollover_nix_time_ms}|{dt_rollover}> -  {time_in_the_AM_to_rollover} - {h}:{m}")
+    
+    return rollover_nix_time_ms
+
+# what are we trying to do with this function?
+# take any time of day
+# the rollover point is for example 5AM
+#
+# ts1        *
+# ts2                           *         < not rolled over yet
+# ts3                                 *   < rolled over
+#     ----R-------------------|----R-------------------|----R-------------------|
+#     |         day 1         |         day 2          |
+#         |         set 1          |         set 2          |
 
 
 
@@ -558,26 +604,61 @@ if __name__ == '__main__':
     print(day, time, time_since_epoch, day_from_nx)                                     #
     print(type(datetime.now()))                                                         #
     print(create_daily_tracker_name_from_nix_time(nix_time_ms()))                       #
+    
+    # rollover time 5AM tomorrow
+    print(datetime.strptime('0500',"%H%M"))
+    nix_ts = nix_time_ms()
+    # %Y 2049 year
+    # %m month
+    # %d 05 day 0pad
+    # %H 09 hours 24h 0pad
+    # %m 05 minutes 0pad
+    # get rollover 5AM time as nix time
+    time_in_the_AM_to_rollover='0500'
+    h = int(time_in_the_AM_to_rollover[0:2])
+    m = int(time_in_the_AM_to_rollover[2:4])
+    ONE_DAY_IN_MS = 24*60*60*1000
+    hrs=5
+    mins=0
+    nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS
+    rollover_time = '0500'
+    print(datetime.utcfromtimestamp(nix_ts / 1000.0).strftime("%Y %m %d %H%M"))
+    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).strftime(f"%Y %m %d {rollover_time}"))    
+    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=5, minute=0).strftime(f"%Y %m %d %H%M"))
+    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=hrs, minute=mins).strftime(f"%Y %m %d %H%M"))
+    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m).strftime(f"%Y %m %d %H%M"))
+    # https://docs.python.org/3.5/library/datetime.html#datetime.datetime.replace
+    dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=hrs, minute=mins)    
+    rollover_nix_time_ms = nix_time_ms(dt_rollover)
+    print(datetime.strptime('2000 0458',"%Y %H%M"))
+    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0458',"%Y %H%M")), '0500') ) )
+    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0459',"%Y %H%M")), '0500') ) )
+    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0500',"%Y %H%M")), '0500') ) )
+    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '0500') ) )
+
+
+    
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
     
     # search  notes
     # return_daily_tracker - hello.py
-    # iface_files - push into config.py use
-    print("- - - USER / UUID - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    user = 'Simon'
-    user_info = get_user_info_dict(user)
-    user_db[user_info['UUID']] = user_info['name']
-    user_info = get_user_info_dict('Susan')
-    user_db[user_info['UUID']] = user_info['name']    
-    pprint(user_db)
-    print("- - - boot DTK - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")    
-    test_dtk = bootstrap_daily_tracker_create(user)
-    pprint(test_dtk)
-    print("- - - WRITE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    store_daily_tracker(test_dtk)
-    print("- - - READ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    test_dtk_read = get_daily_tracker(test_dtk['dtk_user_info']['UUID'])    
-    pprint(test_dtk_read)
-    print("- - - COMMIT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    commit_DTK_DB()
-    commit_User_DB()
+    # print("- - - USER / UUID - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    # user = 'Simon'
+    # user_info = get_user_info_dict(user)
+    # user_db[user_info['UUID']] = user_info['name']
+    # user_info = get_user_info_dict('Susan')
+    # user_db[user_info['UUID']] = user_info['name']    
+    # pprint(user_db)
+    # print("- - - boot DTK - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")    
+    # test_dtk = bootstrap_daily_tracker_create(user)
+    # test_dtk['dtk_user_info']['UUID'] = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    # test_dtk['dtk_user_info']['name'] = 'Simon'
+    # pprint(test_dtk)
+    # print("- - - WRITE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    # store_daily_tracker(test_dtk)
+    # print("- - - READ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    # test_dtk_read = get_daily_tracker(test_dtk['dtk_user_info']['UUID'])    
+    # pprint(test_dtk_read)
+    # print("- - - COMMIT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    # commit_DTK_DB()
+    # commit_User_DB()

@@ -5,7 +5,8 @@
 from pprint import pprint
 from datetime import datetime
 import helpers_db                   # change to from helpers_db import - isolate  iface
-from helper_nutrinfo import iface_files, i_db
+from helper_nutrinfo import i_db
+from config_files import get_file_for_data_set 
 
 # TODO
 # tracker class should inherit from Recipe & extend with simple biometrics
@@ -13,7 +14,7 @@ from helper_nutrinfo import iface_files, i_db
 # 2019 calories month 09 day 15 (1) - 105.7kg,	fat_pc - 38.3,	H2O_pc - 44.8
 
 
-def return_daily_tracker(userUUID = 0):
+def return_daily_tracker(userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298'):
     return helpers_db.get_daily_tracker(userUUID)
 
 def store_daily_tracker(dtk = {}):
@@ -21,10 +22,10 @@ def store_daily_tracker(dtk = {}):
 
 
 def post_interface_file():
-    return iface_files['dtk_recipe_txt']    
+    return get_file_for_data_set('dtk_recipe_txt')
 
 def get_interface_file():
-    return iface_files['dtk_nutrients_txt']
+    return get_file_for_data_set('dtk_nutrients_txt')
 
 
 # take dtk object and convert to daily tracker human readable record
@@ -150,7 +151,7 @@ def get_DTK_info_from_processing(dtk):
     dtk_nut_dict = {}
     
     # load nutrinfo
-    i_db.loadNutrientsFromTextFile(iface_files['dtk_nutrients_txt'], dtk_nut_dict)
+    i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), dtk_nut_dict)
     
     return dtk_nut_dict[search_name]
                 

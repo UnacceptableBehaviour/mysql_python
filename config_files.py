@@ -4,18 +4,18 @@
 import json
 from pathlib import Path
 
-iface_files = {}
+__iface_files = {}
 
 config_file = './scratch/config_files.json'
 with open(config_file, 'r') as f:
     json_config = f.read()
-    iface_files = json.loads(json_config)
-    print(f"Config files LOADED ({iface_files.__len__()})")
+    __iface_files = json.loads(json_config)
+    print(f"Config files LOADED ({__iface_files.__len__()})")
 
 
 def get_file_for_data_set(data_set):
-    if data_set in iface_files:
-        database_file = Path(iface_files[data_set])
+    if data_set in __iface_files:
+        database_file = Path(__iface_files[data_set])
     else:
         raise(f"DATABASE stub ERROR: KeyError data_set key <{data_set}> doesn't exist")    
 
@@ -26,8 +26,8 @@ if __name__ == '__main__':
     from pathlib import Path
     # https://docs.python.org/3/library/pathlib.html#basic-use
     
-    for key in iface_files:
-        file_info = Path(iface_files[key])
+    for key in __iface_files:
+        file_info = Path(__iface_files[key])
         # print(f"anchor: {file_info.anchor}")
         # print(f"parent:{file_info.parent}")
         # print(f"stem: {file_info.stem}")

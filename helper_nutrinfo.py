@@ -5,8 +5,7 @@ import re
 import sys
 import json
 from pprint import pprint 
-from config_files import iface_files
-            
+from config_files import get_file_for_data_set            
 
 class Nutrients:
     match_lookup = {                    # translate from human readable text to dict
@@ -157,7 +156,7 @@ class ResourceLocked(NutriDictError):
 # Singleton interface for the NutrientsDB
 class NutrientsDB:
     #__nutrients_db_file = 'ingredient_db.json'
-    __nutrients_db_file = iface_files['nutrients_txt_db']
+    __nutrients_db_file = get_file_for_data_set('nutrients_txt_db')
     __nutrients_db = {}
     __seek_misses = []
     __nutrients_loaded = False
@@ -287,7 +286,7 @@ if __name__ == '__main__':
     
     t_dict = {}
     i_db = NutrientsDB.getInstance()
-    i_db.loadNutrientsFromTextFile(iface_files['dtk_nutrients_txt'], t_dict)
+    i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), t_dict)
     print("t_dict")
     pprint(t_dict)
 

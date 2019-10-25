@@ -19,7 +19,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
-from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict, get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary, get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
+from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
+from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
+from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
+from helpers_db import get_daily_tracker,store_daily_tracker,commit_DTK_DB
+
 from helpers_tracker import return_daily_tracker, post_DTK_info_for_processing, post_interface_file, get_DTK_info_from_processing
 
 from sqlalchemy import create_engine
@@ -47,7 +51,6 @@ data['chosen_tag_filters'] = ['vegan', 'veggie', 'cbs']
 data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
 
 data['allergens'] = ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide']
-
 
 
 # default
@@ -81,13 +84,16 @@ def db_hello_world():
 
 @app.route('/synch_n_route', methods=["GET", "POST"])
 def query_status_w_js():
-    # load most recet dtk post for user (dtk - daily tracker)
+    # load most recent dtk post for user (dtk - daily tracker)
     # render blank html, with simple JS to POST status
     # post user, device, dt_date from dtk in local storage on device
     # compare to data for user on server
     # if dt_date on device is before 5AM today (set by user) store the dtk
-    daily_tracker = return_daily_tracker()
-    
+    sync_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    daily_tracker = return_daily_tracker(sync_uuid)
+    print("- - - SYNCH - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
+    pprint(daily_tracker)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")    
     return render_template('quick_synch.html', daily_tracker=daily_tracker)
 
 @app.route('/db_gallery')
@@ -109,7 +115,11 @@ def db_gallery():
 
 @app.route('/weigh_in')
 def weigh_in():
-    daily_tracker = return_daily_tracker()
+    daily_tracker = return_daily_tracker()    
+      # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
+      #                                <!--and _page for the content-->
+      # <!--TODO - recipe_t.html recipe_page.html-->
+      # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
     return render_template('weigh_in_t.html', daily_tracker=daily_tracker)
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
@@ -215,9 +225,6 @@ def button_3():
 @app.route('/tracker', methods=["GET", "POST"])
 def track_items():
     headline_py = 'track items..'
-        
-    daily_tracker = return_daily_tracker()
-    recipes = [daily_tracker['dtk_rcp']]
     
     if request.method == 'POST':
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
@@ -226,8 +233,10 @@ def track_items():
         tracker_post = request.get_json() # parse JSON into DICT
         if ('dtk' in tracker_post):
             dtk_data = tracker_post['dtk']
+            uuid =  tracker_post['user']
         
-        pprint(dtk_data)
+        pprint(dtk_data)        
+        print(f"UUID: {uuid}")
         # update DB
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
         # export DTK for PROCESSING
@@ -252,21 +261,28 @@ def track_items():
         
         
         # merge nutrinfo into DTK and send it back!        
-        dtk_data['dtk_rcp']['nutrinfo'].update( nutridata )
-        pprint(dtk_data)    
+        dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
+        dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
+        pprint(dtk_data)
+        store_daily_tracker(dtk_data)   # ram
+        commit_DTK_DB()                 # disc
         print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")         
         return json.dumps(dtk_data), 200
     
     else:
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'ribeye steak')
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'ribeye steak')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'after swim breakfast 20190913')
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
-        add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'cauliflower cheese royale')
+        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'cauliflower cheese royale')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
         # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'pork stew and sweetheart cabbage noodles')
+        #
+        # TODO UUID awaresnes - username login etc
+        daily_tracker = return_daily_tracker('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
+        recipes = [daily_tracker['dtk_rcp']]
     
     pprint(daily_tracker)
     

@@ -46,6 +46,9 @@ clearLocalStorageButton.addEventListener('click', clearLocalStorage);
 var postDTKdataToServer = document.getElementById('but-p');
 postDTKdataToServer.addEventListener('click', fetchUpdateDailyTrackerNutrients);
 //-
+var listPostAndSaveButton = document.getElementById('but-post-store');
+listPostAndSaveButton.addEventListener('click', saveDTKLocallyThenPostToServer);
+//-
 var listLocalStorageButton = document.getElementById('but-l');
 listLocalStorageButton.addEventListener('click', listLocalStorageKeys);
 //-
@@ -128,14 +131,14 @@ function convertToGrams(qty, units, ingredient){
   // load volume of units info from DB
   var unitsToVolume = loadUnitsToVolume();
   
-  try{
+  try {
     if ( servingModifierLUT[ingredient] === undefined) {
       return qty * unitsToVolume[units] * 1.0;      
     } else {
       return qty * unitsToVolume[units] * servingModifierLUT[ingredient]['density'];  
-    }    
-  }
-  catch(err){
+    }
+    
+  } catch(err) {
     console.log(`**** WARNING: convertToGrams - DB lookup MISS: qty:${qty} units:${units} ingredient:${ingredient} vol:${unitsToVolume[units]}`);
     return 99999;     // it's BIG to notice somethings wrong!
   }
@@ -163,11 +166,11 @@ function getServingWeight(qty, ingredient, modifier='medium'){
     { modifier = 'large'; };
   
   
-  try{    
+  try {    
     size = servingModifierLUT[ingredient][modifier];
     console.log(`*> servingModifierLUT: ${modifier} ${ingredient} = ${size} <`);
-  }
-  catch(err){
+  
+  } catch(err) { 
     console.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}`);
     return 99999;     // it's BIG to notice somethings wrong!
   }
@@ -368,14 +371,14 @@ function idFromIngredient(ingredientLineArray){
 function createTablelineHTML(ingredient_line_array){
   var but_delete = '<td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete">X</button></td>'; 
     
-  var time=''
+  var time='';
   if (ingredient_line_array[TRACK_NIX_TIME] < 0) {
-    time = '<td class="col-but-time"></td>'
+    time = '<td class="col-but-time"></td>';
   } else {
-    time = `<td class="col-but-time">${time4d_24h(ingredient_line_array[TRACK_NIX_TIME])}</td>`
+    time = `<td class="col-but-time">${time4d_24h(ingredient_line_array[TRACK_NIX_TIME])}</td>`;
   }
   
-  var qty = `<td class="col-but-qty text-center">${ingredient_line_array[QTY_IN_G_INDEX]}</td>`
+  var qty = `<td class="col-but-qty text-center">${ingredient_line_array[QTY_IN_G_INDEX]}</td>`;
       
   var servings = '';
   if (ingredient_line_array[SERVING_INDEX] === '(0)'){
@@ -384,7 +387,7 @@ function createTablelineHTML(ingredient_line_array){
     servings = `<td class="col-but-serv text-center">${ingredient_line_array[SERVING_INDEX]}</td>`;
   }
   
-  var item = `<td class="col-but-ingdt">${ingredient_line_array[INGREDIENT_INDEX]}</td>`
+  var item = `<td class="col-but-ingdt">${ingredient_line_array[INGREDIENT_INDEX]}</td>`;
   
   var but_photo = '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right"><i class="fas fa-camera"></i></button></td>';
 
@@ -401,7 +404,7 @@ function createTablelineHTML(ingredient_line_array){
     
   }
     
-  return `<tr>${but_delete} ${time} ${qty} ${servings} ${item} ${but_photo} ${but_more}</tr>`
+  return `<tr>${but_delete} ${time} ${qty} ${servings} ${item} ${but_photo} ${but_more}</tr>`;
 }
 
 
@@ -754,6 +757,7 @@ function undeleteItemFromComponent(e){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // LOAD STORE / Local storage
+// TODO -break out into local storage utils - also in quick_synch.js
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // local storage API
@@ -781,7 +785,9 @@ function getPlatformInfo(){ // https://stackoverflow.com/questions/3514784/what-
 }
 
 var lastSavedFile = '';
-var userUUID = '57dfe4d9497ce6ddeebe46a9de344a7d39e8f543';
+// HARD code a bootstrap UUID
+var youAreWhoISayYouAre = '014752da-b49d-4fb0-9f50-23bc90e44298';
+var userUUID = youAreWhoISayYouAre;
 var deviceInfo = getPlatformInfo();
 
 if (typeof(Storage) !== "undefined") {
@@ -791,27 +797,50 @@ if (typeof(Storage) !== "undefined") {
   console.log(`NO LOCAL STORAGE SUPPORT <<`);
 }
 
-
-// store dtk object to ssm / 'disc' / nvm 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// store dtk object to ssm / 'disc' / nvm
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 function saveDailyTrackerToLocalStorage(){
+  var succeeded = false;
+
   // dtk_[timestamp]_[userUUID].JSON  
   var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ userUUID }_${ deviceInfo }`;
   
-  // TODO -   
-  if (lastSavedFile === null){
-    lastSavedFile = fileName;         // result in the '"lastSavedFile"' bug!
-                                      //            vs  'lastSavedFile' key issue
-                                                    // this is already a string!
-    //window.localStorage.setItem( 'lastSavedFile', JSON.stringify(lastSavedFile) );
+  try {
+    window.localStorage.setItem( fileName, JSON.stringify(dtk) );
+    
+    lastSavedFile = fileName;   // store last save filename (which changes) in a consistent place
+    
     window.localStorage.setItem( 'lastSavedFile', lastSavedFile );
-  }
-  window.localStorage.setItem( 'lastSavedFile', lastSavedFile );
-  
-  window.localStorage.setItem( fileName, JSON.stringify(dtk) );
+    
+    succeeded = true;
+    
+    debugOutputDiv.innerHTML = `Saving . . ${fileName}`;      
 
-  debugOutputDiv.innerHTML = `Saving . . ${fileName}`;
+  } catch (err) {
+
+    console.log(`**** WARNING: save to local storage FAILED ${err}`);
+
+    console.log(err);
+
+  }
   
   // POST to server too.
+  
+  return succeeded;
+}
+
+function saveDTKLocallyThenPostToServer (){
+  var success = false;
+  
+  // TODO need to wait for result fix this!
+  if (saveDailyTrackerToLocalStorage() === true) {
+    if (fetchUpdateDailyTrackerNutrients() === true) {
+      success = true;
+    }    
+  }
+  
+  return success;
 }
 
 
@@ -820,21 +849,30 @@ function clearLocalStorage() {
   console.log(`localStorage.cleared >${retVal}<`);
 }
 
+// to list keys AND contents
+// set withContents = true
 function listLocalStorageKeys(withContents = false) {
   // 'iterating' though local storage
   
   console.log( `>- - - - - listLocalStorageKeys: [${localStorage.length}] (${typeof(localStorage)}) <` );
   console.log(`DEVICE: ${getPlatformInfo()}`);
+  
   for (var i = 0; i < localStorage.length; i++){
+  
     if (lastSavedFile === localStorage.key(i)) {
       dtk = JSON.parse( localStorage.getItem(localStorage.key(i)) );
       console.log( `GOT IT:: ${localStorage.key(i)} <` );
     }
+  
     console.log(`>- - - - - - - - - - - - ls keys [${i}] \\\\ `);
+    
     console.log( `lsKey: ${localStorage.key(i)} <` );
+  
     if (withContents) console.log( localStorage.getItem(localStorage.key(i)) );
+    
     console.log('>- - - - - - ');
   }
+  
   console.log('>- - - - - - - - - - - - ls keys // ');
 }
 
@@ -870,13 +908,13 @@ function loadDailyTrackerFromLocalStorage(){
 // post DTK for processing to...
 // fetch Nutrients
 function fetchUpdateDailyTrackerNutrients() {
-  
+  var success = false;
   // TODO - careful think about where/when to set this - new recipe vs daily tracker
   //dtk['dtk_rcp']['ri_name'] = createDailyTrackerNameFromNixTime();
   //console.log("--------> dtk['dtk_rcp']['ri_name']");
   //console.log(dtk['dtk_rcp']['ri_name']);
   //console.log("--------> dtk['dtk_rcp']['ri_name']");
-  
+    
   fetch( '/tracker', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
@@ -923,13 +961,14 @@ function fetchUpdateDailyTrackerNutrients() {
     recipes = [ data['dtk_rcp'] ] // load recipes array
     
     fill_in_nutrients_table();
-  
+    
+    success = true;
+    console.log(`fetchUpdateDailyTrackerNutrients INside: \n ${success}`);
   });
   
-  
-  
-  
-  
+  // TODO this comes back straight await (before console above) - use await?
+  console.log(`fetchUpdateDailyTrackerNutrients OUTside: \n ${success}`);
+  return success;
 }
 
 
