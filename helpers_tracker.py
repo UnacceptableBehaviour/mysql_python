@@ -1,12 +1,19 @@
 #! /usr/bin/env python
 
-# tracker helpers
+# tracker helpers - this should dissapear - for the most part when DB is implemented
 
 from pprint import pprint
+
+import subprocess   # exec CLI commands
+
 from datetime import datetime
-import helpers_db                   # change to from helpers_db import - isolate  iface
+import helpers_db       # explicitly use helpers_db.func_name()     << highlight where function is from 
+# change to from helpers_db import - isolate  iface:
+    #from helpers_db import get_daily_tracker, store_daily_tracker, time24h_from_nix_time, commit_DTK_DB
+    #from helpers_db import TRACK_NIX_TIME, QTY_IN_G_INDEX
 from helper_nutrinfo import i_db
-from config_files import get_file_for_data_set 
+from config_files import get_file_for_data_set
+
 
 # TODO
 # tracker class should inherit from Recipe & extend with simple biometrics
@@ -14,10 +21,10 @@ from config_files import get_file_for_data_set
 # 2019 calories month 09 day 15 (1) - 105.7kg,	fat_pc - 38.3,	H2O_pc - 44.8
 
 
-def return_daily_tracker(userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298'):
+def get_daily_tracker_from_DB(userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298'):
     return helpers_db.get_daily_tracker(userUUID)
 
-def store_daily_tracker(dtk = {}):
+def store_daily_tracker_to_DB(dtk = {}):
     return helpers_db.store_daily_tracker(dtk)
 
 
@@ -129,20 +136,32 @@ def create_human_readable_DTK_spec(dtk):
     test_text_4 = '''
 ====================================================================================
 '''
+    # TODO
+    # reverse iterate components creating multiple test_text_2 sections
+    # using create_text_component(component)    # list ? dict of components in dtk['components']
+    # TODO - recursive into components - CHECK
+    #      - reverse order? lowest level component first
+    #
+    # test_text_2 = ''
+    # for recipe in dtk['dtk_rcp']['components']:
+    #     test_text_2 += create_text_component(recipe)
 
     test_text_3 = create_DTK_textcomponent(dtk)
 
     return test_text_1 + test_text_2 + test_text_3 + test_text_4
 
-
+# awaiting implementation
+# 
 def post_DTK_info_for_processing(dtk):
     # create DTK
     dtk_spec = create_human_readable_DTK_spec(dtk)    
     
-    # file it
+    # file it - post_interface_file() get the name of filee from
+    # a shared config file - a json file
     with open(post_interface_file(), 'w') as i_face_out:
         i_face_out.write(dtk_spec)
         i_face_out.close()
+
         
 def get_DTK_info_from_processing(dtk):
     # just loaf info for dtk
@@ -175,9 +194,91 @@ def get_DTK_info_from_processing(dtk):
     #         'yield': '400g'}
 
 
+# updated dtk package arrived from user
+# process into nutrient info:
+#
+#   h_tracker  -   -   >     config     <   -  legacy
+#                              .
+#   createHRversion            .
+#   |                          .
+#   create_human_readable_DTK_spec
+#   create_DTK_textcomponent   .
+#   |                          .
+#   save it to file - - -> iface_file - - -> process into nutrients
+#                                                   |
+#   load file <- - - - - - iface_file <- - - write it back
+#   |
+#
+#
+#
+
+def process_new_dtk_from_user(dtk_data):
+    uuid = dtk_data['dtk_user_info']['UUID']
+    
+    # update DB
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
+    
+    # export DTK for PROCESSING
+    # as nutridoc entry
+    post_DTK_info_for_processing(dtk_data)
+    
+    # fire up ccm_nutridoc_web.rb PROCESS DTK data
+    arg1 = f"{dtk_data['dtk_weight']}"
+    arg2 = f"file={post_interface_file()}"
+    data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
+    
+    # import RESULT: just get nutrinfo for daily tracker for now.
+    # will expect a fully processed DTK including subcomponents
+    # TODO
+    nutridata = get_DTK_info_from_processing(dtk_data)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+    
+    # TODO - 1st
+    # Make robust - if a single item is NO NUTIRIENT DATA
+    # nothing is returned because DTK in for day FAILS
+    # Highlight missing items, but total the known ones
+    
+    
+    # merge nutrinfo into DTK and send it back!        
+    dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
+    dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
+    pprint(dtk_data)
+    store_daily_tracker_to_DB(dtk_data)   # ram
+    helpers_db.commit_DTK_DB()            # disc
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
+
+    return(dtk_data)
+
+
+# synch / login route
+# check dtk too see if we've passed the rollover point
+#
+# if passed the rollover 
+#   archive old one and create a fresh dtk
+#   for return rendering weigh in
+#
+# if not rollover dtk
+#   process the new addition and return the data to
+#   tracker
+def check_dtk_timestamp_archive_if_needed(dtk):
+    # check ts
+    rollover_from_dtk = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
+    
+    # if nix_time_ms() > dtk['dtk_rcp']['dt_rollover']  # store rollover at creation time!TODO
+    if nix_time_ms() > rollover_from_dtk:
+        pass
+        # archive the current dtk
+        # generate & store a new one, return it
+    else:
+        dtk_data = process_new_dtk_from_user(dtk)
+    
+    return(dtk_data)
+
+
+
 # testing         
 if __name__ == '__main__':
-    pass
+    pprint(get_daily_tracker_from_DB())
 
 
     

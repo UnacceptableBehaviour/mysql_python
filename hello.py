@@ -19,12 +19,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
+
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-from helpers_db import get_daily_tracker,store_daily_tracker,commit_DTK_DB
+from helpers_db import get_daily_tracker, commit_DTK_DB
+#from helpers_db import store_daily_tracker
 
-from helpers_tracker import return_daily_tracker, post_DTK_info_for_processing, post_interface_file, get_DTK_info_from_processing
+from helpers_tracker import get_daily_tracker_from_DB, post_DTK_info_for_processing, post_interface_file
+from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -37,7 +40,6 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 import re           # regex
 import json         # JSON tools
-import subprocess   # exec CLI commands
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
@@ -90,7 +92,7 @@ def query_status_w_js():
     # compare to data for user on server
     # if dt_date on device is before 5AM today (set by user) store the dtk
     sync_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
-    daily_tracker = return_daily_tracker(sync_uuid)
+    daily_tracker = get_daily_tracker_from_DB(sync_uuid)
     print("- - - SYNCH - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
     pprint(daily_tracker)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")    
@@ -115,7 +117,7 @@ def db_gallery():
 
 @app.route('/weigh_in')
 def weigh_in():
-    daily_tracker = return_daily_tracker()    
+    daily_tracker = get_daily_tracker_from_DB()    
       # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
       #                                <!--and _page for the content-->
       # <!--TODO - recipe_t.html recipe_page.html-->
@@ -234,54 +236,17 @@ def track_items():
         if ('dtk' in tracker_post):
             dtk_data = tracker_post['dtk']
             uuid =  tracker_post['user']
-        
-        pprint(dtk_data)        
-        print(f"UUID: {uuid}")
-        # update DB
-        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
-        # export DTK for PROCESSING
-        # as nutridoc entry
-        post_DTK_info_for_processing(dtk_data)
-        
-        # fire up ccm_nutridoc_web.rb PROCESS DTK data
-        arg1 = f"{dtk_data['dtk_weight']}"
-        arg2 = f"file={post_interface_file()}"
-        data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
-        
-        # import RESULT: just get nutrinfo for daily tracker for now.
-        # will expect a fully processed DTK including subcomponents
-        # TODO
-        nutridata = get_DTK_info_from_processing(dtk_data)
-        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-        
-        # TODO - 1st
-        # Make robust - if a single item is NO NUTIRIENT DATA
-        # nothing is returned because DTK infor for day FAILS
-        # Highlight missing items, but total the known ones
-        
-        
-        # merge nutrinfo into DTK and send it back!        
-        dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
-        dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
-        pprint(dtk_data)
-        store_daily_tracker(dtk_data)   # ram
-        commit_DTK_DB()                 # disc
-        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")         
-        return json.dumps(dtk_data), 200
+            updated_dtk_data = process_new_dtk_from_user(dtk_data)  # , uuid) contained in dtk 
+            pprint(updated_dtk_data)        
+            print(f"UUID: {uuid}")
+        else:
+            raise(Exception("POST to route: /tracker - INVALID DATA"))
+       
+        return json.dumps(updated_dtk_data), 200
     
     else:
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'coffee')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'ribeye steak')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'after swim breakfast 20190913')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '240g', 'bananas', 2)
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '180g', 'apple fennel pate ploughmans')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'cauliflower cheese royale')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 1, '50g', 'bananas')
-        # add_ingredient_w_timestamp(daily_tracker['dtk_rcp'], 0, '180g', 'pork stew and sweetheart cabbage noodles')
-        #
         # TODO UUID awaresnes - username login etc
-        daily_tracker = return_daily_tracker('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
+        daily_tracker = get_daily_tracker_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
         recipes = [daily_tracker['dtk_rcp']]
     
     pprint(daily_tracker)

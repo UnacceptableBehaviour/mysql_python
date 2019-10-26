@@ -114,6 +114,7 @@ def roll_over_from_nix_time(nix_ts, time_in_the_AM_to_rollover='0500'):
     return rollover_nix_time_ms
 
 # What are we trying to do with this function?
+# Create a rollover timestamp (R) for a passed in timestamp
 # Compare a posted timestamp to the users daily tracker timestamp.
 # if the posted timestamp has gone past the roll over
 # R the rollover point R is, for example 5AM
@@ -453,10 +454,11 @@ class RecipeTracker:
     def __init__(self, recipe={}):
         self.recipe = return_recipe_dictionary().update(recipe)
 
+
+
+
 # TODO - implement DB DTK LOAD/STORE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # for now - load data from JSON files - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-
 
 
 
@@ -546,7 +548,11 @@ def get_user_info_dict(name):
 
 # private
 daily_tracker_db = load_dict_data_from_DB('dtk_database')
+# private
 user_db = load_dict_data_from_DB('user_database')
+# private
+users_devices = load_dict_data_from_DB('user_device_database')
+
 
 def commit_DTK_DB():
     commit_dict_to_DB(daily_tracker_db, 'dtk_database')
@@ -570,6 +576,9 @@ def store_daily_tracker(dtk):
         print("** W A R N I N G ** Failed to Store DTK data:")
         pprint(dtk)
         raise("Failed to Store DTK data:")
+
+
+
 
 
 
@@ -685,7 +694,7 @@ if __name__ == '__main__':
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
     
     # search  notes
-    # return_daily_tracker - hello.py
+    # get_daily_tracker_from_DB - hello.py
     # print("- - - USER / UUID - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     # user = 'Simon'
     # user_info = get_user_info_dict(user)
