@@ -102,19 +102,14 @@ def roll_over_from_nix_time(nix_ts, time_in_the_AM_to_rollover='0500'):
     
     if nixtime_opt1 > nix_ts:
         rollover_nix_time_ms = nixtime_opt1
-        print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts} - <{rollover_nix_time_ms}|{hr_readable_from_nix(rollover_nix_time_ms)}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")
+        #print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts} - <{rollover_nix_time_ms}|{hr_readable_from_nix(rollover_nix_time_ms)}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")
     else:        
         nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS   # this takes care of rollover, last day of month / year etc        
                                                             # set hours minute to the rollover time >--------\
         dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m)  # <---/  
     
         rollover_nix_time_ms = nix_time_ms(dt_rollover)
-        print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts_plus_1_day} - <{rollover_nix_time_ms}|{dt_rollover}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")
-    
-    
-    
-    
-    
+        #print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts_plus_1_day} - <{rollover_nix_time_ms}|{dt_rollover}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")    
     
     return rollover_nix_time_ms
 
