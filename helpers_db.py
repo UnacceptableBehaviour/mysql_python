@@ -36,6 +36,14 @@ from config_files import get_file_for_data_set
 
 import uuid
 
+class DBHelperError(Exception):
+    '''TODO Move this and other error classes to separate file: exceptions.py'''
+    pass
+
+class ArgsOutOfBounds(DBHelperError):
+    '''Time argument are invalid'''
+    pass
+
 # time helper function for time since epoch, day, 24hr clock
 # https://www.techatbloomberg.com/blog/work-dates-time-python/ < overview timezones
 def nix_time_ms(dt=datetime.now()):
@@ -51,7 +59,8 @@ def time24h_from_nix_time(nix_time_ms):
 def hr_readable_from_nix(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d %H%M")
 
-
+# Unecessarily complicated refactor!
+#
 # %Y 2049 year
 # %m month
 # %d 05 day 0pad
@@ -62,37 +71,68 @@ def hr_readable_from_nix(nix_time_ms):
 #
 # time_in_the_AM_to_rollover 24h 4 digit string 5am = '0500'
 def roll_over_from_nix_time(nix_ts, time_in_the_AM_to_rollover='0500'):
+    rollover_nix_time_ms = 0
+
     ONE_DAY_IN_MS = 24*60*60*1000
+    HRS_IN_DAY = 24
+    MIN_IN_HOUR = 60
     
     if len(time_in_the_AM_to_rollover) == 4:
         h = int(time_in_the_AM_to_rollover[0:2])
+        herr = int(h / HRS_IN_DAY)      # check for out of range
+        h = h % HRS_IN_DAY
+        
         m = int(time_in_the_AM_to_rollover[2:4])
-    else:
+        merr = int(m / MIN_IN_HOUR)     # check for out of range
+        m = m % MIN_IN_HOUR
+        
+        if (herr or merr):
+            raise(ArgsOutOfBounds(f"roll_over_from_nix_time - arguments out of range; H{herr}-M{merr} >=1 => ERROR"))
+    
+    else:       # set to 5am - 0500
         h=5
         m=0
 
-    nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS     # this takes care of rollover, last day of month / year etc
-                                                        # set hours minute to the rollover time-------\
-    dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m)  # <<|  
-    
-    rollover_nix_time_ms = nix_time_ms(dt_rollover)
-    
+    # convert to datetime to overwrite hrs/mins then back to nixtime
+    # ts1_date:0500
+    nixtime_opt1 = nix_time_ms( datetime.utcfromtimestamp(nix_ts / 1000.0).replace(hour=h, minute=m) ) 
+
+    # debug
     nix_ts_hr = hr_readable_from_nix(nix_ts)
     
-    print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts_plus_1_day} - <{rollover_nix_time_ms}|{dt_rollover}> -  {time_in_the_AM_to_rollover} - {h}:{m}")
+    if nixtime_opt1 > nix_ts:
+        rollover_nix_time_ms = nixtime_opt1
+        print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts} - <{rollover_nix_time_ms}|{hr_readable_from_nix(rollover_nix_time_ms)}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")
+    else:        
+        nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS   # this takes care of rollover, last day of month / year etc        
+                                                            # set hours minute to the rollover time >--------\
+        dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m)  # <---/  
+    
+        rollover_nix_time_ms = nix_time_ms(dt_rollover)
+        print(f"<{nix_ts}|{nix_ts_hr}> - {nix_ts_plus_1_day} - <{rollover_nix_time_ms}|{dt_rollover}> -  {time_in_the_AM_to_rollover} - {h}:{m} - ERR:{herr} or {merr} = {herr or merr}")
+    
+    
+    
+    
+    
     
     return rollover_nix_time_ms
 
-# what are we trying to do with this function?
-# take any time of day
-# the rollover point is for example 5AM
+# What are we trying to do with this function?
+# Compare a posted timestamp to the users daily tracker timestamp.
+# if the posted timestamp has gone past the roll over
+# R the rollover point R is, for example 5AM
 #
-# ts1        *
+# ts1        *                            < initial ts
 # ts2                           *         < not rolled over yet
 # ts3                                 *   < rolled over
-#     ----R-------------------|----R-------------------|----R-------------------|
+#     ----R-------------------|----R-------------------|----R-------------------| < timeline
 #     |         day 1         |         day 2          |
 #         |         set 1          |         set 2          |
+#
+# if    ts1_date:0500 > ts1     roll over = ts1_date:0500
+# else                          roll over = (ts1_date +1day):0500
+
 
 
 
@@ -635,8 +675,17 @@ if __name__ == '__main__':
     print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0459',"%Y %H%M")), '0500') ) )
     print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0500',"%Y %H%M")), '0500') ) )
     print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '0500') ) )
-
-
+    #print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '0599') ) ) # out of bounds 
+    #print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '2615') ) ) # out of bounds 
+    # for i in range(1,240):
+    #     print(f"{i % 24}\t{i % 12}\t{i % 60}")
+    # 
+    # print(int(23 / 24))
+    # print(int(12 / 24))
+    # print(int(24 / 24))
+    # print("-")
+    # print(0 or 1)
+    # print(0 or 0)
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
     
