@@ -23,11 +23,11 @@ from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-from helpers_db import get_daily_tracker, commit_DTK_DB
+from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
 #from helpers_db import store_daily_tracker
 
 from helpers_tracker import get_daily_tracker_from_DB, post_DTK_info_for_processing, post_interface_file
-from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user
+from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -83,7 +83,16 @@ def db_hello_world():
     return render_template('show_all_recipe_images.html', recipes=db_lines)
     #return f"Processed Query:<br>{formatted_text} <br>END"
 
-
+# synch / login route
+# check dtk to see if we've passed the rollover point
+#
+# if passed the rollover 
+#   archive old one and create a fresh dtk
+#   for return rendering weigh in
+#
+# if not rollover dtk
+#   process the new addition and return the data to
+#   tracker
 @app.route('/synch_n_route', methods=["GET", "POST"])
 def query_status_w_js():
     # load most recent dtk post for user (dtk - daily tracker)
@@ -91,12 +100,49 @@ def query_status_w_js():
     # post user, device, dt_date from dtk in local storage on device
     # compare to data for user on server
     # if dt_date on device is before 5AM today (set by user) store the dtk
-    sync_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
-    daily_tracker = get_daily_tracker_from_DB(sync_uuid)
-    print("- - - SYNCH - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(daily_tracker)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")    
-    return render_template('quick_synch.html', daily_tracker=daily_tracker)
+    # sync_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    # daily_tracker = get_daily_tracker_from_DB(sync_uuid)    
+    # print("- - - SYNCH - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
+    # pprint(daily_tracker)
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+    if request.method == 'POST':
+        tracker_post = request.get_json() # parse JSON into DICT
+        
+        if ('dtk' in tracker_post):
+            dtk = tracker_post['dtk']
+            uuid =  tracker_post['user']
+            
+            # it's rolled over archive current dtk
+            if dtk_timestamp_rolled_over(dtk):   
+                archive_dtk(dtk)
+                
+                new_day_dtk = bootstrap_daily_tracker_create(uuid)                
+                
+                dtk_w_reroute = { 'route': '/weigh_in', 'dtk': new_day_dtk }
+                
+                return json.dumps(dtk_w_reroute), 200
+                #return render_template('weigh_in_t.html', daily_tracker=new_day_dtk) # render weigh in screen
+            
+            else:
+                updated_dtk_data = process_new_dtk_from_user(dtk)
+                
+                pprint(updated_dtk_data)
+                
+                print(f"UUID: {dtk['dtk_user_info']['UUID']}")
+            
+                dtk_w_reroute = { 'route': '/tracker', 'dtk': updated_dtk_data }
+                
+                return json.dumps(dtk_w_reroute), 200            
+                #return render_template('track_items.html', daily_tracker=dtk)        # render tracker
+        else:
+            raise(Exception("POST to route: /synch_n_route - INVALID DATA"))       
+            return 404
+    
+    else:
+        return render_template('quick_synch.html')
+    
+        
+        
 
 @app.route('/db_gallery')
 def db_gallery():
@@ -250,9 +296,8 @@ def track_items():
         recipes = [daily_tracker['dtk_rcp']]
     
     pprint(daily_tracker)
-    
-    return render_template('track_items.html', headline=headline_py, daily_tracker=daily_tracker, recipes=recipes, lines=[f"BUTTON 5"])
-    #return render_template('track_items.html', headline=headline_py, daily_tracker=daily_tracker, lines=[f"BUTTON 5"])
+        
+    return render_template('track_items.html', daily_tracker=daily_tracker, recipes=recipes)
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])

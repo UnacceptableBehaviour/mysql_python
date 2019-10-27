@@ -9,14 +9,16 @@
 
 
 // from server
-var ts = dtk['dtk_rcp']['dt_date'];   // dtk timestamp on server
+// var ts = dtk['dtk_rcp']['dt_date'];   // dtk timestamp on server
 
-var uuid = '014752da-b49d-4fb0-9f50-23bc90e44298';
+// retrieve userUUID from local storage
+// TODO implement users / login / sessions 
+var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
 
 // on device
 var dbgOut = document.getElementById('debug_op');
 
-var dtkLocal
+var dtkLocal;
 
 
 // TODO -break out into local storage utils - also in track_items.js
@@ -39,22 +41,46 @@ if (typeof(Storage) !== "undefined") {
 lastSavedFile = window.localStorage.getItem('lastSavedFile');         // load name of last saved file
 dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) );  // key = content of lastSavedFile
   
-// compare to dtk - select most recent
-
-//dtk = dtkLocal; // ts compare
 
 console.log("Loaded DTK:");
 console.log(dtkLocal);
 console.log("<<\n<<\n<<\n<<");
-    
 
 
 //console.log()
-var dbgTxt = `SERVER timsamp:${ts}`;
+var dbgTxt = `Date timestamp:${dtkLocal['dtk_rcp']['dt_date']}`;
 var blank = "";
-dbgTxt += `<br>UUID: ${uuid}`;
+dbgTxt += `<br>HRD UUID: ${userUUID}`;
+dbgTxt += `<br>DTK UUID: ${dtkLocal['dtk_user_info']['UUID']}`;
 dbgTxt += `<br>${lastSavedFile}`;
 dbgTxt += `<br>: ${blank}`;
 dbgTxt += `<br>: ${blank}`;
 
 dbgOut.innerHTML = dbgTxt;
+
+console.log("POSTING DTK");
+
+fetch( '/synch_n_route', {
+  method: 'POST',                                             // method (default is GET)
+  headers: {'Content-Type': 'application/json' },             // JSON
+  body: JSON.stringify( { 'user':userUUID, 'dtk':dtkLocal } )      // Payload        
+
+}).then( function(response) {
+  
+  console.log("  - - - -|- - - - response");
+  console.log(response);
+  console.log("  - - - -|- - - -");
+  console.log(typeof(response));
+  console.log("  - - - -|- - - -");
+  
+  //return response.text();
+  return response.json();
+
+}).then( function(dtk_w_route) {
+  console.log("  - - - - - - - - data S");
+  console.log(dtk_w_route);
+  console.log(dtk_w_route['route']);
+  console.log("  - - - - - - - - data E");
+  window.location.replace(dtk_w_route['route']);
+});
+

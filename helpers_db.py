@@ -265,6 +265,8 @@ def return_recipe_dictionary():
         'dt_date': nix_time_in_ms,
         'dt_day': day_from_nix_time(nix_time_in_ms),
         'dt_time': time24h_from_nix_time(nix_time_in_ms),
+        'dt_rollover': roll_over_from_nix_time(nix_time_in_ms),
+        'dt_last_update': 0,
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
         'nutrinfo': {
@@ -465,12 +467,12 @@ class RecipeTracker:
 def create_daily_tracker_name_from_nix_time(nix_time_ms = nix_time_ms()):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
 
-def bootstrap_daily_tracker_create(name):
-    dtk = { 'dtk_user_info': get_user_info_dict(name),
+def bootstrap_daily_tracker_create(uuid):
+    dtk = { 'dtk_user_info': get_user_info_dict(uuid),
             'dtk_rcp':    return_recipe_dictionary(),
-            'dtk_weight': 102.7,
-            'dtk_pc_fat': 36.2,
-            'dtk_pc_h2o': 46.4  }
+            'dtk_weight': 0.0,
+            'dtk_pc_fat': 0.0,
+            'dtk_pc_h2o': 0.0  }
     
     dtk['dtk_rcp']['ri_name'] = create_daily_tracker_name_from_nix_time()
     
@@ -537,11 +539,18 @@ def load_dict_data_from_DB(data_set):
     return db
       
       
-def get_user_info_dict(name):
+def get_user_info_dict(uuid):
     # https://docs.python.org/3/library/uuid.html
     # maybe use domain version, have a think
-    return { 'UUID': str(uuid.uuid4()),
-             'name': name }
+    
+    user_data_db = load_dict_data_from_DB("user_database")
+
+    pprint(user_data_db['014752da-b49d-4fb0-9f50-23bc90e44298'])
+    
+    #return user_data_db[uuid]        
+    
+    return { 'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', #str(uuid.uuid4()), # TODO comment back in and look up from unique name
+             'name': 'Simon' }
 
 
 

@@ -83,9 +83,7 @@
 
 <body>
   <script>      
-    //var recipes = {{ recipes|tojson }};                       // convert info using tojson filter
     var dtk = {{ daily_tracker|tojson }}
-    //console.log(`tracker_items.html JS recipes[0] ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check
     console.log(`tracker_items.html JS dtk ${dtk['dtk_rcp']['ri_name']} - inline`);  // sanity check
     console.log(dtk);  // sanity check
     console.log(`tracker_items.html - inline CONCLUDED`);  // sanity check

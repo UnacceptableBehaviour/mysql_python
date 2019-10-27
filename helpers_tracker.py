@@ -10,7 +10,7 @@ from datetime import datetime
 import helpers_db       # explicitly use helpers_db.func_name()     << highlight where function is from 
 # change to from helpers_db import - isolate  iface:
     #from helpers_db import get_daily_tracker, store_daily_tracker, time24h_from_nix_time, commit_DTK_DB
-    #from helpers_db import TRACK_NIX_TIME, QTY_IN_G_INDEX
+    #from helpers_db import TRACK_NIX_TIME, QTY_IN_G_INDEX, nix_time_ms
 from helper_nutrinfo import i_db
 from config_files import get_file_for_data_set
 
@@ -24,6 +24,7 @@ from config_files import get_file_for_data_set
 def get_daily_tracker_from_DB(userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298'):
     return helpers_db.get_daily_tracker(userUUID)
 
+# dtk contains a uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
 def store_daily_tracker_to_DB(dtk = {}):
     return helpers_db.store_daily_tracker(dtk)
 
@@ -250,29 +251,30 @@ def process_new_dtk_from_user(dtk_data):
     return(dtk_data)
 
 
-# synch / login route
-# check dtk too see if we've passed the rollover point
-#
-# if passed the rollover 
-#   archive old one and create a fresh dtk
-#   for return rendering weigh in
-#
-# if not rollover dtk
-#   process the new addition and return the data to
-#   tracker
-def check_dtk_timestamp_archive_if_needed(dtk):
+
+def archive_dtk(dtk):
     # check ts
-    rollover_from_dtk = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
+    rollover_from_dtk = dtk['dtk_rcp']['dt_rollover']    
+    time_now_ms = helpers_db.nix_time_ms()
+    print("------------------+------------------+ a r c h i v i n g +------------------+------------------ S")
+    print(f"U:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']}")
+    pprint(dtk)
+    print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")    
+                
+
+
+
+def dtk_timestamp_rolled_over(dtk):    
     
-    # if nix_time_ms() > dtk['dtk_rcp']['dt_rollover']  # store rollover at creation time!TODO
-    if nix_time_ms() > rollover_from_dtk:
-        pass
-        # archive the current dtk
-        # generate & store a new one, return it
-    else:
-        dtk_data = process_new_dtk_from_user(dtk)
-    
-    return(dtk_data)
+    if 'dt_rollover' not in dtk['dtk_rcp']:
+        dtk['dtk_rcp']['dt_rollover'] = 0
+        
+    if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:    
+        return True
+
+    return(False)
+
+
 
 
 
