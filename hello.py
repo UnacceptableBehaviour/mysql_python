@@ -84,27 +84,22 @@ def db_hello_world():
     #return f"Processed Query:<br>{formatted_text} <br>END"
 
 # synch / login route
+# load js that send devices uuid, user uuid, and most recent dtk (daily tracker)
+# load most users most recent dtk from DB
+# use the version w/ most recent last update (highest value)
+#
 # check dtk to see if we've passed the rollover point
 #
 # if passed the rollover 
 #   archive old one and create a fresh dtk
-#   for return rendering weigh in
+#   return for rendering with weigh_in route
 #
 # if not rollover dtk
-#   process the new addition and return the data to
-#   tracker
+#   process the new addition and return the data
+#   return for rendering with tracker route
+#
 @app.route('/synch_n_route', methods=["GET", "POST"])
 def query_status_w_js():
-    # load most recent dtk post for user (dtk - daily tracker)
-    # render blank html, with simple JS to POST status
-    # post user, device, dt_date from dtk in local storage on device
-    # compare to data for user on server
-    # if dt_date on device is before 5AM today (set by user) store the dtk
-    # sync_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
-    # daily_tracker = get_daily_tracker_from_DB(sync_uuid)    
-    # print("- - - SYNCH - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    # pprint(daily_tracker)
-    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
     if request.method == 'POST':
         tracker_post = request.get_json() # parse JSON into DICT
         
@@ -121,7 +116,6 @@ def query_status_w_js():
                 dtk_w_reroute = { 'route': '/weigh_in', 'dtk': new_day_dtk }
                 
                 return json.dumps(dtk_w_reroute), 200
-                #return render_template('weigh_in_t.html', daily_tracker=new_day_dtk) # render weigh in screen
             
             else:
                 updated_dtk_data = process_new_dtk_from_user(dtk)
@@ -133,12 +127,12 @@ def query_status_w_js():
                 dtk_w_reroute = { 'route': '/tracker', 'dtk': updated_dtk_data }
                 
                 return json.dumps(dtk_w_reroute), 200            
-                #return render_template('track_items.html', daily_tracker=dtk)        # render tracker
         else:
             raise(Exception("POST to route: /synch_n_route - INVALID DATA"))       
             return 404
     
     else:
+        # render blank html, with simple JS to POST status
         return render_template('quick_synch.html')
     
         
