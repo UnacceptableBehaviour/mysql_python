@@ -537,8 +537,7 @@ function addItemToTableFromForm(e){
   //atomic, qty,  sevings, item, timestamp, img_id, html_id
   // ['1', '180g', '(0)', 'steak', 1568927767066, tag_id]
   
-  dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);
-  
+  dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);  
   
   // COMPONENT
 
@@ -807,6 +806,8 @@ function saveDailyTrackerToLocalStorage(){
   var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ userUUID }_${ deviceInfo }`;
   
   try {
+    dtk['dtk_rcp']['dt_last_update'] = timeNixTimeInms();
+    
     window.localStorage.setItem( fileName, JSON.stringify(dtk) );
     
     lastSavedFile = fileName;   // store last save filename (which changes) in a consistent place
@@ -831,7 +832,7 @@ function saveDailyTrackerToLocalStorage(){
 }
 
 function saveDTKLocallyThenPostToServer (){
-  var success = false;
+  var success = false;    
   
   // TODO need to wait for result fix this!
   if (saveDailyTrackerToLocalStorage() === true) {

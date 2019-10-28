@@ -28,11 +28,12 @@ if __name__ == '__main__':
     
     for key in __iface_files:
         file_info = Path(__iface_files[key])
-        # print(f"anchor: {file_info.anchor}")
-        # print(f"parent:{file_info.parent}")
-        # print(f"stem: {file_info.stem}")
-        # print(f"suffix: {file_info.suffix}")
-        # print(f"suffixes: {file_info.suffixes}")
-        # print(f"as_uri: {file_info.as_uri}")
-        print(f"K:{key} \t\t{file_info.name} \t{file_info.stem}")
-        
+        # print(f"anchor: {file_info.anchor}")      #
+        # print(f"parent:{file_info.parent}")       # path
+        # print(f"stem: {file_info.stem}")          # basename no ext
+        # print(f"suffix: {file_info.suffix}")      # ext
+        # print(f"suffixes: {file_info.suffixes}")  # .tar.gz  < both as array
+        # print(f"as_uri: {file_info.as_uri}")        
+        # print(f"K:{key} \t\t{file_info.name} \t{file_info.stem}") # name > basename.ext
+    
+    print(f"join: { Path(__iface_files['archive_path']).joinpath( Path(__iface_files['user_database']).name ) }")

@@ -4,7 +4,9 @@
 
 from pprint import pprint
 
+from pathlib import Path
 import subprocess   # exec CLI commands
+import json
 
 from datetime import datetime
 import helpers_db       # explicitly use helpers_db.func_name()     << highlight where function is from 
@@ -253,12 +255,40 @@ def process_new_dtk_from_user(dtk_data):
 
 
 def archive_dtk(dtk):
-    # check ts
-    rollover_from_dtk = dtk['dtk_rcp']['dt_rollover']    
-    time_now_ms = helpers_db.nix_time_ms()
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ S")
-    print(f"U:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']}")
-    pprint(dtk)
+    # scenarios
+    # submitted dtk most up to date - archive it
+    # server side dtk more up to date (updated by another device) archive it 
+    serv_dtk = get_daily_tracker_from_DB(dtk['dtk_user_info']['UUID'])
+
+    # compare server / device versions
+    # make sure they're in the same 24hr period
+    dtk_timestamp_rolled_over(serv_dtk) # insert 'dt_rollover' if not present - TODO REMOVE
+    dtk_timestamp_rolled_over(dtk)
+    
+
+    # if 'dt_last_update' not in dtk['dtk_rcp']: dtk['dtk_rcp']['dt_last_update'] = 0
+    # if 'dt_last_update' not in serv_dtk['dtk_rcp']: serv_dtk['dtk_rcp']['dt_last_update'] = 0
+    
+    if serv_dtk['dtk_rcp']['dt_rollover'] == dtk['dtk_rcp']['dt_rollover']:
+        archive_dtk = dtk if (dtk['dtk_rcp']['dt_last_update'] > serv_dtk['dtk_rcp']['dt_last_update']) else serv_dtk
+        print(f"Comparing DEV_TS:{dtk['dtk_rcp']['dt_last_update']} SRV_TS:{serv_dtk['dtk_rcp']['dt_last_update']}")
+    else:
+        archive_dtk = dtk
+        print("Archiving DEV driectly")
+
+    archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}.json"
+    
+    arch_target = Path(get_file_for_data_set("archive_path")).joinpath(archfile_name)
+    
+    with open(arch_target, 'w') as f:
+        f.write(json.dumps(archive_dtk))
+        #f.close()
+    
+    print(f"SRV:{serv_dtk['dtk_user_info']['name']} - {serv_dtk['dtk_user_info']['UUID']} - {serv_dtk['dtk_rcp']['dt_last_update']}")
+    print(f"DEV:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']} - {dtk['dtk_rcp']['dt_last_update']}")
+    print(f"ARC:{archive_dtk['dtk_user_info']['name']} - {archive_dtk['dtk_user_info']['UUID']} - {archive_dtk['dtk_rcp']['dt_last_update']}")
+    pprint(archive_dtk)
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")    
                 
 

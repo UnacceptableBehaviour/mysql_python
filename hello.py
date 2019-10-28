@@ -109,6 +109,7 @@ def query_status_w_js():
             
             # it's rolled over archive current dtk
             if dtk_timestamp_rolled_over(dtk):   
+                
                 archive_dtk(dtk)
                 
                 new_day_dtk = bootstrap_daily_tracker_create(uuid)                
@@ -136,8 +137,10 @@ def query_status_w_js():
         return render_template('quick_synch.html')
     
         
-        
-
+# @app.route('/db_gallery/<int:year>/<int:month>/<title>')
+# def db_gallery(year, month, title):
+#     pass
+    
 @app.route('/db_gallery')
 def db_gallery():
     # execute this query

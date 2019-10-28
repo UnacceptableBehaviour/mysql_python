@@ -59,6 +59,9 @@ def time24h_from_nix_time(nix_time_ms):
 def hr_readable_from_nix(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d %H%M")
 
+def hr_readable_date_from_nix(nix_time_ms):
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d")
+
 # Unecessarily complicated refactor!
 #
 # %Y 2049 year
@@ -574,11 +577,13 @@ def commit_User_DB():
 def get_daily_tracker(userUUID):
     try:
         return daily_tracker_db[userUUID]
-    except KeyError:
+    except KeyError:        
         return None
+    
     
 def store_daily_tracker(dtk):
     try:
+        dtk['dtk_rcp']['dt_last_update'] = nix_time_ms()
         daily_tracker_db[str(dtk['dtk_user_info']['UUID'])] = dtk
         return True
     except KeyError:
