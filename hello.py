@@ -300,11 +300,10 @@ def track_items():
     else:
         # TODO UUID awaresnes - username login etc
         daily_tracker = get_daily_tracker_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
-        recipes = [daily_tracker['dtk_rcp']]
     
     pprint(daily_tracker)
         
-    return render_template('track_items.html', daily_tracker=daily_tracker, recipes=recipes)
+    return render_template('track_items.html', daily_tracker=daily_tracker)
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])

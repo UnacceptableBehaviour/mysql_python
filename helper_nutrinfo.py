@@ -225,7 +225,7 @@ class NutrientsDB:
     
     @classmethod                    
     def loadNutrientsFromTextFile(cls, nutri_file, nutri_dict):
-        '''Load nutrient information fro text file and load it into Dict'''
+        '''Load nutrient information from text file and load it into Dict'''
         try:
             with open(nutri_file, 'r') as f:
                 nutrition_items_text = f.read()

@@ -1,5 +1,6 @@
   <script>      
-    var recipes = {{ recipes|tojson }};       // convert info using tojson filter      
+    var dtk_recipe = {{ daily_tracker['dtk_rcp']|tojson }};       // convert info using tojson filter
+    var recipes = [dtk_recipe];
     console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check      
   </script>
 
