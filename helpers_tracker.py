@@ -258,7 +258,7 @@ def archive_dtk(dtk):
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ S")
     # scenarios
     # submitted dtk most up to date - archive it
-    # server side dtk more up to date (updated by another device) archive it 
+    # server side dtk more up to date (updated by another device) archive it instead
     serv_dtk = get_daily_tracker_from_DB(dtk['dtk_user_info']['UUID'])
 
     # compare server / device versions
@@ -296,8 +296,9 @@ def archive_dtk(dtk):
 
 def dtk_timestamp_rolled_over(dtk):    
     
+    # this is only necessary for erlier version - TODO REMOVE
     if 'dt_rollover' not in dtk['dtk_rcp']:
-        dtk['dtk_rcp']['dt_rollover'] = 0
+        dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
         
     if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:    
         return True

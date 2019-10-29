@@ -729,3 +729,5 @@ if __name__ == '__main__':
     # print("- - - COMMIT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     # commit_DTK_DB()
     # commit_User_DB()
+    
+    pprint(bootstrap_daily_tracker_create('014752da-b49d-4fb0-9f50-23bc90e44298'))

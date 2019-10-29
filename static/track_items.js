@@ -333,6 +333,11 @@ String.prototype.ingtToClass = function(){
 
 }
 
+function invalidateYield(){
+  dtk['dtk_rcp']['nutrinfo']['yield'] = 0;  
+}
+
+
 // create line ID, add it to line
 function idFromIngredient(ingredientLineArray){
   // timestamp-ingredient_name
@@ -539,7 +544,8 @@ function addItemToTableFromForm(e){
   
   dtk['dtk_rcp']['ingredients'].push(ingredientLineArray);  
   
-  // COMPONENT
+  // reset yield to zero so it's recalculated
+  invalidateYield();
 
   // all print exaclty the same thing
   console.log( `dtk['dtk_rcp'] ingredientLineArray - ${ingredientLineArray}` );      // => [[ingredient_arr]]
@@ -679,6 +685,8 @@ function clickHandler(e) {
         
     // remove item from table
     tableBody.removeChild(tableRow);
+    
+    invalidateYield();
   }
   
 }
@@ -696,6 +704,8 @@ function undeleteItemFromComponent(e){
   if (undoList.length === 0) { success = true; return success; }
       
   var undoItem = undoList.pop();
+  
+  invalidateYield();
   
   recipeTracker = getComponentRef(undoItem['parent']);
     

@@ -23,7 +23,7 @@ from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
+from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
 #from helpers_db import store_daily_tracker
 
 from helpers_tracker import get_daily_tracker_from_DB, post_DTK_info_for_processing, post_interface_file
@@ -100,6 +100,7 @@ def db_hello_world():
 #
 @app.route('/synch_n_route', methods=["GET", "POST"])
 def query_status_w_js():
+
     if request.method == 'POST':
         tracker_post = request.get_json() # parse JSON into DICT
         
@@ -119,6 +120,10 @@ def query_status_w_js():
                 return json.dumps(dtk_w_reroute), 200
             
             else:
+                # TODO REMOVE - BOOTPATCH                
+                if dtk['dtk_rcp']['dt_rollover'] == 0:  #1572411612346
+                    dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
+                
                 updated_dtk_data = process_new_dtk_from_user(dtk)
                 
                 pprint(updated_dtk_data)
@@ -279,6 +284,11 @@ def track_items():
         if ('dtk' in tracker_post):
             dtk_data = tracker_post['dtk']
             uuid =  tracker_post['user']
+            
+            # # TODO REMOVE - BOOTPATCH                
+            # if dtk_data['dtk_rcp']['dt_rollover'] == 0:  #1572411612346
+            #     dtk_data['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk_data['dtk_rcp']['dt_date'])
+            
             updated_dtk_data = process_new_dtk_from_user(dtk_data)  # , uuid) contained in dtk 
             pprint(updated_dtk_data)        
             print(f"UUID: {uuid}")
