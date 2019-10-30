@@ -24,6 +24,7 @@ from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
+from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
 #from helpers_db import store_daily_tracker
 
 from helpers_tracker import get_daily_tracker_from_DB, post_DTK_info_for_processing, post_interface_file
@@ -103,10 +104,20 @@ def query_status_w_js():
 
     if request.method == 'POST':
         tracker_post = request.get_json() # parse JSON into DICT
+        uuid =  tracker_post['user']
+        
+        if ('fp' in tracker_post):
+            fingerprint = json.loads(tracker_post['fp'])
+            
+            pprint(fingerprint)
+            
+            store_user_devices(uuid,fingerprint)
+            
+            commit_User_Devices_DB()
+            
         
         if ('dtk' in tracker_post):
-            dtk = tracker_post['dtk']
-            uuid =  tracker_post['user']
+            dtk = tracker_post['dtk']            
             
             # it's rolled over archive current dtk
             if dtk_timestamp_rolled_over(dtk):   

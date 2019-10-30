@@ -553,7 +553,9 @@ def get_user_info_dict(uuid):
     #return user_data_db[uuid]        
     
     return { 'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', #str(uuid.uuid4()), # TODO comment back in and look up from unique name
-             'name': 'Simon' }
+             'name': 'Simon',
+             'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'] }
+             # create from JOINs? ^
 
 
 
@@ -563,7 +565,7 @@ daily_tracker_db = load_dict_data_from_DB('dtk_database')
 # private
 user_db = load_dict_data_from_DB('user_database')
 # private
-users_devices = load_dict_data_from_DB('user_device_database')
+users_devices_db = load_dict_data_from_DB('user_device_database')
 
 
 def commit_DTK_DB():
@@ -571,6 +573,9 @@ def commit_DTK_DB():
 
 def commit_User_DB():
     commit_dict_to_DB(user_db, 'user_database')
+
+def commit_User_Devices_DB():
+    commit_dict_to_DB(users_devices_db, 'user_device_database')
 
 
 
@@ -592,6 +597,25 @@ def store_daily_tracker(dtk):
         raise("Failed to Store DTK data:")
 
 
+def get_user_devices(userUUID):
+    try:
+        return daily_tracker_db[userUUID]
+    except KeyError:        
+        return None
+    
+    
+def store_user_devices(userUUID, devFP):
+    if userUUID not in users_devices_db:
+        print(f"store_user_devices===---> Adding: {devFP['fp']}")
+        users_devices_db[userUUID] = {devFP['fp']: devFP}
+        pprint(users_devices_db[userUUID])
+        
+        
+    elif devFP['fp'] not in users_devices_db[userUUID]:
+        print(f"store_user_devices===---> Appending: {devFP['fp']}")
+        pprint(users_devices_db[userUUID])
+        users_devices_db[userUUID][devFP['fp']] = devFP
+        
 
 
 
@@ -731,3 +755,9 @@ if __name__ == '__main__':
     # commit_User_DB()
     
     pprint(bootstrap_daily_tracker_create('014752da-b49d-4fb0-9f50-23bc90e44298'))
+    
+    print("\n\n\n\n\nUser Device Fingerprints\n")
+    pprint(users_devices_db)
+    
+    
+    

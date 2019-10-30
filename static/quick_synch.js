@@ -10,7 +10,6 @@
 
 // no lib for initial simple id - but give this a go: fingerprintjs2
 // navigator.appName
-// navigator.appVersion
 // navigator.platform
 // navigator.userAgent
 var fingerprint = {}; 
@@ -22,7 +21,6 @@ var storeFingerprint = function () {
   Fingerprint2.get( function(components) {
     fingerprint['fp'] = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
     fingerprint['appName'] = navigator.appName;
-    fingerprint['appVersion'] = navigator.appVersion;
     fingerprint['platform'] = navigator.platform;
     fingerprint['userAgent'] = navigator.userAgent;
   
