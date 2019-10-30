@@ -295,14 +295,18 @@ def archive_dtk(dtk):
 
 
 def dtk_timestamp_rolled_over(dtk):    
+    print("dtk_timestamp_rolled_over? True")
     
     # this is only necessary for erlier version - TODO REMOVE
     if 'dt_rollover' not in dtk['dtk_rcp']:
         dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
+        print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")
         
-    if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:    
+    if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
+        print("dtk_timestamp_rolled_over? True")
         return True
 
+    print("dtk_timestamp_rolled_over? False")
     return(False)
 
 

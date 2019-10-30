@@ -165,7 +165,16 @@ def db_gallery():
 
 @app.route('/weigh_in')
 def weigh_in():
-    daily_tracker = get_daily_tracker_from_DB()    
+    daily_tracker = get_daily_tracker_from_DB() # uuid/session
+    uuid = daily_tracker['dtk_user_info']['UUID']
+    
+    # if it's rolled over archive and create a new dtk
+    if dtk_timestamp_rolled_over(daily_tracker):   
+        
+        archive_dtk(daily_tracker)
+        
+        daily_tracker = bootstrap_daily_tracker_create(uuid)    
+    
       # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
       #                                <!--and _page for the content-->
       # <!--TODO - recipe_t.html recipe_page.html-->

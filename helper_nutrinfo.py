@@ -98,7 +98,10 @@ class Nutrients:
             elif (m.group(2).replace('per ', '') == m.group(4)):                  # yield and serving same. .
                 nutridict_for_pass['serving_size'] = nutridict_for_pass['yield']  # need to normalise nutrients to 100g
                 nutridict_for_pass['servings'] = 1.0
-                normalise = 100.0 / nutridict_for_pass['serving_size']
+                if nutridict_for_pass['serving_size'] == 0:
+                    normalise = 1.0
+                else:
+                    normalise = 100.0 / nutridict_for_pass['serving_size']
             
             #print(f"\n\n** {name} - {m.group(2)} \n {m.group(3)} \n {m.group(4)} \n--")
             
