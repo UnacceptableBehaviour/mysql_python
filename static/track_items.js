@@ -24,7 +24,9 @@ var addItemButton = document.getElementById('add-item-button');
 var inputForm = document.getElementById('addForm');
 // Form submit event
 addItemButton.addEventListener('click', addItem);
-  //addItemToTableFromForm(e);
+inputForm.addEventListener('keyup', function(event) {   // act on hit return key
+  if (event.key === "Enter") { addItem(event) }
+});
 
 var trackerTable = document.getElementById('table-tracked-items');
 var tableWithFocus = trackerTable;
