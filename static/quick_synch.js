@@ -58,6 +58,14 @@ dbgTxt += `<br>: ${blank}`;
 
 dbgOut.innerHTML = dbgTxt;
 
+// no lib for initial simple id - but give theis a go fingerprintjs2
+// navigator.appName
+// navigator.appVersion
+// navigator.platform
+// navigator.userAgent
+fingerprint = {}
+
+
 console.log("POSTING DTK");
 
 fetch( '/synch_n_route', {
@@ -81,6 +89,68 @@ fetch( '/synch_n_route', {
   console.log(dtk_w_route);
   console.log(dtk_w_route['route']);
   console.log("  - - - - - - - - data E");
-  window.location.replace(dtk_w_route['route']);
+  //window.location.replace(dtk_w_route['route']);
 });
+
+
+
+
+
+// fingerprinting code
+
+var fingerprintReport = function () {
+  var d1 = new Date()
+  Fingerprint2.get( function(components) {
+    var murmur = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
+    var d2 = new Date();
+    var time = d2 - d1;
+
+    console.log(`==> FP: ${murmur}`);
+    console.log(`==> appName: ${navigator.appName}`);
+    console.log(`==> appVersion: ${navigator.appVersion}`);
+    console.log(`==> platform: ${navigator.platform}`);
+    console.log(`==> userAgent: ${navigator.userAgent}`);
+    console.log("==> time:", time);
+
+    //document.querySelector("#time").textContent = time
+    //document.querySelector("#fp").textContent = murmur
+    //var details = ""
+    //if(hasConsole) {
+      //console.log("time", time);
+      //console.log("fingerprint hash", murmur);
+    //}
+    //for (var index in components) {
+    //  var obj = components[index]
+    //  var line = obj.key + " = " + String(obj.value).substr(0, 100)
+    //  if (hasConsole) {
+    //    console.log(line)
+    //  }
+    //  details += line + "\n"
+    //}
+    //document.querySelector("#details").textContent = details
+  })
+}
+
+var cancelId;
+var cancelFunction;
+
+// see usage note in the README
+// 
+if (window.requestIdleCallback) {                     // check to see if requestIdleCallback available
+  cancelId = requestIdleCallback(fingerprintReport);  // run fingerprintReport() when browser idle
+  cancelFunction = cancelIdleCallback
+} else {
+  cancelId = setTimeout(fingerprintReport, 500)       // use timeout if requestIdleCallback NOT available
+  cancelFunction = clearTimeout
+}
+
+//document.querySelector("#btn").addEventListener("click", function () {
+//  if (cancelId) {
+//    cancelFunction(cancelId)
+//    cancelId = undefined
+//  }
+//  fingerprintReport()
+//})
+
+
 
