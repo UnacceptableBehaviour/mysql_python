@@ -497,6 +497,7 @@ def db_recipe_page():
 def button_7():    
     return render_template('data_return.html', lines=[f"BUTTON 7"])
 
+# https://flask.palletsprojects.com/en/0.12.x/patterns/favicon/
 @app.route('/favicon.ico') 
 def favicon(): 
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
