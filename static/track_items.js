@@ -336,7 +336,8 @@ String.prototype.ingtToClass = function(){
 }
 
 function invalidateYield(){
-  dtk['dtk_rcp']['nutrinfo']['yield'] = 0;  
+  dtk['dtk_rcp']['nutrinfo']['yield'] = 0;
+  dtkLocalState = 'yieldInvalid';
 }
 
 
@@ -768,7 +769,8 @@ function undeleteItemFromComponent(e){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // LOAD STORE / Local storage
-// TODO -break out into local storage utils - also in quick_synch.js
+// TODO - break out into local storage utils - also in quick_synch.js
+//      - use dtk_storage.js
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // local storage API
@@ -907,9 +909,9 @@ function loadDailyTrackerFromLocalStorage(){
   // load last saved
   lastSavedFile = window.localStorage.getItem('lastSavedFile');  
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) ); // key = content of lastSavedFile
+  dtkLocalState = 'yieldInvalid';  
   
-    // compare to dtk - select most recent
-
+  // compare to dtk - select most recent - server side at the mo
   dtk = dtkLocal
 
   console.log(`Loaded DTK = ${dtk} <<\n<<\n<<\n<<`);
@@ -967,9 +969,9 @@ function fetchUpdateDailyTrackerNutrients() {
         console.log(key, value);                
     }
     console.log('====================');
-    
-    dtk_status = 'badonkadonk'                     // that's gotta be good right?
-    console.log(`DTK returned: ${dtk_status}`);    // should read "POST response: OK"
+        
+    dtkLocalState = 'loadedValid';
+    console.log(`DTK returned: ${dtkLocalState}`);    // should read "POST response: OK"
   
     recipes = [ data['dtk_rcp'] ] // load recipes array
     

@@ -1,5 +1,7 @@
 // probe script
 
+var dbgOut = document.getElementById('debug_op');
+
 //# load most recent dtk post for user (dtk - daily tracker)
 //# render blank html, with simple JS to POST status (THIS javascript)
 //# post user, device, dt_date from dtk in local storage on device
@@ -12,7 +14,14 @@
 // navigator.appName
 // navigator.platform
 // navigator.userAgent
-var fingerprint = {}; 
+var fingerprint = {};
+var page_report = '';
+
+fingerprint['appName'] = navigator.appName;
+fingerprint['platform'] = navigator.platform;
+fingerprint['userAgent'] = navigator.userAgent;
+
+
 
 var storeFingerprint = function () {
   var d1 = new Date();  
@@ -20,9 +29,6 @@ var storeFingerprint = function () {
   
   Fingerprint2.get( function(components) {
     fingerprint['fp'] = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
-    fingerprint['appName'] = navigator.appName;
-    fingerprint['platform'] = navigator.platform;
-    fingerprint['userAgent'] = navigator.userAgent;
   
     var d2 = new Date();
     var time = d2 - d1;
@@ -34,6 +40,7 @@ var storeFingerprint = function () {
       window.localStorage.setItem( 'fingerprint', JSON.stringify(fingerprint) );
       console.log(`FINGERPRINT stored on device <<`);
     } else {
+      page_report += "\nFINGERPRINT NOT stored on device <<"
       console.log(`NO LOCAL STORAGE SUPPORT <<`);
     }    
     
@@ -46,7 +53,7 @@ if ( fingerprint === null) {
   // shiming https://developers.google.com/web/updates/2015/08/using-requestidlecallback#why_should_i_use_requestidlecallback
   // https://www.npmjs.com/package/fingerprintjs2
   //
-  if (window.requestIdleCallback) {          // check to see if requestIdleCallback available
+  if (window.requestIdleCallback) {         // check to see if requestIdleCallback available
     requestIdleCallback(storeFingerprint);  // run storeFingerprint() when browser idle
   } else {
     setTimeout(storeFingerprint, 500)       // use timeout if requestIdleCallback NOT available
@@ -60,8 +67,6 @@ if ( fingerprint === null) {
 // TODO implement users / login / sessions 
 var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
 
-// on device
-var dbgOut = document.getElementById('debug_op');
 
 // JSON.parse(string, function)
     // create object from JSON string, func can be used for further conversion
@@ -71,21 +76,29 @@ var dbgOut = document.getElementById('debug_op');
     // var myJSON = JSON.stringify(obj);
 
 
-var dtkLocal;
-// TODO -break out into local storage utils - also in track_items.js
+// var dtkLocal; declared in dtk_storage.js
+//
+// TODO -break out into local storage utils (dtk_storage.js) - also in track_items.js
 // load dtk from local storage - if present
+
+
 if (typeof(Storage) !== "undefined") {
   // load dtk object to ssm / 'disc' / nvm                      // key = 'lastSavedFile'
   lastSavedFile = window.localStorage.getItem('lastSavedFile'); // load name of last saved file
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) );  // key = content of lastSavedFile
   
+  //(compare to server before valid - currently server is required to recalculate the nutrients data)
+  dtkLocalState = 'yieldInvalid'; 
+  
   console.log(`LASTSAVED FILENAME = ${lastSavedFile} <<`);
 } else {
-  console.log(`NO LOCAL STORAGE SUPPORT <<`);
+  page_report += "\nNO LOCAL STORAGE SUPPORT <<"
+  console.log(page_report);
 }
 
-console.log("Loaded DTK:");
+console.log("Loaded LOCALSTORAGE DTK to dtkLocal:");
 console.log(dtkLocal);
+console.log(`\ndtkLocalState: ${dtkLocalState} <`);
 console.log("<<\n<<\n<<\n<<");
 
 
@@ -97,11 +110,14 @@ dbgTxt += `<br>DTK UUID: ${dtkLocal['dtk_user_info']['UUID']}`;
 dbgTxt += `<br>${lastSavedFile}`;
 dbgTxt += `<br>: ${fingerprint}`;
 dbgTxt += `<br>: ${blank}`;
+dbgTxt += `<br>page_report: ${page_report}`;
+dbgTxt += `<br>: ${blank}`;
+dbgTxt += `<br>: ${blank}`;
 
 dbgOut.innerHTML = dbgTxt;
 
 
-console.log("POSTING DTK");
+console.log("POSTING DTK for comparison");
 
 fetch( '/synch_n_route', {
   method: 'POST',                                             // method (default is GET)
@@ -124,7 +140,9 @@ fetch( '/synch_n_route', {
   console.log(dtk_w_route);
   console.log(dtk_w_route['route']);
   console.log("  - - - - - - - - data E");
-  //window.location.replace(dtk_w_route['route']);
+  // if it's a nee day go to weigh in page
+  // if same day go to tracker page
+  window.location.replace(dtk_w_route['route']);
 });
 
 

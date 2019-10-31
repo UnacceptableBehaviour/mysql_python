@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 app = Flask(__name__)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -497,7 +497,9 @@ def db_recipe_page():
 def button_7():    
     return render_template('data_return.html', lines=[f"BUTTON 7"])
 
-
+@app.route('/favicon.ico') 
+def favicon(): 
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 
