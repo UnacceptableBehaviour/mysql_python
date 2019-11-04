@@ -24,7 +24,7 @@ from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
-from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
+from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_date_from_nix
 #from helpers_db import store_daily_tracker
 
 from helpers_tracker import get_daily_tracker_from_DB, post_DTK_info_for_processing, post_interface_file
@@ -120,8 +120,11 @@ def query_status_w_js():
             dtk = tracker_post['dtk']            
             
             # it's rolled over archive current dtk
-            if dtk_timestamp_rolled_over(dtk):   
-                
+            if dtk_timestamp_rolled_over(dtk):
+                dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+                dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+                dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+                print(f"ROLLED OVER: {dro} <   TS: {dts} <    LUP: {dlu} <")
                 archive_dtk(dtk)
                 
                 new_day_dtk = bootstrap_daily_tracker_create(uuid)                
@@ -131,11 +134,27 @@ def query_status_w_js():
                 return json.dumps(dtk_w_reroute), 200
             
             else:
+                dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+                dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+                dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+                print(f"SYNCH A: {dro} <   TS: {dts} <    LUP: {dlu} <")
+
                 # TODO REMOVE - BOOTPATCH                
                 if dtk['dtk_rcp']['dt_rollover'] == 0:  #1572411612346
                     dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
+
+                dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+                dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+                dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+                print(f"SYNCH B: {dro} <   TS: {dts} <    LUP: {dlu} <")
+
                 
                 updated_dtk_data = process_new_dtk_from_user(dtk)
+
+                dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+                dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+                dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+                print(f"SYNCH C: {dro} <   TS: {dts} <    LUP: {dlu} <")
                 
                 pprint(updated_dtk_data)
                 
@@ -176,21 +195,25 @@ def db_gallery():
 
 @app.route('/weigh_in')
 def weigh_in():
-    daily_tracker = get_daily_tracker_from_DB() # uuid/session
-    uuid = daily_tracker['dtk_user_info']['UUID']
+    dtk = get_daily_tracker_from_DB() # uuid/session
+    uuid = dtk['dtk_user_info']['UUID']
     
     # if it's rolled over archive and create a new dtk
-    if dtk_timestamp_rolled_over(daily_tracker):   
+    if dtk_timestamp_rolled_over(dtk):   
+        dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+        dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+        dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+        print(f"WEIGH IN ROver: {dro} <   TS: {dts} <    LUP: {dlu} <")
         
-        archive_dtk(daily_tracker)
+        archive_dtk(dtk)
         
-        daily_tracker = bootstrap_daily_tracker_create(uuid)    
+        dtk = bootstrap_daily_tracker_create(uuid)    
     
       # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
       #                                <!--and _page for the content-->
       # <!--TODO - recipe_t.html recipe_page.html-->
       # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
-    return render_template('weigh_in_t.html', daily_tracker=daily_tracker)
+    return render_template('weigh_in_t.html', daily_tracker=dtk)
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
 def buttons_inputs():
@@ -302,14 +325,15 @@ def track_items():
         # check payload
         tracker_post = request.get_json() # parse JSON into DICT
         if ('dtk' in tracker_post):
-            dtk_data = tracker_post['dtk']
+            dtk = tracker_post['dtk']
             uuid =  tracker_post['user']
             
-            # # TODO REMOVE - BOOTPATCH                
-            # if dtk_data['dtk_rcp']['dt_rollover'] == 0:  #1572411612346
-            #     dtk_data['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk_data['dtk_rcp']['dt_date'])
-            
-            updated_dtk_data = process_new_dtk_from_user(dtk_data)  # , uuid) contained in dtk 
+            dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+            dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+            dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+            print(f"TRACKING POST: {dro} <   TS: {dts} <    LUP: {dlu} <")
+                
+            updated_dtk_data = process_new_dtk_from_user(dtk)  # , uuid) contained in dtk 
             pprint(updated_dtk_data)        
             print(f"UUID: {uuid}")
         else:
@@ -319,11 +343,15 @@ def track_items():
     
     else:
         # TODO UUID awaresnes - username login etc
-        daily_tracker = get_daily_tracker_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
+        dtk = get_daily_tracker_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') # < UUID
+        dro = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+        dts = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+        dlu = hr_readable_date_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+        print(f"TRACKING: {dro} <   TS: {dts} <    LUP: {dlu} <")
     
-    pprint(daily_tracker)
+    pprint(dtk)
         
-    return render_template('track_items.html', daily_tracker=daily_tracker)
+    return render_template('track_items.html', daily_tracker=dtk)
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])
