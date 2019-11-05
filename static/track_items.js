@@ -82,6 +82,8 @@ function loadServingModifierLUT(){
   // load from DB
   var lut = {
     'onions': { 'small': 100.0, 'medium': 150.0, 'large': 200.0, 'density': 1.0 },
+    'apple': { 'small': 90.0, 'medium': 120.0, 'large': 140.0, 'density': 1.0 },
+    'apples': { 'small': 90.0, 'medium': 120.0, 'large': 140.0, 'density': 1.0 },
     'red onions' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0, 'density': 1.0 },
     'banana' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
     'bananas' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
@@ -199,12 +201,26 @@ function splitLineIntoQtyAndIngredient(newItem){
   // matches in order - put plurals 1st!
   // ^(\d+(?:gs|g|kgs|kg|oz|lbs|lb|tsp|tbsp|cups|cup|ls|l)*)      // generate using loadUnitsToVolume().keys - DRY
   // /regex/i - insensitive - no need .toLowerCase()
-  var qty='99999', units=null, modifier='', ingredient=newItem, servings='(0)';
-  
+  var qty='99999', units=null, modifier='', ingredient=newItem, servings='(0)', new_timestamp = null;
+
+
+  // Check if @1845 time over ride in ingredient EG 120g apple @1330
+  console.log(`ingredient CHECK @time? ${newItem} <<`);
+  info = newItem.match(/(@(\d\d)(\d\d))/);
+  console.log(info);
+  console.log('^^ info ^^');
+  if (info !== null) { // 1 = @1330  2 = hrs  3 = mins
+    newItem = newItem.replace( info[1], '');
+    const new_hr = info[2];
+    const new_min = info[3];
+    new_timestamp = timeNixTimeInmsFromHrsMins(new_hr, new_min);
+    console.log(`ingredient @time? ${newItem} changing to time: ${new_hr}${new_min}`);
+  } else {
+    console.log(`ingredient @time? ${newItem} no change.`);
+  }  
   
   // replace line starting a with one - a chicken - 1 (unlucky) chicken
-  newItem = newItem.trim().replace(/^a/i, '1 ' );
-
+  newItem = newItem.trim().replace(/^(an\b|a\b)/i, '1 ' );
   
   // split entry into separate items, and discard blanks
   breakDown = newItem.split(' ').filter(function (i) { return ((i != "") && (i != null)); }); // remove empty, null and undefined;
@@ -254,9 +270,9 @@ function splitLineIntoQtyAndIngredient(newItem){
     breakDown.shift();
 
     ingredient = breakDown.join(' ');
-    console.log(`ingredient ${ingredient}`);
+    console.log(`ingredient > ${ingredient} <`);
   }
-  
+    
   
   // have no units - look item up and calculate/guess weight
   if (units === null) { // generate weight in g from LUT
@@ -275,10 +291,19 @@ function splitLineIntoQtyAndIngredient(newItem){
   
   qtyUnits = `${qty}${units}`
   
-  console.log([isIngredientAtomic(newItem), qtyUnits, servings, ingredient]);
+  console.log([isIngredientAtomic(newItem), qtyUnits, servings, ingredient]);   // << BUG - surely this is ingredient
+  console.log([isIngredientAtomic(ingredient), qtyUnits, servings, ingredient]);
   console.log('- - - - regex QTY - E');
+
+  // use consts to define array
+//const ATOMIC_INDEX = 0;        // default value is 1 - TRUE
+//const QTY_IN_G_INDEX = 1;
+//const SERVING_INDEX = 2;
+//const INGREDIENT_INDEX = 3;
+//const TRACK_NIX_TIME = 4;
   
-  return [isIngredientAtomic(newItem), qtyUnits, servings, (`${modifier} ${ingredient}`).trim()];
+  //return [isIngredientAtomic(ingredient), qtyUnits, servings, (`${modifier} ${ingredient}`).trim()];
+  return [isIngredientAtomic(newItem), qtyUnits, servings, (`${modifier} ${ingredient}`).trim(), new_timestamp];
   //return [qty, units, modifier, ingredient];
 }
 
@@ -302,6 +327,18 @@ function time4d_24h(timestamp){
 function timeNixTimeInms(){
   return (new Date()).getTime();
 }
+
+// TODO - needs to be rollover aware if after midnight & before rollover +1 day
+// port the python code - using nix time dodges day/month rollover
+function timeNixTimeInmsFromHrsMins(hrs, mins){
+  new_time = (new Date()).setHours(hrs, mins);
+  console.log(`timeNixTimeInmsFromHrsMins: ${typeof(new_time)} - ${new_time}`)
+  new_time = (new Date(new_time)).setSeconds(0);
+  new_time = (new Date(new_time)).setMilliseconds(0);  
+  return new_time //.getTime();
+}
+
+
 
 //
 // 1569665275998ms to '2019 calories month 09 thu 26'
@@ -532,13 +569,15 @@ function addItemToTableFromForm(e){
   inputForm.value = null;
 
   console.log(`>newItem ${newItem} - ${newItem.trim().length} [${newItem.trim()}]`);
-  
+
   // break it into constituents  
   ingredientLineArray = splitLineIntoQtyAndIngredient(newItem);  // return [qty, units, modifier, ingredient];
-  
+
   // timestamp it 
-  ingredientLineArray[TRACK_NIX_TIME] = timeNixTimeInms();  
-    
+  if (ingredientLineArray[TRACK_NIX_TIME] === null) {
+    ingredientLineArray[TRACK_NIX_TIME] = timeNixTimeInms();    
+  }
+
   // create html ID for it
   ingredientLineArray[HTML_ID] = idFromIngredient(ingredientLineArray);
   
