@@ -258,7 +258,7 @@ def archive_dtk(dtk):
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ S")
     # scenarios
     # submitted dtk most up to date - archive it
-    # server side dtk more up to date (updated by another device) archive it instead
+    # server side dtk more up to date (updated by another device) merge them - lossless
     serv_dtk = get_daily_tracker_from_DB(dtk['dtk_user_info']['UUID'])
 
     # compare server / device versions
@@ -270,12 +270,14 @@ def archive_dtk(dtk):
     # if 'dt_last_update' not in dtk['dtk_rcp']: dtk['dtk_rcp']['dt_last_update'] = 0
     # if 'dt_last_update' not in serv_dtk['dtk_rcp']: serv_dtk['dtk_rcp']['dt_last_update'] = 0
     
+    # check we're in the same day - otherwise not relevant
     if serv_dtk['dtk_rcp']['dt_rollover'] == dtk['dtk_rcp']['dt_rollover']:
         archive_dtk = dtk if (dtk['dtk_rcp']['dt_last_update'] > serv_dtk['dtk_rcp']['dt_last_update']) else serv_dtk
+        # TODO if server is more upto date MERGE
         print(f"Comparing DEV_TS:{dtk['dtk_rcp']['dt_last_update']} SRV_TS:{serv_dtk['dtk_rcp']['dt_last_update']}")
     else:
         archive_dtk = dtk
-        print("Archiving DEV driectly")
+        print("Archiving DEV directly")
 
     archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}.json"
     
@@ -283,7 +285,9 @@ def archive_dtk(dtk):
     
     with open(arch_target, 'w') as f:
         f.write(json.dumps(archive_dtk))
-        #f.close()
+        #f.close()        
+    
+    store_daily_tracker_to_DB(archive_dtk)
     
     print(f"SRV:{serv_dtk['dtk_user_info']['name']} - {serv_dtk['dtk_user_info']['UUID']} - {serv_dtk['dtk_rcp']['dt_last_update']}")
     print(f"DEV:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']} - {dtk['dtk_rcp']['dt_last_update']}")
@@ -295,12 +299,13 @@ def archive_dtk(dtk):
 
 
 def dtk_timestamp_rolled_over(dtk):    
-    print("dtk_timestamp_rolled_over? True")
+    print("dtk_timestamp_rolled_over?")
     
-    # this is only necessary for erlier version - TODO REMOVE
+    # this is only necessary for earlier version - TODO REMOVE
     if 'dt_rollover' not in dtk['dtk_rcp']:
         dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
-        print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")
+        print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")        
+        return True         # start a fresh dtk
         
     if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
         print("dtk_timestamp_rolled_over? True")

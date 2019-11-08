@@ -15,6 +15,7 @@ const HTML_ID = 6;
 const NO_TIME = -1;
 const ATOMIC = 1;
 const RCP_IN_DB = 0;
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 // code review - mixed style! BAD
 // find out generally accepted coding style fro JS and redo JS files TODO
@@ -206,7 +207,7 @@ function splitLineIntoQtyAndIngredient(newItem){
 
   // Check if @1845 time over ride in ingredient EG 120g apple @1330
   console.log(`ingredient CHECK @time? ${newItem} <<`);
-  info = newItem.match(/(@(\d\d)(\d\d))/);
+  info = newItem.match(/(@\s*?(\d\d)(\d\d)\b)/);
   console.log(info);
   console.log('^^ info ^^');
   if (info !== null) { // 1 = @1330  2 = hrs  3 = mins
@@ -334,8 +335,16 @@ function timeNixTimeInmsFromHrsMins(hrs, mins){
   new_time = (new Date()).setHours(hrs, mins);
   console.log(`timeNixTimeInmsFromHrsMins: ${typeof(new_time)} - ${new_time}`)
   new_time = (new Date(new_time)).setSeconds(0);
-  new_time = (new Date(new_time)).setMilliseconds(0);  
-  return new_time //.getTime();
+  new_time = (new Date(new_time)).setMilliseconds(0);
+  
+  // check it lands on correct side of dtk rollover
+  if (new_time > dtk['dtk_rcp']['dt_rollover']) {
+    console.log(`timeNixTimeInmsFromHrsMins ${new_time}`);
+    new_time -= ONE_DAY_IN_MS;
+    console.log(`                changed to ${new_time}`);
+  }
+  
+  return new_time;
 }
 
 
@@ -348,7 +357,7 @@ function createDailyTrackerNameFromNixTime( nix_time_ms = timeNixTimeInms() ){
   dateDD    = pad(date.getDate());                              // day of month   1-31
   yearYYYY  = date.getFullYear(); 
   monthMM   = pad(date.getMonth()+1);                           // month of year  0-11
-  dayDDD    = dayNumToDay3L[date.getDay()]
+  dayDDD    = dayNumToDay3L[date.getDay()];
   return `${yearYYYY} calories month ${monthMM} ${dayDDD} ${dateDD}`;
 }
 
@@ -374,7 +383,7 @@ String.prototype.ingtToClass = function(){
 
 function invalidateYield(){
   dtk['dtk_rcp']['nutrinfo']['yield'] = 0;
-  dtkLocalState = 'yieldInvalid';
+  dtkState = 'yieldInvalid';
 }
 
 
@@ -948,10 +957,12 @@ function loadDailyTrackerFromLocalStorage(){
   // load last saved
   lastSavedFile = window.localStorage.getItem('lastSavedFile');  
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) ); // key = content of lastSavedFile
-  dtkLocalState = 'yieldInvalid';  
   
-  // compare to dtk - select most recent - server side at the mo
+  //  
+  // TODO compare to dtk - select most recent - server side at the mo
+  //
   dtk = dtkLocal
+  dtkState = 'yieldInvalid';
 
   console.log(`Loaded DTK = ${dtk} <<\n<<\n<<\n<<`);
     
@@ -1009,8 +1020,8 @@ function fetchUpdateDailyTrackerNutrients() {
     }
     console.log('====================');
         
-    dtkLocalState = 'loadedValid';
-    console.log(`DTK returned: ${dtkLocalState}`);    // should read "POST response: OK"
+    dtkState = 'loadedValid';
+    console.log(`DTK returned: ${dtkState}`);    // should read "POST response: OK"
   
     recipes = [ data['dtk_rcp'] ] // load recipes array
     

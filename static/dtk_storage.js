@@ -19,7 +19,7 @@ if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and 
  
 //var videoElement = document.getElementById("videoElement");
 var dtkLocal = {};
-dtkLocalState = 'waitingToLoad';
+dtkState = 'waitingToLoad';
 
 // TODO - implement DTK event handling
 // loadFromServer, invalidateYield (dtkLocal has additions, recalculate & store), storeToServer (cache & write through), 
@@ -32,18 +32,18 @@ function handleVisibilityChange() {
   
   if (document[hidden]) {
     // going into hiding - on the lamb store DTK to cache (and server if available)
-    console.log(`GONE DARK - storing dtkLocal to cache & server ${dtkLocalState}`);
-    dtkLocalState = 'yieldInvalid'; // updates may occur serverside
+    console.log(`GONE DARK - storing dtkLocal to cache & server ${dtkState}`);
+    dtkState = 'yieldInvalid'; // updates may occur serverside
     console.log(dtkLocal);
     // store dtkLocal
-    console.log(`dtkLocalState: ${dtkLocalState} <`);
+    console.log(`dtkState: ${dtkState} <`);
     
   } else {
     // coming out to play - load latest DTK from cache (and server if available)
-    console.log(`HELOOO THERE I'm BACK - no action needed: ${dtkLocalState}`);
+    console.log(`HELOOO THERE I'm BACK - no action needed: ${dtkState}`);
     
     // store dtkLocal
-    console.log(`dtkLocalState: ${dtkLocalState} <`);
+    console.log(`dtkState: ${dtkState} <`);
   
   }
 }

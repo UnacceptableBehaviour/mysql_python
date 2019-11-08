@@ -17,11 +17,6 @@ var dbgOut = document.getElementById('debug_op');
 var fingerprint = {};
 var page_report = '';
 
-fingerprint['appName'] = navigator.appName;
-fingerprint['platform'] = navigator.platform;
-fingerprint['userAgent'] = navigator.userAgent;
-
-
 
 var storeFingerprint = function () {
   var d1 = new Date();  
@@ -48,6 +43,18 @@ var storeFingerprint = function () {
 }
 
 fingerprint = localStorage.getItem("fingerprint");
+fingerprint['appName']    = navigator.appName;
+fingerprint['platform']   = navigator.platform;
+fingerprint['userAgent']  = navigator.userAgent;
+console.log('FINGERPRINT stored on device << S');
+console.log(fingerprint);
+console.log(navigator.appName);
+console.log(navigator.platform);
+console.log(navigator.userAgent);
+console.log(fingerprint['appName']  );
+console.log(fingerprint['platform'] );
+console.log(fingerprint['userAgent']);
+console.log('FINGERPRINT stored on device << E');
 if ( fingerprint === null) {
 
   // shiming https://developers.google.com/web/updates/2015/08/using-requestidlecallback#why_should_i_use_requestidlecallback
@@ -83,12 +90,15 @@ var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
 
 
 if (typeof(Storage) !== "undefined") {
+  //
+  // it's possible nothing is currently stored locally!
+  //
   // load dtk object to ssm / 'disc' / nvm                      // key = 'lastSavedFile'
   lastSavedFile = window.localStorage.getItem('lastSavedFile'); // load name of last saved file
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) );  // key = content of lastSavedFile
   
   //(compare to server before valid - currently server is required to recalculate the nutrients data)
-  dtkLocalState = 'yieldInvalid'; 
+  dtkState = 'yieldInvalid'; 
   
   console.log(`LASTSAVED FILENAME = ${lastSavedFile} <<`);
 } else {
@@ -98,50 +108,57 @@ if (typeof(Storage) !== "undefined") {
 
 console.log("Loaded LOCALSTORAGE DTK to dtkLocal:");
 console.log(dtkLocal);
-console.log(`\ndtkLocalState: ${dtkLocalState} <`);
+console.log(`\ndtkState: ${dtkState} <`);
 console.log("<<\n<<\n<<\n<<");
 
 
 // REMOVE - TODO - debug
-var dbgTxt = `Date timestamp:${dtkLocal['dtk_rcp']['dt_date']}`;
+var dbgTxt = 'dbg blank';
 var blank = "";
-dbgTxt += `<br>HRD UUID: ${userUUID}`;
-dbgTxt += `<br>DTK UUID: ${dtkLocal['dtk_user_info']['UUID']}`;
-dbgTxt += `<br>${lastSavedFile}`;
-dbgTxt += `<br>: ${fingerprint}`;
-dbgTxt += `<br>: ${blank}`;
-dbgTxt += `<br>page_report: ${page_report}`;
-dbgTxt += `<br>: ${blank}`;
-dbgTxt += `<br>: ${blank}`;
+
+try {
+  
+  dbgTxt = `Date timestamp:${dtkLocal['dtk_rcp']['dt_date']}`;
+  blank = "";
+  dbgTxt += `<br>HRD UUID: ${userUUID}`;
+  dbgTxt += `<br>DTK UUID: ${dtkLocal['dtk_user_info']['UUID']}`;
+  dbgTxt += `<br>${lastSavedFile}`;
+  dbgTxt += `<br>: ${fingerprint}`;
+  dbgTxt += `<br>: ${blank}`;
+  dbgTxt += `<br>page_report: ${page_report}`;
+  dbgTxt += `<br>: ${blank}`;
+  dbgTxt += `<br>: ${blank}`;
+  
+} catch (err) {
+
+  if (dtkLocal === null) {
+    console.log("*** WARNING *** NO LOCALSTORAGE DTK! dtkLocal: null");  
+  } else {
+    console.log("*** WARNING *** ERROR! dtkLocal:", dtkLocal);
+    console.log("*** ERROR:\n", err);  
+  }
+
+}
 
 dbgOut.innerHTML = dbgTxt;
 
 
-console.log("POSTING DTK for comparison");
+console.log("Gettting DTK from Server (POST to /synch_n_route");
 
 fetch( '/synch_n_route', {
   method: 'POST',                                             // method (default is GET)
   headers: {'Content-Type': 'application/json' },             // JSON
   body: JSON.stringify( { 'user':userUUID, 'dtk':dtkLocal, 'fp': fingerprint } )      // Payload        
 
-}).then( function(response) {
-  
-  console.log("  - - - -|- - - - response");
-  console.log(response);
-  console.log("  - - - -|- - - -");
-  console.log(typeof(response));
-  console.log("  - - - -|- - - -");
-  
-  //return response.text();
+}).then( function(response) {  
   return response.json();
-
 }).then( function(dtk_w_route) {
   console.log("  - - - - - - - - data S");
   console.log(dtk_w_route);
   console.log(dtk_w_route['route']);
   console.log("  - - - - - - - - data E");
-  // if it's a nee day go to weigh in page
-  // if same day go to tracker page
+  // if it's a NEW day go to weigh in page    \
+  // if SAME day go to tracker page            \ - - detected server side
   window.location.replace(dtk_w_route['route']);
 });
 

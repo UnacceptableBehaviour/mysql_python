@@ -590,6 +590,7 @@ def store_daily_tracker(dtk):
     try:
         dtk['dtk_rcp']['dt_last_update'] = nix_time_ms()
         daily_tracker_db[str(dtk['dtk_user_info']['UUID'])] = dtk
+        commit_DTK_DB()
         return True
     except KeyError:
         print("** W A R N I N G ** Failed to Store DTK data:")
@@ -599,7 +600,7 @@ def store_daily_tracker(dtk):
 
 def get_user_devices(userUUID):
     try:
-        return daily_tracker_db[userUUID]
+        return users_devices_db[userUUID]
     except KeyError:        
         return None
     

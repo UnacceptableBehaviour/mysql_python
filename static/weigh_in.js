@@ -12,18 +12,18 @@ var userUUID = dtk['dtk_user_info']['UUID'];
 // TODO use an iterator for this
 // set initial values if they're already present (retrurn to page)
 console.log(`formWeight.value ${formWeight.value}`);
-if ((formWeight.value === "") && (dtk['dtk_weight'] !== 0)) {
-  formWeight.placeholder = dtk['dtk_weight'];
+if ((formWeight.value === "") && (dtk['dtk_weight'] !== 0)) {  
+  formWeight.value = dtk['dtk_weight'];
 }
 
 console.log(`formPCFat.value ${formPCFat.value}`);
 if ((formPCFat.value === "") && (dtk['dtk_pc_fat'] !== 0)) {
-  formPCFat.placeholder = dtk['dtk_pc_fat'];
+  formPCFat.value = dtk['dtk_pc_fat'];
 }
 
 console.log(`formPCWater.value ${formPCWater.value}`);
 if ((formPCWater.value === "") && (dtk['dtk_pc_h2o'] !== 0)) {
-  formPCWater.placeholder = dtk['dtk_pc_h2o'];
+  formPCWater.value = dtk['dtk_pc_h2o'];
 }
 
 
@@ -33,6 +33,9 @@ function recordWeighInDetails (){
   if ( (formWeight.value === "")|| (formPCFat.value === "")|| (formPCWater.value === "") ) {
     // user pressed RECORD w/o entering values - see if place holder values valid        
     console.log("INVALID WEIGH IN VALUES");
+    
+    // TODO flash the form(s) missing data in red then fade to normal
+    
     return;
   }
   
