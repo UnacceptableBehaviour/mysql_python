@@ -181,45 +181,26 @@ def query_status_w_js():
         return render_template('quick_synch.html')
     
         
-# @app.route('/db_gallery/<int:year>/<int:month>/<title>')
-# def db_gallery(year, month, title):
-#     pass
-    
-@app.route('/db_gallery')
-def db_gallery():
-    # execute this query
-    # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
-    
-    # do this in pages when larger db - use JS to reload
-    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
-    
-    recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
-
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(recipes)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-          
-    #return render_template('data_return.html', lines=db_lines)
-    return render_template('gallery.html', recipes=recipes)
 
 @app.route('/weigh_in')
 def weigh_in():
-    dtk = get_daily_tracker_from_DB() # uuid/session
+    # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
+    #                                <!--and _page for the content-->
+    # <!--TODO - recipe_t.html recipe_page.html-->
+    # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
+
+    dtk = get_daily_tracker_from_DB() # TODO uuid/session
     uuid = dtk['dtk_user_info']['UUID']
     
     # if it's rolled over archive and create a new dtk
     print(f"WEIGH IN Rollover:")
-    if dtk_timestamp_rolled_over(dtk):   
-        
-        archive_dtk(dtk)
-        
+    if dtk_timestamp_rolled_over(dtk):           
+        archive_dtk(dtk)        
         dtk = bootstrap_daily_tracker_create(uuid)
         store_daily_tracker_to_DB(dtk)
     
-      # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
-      #                                <!--and _page for the content-->
-      # <!--TODO - recipe_t.html recipe_page.html-->
-      # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
+    # draw chart - in .js
+    
     return render_template('weigh_in_t.html', daily_tracker=dtk)
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
@@ -303,11 +284,41 @@ def buttons_inputs():
     
     return render_template('buttons_and_inputs.html', headline=headline_py, data=data, recipes=recipes)
 
+
+# @app.route('/db_gallery/<int:year>/<int:month>/<title>')
+# def db_gallery(year, month, title):
+#     pass
+    
+@app.route('/db_gallery')
+def db_gallery():
+    # execute this query
+    # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
+    
+    # do this in pages when larger db - use JS to reload
+    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
+    
+    recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
+
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
+    pprint(recipes)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+          
+    #return render_template('data_return.html', lines=db_lines)
+    return render_template('gallery.html', recipes=recipes)
+
     
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
-    return render_template('data_return.html', lines=[f"BUTTON 1"])
-    #return f"<h1>BUTTON 1</h1>"
+    
+    
+    # get ingredient from form
+    
+    # query database - get all recipes with ingredient
+    
+    # pass list to gallery
+    
+    return render_template('recipe_search_t.html')
+
 
 @app.route('/buton_2', methods=["GET", "POST"])
 def button_2():

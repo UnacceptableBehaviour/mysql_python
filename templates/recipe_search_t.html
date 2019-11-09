@@ -1,0 +1,62 @@
+{% extends 'nav_buttons.html' %}
+
+
+{% block header %}
+<head>
+  <title>recipe_search</title>
+  <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->  
+
+  <script>      
+    
+    // move this into nav_bar? above dtk_store.js    
+    //console.log(`weight_in_t.html JS dtk ${dtk['dtk_rcp']['ri_name']} - inline`);  // sanity check
+    //console.log(dtk);  // sanity check
+    //console.log(`weight_in_t.html - inline CONCLUDED`);  // sanity check
+  </script>
+  
+  <link rel="stylesheet" type="text/css" href="static/weigh_in.css"/>  
+  
+  <style>
+    body {
+      --title-font-size:1.5rem;
+      color: #222;
+    }
+    
+    #recipe-search-input-row {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+    
+    #page-display-title {
+      /* font-size: var(--title-font-size); */
+    }
+    
+    #but-recipe-search-record {
+      /* display: inline-block;
+      vertical-align: top; */
+      /* margin-top: calc(-1 * var(--title-font-size));  /* multiply var by -1 */
+    }
+    #recipe-search-chart-svg{
+      width: 100%;
+    }
+  </style>
+  
+</head>
+{% endblock %}
+
+{% block content %}
+    
+  {% include 'recipe_search_page.html' %}
+  
+    
+  <!--REMOVE DEBUG-->
+  <table id='debug-recipe-search-table'>
+    <tbody>
+    <td>S1</td>
+    <td>S2</td>
+    <td>S3</td>   
+    </tbody>
+  </table>
+  <!--REMOVE DEBUG-->
+  
+{% endblock %}
