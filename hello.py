@@ -208,11 +208,8 @@ def weigh_in():
     uuid = dtk['dtk_user_info']['UUID']
     
     # if it's rolled over archive and create a new dtk
+    print(f"WEIGH IN Rollover:")
     if dtk_timestamp_rolled_over(dtk):   
-        dro = hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
-        dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
-        dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
-        print(f"WEIGH IN ROver: {dro} <   TS: {dts} <    LUP: {dlu} <")
         
         archive_dtk(dtk)
         
@@ -307,8 +304,8 @@ def buttons_inputs():
     return render_template('buttons_and_inputs.html', headline=headline_py, data=data, recipes=recipes)
 
     
-@app.route('/buton_1', methods=["GET", "POST"])
-def button_1():
+@app.route('/search_ingredient', methods=["GET", "POST"])
+def search_ingredient():
     return render_template('data_return.html', lines=[f"BUTTON 1"])
     #return f"<h1>BUTTON 1</h1>"
 
@@ -344,6 +341,7 @@ def track_items():
             print(f"TRACKING POST ROv: {dro} <   TS: {dts} <    LUP: {dlu} <")
                 
             updated_dtk_data = process_new_dtk_from_user(dtk)  # , uuid) contained in dtk 
+            # TODO - store runs twice on post!???? - ENABLE print dtk in store_daily_tracker_to_DB
             store_daily_tracker_to_DB(updated_dtk_data)
             pprint(updated_dtk_data)
             
@@ -361,7 +359,7 @@ def track_items():
         dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
         print(f"TRACKING: {dro} <   TS: {dts} <    LUP: {dlu} <")
     
-    pprint(dtk)
+    #pprint(dtk)
         
     return render_template('track_items.html', daily_tracker=dtk)
 

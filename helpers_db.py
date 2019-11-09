@@ -507,7 +507,7 @@ def commit_dict_to_DB(db, data_set):
     database_file = get_file_for_data_set(data_set)
     
     with open(database_file, 'w') as f:
-        pprint(db)
+        #pprint(db)
         db_as_json = json.dumps(db)
         f.write(db_as_json)
     
@@ -591,6 +591,7 @@ def store_daily_tracker(dtk):
         dtk['dtk_rcp']['dt_last_update'] = nix_time_ms()
         daily_tracker_db[str(dtk['dtk_user_info']['UUID'])] = dtk
         commit_DTK_DB()
+        #pprint(dtk)
         return True
     except KeyError:
         print("** W A R N I N G ** Failed to Store DTK data:")

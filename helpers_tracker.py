@@ -245,9 +245,9 @@ def process_new_dtk_from_user(dtk_data):
     # merge nutrinfo into DTK and send it back!        
     dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
     dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
-    pprint(dtk_data)
-    store_daily_tracker_to_DB(dtk_data)   # ram
-    helpers_db.commit_DTK_DB()            # disc
+    #pprint(dtk_data)
+    store_daily_tracker_to_DB(dtk_data)   # ram & disc
+    #helpers_db.commit_DTK_DB()            # disc
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
 
     return(dtk_data)
@@ -306,6 +306,12 @@ def dtk_timestamp_rolled_over(dtk):
         dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
         print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")        
         return True         # start a fresh dtk
+    
+    dro = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+    dts = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+    dlu = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+    nix_now = helpers_db.nix_time_ms()                                       # time now
+    print(f"RollOver check: RO: {dro} < NOW: {nix_now}  -  CREATED: {dts}  -  Last Update: {dlu} <")
         
     if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
         print("dtk_timestamp_rolled_over? True")
