@@ -72,7 +72,8 @@ if ( fingerprint === null) {
 // var ts = dtk['dtk_rcp']['dt_date'];   // dtk timestamp on server
 // retrieve userUUID from local storage
 // TODO implement users / login / sessions 
-var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
+//var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
+//moved to dtk_storage.js
 
 
 // JSON.parse(string, function)

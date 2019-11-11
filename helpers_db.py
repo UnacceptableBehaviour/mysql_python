@@ -414,6 +414,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#                     list of ID's for SEARCH - - - - \
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
     

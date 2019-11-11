@@ -4,6 +4,8 @@
 //
 // detect when app goes in/out of visibility
 
+var userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298';
+
 // Set the name of the hidden property and the change event for visibility
 var hidden, visibilityChange;                 // document[hidden] 
 if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 

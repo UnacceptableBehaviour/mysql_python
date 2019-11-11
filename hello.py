@@ -171,7 +171,7 @@ def query_status_w_js():
             
                 dtk_w_reroute = { 'route': '/tracker', 'dtk': updated_dtk_data }
                 
-                return json.dumps(dtk_w_reroute), 200            
+                return json.dumps(dtk_w_reroute), 200
         else:
             raise(Exception("POST to route: /synch_n_route - INVALID DATA"))       
             return 404
@@ -309,14 +309,33 @@ def db_gallery():
     
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
-    
-    
-    # get ingredient from form
-    
-    # query database - get all recipes with ingredient
+
+    # process search post - query database
+    # get all recipes with search criterea    
+    if request.method == 'POST':
+        search_request = request.get_json() # parse JSON into DICT
+                
+        if ('user' in search_request):
+            uuid =  search_request['user']
+        
+        if ('search' in search_request):
+            queries = search_request['search']
+            print("search_ingredient >>")
+            pprint(queries)
+        else:
+            raise('Come on!!')
+        
+        #ri_ids = ['301','1101','1202','1701','2301','2501','2902','3301','3401']
+        ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]
+        
+        recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
+        
+        #return render_template('gallery.html', recipes=recipes)
+        return json.dumps(recipes), 200
     
     # pass list to gallery
     
+    # GET route    
     return render_template('recipe_search_t.html')
 
 
