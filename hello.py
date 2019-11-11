@@ -333,9 +333,19 @@ def search_ingredient():
         #return render_template('gallery.html', recipes=recipes)
         return json.dumps(recipes), 200
     
+    else:
+        print(f"search_ingredient: {request.method}")
+        pprint(request)
+        print("- - - - s_i:" )
+        
+        ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]        
+        recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)                
+    
+    
     # pass list to gallery
     
-    # GET route    
+    # GET route
+    #return render_template('gallery.html', recipes=recipes)
     return render_template('recipe_search_t.html')
 
 

@@ -81,11 +81,65 @@ function searchForRecipe (){
   
   }).then( function(search_response) {
     console.log("AHEM:", search_response);
+    console.log('----*----');
+    gallery_html = renderRecipeCard(search_response[0]);
+    console.log(gallery_html);
+    console.log('----*----');
+    gallery = document.getElementById('rcp-gallery');
+    gallery.innerHTML = gallery_html;
     // how to something like . .
     // window.location.replace('/db_gallery', recipes=search_response);
-    window.location.replace('/db_gallery')
+    // window.location.replace('/db_gallery')
+    // window.location.href="district.php?dist="+dist;
   })
   //.catch(err){
   //  console.log("WTF", err);
   //};
+}
+
+function renderRecipeCard(rcpInfo){
+  //<div class="card">
+  //    <img class="card-img-top" src="http://192.168.0.8:8000/static/recipe/{{recipe_info['image_file']}}"></img>
+  //    <div class="card-body">
+  //        <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
+  //        <p class="card-text">{{ recipe_info['description'] }}</p>
+  //        <!-- (recipe_info['user_rating']|int) user_rating is a float use a filter to covert to int -->
+  //        {% for stars in range((recipe_info['user_rating']|int)) %}
+  //        <i class="fa fa-star recip-star-up-rating"></i>
+  //        {% endfor %}
+  //        {% for stars in range(5 - (recipe_info['user_rating']|int)) %}
+  //        <i class="fa fa-star recip-star-down-rating"></i>
+  //        {% endfor %}
+  //        <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
+  //    </div>
+  //</div>
+  
+  assets_url = 'http://192.168.0.8:8000/static/recipe/';
+
+  var html_stars = '';
+  for ( var i = 0; i < 5; i++ ) {
+    if ( i+1 <= parseInt(rcpInfo['user_rating']) ) {                          // gold star
+      html_stars += '<i class="fa fa-star recip-star-up-rating"></i>';
+    } else {                                                              // black star
+      html_stars += '<i class="fa fa-star recip-star-down-rating"></i>';
+    }
+  }
+  
+  html_card = `<div class="card">
+      <img class="card-img-top" src="${assets_url}${rcpInfo['image_file']}"></img>
+      <div class="card-body">
+          <h5 class="card-title">${rcpInfo['ri_name']}</h5>
+          <p class="card-text">${rcpInfo['description']}</p>
+          ${html_stars}        
+          <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
+      </div>
+  </div>`
+  
+  return html_card;
+}
+
+function renderGalleryFromResult(recipeList){
+  
+  
+  
 }
