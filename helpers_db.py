@@ -445,6 +445,43 @@ def get_all_recipe_ids():
     
     return ids
 
+# EG search
+# SELECT ri_name, ri_id, tags FROM exploded WHERE 'vegan'= ANY(tags);       # recipe w/ tag 'vegan'
+# inc ANY
+# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) OR 'vegan' = ANY( tags );
+# inc ALL
+# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) AND 'vegan' = ANY( tags );
+
+# All veggie recipes that are GF
+# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) AND ('vegan' =  ANY( tags ) OR 'veggie' =  ANY( tags ));
+
+def get_all_recipe_ids_with_any_tags(inc_any_tags=[]):
+    
+    ids = []
+    query = 'SELECT ri_id  FROM exploded WHERE -*-'
+    
+    print(f"type(inc_any_tags){type(inc_any_tags).__name__}< == 'list' {type(inc_any_tags).__name__ == 'list'}")
+    pprint(inc_any_tags)
+    
+    if type(inc_any_tags).__name__ == 'list':
+        if len(inc_any_tags) > 0:
+            for tag in inc_any_tags:
+                insert = f" '{tag}' = ANY( tags ) OR-*-"
+                print(query, insert)
+                query = query.replace('-*-', insert)       # insert queary for each tag
+            
+            query = query.replace('OR-*-', ';') # remove that last OR and insert marker, finish w/ semi colon
+            print(query)
+            #db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE image_file <> '';").fetchall()
+            db_lines = helper_db_class_db.execute(query).fetchall()
+            print(db_lines)
+            ids = [ int( str(line).lstrip('(').rstrip(',)') )  for line in db_lines ]            
+    
+    return ids
+
+
+
+
 
 def toggle_filter(filter_list, filter_name):
     
@@ -762,5 +799,8 @@ if __name__ == '__main__':
     print("\n\n\n\n\nUser Device Fingerprints\n")
     pprint(users_devices_db)
     
+    # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, s&c, alcohol, celery, gluten, soya, sulphur_dioxide
+    # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, s&c, gluten_free, ns_pregnant, 
+    pprint( get_all_recipe_ids_with_any_tags(['chicken', 'gluten_free']) )
     
     
