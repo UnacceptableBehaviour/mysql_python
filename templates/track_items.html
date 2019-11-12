@@ -1,7 +1,7 @@
 {% extends 'nav_buttons_thin.html' %}
 
 {% block header %}
-<head>
+
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>tracker</title>
   <script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
@@ -74,14 +74,13 @@
   
 
   </style>
-</head>
+
 {% endblock %}
 
 {% block content %}
 
 {% include 'nutrient_tracker_targets.html' %}
 
-<body>
   <script>      
     var dtk = {{ daily_tracker|tojson }}
     console.log(`tracker_items.html JS dtk ${dtk['dtk_rcp']['ri_name']} - inline`);  // sanity check
@@ -121,10 +120,7 @@
     <div id='store-display'>TEST TEXT</div>
   </div>
 
-
   <script src="static/track_items.js"></script>
-  
-</body>
     
 {% endblock %}
 

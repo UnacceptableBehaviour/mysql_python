@@ -1,4 +1,5 @@
 <style>
+
   /*    tag
       . class
       # id
@@ -11,4 +12,26 @@
     text-align: center;
   }
 
+  body {
+    --title-font-size:1.5rem;
+    color: #222;
+  }
+  
+  #weigh-in-input-row {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  
+  #page-display-title {
+    /* font-size: var(--title-font-size); */
+  }
+  
+  #but-weigh-in-record {
+    /* display: inline-block;
+    vertical-align: top; */
+    /* margin-top: calc(-1 * var(--title-font-size));  /* multiply var by -1 */
+  }
+  #weigh-in-chart-svg{
+    width: 100%;
+  }
 </style>

@@ -82,7 +82,8 @@ function searchForRecipe (){
   }).then( function(search_response) {
     console.log("AHEM:", search_response);
     console.log('----*----');
-    gallery_html = renderRecipeCard(search_response[0]);
+    //gallery_html = renderRecipeCard(search_response[0]);
+    gallery_html = renderGalleryFromResult(search_response);
     console.log(gallery_html);
     console.log('----*----');
     gallery = document.getElementById('rcp-gallery');
@@ -139,7 +140,23 @@ function renderRecipeCard(rcpInfo){
 }
 
 function renderGalleryFromResult(recipeList){
+  var htmlInnerGallery = ''
   
-  
-  
+  if (typeof(recipeList) === 'object') {
+    
+    for (var rcpNo = 0; rcpNo < recipeList.length; rcpNo++ ) {      
+      htmlInnerGallery += renderRecipeCard(recipeList[rcpNo]);
+    }
+    
+  } 
+
+  var html_gallery = `<div class="row padding">
+      <div class="card-columns">
+          <form action='/db_recipe_page' method='POST'>
+            ${htmlInnerGallery}
+          </form>
+      </div>
+  </div>`;
+
+  return html_gallery;
 }
