@@ -8,6 +8,9 @@ from pprint import pprint
 from config_files import get_file_for_data_set            
 
 class Nutrients:
+    NUTRI_KEY = 0
+    NUTRI_VALUE = 1
+    
     match_lookup = {                    # translate from human readable text to dict
         'energy':'n_En',
         'fat':'n_Fa',
@@ -112,16 +115,28 @@ class Nutrients:
             for line in lines:
                 #print(f"L:{len(line)} - [{line}]");
                 pair = [ item.strip() for item in line.split() ]    # split line by white space, strip excess space off                
+                nutrient = pair[Nutrients.NUTRI_KEY]
+                quantity = pair[Nutrients.NUTRI_VALUE]
                 #pprint(pair)
-                try:
-                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1]) * normalise
-                except KeyError:
-                    Nutrients.log_nutridata_key_errors.append(pair[0])
-                except ValueError:
-                    if (',' in pair[1]): pair[1] = pair[1].replace(',','.')
-                    if (pair[1] == '.'): pair[1] = '0.0'
-                    if ('g' in pair[1]): pair[1] = pair[1].replace('g','')
-                    nutridict_for_pass[ nut2ObjLUT[pair[0]] ] = float(pair[1]) * normalise
+                while True:     # process until value calculated or a key error is logged - new key EG vit-b
+                    try:        # we can worry about the build up of new keys when full DB is implemented
+                        nutridict_for_pass[ nut2ObjLUT[nutrient] ] = float(quantity) * normalise
+                        break
+                    except KeyError:
+                        Nutrients.log_nutridata_key_errors.append(nutrient)
+                        break
+                    except ValueError:
+                        if (',' in quantity): quantity = quantity.replace(',','.')
+                        if (quantity == '.'): quantity = '0.0'
+                        # if unit included in value adjust value to grams
+                        if ('mg' in quantity):
+                            quantity = quantity.replace('mg','')
+                            quantity = float(quantity) / 1000.0
+                        elif ('ug' in quantity):
+                            quantity = quantity.replace('ug','')
+                            quantity = float(quantity) / 1000000.0
+                        elif ('g' in quantity): quantity = quantity.replace('g','')
+                        #nutridict_for_pass[ nut2ObjLUT[nutrient] ] = float(quantity) * normalise
                     
             # TODO 
             # insert = Nutrients(name, nutridict_for_pass)
