@@ -13,6 +13,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>    
+        <script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
         <script src='static/dtk_storage.js'></script>
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Picker Integration</title>
@@ -33,23 +34,27 @@
     <body>
 
         <button id='bt_home'>
-            <a href="{{url_for('db_hello_world')}}">HOME</a>
+            <a href="{{url_for('db_hello_world')}}"><i class="fas fa-seedling"></i></i></a>
         </button>
 
         <button>
-            <a href="{{url_for('track_items')}}">TRACK</a>
+            <a href="{{url_for('track_items')}}"><i class="fas fa-pen-alt"></i></a>
         </button>
         
         <button id='bt_gallery'>
-            <a href="{{url_for('db_gallery')}}">GALLERY</a>
+            <a href="{{url_for('db_gallery')}}"><i class="fas fa-image"></i></a>
+        </button>
+
+        <button>
+            <a href="{{url_for('search_ingredient')}}"><i class="fas fa-search"></i></a>
         </button>
 
         <button id='bt_db_snap'>
-            <a href="{{url_for('diary_w_image_snap')}}">SNAP</a>
+            <a href="{{url_for('diary_w_image_snap')}}"><i class="fas fa-camera"></i></a>            
         </button>
         
         <button id='bt_weigh_in'>
-            <a href="{{url_for('weigh_in')}}">WEIGH</a>
+            <a href="{{url_for('weigh_in')}}"><i class="fas fa-balance-scale"></i></a>
         </button>
 
 

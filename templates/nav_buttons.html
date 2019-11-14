@@ -33,31 +33,32 @@
     <body>
 
         <button id='bt_home'>
-            <a href="{{url_for('db_hello_world')}}">HOME</a>
+            <a href="{{url_for('db_hello_world')}}"><i class="fas fa-seedling"></i></i></a>
         </button>
 
         <button>
-            <a href="{{url_for('track_items')}}">TRACK</a>
+            <a href="{{url_for('track_items')}}"><i class="fas fa-pen-alt"></i></a>
+        </button>
+        
+        <button id='bt_gallery'>
+            <a href="{{url_for('db_gallery')}}"><i class="fas fa-image"></i></a>
         </button>
 
-        <button id='bt_gallery'>
-            <a href="{{url_for('db_gallery')}}">GALLERY</a>
+        <button>
+            <a href="{{url_for('search_ingredient')}}"><i class="fas fa-search"></i></a>
         </button>
 
         <button id='bt_db_snap'>
-            <a href="{{url_for('diary_w_image_snap')}}">SNAP</a>
+            <a href="{{url_for('diary_w_image_snap')}}"><i class="fas fa-camera"></i></a>            
+        </button>
+        
+        <button id='bt_weigh_in'>
+            <a href="{{url_for('weigh_in')}}"><i class="fas fa-balance-scale"></i></a>
         </button>
 
-        <button id='bt_weigh_in'>
-            <a href="{{url_for('weigh_in')}}">WEIGH</a>
-        </button>
 
         <button id='bt_inputs'>
             <a href="{{url_for('buttons_inputs')}}">BUTTONS</a>
-        </button>
-        
-        <button>
-            <a href="{{url_for('search_ingredient')}}">SEARCH</a>
         </button>
 
 
