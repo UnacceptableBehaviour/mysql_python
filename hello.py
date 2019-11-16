@@ -307,7 +307,21 @@ def db_gallery():
     #return render_template('data_return.html', lines=db_lines)
     return render_template('gallery.html', recipes=recipes)
 
+
+@app.route('/settings', methods=["GET", "POST"])
+def settings():
     
+    # tag_sets = { 'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
+    #              'tags': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'], 
+    #              'type': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot']
+    
+    tags_sets = {'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
+                 'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
+                 'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'],
+                 'type': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'] }
+    
+    return render_template('settings_t.html', data=tags_sets)
+
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
 

@@ -1,0 +1,34 @@
+{% extends 'nav_buttons_thin.html' %}
+
+{% block header %}
+
+  <title>weigh_in_page</title>
+  <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->  
+
+  <script>          
+    // move this into nav_bar? above dtk_store.js    
+    //console.log(`weight_in_t.html JS dtk ${dtk['dtk_rcp']['ri_name']} - inline`);  // sanity check
+    //console.log(dtk);  // sanity check
+    //console.log(`weight_in_t.html - inline CONCLUDED`);  // sanity check
+  </script>
+  
+  <link rel="stylesheet" type="text/css" href="static/settings.css"/>  
+
+{% endblock %}
+
+{% block content %}
+    
+  {% include 'settings_page.html' %}
+  
+    
+  <!--REMOVE DEBUG-->
+  <table id='debug-settings-table'>
+    <tbody>
+    <td>allergens:</td>
+    <td>tags_inc</td>
+    <td>tags_exc</td>   
+    </tbody>
+  </table>
+  <!--REMOVE DEBUG-->
+  
+{% endblock %}

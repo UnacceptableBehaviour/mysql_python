@@ -13,6 +13,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
         <script src='static/dtk_storage.js'></script>
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Picker Integration</title>
@@ -55,12 +56,14 @@
         <button id='bt_weigh_in'>
             <a href="{{url_for('weigh_in')}}"><i class="fas fa-balance-scale"></i></a>
         </button>
-
+        
+        <button id='bt_settings'>
+            <a href="{{url_for('settings')}}"><i class="fas fa-cog"></i></i></a>
+        </button>
 
         <button id='bt_inputs'>
             <a href="{{url_for('buttons_inputs')}}">BUTTONS</a>
         </button>
-
 
         <button>
             <a href="{{url_for('button_2')}}">2 INGREDIENTS</a>

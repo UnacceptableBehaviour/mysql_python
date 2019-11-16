@@ -1,0 +1,37 @@
+<style>
+
+  /*    tag
+      . class
+      # id
+      TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
+  */
+  body {
+    --title-font-size:1.5rem;
+    color: #222;
+  }
+  
+  #settings-container {
+    margin: 0.1rem;
+    padding: 0.1rem;
+  }
+  
+  .card {
+    margin: 0.2rem;
+    padding: 0.2rem;    
+  }
+
+  .container-fluid {
+    padding-left: 0.1rem;
+    
+  }
+
+
+  /*  TODO - remove w/ debug / dev   */
+  #debug-settings-table {
+    width: 80%;
+  }
+  #debug-settings-table td {
+    text-align: center;
+  }
+
+</style>

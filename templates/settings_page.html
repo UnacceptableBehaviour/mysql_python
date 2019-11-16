@@ -1,0 +1,49 @@
+{% block content %}
+
+<br>
+<form id='form_filter_tags' action={{url_for('settings')}} method='POST'>
+  <div id='settings-container' class="container">
+        ALLERGIES (EXCLUDE RECIPES):<br>
+        EXCLUDE: {{data['chosen_tag_filters_string']}}
+        <div class="container-fluid padding">
+            {% for tag in data['allergens'] %}
+            <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary filter_tag_btn'>{{tag}}</button>
+            {% endfor %}
+        </div><br>
+        TAGS TO INCLUDE:<br>
+        INCLUDE: {{data['chosen_tag_filters_string']}}
+        <div class="container-fluid ">
+            {% for tag in data['tags_inc'] %}
+            <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary filter_tag_btn'>{{tag}}</button>
+            {% endfor %}
+        </div><br>
+        TAGS TO EXCLUDE:<br>
+        EXCLUDE: {{data['chosen_tag_filters_string']}}
+        <div class="container-fluid padding">
+            {% for tag in data['tags_exc'] %}
+            <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary filter_tag_btn'>{{tag}}</button>
+            {% endfor %}
+        </div>
+        <div class="input-group mb-3">
+          <input name='create_tag_button' type="text" class="form-control" placeholder="Enter new tag . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">CREATE TAG</button>
+          </div>
+        </div>
+        INGREDIENTS TO EXCLUDE:<br>
+        EXCLUDE: {{data['chosen_tag_filters_string']}}
+        <div class="container-fluid padding">
+            {% for tag in data['tags'] %}
+            <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary filter_tag_btn'>{{tag}}</button>
+            {% endfor %}
+        </div>
+        <div class="input-group mb-3">
+          <input name='create_tag_button' type="text" class="form-control" placeholder="Enter new tag . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">ADD ingredient</button>
+          </div>
+        </div>    
+  </div>
+</form>
+
+{% endblock %}

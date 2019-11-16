@@ -382,6 +382,7 @@ String.prototype.ingtToClass = function(){
 }
 
 function invalidateYield(){
+  dtk['dtk_rcp']['dt_last_update'] = timeNixTimeInms();
   dtk['dtk_rcp']['nutrinfo']['yield'] = 0;
   dtkState = 'yieldInvalid';
 }
@@ -867,9 +868,7 @@ function saveDailyTrackerToLocalStorage(){
   // dtk_[timestamp]_[userUUID].JSON  
   var fileName = `dtk_${ dtk['dtk_rcp']['dt_date'] }_${ userUUID }_${ deviceInfo }`;
   
-  try {
-    dtk['dtk_rcp']['dt_last_update'] = timeNixTimeInms();
-    
+  try {        
     window.localStorage.setItem( fileName, JSON.stringify(dtk) );
     
     lastSavedFile = fileName;   // store last save filename (which changes) in a consistent place
