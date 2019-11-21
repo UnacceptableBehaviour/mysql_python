@@ -26,7 +26,7 @@ from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_from_nix
 from helpers_db import get_all_recipe_ids_with_any_tags
-from helpers_db import get_user_info_dict, update_user_info_dict
+from helpers_db import get_user_info_dict, update_user_info_dict, get_search_settings_dict
 
 from helpers_tracker import get_daily_tracker_from_DB, store_daily_tracker_to_DB, post_DTK_info_for_processing, post_interface_file
 from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
@@ -312,21 +312,21 @@ def db_gallery():
 @app.route('/settings', methods=["GET", "POST"])
 def settings():
     
-    # tag_sets = { 'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
-    #              'tags': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'], 
-    #              'type': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot']
+    # default_filters = { # ADDITIONS LIKELY - USER DEFINED ESPECIALLY
+    #     'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
+    #     'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
+    #     'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'],
+    #     'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
+    #     'type_exc': [],
+    #     'ingredient_exc': [] }
     
-    # create available option buttons
-    # use get_empty_search_settings_dict < rename
-    tags_sets = {'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
-                 'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
-                 'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'],
-                 'type': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'] }
-    
+    # create available option buttons    
+    tag_sets = get_search_settings_dict()
     
     user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
+    user_info.pop('devices', None)
     
-    return render_template('settings_t.html', data=tags_sets, user_info=user_info)
+    return render_template('settings_t.html', data=tag_sets, user_info=user_info)
 
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
