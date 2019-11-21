@@ -7,21 +7,21 @@
       <div id="did_allergens" class="container-fluid padding tag-div">            
           ALLERGIES TO EXCLUDE:            
           {% for tag in data['allergens'] %}
-          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary '>{{tag}}</button>
+          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
           {% endfor %}
       </div>
 
       <div id="did_tags_exc" class="container-fluid padding tag-div">
           TAGS TO EXCLUDE:
           {% for tag in data['tags_exc'] %}
-          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary '>{{tag}}</button>
+          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
           {% endfor %}
       </div>
 
       <div id="did_tags_inc" class="container-fluid padding tag-div">
           TAGS TO INCLUDE:
           {% for tag in data['tags_inc'] %}
-          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary ftb_set'>{{tag}}</button>
+          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
           {% endfor %}
       </div><br>
       
