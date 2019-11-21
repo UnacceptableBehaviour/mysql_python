@@ -4,8 +4,9 @@
 <form id='form_filter_tags' action={{url_for('settings')}} method='POST'>
   <div id='settings-container' class="container">
         ALLERGIES (EXCLUDE RECIPES):<br>
-        EXCLUDE: {{data['chosen_tag_filters_string']}}
-        <div class="container-fluid padding">
+        <div class="container-fluid padding">            
+            EXCLUDE: {{data['chosen_tag_filters_string']}}
+            
             {% for tag in data['allergens'] %}
             <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary filter_tag_btn'>{{tag}}</button>
             {% endfor %}

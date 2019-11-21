@@ -108,7 +108,7 @@ def query_status_w_js():
         uuid =  tracker_post['user']
         
         if ('fp' in tracker_post):
-            fingerprint = json.loads(tracker_post['fp'])
+            fingerprint = tracker_post['fp']
             print(">FINGERPRINT- -- -- -- -- -- -- -- -- -- -- -- -- -- -\ ")
             pprint(fingerprint)
             print(">FINGERPRINT- -- -- -- -- -- -- -- -- -- -- -- -- -- -/ ")
@@ -120,8 +120,9 @@ def query_status_w_js():
             pprint(get_user_devices(uuid))
             print(">DEVICES- -- -- -- -- -- -- -- -- -- -- -- -- -- -/ ")
             
+        #pprint(dtk)
         
-        if ('dtk' in tracker_post):
+        if ( ('dtk' in tracker_post) and (tracker_post['dtk'] != None) ):
             dtk = tracker_post['dtk']
             
             # check for roll over key, if present archive dtk
@@ -324,7 +325,7 @@ def settings():
     tag_sets = get_search_settings_dict()
     
     user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
-    user_info.pop('devices', None)
+    user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
     
     return render_template('settings_t.html', data=tag_sets, user_info=user_info)
 

@@ -1,5 +1,7 @@
 
 console.log(dtk);
+
+console.log();
   
 //// post info to DB
 //fetch( '/tracker', {

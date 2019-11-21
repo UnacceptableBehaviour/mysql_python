@@ -20,7 +20,7 @@ var page_report = '';
 
 var storeFingerprint = function () {
   var d1 = new Date();  
-  var fingerprint = {};
+  //var fingerprint = {};
   
   Fingerprint2.get( function(components) {
     fingerprint['fp'] = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
@@ -28,6 +28,10 @@ var storeFingerprint = function () {
     var d2 = new Date();
     var time = d2 - d1;
     fingerprint['timeTaken'] = time;
+    fingerprint['appName']    = navigator.appName;
+    fingerprint['platform']   = navigator.platform;
+    fingerprint['userAgent']  = navigator.userAgent;
+
     console.log(`==> FP: ${fingerprint}`);
     console.log(fingerprint);
 
@@ -38,34 +42,36 @@ var storeFingerprint = function () {
       page_report += "\nFINGERPRINT NOT stored on device <<"
       console.log(`NO LOCAL STORAGE SUPPORT <<`);
     }    
-    
   })
+    
 }
 
-fingerprint = localStorage.getItem("fingerprint");
-fingerprint['appName']    = navigator.appName;
-fingerprint['platform']   = navigator.platform;
-fingerprint['userAgent']  = navigator.userAgent;
-console.log('FINGERPRINT stored on device << S');
-console.log(fingerprint);
-console.log(navigator.appName);
-console.log(navigator.platform);
-console.log(navigator.userAgent);
-console.log(fingerprint['appName']  );
-console.log(fingerprint['platform'] );
-console.log(fingerprint['userAgent']);
-console.log('FINGERPRINT stored on device << E');
-if ( fingerprint === null) {
+// shiming https://developers.google.com/web/updates/2015/08/using-requestidlecallback#why_should_i_use_requestidlecallback
+// https://www.npmjs.com/package/fingerprintjs2
+if (window.requestIdleCallback) {         // check to see if requestIdleCallback available
+  requestIdleCallback(storeFingerprint);  // run storeFingerprint() when browser idle
+} else {
+  setTimeout(storeFingerprint, 500)       // use timeout if requestIdleCallback NOT available
+}
 
-  // shiming https://developers.google.com/web/updates/2015/08/using-requestidlecallback#why_should_i_use_requestidlecallback
-  // https://www.npmjs.com/package/fingerprintjs2
-  //
-  if (window.requestIdleCallback) {         // check to see if requestIdleCallback available
-    requestIdleCallback(storeFingerprint);  // run storeFingerprint() when browser idle
+
+function reportFPtoConsole(){
+  if (typeof(Storage) !== "undefined") {
+    fingerprint = localStorage.getItem("fingerprint");
+    console.log('FINGERPRINT stored on device << S');
+    console.log(fingerprint);
+    console.log(navigator.appName);
+    console.log(navigator.platform);
+    console.log(navigator.userAgent);
+    console.log(fingerprint['appName']  );
+    console.log(fingerprint['platform'] );
+    console.log(fingerprint['userAgent']);
+    console.log('FINGERPRINT stored on device << E');  
   } else {
-    setTimeout(storeFingerprint, 500)       // use timeout if requestIdleCallback NOT available
-  }
-} 
+    console.log(`NO LOCAL STORAGE SUPPORT <<`);
+  }    
+}
+
 
 
 // from server
@@ -117,53 +123,31 @@ console.log("<<\n<<\n<<\n<<");
 var dbgTxt = 'dbg blank';
 var blank = "";
 
-try {
-  
-  dbgTxt = `Date timestamp:${dtkLocal['dtk_rcp']['dt_date']}`;
-  blank = "";
-  dbgTxt += `<br>HRD UUID: ${userUUID}`;
-  dbgTxt += `<br>DTK UUID: ${dtkLocal['dtk_user_info']['UUID']}`;
-  dbgTxt += `<br>${lastSavedFile}`;
-  dbgTxt += `<br>: ${fingerprint}`;
-  dbgTxt += `<br>: ${blank}`;
-  dbgTxt += `<br>page_report: ${page_report}`;
-  dbgTxt += `<br>: ${blank}`;
-  dbgTxt += `<br>: ${blank}`;
-  
-} catch (err) {
 
-  if (dtkLocal === null) {
-    console.log("*** WARNING *** NO LOCALSTORAGE DTK! dtkLocal: null");  
-  } else {
-    console.log("*** WARNING *** ERROR! dtkLocal:", dtkLocal);
-    console.log("*** ERROR:\n", err);  
-  }
+var reportFindings = function () {
+  
+  var payLoad = JSON.stringify( { 'user':userUUID, 'dtk':dtkLocal, 'fp': fingerprint } );
+  console.log(`paayLoadType: ${typeof(payLoad)}`);
+  console.log(payLoad);
+  
+  fetch( '/synch_n_route', {
+    method: 'POST',                                             // method (default is GET)
+    headers: {'Content-Type': 'application/json' },             // JSON
+    body: payLoad                                               // Payload        
+  
+  }).then( function(response) {  
+    return response.json();
+  }).then( function(dtk_w_route) {
+    console.log("  - - - - - - - - data S");
+    console.log(dtk_w_route);
+    console.log(dtk_w_route['route']);
+    console.log("  - - - - - - - - data E");
+    // if it's a NEW day go to weigh in page    \
+    // if SAME day go to tracker page            \ - - detected server side
+    window.location.replace(dtk_w_route['route']);
+  });
 
 }
 
-dbgOut.innerHTML = dbgTxt;
-
-
-console.log("Gettting DTK from Server (POST to /synch_n_route");
-
-fetch( '/synch_n_route', {
-  method: 'POST',                                             // method (default is GET)
-  headers: {'Content-Type': 'application/json' },             // JSON
-  body: JSON.stringify( { 'user':userUUID, 'dtk':dtkLocal, 'fp': fingerprint } )      // Payload        
-
-}).then( function(response) {  
-  return response.json();
-}).then( function(dtk_w_route) {
-  console.log("  - - - - - - - - data S");
-  console.log(dtk_w_route);
-  console.log(dtk_w_route['route']);
-  console.log("  - - - - - - - - data E");
-  // if it's a NEW day go to weigh in page    \
-  // if SAME day go to tracker page            \ - - detected server side
-  window.location.replace(dtk_w_route['route']);
-});
-
-
-
-
-
+// TODO - this need to be sequnce after fingerprinting!
+setTimeout(reportFindings, 800);
