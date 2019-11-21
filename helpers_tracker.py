@@ -311,9 +311,14 @@ def dtk_timestamp_rolled_over(dtk):
     dts = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
     dlu = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
     nix_now = helpers_db.nix_time_ms()                                       # time now
-    print(f"RollOver check: RO: {dro} < NOW: {nix_now}  -  CREATED: {dts}  -  Last Update: {dlu} <")
+    hr_now = helpers_db.hr_readable_from_nix(nix_now)
+    # human readable
+    print(f"RollOver check: RO: {dro} < NOW: {hr_now}  -  CREATED: {dts}  -  Last Update: {dlu} <")
+    # nix time
+    print(f"RollOver check: RO: {dtk['dtk_rcp']['dt_rollover']} < NOW: {nix_now}  -  CREATED: {dtk['dtk_rcp']['dt_date']}  -  Last Update: {dtk['dtk_rcp']['dt_last_update']} <")
         
-    if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
+    #if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
+    if nix_now > dtk['dtk_rcp']['dt_rollover']:
         print("dtk_timestamp_rolled_over? True")
         return True
 
