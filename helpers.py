@@ -300,8 +300,8 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
         # notes: // multiline - later
         # description:
         # stars:
-        # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, s&c, alcohol, celery, gluten, soya, sulphur_dioxide
-        # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, s&c, gluten_free, ns_pregnant, 
+        # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
+        # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant, 
         # type: amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
         
         m = re.match( r'((^tags:)|(^allergens:)|(^description:)|(^stars:))', line)

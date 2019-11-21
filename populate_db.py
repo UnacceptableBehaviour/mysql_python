@@ -141,7 +141,7 @@ def create_sql_insert_ingredients_array_text(ingredients):
 
 # insert array of strings
 def create_sql_insert_tags_array_text(tags):
-    # '{"veggie", "beef", "s&c", "fish"}'
+    # '{"veggie", "beef", "shellfish", "fish"}'
     
     sql_insert = "'{"
     

@@ -2,8 +2,14 @@
 
   /*    tag
       . class
-      # id
-      TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
+      # id      
+  */
+  /*
+  .container-fluid    - space out exclude divs 
+  .padding
+  buttons
+  
+  remove <br> 
   */
   body {
     --title-font-size:1.5rem;
@@ -22,7 +28,15 @@
 
   .container-fluid {
     padding-left: 0.1rem;
-    
+    /* padding-top: 0.1rem;
+    padding-bottom: 0.1rem; on buttons! */
+  }
+  
+  .ftb_set {    /* present in list highlighted */
+    background-color: #B8DB0D;
+  }
+  .ftb_none {   /* NOT present in list, NOT highlighted */
+    background-color: #FFFFFF;
   }
 
 

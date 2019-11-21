@@ -22,7 +22,7 @@
 //   901 | spinach tortilla                  | {veggie,gluten_free,msg,ns_pregnant}
 //  2701 | mushroom risotto                  | {veggie,cbs,gluten_free}
 //  3101 | goats cheese and spinach omelette | {veggie,gluten_free}
-//  3401 | simple beef and onion broth       | {vegan,veggie,cbs,chicken,pork,beef,seafood,s&c,gluten_free,ns_pregnant}
+//  3401 | simple beef and onion broth       | {vegan,veggie,cbs,chicken,pork,beef,seafood,shellfish,gluten_free,ns_pregnant}
 //(4 rows)
 
 

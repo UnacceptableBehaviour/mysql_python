@@ -25,8 +25,8 @@ print(m.group(0))
 print(m.group(1))
 
 
-allergens = 'dairy, eggs, peanuts, nuts, seeds, fish, molluscs, s&c, alcohol, celery, gluten, soya, sulphur dioxide'
-tags = 'vegan, veggie, cbs, chicken, pork, beef, seafood, s&c, gluten_free, ns_pregnant'
+allergens = 'dairy, eggs, peanuts, nuts, seeds, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur dioxide'
+tags = 'vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant'
 
 
 print("List comprehension test")

@@ -644,9 +644,9 @@ def get_search_settings_dict(empty=False):
     #              'ingredient_exc': [] }   # exclude ALL
 
     default_filters = {
-        'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 's&c', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
+        'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
         'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
-        'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 's&c', 'gluten_free', 'ns_pregnant'],
+        'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
         'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
         'type_exc': [],
         'ingredient_exc': [] }
@@ -866,8 +866,8 @@ if __name__ == '__main__':
     print("\n\n\n\n\nUser Device Fingerprints\n")
     pprint(users_devices_db)
     
-    # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, s&c, alcohol, celery, gluten, soya, sulphur_dioxide
-    # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, s&c, gluten_free, ns_pregnant, 
+    # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
+    # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant, 
     pprint( get_all_recipe_ids_with_any_tags(['chicken', 'gluten_free']) )
         
     user_data_db = load_dict_data_from_DB("user_database")
