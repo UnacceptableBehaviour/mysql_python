@@ -16,25 +16,27 @@ function toggleTagInCategory(button) {
   
   var tagCat = button.parentNode.id.replace('did_','');
   
-  console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+  //console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
   
   if ( userInfo['default_filters'][tagCat].includes(tag) ){
     //console.log(`${tag} - FROM ON to OFF`);
     button.classList.add("ftb_none");
     button.classList.remove("ftb_set");
+
     // remove tag from category - userInfo['default_filters'][tagCat].delete(tag)
-    //console.log(tag, userInfo['default_filters'][tagCat].filter( tagsToKeep => tagsToKeep !== tag  )); // less compatible
-    //console.log(tag, userInfo['default_filters'][tagCat].filter( function(tagsToKeep) { return tagsToKeep !== tag; } ));
     userInfo['default_filters'][tagCat] = userInfo['default_filters'][tagCat].filter( function(tagsToKeep) { return tagsToKeep !== tag; } )
-    //
+
   } else {
     //console.log(`${tag} - FROM OFF to ON`);
     button.classList.add("ftb_set");
     button.classList.remove("ftb_none");
+
     // add tag back to category
     userInfo['default_filters'][tagCat].push(tag)
   }
-  console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+  //console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+  console.log(userInfo);
+  postUpdateSettingsToServer();
 }
 
 
@@ -69,7 +71,7 @@ function fillInTagButtons(e){
     
   buttons = document.getElementsByTagName('button');
 
-  // most compatible of teh 4 solutions
+  // most compatible of the 4 loop/iter solutions - all at bottom!
   
   for (var i=0; i < buttons.length; i++) {
     
@@ -102,7 +104,23 @@ function fillInTagButtons(e){
 
 
 
+function postUpdateSettingsToServer(){
 
+  fetch( '/settings', {
+    method: 'POST',                                             // method (default is GET)
+    headers: {'Content-Type': 'application/json' },             // JSON
+    body: JSON.stringify( { 'user':userUUID, 'user_info':userInfo } )      // Payload        
+  
+  }).then( function(response) {    
+    return response.json();
+  
+  }).then( function(jsonResp) {
+    //window.location.replace('/tracker');
+    //window.location.replace('/weigh_in');
+    console.log(`setting UPDATED? - ${jsonResp}`);
+  });  
+  
+}
 
 
 

@@ -713,13 +713,13 @@ def get_user_info_name_uuid_dict(uuid):
         return None
 
 
-def update_user_info_dict(uuid, user_settings):
+def update_user_info_dict(user_settings):
+    uuid = user_settings['UUID']
     
     try:
         user_db[uuid].update(user_settings)
         commit_User_DB()
         return True
-
     
     except KeyError as e:
         raise(DBAccessKeyError("get_user_info_name_uuid_dict ERROR", e))

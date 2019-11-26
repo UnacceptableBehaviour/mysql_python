@@ -39,6 +39,8 @@ function handleVisibilityChange() {
     console.log(dtkLocal);
     // store dtkLocal
     console.log(`dtkState: ${dtkState} <`);
+    // store userInfo (allergy settiings)
+    
     
   } else {
     // coming out to play - load latest DTK from cache (and server if available)

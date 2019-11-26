@@ -312,6 +312,25 @@ def db_gallery():
 
 @app.route('/settings', methods=["GET", "POST"])
 def settings():
+        
+    # POST route
+    if request.method =='POST':
+        settings = request.get_json() # parse JSON into DICT
+        
+        if 'user_info' in settings:
+            print('/settings/POST:user_info:')
+            pprint(settings['user_info'])
+            
+            # write settings to DB
+            update_user_info_dict(settings['user_info'])
+            
+            # return all good
+            return json.dumps({}), 201 # created
+        
+        else:
+            # return - couldnt fine user_info!??
+            pass
+            
     
     # default_filters = { # ADDITIONS LIKELY - USER DEFINED ESPECIALLY
     #     'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
@@ -420,7 +439,7 @@ def track_items():
         dro = hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
         dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
         dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
-        print(f"TRACKING: {dro} <   TS: {dts} <    LUP: {dlu} <")
+        print(f"TRACKING: {dro} <  NOW: {hr_readable_from_nix(nix_time_ms())} TS: {dts} <    LUP: {dlu} <")
     
     #pprint(dtk)
         
