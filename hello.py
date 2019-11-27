@@ -439,7 +439,7 @@ def track_items():
         dro = hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
         dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
         dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
-        print(f"TRACKING: {dro} <  NOW: {hr_readable_from_nix(nix_time_ms())} TS: {dts} <    LUP: {dlu} <")
+        #print(f"TRACKING: {dro} <  NOW: {hr_readable_from_nix(nix_time_ms())} TS: {dts} <    LUP: {dlu} <")
     
     #pprint(dtk)
         
