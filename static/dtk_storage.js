@@ -39,7 +39,7 @@ function handleVisibilityChange() {
     console.log(dtkLocal);
     // store dtkLocal
     console.log(`dtkState: ${dtkState} <`);
-    // store userInfo (allergy settiings)
+    // store userInfo (allergy settiings) - postUpdateSettingsToServer(); - 
     
     
   } else {

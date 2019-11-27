@@ -339,14 +339,11 @@ def settings():
     #     'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
     #     'type_exc': [],
     #     'ingredient_exc': [] }
-    
-    # create available option buttons    
-    tag_sets = get_search_settings_dict()
-    
+        
     user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
     
-    return render_template('settings_t.html', data=tag_sets, user_info=user_info)
+    return render_template('settings_t.html', user_info=user_info)
 
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():

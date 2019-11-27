@@ -676,6 +676,7 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         'name': 'Simon',
         'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'],
         'default_filters': get_search_settings_dict(True),
+        'tag_sets': get_search_settings_dict(True),
         }
     
     default_user_settings.update(user_settings)

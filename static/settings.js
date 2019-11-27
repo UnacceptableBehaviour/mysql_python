@@ -51,6 +51,23 @@ function clickHandler(e) {
   
   if (e.target.id.includes('tag_btn_id_')) { // its a tag - toggle it
     toggleTagInCategory(e.target);
+    
+  } else if (e.target.id === 'igd_btn_id') {
+    input = document.getElementById('add_igd_form');
+    
+    console.log(`IGD EXC = ${input.value}`); console.log(input);
+    
+    if ( input.value === '' ) return; // dont add blanks
+
+    // TODO - add viewport update
+    //df = userInfo['default_filters']['ingredient_exc'];
+    //df.indexOf(input.value) === -1 ? df.push(input.value) : console.log(`ALREADY PRESENT: ${input.value} <`);    
+    ts = userInfo['tag_sets']['ingredient_exc'];
+    ts.indexOf(input.value) === -1 ? ts.push(input.value) : console.log(`ALREADY PRESENT: ${input.value} <`);
+
+    //userInfo['default_filters']['ingredient_exc'] = [];
+    //userInfo['tag_sets']['ingredient_exc'] = [];
+    postUpdateSettingsToServer();    
   }
   
 }
@@ -105,6 +122,8 @@ function fillInTagButtons(e){
 
 
 function postUpdateSettingsToServer(){
+
+  // TODO - store setting locally - register with dtk_storage
 
   fetch( '/settings', {
     method: 'POST',                                             // method (default is GET)
