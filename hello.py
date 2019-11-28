@@ -48,15 +48,6 @@ import json         # JSON tools
 # run 'populate_db.py'
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# add persistence until sessions implemented
-data = {}
-data['tags'] = ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant']
-data['chosen_tag_filters'] = ['vegan', 'veggie', 'cbs']
-data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
-
-data['allergens'] = ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide']
-
-
 # default
 #engine = db.create_engine('dialect+driver://user:pass@host:port/db')
 #engine = create_engine('mysql://root:meepmeep@localhost:3306/nutridb_sr25_sanitized')
@@ -205,6 +196,7 @@ def weigh_in():
     # draw chart - in .js
     
     return render_template('weigh_in_t.html', daily_tracker=dtk)
+
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
 def buttons_inputs():

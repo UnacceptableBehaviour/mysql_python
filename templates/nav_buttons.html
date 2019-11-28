@@ -13,7 +13,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        <script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>
+        <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->
         <script src='static/dtk_storage.js'></script>
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Picker Integration</title>
@@ -34,32 +34,46 @@
     <body>
 
         <button id='bt_home'>
-            <a href="{{url_for('db_hello_world')}}"><i class="fas fa-seedling"></i></i></a>
-        </button>
+            <a href="{{url_for('db_hello_world')}}"><img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg"></a>
+<!--            <img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg">
+            <a href="{{url_for('db_hello_world')}}"><i class="fas fa-seedling"></i></a>
+-->        </button>
 
         <button>
+            <a href="{{url_for('track_items')}}"><img src="static/PNG/pencil.png" alt="tick" srcset="static/SVG/pencil.svg"></a>
+<!--            <img src="static/PNG/pencil.png" alt="tick" srcset="static/SVG/pencil.svg">
             <a href="{{url_for('track_items')}}"><i class="fas fa-pen-alt"></i></a>
-        </button>
+-->        </button>
         
         <button id='bt_gallery'>
+            <a href="{{url_for('db_gallery')}}"><img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg"></a>
+<!--            <img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg">
             <a href="{{url_for('db_gallery')}}"><i class="fas fa-image"></i></a>
-        </button>
+-->        </button>
 
         <button>
+            <a href="{{url_for('search_ingredient')}}"><img src="static/PNG/search.png" alt="tick" srcset="static/SVG/search.svg"></a>
+<!--            <img src="static/PNG/search.png" alt="tick" srcset="static/SVG/search.svg">
             <a href="{{url_for('search_ingredient')}}"><i class="fas fa-search"></i></a>
-        </button>
+-->        </button>
 
         <button id='bt_db_snap'>
+            <a href="{{url_for('diary_w_image_snap')}}"><img src="static/PNG/camera.png" alt="tick" srcset="static/SVG/camera.svg"></a>            
+<!--            <img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg">
             <a href="{{url_for('diary_w_image_snap')}}"><i class="fas fa-camera"></i></a>            
-        </button>
+-->        </button>
         
         <button id='bt_weigh_in'>
+            <a href="{{url_for('weigh_in')}}"><img src="static/PNG/balance-scale.png" alt="tick" srcset="static/SVG/balance-scale.svg"></a>
+<!--            <img src="static/PNG/balance-scale.png" alt="tick" srcset="static/SVG/balance-scale.svg">
             <a href="{{url_for('weigh_in')}}"><i class="fas fa-balance-scale"></i></a>
-        </button>
+-->        </button>
         
         <button id='bt_settings'>
-            <a href="{{url_for('settings')}}"><i class="fas fa-cog"></i></i></a>
-        </button>
+            <a href="{{url_for('settings')}}"><img src="static/PNG/cog.png" alt="tick" srcset="static/SVG/cog.svg"></a>
+<!--            <img src="static/PNG/cog.png" alt="tick" srcset="static/SVG/cog.svg">
+            <a href="{{url_for('settings')}}"><i class="fas fa-cog"></i></a>
+-->        </button>
 
         <button id='bt_inputs'>
             <a href="{{url_for('buttons_inputs')}}">BUTTONS</a>
