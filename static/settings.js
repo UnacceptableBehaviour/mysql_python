@@ -23,8 +23,10 @@ function toggleTagInCategory(button) {
     button.classList.add("ftb_none");
     button.classList.remove("ftb_set");
 
-    // remove tag from category - userInfo['default_filters'][tagCat].delete(tag)
-    userInfo['default_filters'][tagCat] = userInfo['default_filters'][tagCat].filter( function(tagsToKeep) { return tagsToKeep !== tag; } )
+    // remove tag from category - userInfo['default_filters'][tagCat].delete(tag)    
+    var default_filters = userInfo['default_filters'][tagCat];
+    // remove tag
+    default_filters = default_filters.filter( function(tagsToKeep) { return tagsToKeep !== tag; } );
 
   } else {
     //console.log(`${tag} - FROM OFF to ON`);
@@ -34,6 +36,11 @@ function toggleTagInCategory(button) {
     // add tag back to category
     userInfo['default_filters'][tagCat].push(tag)
   }
+  
+  // typing help for touch screen - add button name to input for no type removal
+  if (button.parentNode.id.includes('did_ingredient_exc')) { document.getElementById('add_igd_form').value = tag; };
+  
+  
   //console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
   console.log(userInfo);
   postUpdateSettingsToServer();
@@ -52,20 +59,29 @@ function clickHandler(e) {
   if (e.target.id.includes('tag_btn_id_')) { // its a tag - toggle it
     toggleTagInCategory(e.target);
     
-  } else if (e.target.id === 'add_igd_btn_id') {  // and an ingredients to exclude button
+  } else if (e.target.id.includes('_igd_btn_id')) {  // and an ingredients to exclude button
     input = document.getElementById('add_igd_form');
     
     console.log(`IGD EXC = ${input.value}`); console.log(input);
     
     if ( input.value === '' ) return; // dont add blanks
     
-    // add ingredient to tag sets to creat button
-    ts = userInfo['tag_sets']['ingredient_exc'];
-    ts.indexOf(input.value) === -1 ? ts.push(input.value) : console.log(`ADD - ALREADY PRESENT: ${input.value} <`);
-
-    // seeing as we're creating the button user probably want it set!
-    df = userInfo['default_filters']['ingredient_exc'];
-    df.indexOf(input.value) === -1 ? df.push(input.value) : console.log(`ADD - ALREADY PRESENT: ${input.value} <`);    
+    if (e.target.id === 'add_igd_btn_id') {      
+      ts = userInfo['tag_sets']['ingredient_exc'];           // add ingredient to tag sets to creat button
+      ts.indexOf(input.value) === -1 ? ts.push(input.value) : console.log(`ADD - ALREADY PRESENT: ${input.value} <`);
+        
+      df = userInfo['default_filters']['ingredient_exc'];   // seeing as we're creating the button user probably want it set!
+      df.indexOf(input.value) === -1 ? df.push(input.value) : console.log(`ADD - ALREADY PRESENT: ${input.value} <`);    
+      
+    } else if (e.target.id === 'remove_igd_btn_id') {      
+      ts = userInfo['tag_sets']['ingredient_exc'];            // remove ingredient fomr tag_sets 
+      var index = ts.indexOf(input.value);
+      index === -1 ? console.log(`REMOVE - ALREADY PRESENT: ${input.value} <`) : ts.splice(index, 1);
+      
+      df = userInfo['default_filters']['ingredient_exc'];     // seeing as we're removing the button remove from user defaults
+      index = df.indexOf(input.value);
+      index === -1 ? console.log(`REMOVE - ALREADY PRESENT: ${input.value} <`) : df.splice(index, 1);      
+    }
     
     postUpdateSettingsToServer();
     
@@ -73,32 +89,7 @@ function clickHandler(e) {
     console.log(`IGD EXC = RELOAD /settings`);
     window.location.replace('/settings');
     
-  } else if (e.target.id === 'remove_igd_btn_id') {
-
-    input = document.getElementById('add_igd_form');
-    
-    console.log(`IGD EXC = ${input.value}`); console.log(input);
-    
-    if ( input.value === '' ) return; 
-    
-    // remove ingredient to tag sets to creat button
-    ts = userInfo['tag_sets']['ingredient_exc'];
-    var index = ts.indexOf(input.value);
-    index === -1 ? console.log(`REMOVE - ALREADY PRESENT: ${input.value} <`) : ts.splice(index, 1);
-
-    // seeing as we're creating the button user probably want it set!
-    df = userInfo['default_filters']['ingredient_exc'];
-    index = df.indexOf(input.value);
-    index === -1 ? console.log(`REMOVE - ALREADY PRESENT: ${input.value} <`) : df.splice(index, 1);
-    
-    postUpdateSettingsToServer();
-    
-    // TODO - chain promises?
-    console.log(`IGD EXC = RELOAD /settings`);
-    window.location.replace('/settings');
-
-    
-  }
+  } 
   
 }
 
