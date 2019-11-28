@@ -445,7 +445,9 @@ function createTablelineHTML(ingredient_line_array){
   
   var item = `<td class="col-but-ingdt">${ingredient_line_array[INGREDIENT_INDEX]}</td>`;
   
-  var but_photo = '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right"><i class="fas fa-camera"></i></button></td>';
+  // <img src="static/PNG/camera.png" alt="tick" srcset="static/SVG/camera.svg">
+  //var but_photo = '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right"><i class="fas fa-camera"></i></button></td>';
+  var but_photo = '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right"><img src="static/PNG/camera.png" alt="tick" srcset="static/SVG/camera.svg"></button></td>';
 
   var but_explode = '<td class="col-but-all"><a class="btn btn-sm btn-outline-success float-right" href="#" role="button">e</a></td>';
   var but_recipe = '<td class="col-but-all"><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">R</a></td>';

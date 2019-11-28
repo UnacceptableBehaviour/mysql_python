@@ -320,8 +320,8 @@ def settings():
             return json.dumps({}), 201 # created
         
         else:
-            # return - couldnt fine user_info!??
-            pass
+            # return - couldnt find user_info!??
+            return json.dumps({}), 404 
             
     
     # default_filters = { # ADDITIONS LIKELY - USER DEFINED ESPECIALLY
@@ -343,8 +343,8 @@ def search_ingredient():
     # process search post - query database
     # get all recipes with search criterea    
     if request.method == 'POST':
-        search_request = request.get_json() # parse JSON into DICT
-                
+        search_request = request.get_json() # parse JSON into DICT        
+        
         if ('user' in search_request):
             uuid =  search_request['user']
         

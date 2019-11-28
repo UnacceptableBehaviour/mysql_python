@@ -29,10 +29,12 @@
                             <p class="card-text">{{ recipe_info['description'] }}</p>
                             <!-- (recipe_info['user_rating']|int) user_rating is a float use a filter to covert to int -->
                             {% for stars in range((recipe_info['user_rating']|int)) %}
-                            <i class="fa fa-star recip-star-up-rating"></i>
+                            <!--<i class="fa fa-star recip-star-up-rating"></i>-->
+                            <img src="static/PNG/star.png" alt="tick" srcset="static/SVG/star.svg" class="recip-star-up-rating">
                             {% endfor %}
                             {% for stars in range(5 - (recipe_info['user_rating']|int)) %}
-                            <i class="fa fa-star recip-star-down-rating"></i>
+                            <!--<i class="fa fa-star recip-star-down-rating"></i>-->
+                            <img src="static/PNG/star.png" alt="tick" srcset="static/SVG/star.svg" class="recip-star-down-rating">
                             {% endfor %}
                             <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
                         </div>
