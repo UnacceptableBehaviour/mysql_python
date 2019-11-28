@@ -23,19 +23,18 @@
           {% for tag in user_info['tag_sets']['tags_inc'] %}
           <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
           {% endfor %}
-      </div><br>
+      </div>
       
       
       <div class="input-group mb-3">
         <input name='create_tag_button' type="text" class="form-control" placeholder="Enter new tag . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
         <div class="input-group-append">
-          <button id="igd_btn_id" class="btn btn-outline-secondary" type="submit">CREATE TAG</button>
+          <button id="create_tag_btn_id" class="btn btn-outline-secondary" type="submit">CREATE TAG</button>
         </div>
       </div>
       
       <div id="did_ingredient_exc" class="container-fluid padding tag-div">
-        INGREDIENTS TO EXCLUDE:<br>
-        EXCLUDE: {{user_info['default_filters']['ingredient_exc']}}        
+        INGREDIENTS TO EXCLUDE:        
         {% for tag in user_info['tag_sets']['ingredient_exc'] %}
         <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary '>{{tag}}</button>
         {% endfor %}
@@ -43,7 +42,10 @@
         <div class="input-group mb-3">
           <input id='add_igd_form' name='add_igd_form' type="text" class="form-control" placeholder="ingredients to avoid in search . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
           <div class="input-group-append">
-            <button id="igd_btn_id" class="btn btn-outline-secondary" type="submit">ADD ingredient</button>
+            <button id="remove_igd_btn_id" class="btn btn-outline-secondary" type="submit">-</button>
+          </div>
+          <div class="input-group-append">
+            <button id="add_igd_btn_id" class="btn btn-outline-secondary" type="submit">+ ingredient</button>
           </div>
         </div>
       </div>

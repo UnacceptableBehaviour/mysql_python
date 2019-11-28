@@ -26,6 +26,10 @@
     padding: 0.2rem;    
   }
 
+  .tag-div{
+    margin-bottom: 1.2rem;
+  }
+
   .container-fluid {
     padding-left: 0.1rem;
     /* padding-top: 0.1rem;
