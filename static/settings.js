@@ -10,6 +10,8 @@ console.log('settings.js - START');
 //  }  
 //}
 
+
+// TODO - toggle should reverse oposing LOGIC
 function toggleTagInCategory(button) {
 
   var tag = button.id.replace('tag_btn_id_', '');            
@@ -27,6 +29,8 @@ function toggleTagInCategory(button) {
     var default_filters = userInfo['default_filters'][tagCat];
     // remove tag
     default_filters = default_filters.filter( function(tagsToKeep) { return tagsToKeep !== tag; } );
+    
+    userInfo['default_filters'][tagCat] = default_filters;
 
   } else {
     //console.log(`${tag} - FROM OFF to ON`);

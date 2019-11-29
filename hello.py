@@ -339,7 +339,8 @@ def settings():
 
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
-
+    user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
+    
     # process search post - query database
     # get all recipes with search criterea    
     if request.method == 'POST':
@@ -349,15 +350,16 @@ def search_ingredient():
             uuid =  search_request['user']
         
         if ('search' in search_request):
-            queries = search_request['search']
+            search = search_request['search']
             print("search_ingredient >>")
-            pprint(queries)
+            pprint(search)
         else:
             raise('Come on!!')
         
-        #ri_ids = ['301','1101','1202','1701','2301','2501','2902','3301','3401']
+        
         ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]
-        ri_ids = get_all_recipe_ids_with_any_tags(['chicken', 'gluten_free'])
+        #search = ''
+        ri_ids = get_all_recipe_ids_with_any_tags(search, user_info['default_filters'])
         
         recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
         
@@ -369,9 +371,11 @@ def search_ingredient():
         pprint(request)
         print("- - - - s_i:" )
         
-        ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]        
-        recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)                
-    
+        #ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]        
+        #recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)                
+        dbg_user_info = dict(user_info)
+        dbg_user_info.pop('tag_sets')
+        pprint(dbg_user_info)
     
     # pass list to gallery
     

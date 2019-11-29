@@ -462,10 +462,19 @@ def get_all_recipe_ids():
 # All veggie recipes that are GF
 # SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) AND ('vegan' =  ANY( tags ) OR 'veggie' =  ANY( tags ));
 
-def get_all_recipe_ids_with_any_tags(inc_any_tags=[]):
+
+# {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298',
+#  'default_filters': {'allergens': [],
+#                      'ingredient_exc': [],
+#                      'tags_exc': [],
+#                      'tags_inc': ['chicken', 'pork']},
+def get_all_recipe_ids_with_any_tags(search, default_filter):
     
+    inc_any_tags = default_filter['tags_inc']
     ids = []
-    query = 'SELECT ri_id  FROM exploded WHERE -*-'
+    #query = 'SELECT ri_id  FROM exploded WHERE -*-'
+    query = f"SELECT ri_id  FROM exploded WHERE ('{search}' = ANY (ingredients)) AND (-*-"
+    
     
     print(f"type(inc_any_tags){type(inc_any_tags).__name__}< == 'list' {type(inc_any_tags).__name__ == 'list'}")
     pprint(inc_any_tags)
@@ -475,10 +484,14 @@ def get_all_recipe_ids_with_any_tags(inc_any_tags=[]):
             for tag in inc_any_tags:
                 insert = f" '{tag}' = ANY( tags ) OR-*-"
                 print(query, insert)
-                query = query.replace('-*-', insert)       # insert queary for each tag
+                query = query.replace('-*-', insert)       # insert query for each tag
             
-            query = query.replace('OR-*-', ';') # remove that last OR and insert marker, finish w/ semi colon
+            query = query.replace('OR-*-', ');') # remove that last OR and insert marker, finish w/ semi colon
+            print("|\n|\n|\n|\n|\nQUERY:")
+            pprint(search)
+            print('<=>')
             print(query)
+            print("|\n|\n|\n|\n|\n")            
             #db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE image_file <> '';").fetchall()
             db_lines = helper_db_class_db.execute(query).fetchall()
             print(db_lines)
@@ -648,7 +661,7 @@ def get_search_settings_dict(empty=False):
 
     default_filters = {
         'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
-        'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
+        'tags_inc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
         'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
         'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
         'type_exc': [],

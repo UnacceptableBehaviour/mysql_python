@@ -26,8 +26,6 @@
 //(4 rows)
 
 
-
-
 searchButton = document.getElementById('but-recipe-search');
 searchButton.addEventListener('click', searchForRecipe);
 
@@ -43,7 +41,7 @@ formLogic.placeholder = 'contains';
 
 function searchForRecipe (){
   formField.value = 'tags';
-  formValue.value = 'vegan';
+  //formValue.value = 'vegan';            << USE ACTUAL FORM VALUE!
   formLogic.value = 'contains';
   
   if ( (formField.value === "")|| (formValue.value === "")|| (formLogic.value === "") ) {
@@ -55,13 +53,15 @@ function searchForRecipe (){
     return;
   }
 
-  var query = {
-    field: formField.value,
-    value: formValue.value,
-    logic: formLogic.value,
-  }
+  //var query = {
+  //  field: formField.value,
+  //  value: formValue.value,
+  //  logic: formLogic.value,
+  //}
+  //
+  //var search = [query];
   
-  var search = [query];
+  search = formValue.value;
 
   //query =  = {
   //  field: [formField.value],
