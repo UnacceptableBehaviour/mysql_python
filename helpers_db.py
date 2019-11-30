@@ -469,6 +469,34 @@ def get_all_recipe_ids():
 #                      'tags_exc': [],
 #                      'tags_inc': ['chicken', 'pork']},
 def get_all_recipe_ids_with_any_tags(search, default_filter):
+    # # SELECT ri_id,ri_name, igd FROM  (SELECT ri_id,ri_name, unnest(ingredients) igd FROM exploded) x WHERE igd LIKE '%red onion%';
+    #  ri_id |                   ri_name                    |    igd     
+    # -------+----------------------------------------------+------------
+    #      1 | mixed vegetable risotto                      | red onion
+    #      3 | crispy prawn and vegetable risotto           | red onion
+    #    503 | beetroot and chicken broth                   | red onion
+    #    504 | chicken beetroot w broccoli and greens       | red onion
+    #    801 | chicken and shredded lettuce soup w cardamom | red onion
+    #   1001 | fillet steak and vegetables in gravy         | red onion
+    #   1302 | beef & jalapeno burger                       | red onion
+    #   1304 | jalapeno burger w cauliflower california     | red onion
+    #   1601 | winner winner chicken dinner                 | red onion
+    #   1901 | chicken and aubergine stew                   | red onions
+    #   2301 | savoury pear grape and squash salad          | red onion
+    #   2401 | mango salsa                                  | red onion
+    #   2402 | savoury pear grape and squash salad          | red onion
+    #   2403 | prawns w crab cakes mango salsa and salad    | red onion
+    #   3101 | goats cheese and spinach omelette            | red onion
+    #   3201 | light apricot cous cous                      | red onion
+    #   3202 | ham green beans and cous cous w egg          | red onion
+    #   3301 | light apricot cous cous                      | red onion
+    # (18 rows)
+    
+    # split search by commas
+    # build basic query from search
+    # add the default filters
+    #    handle empty filter arrays
+    
     
     inc_any_tags = default_filter['tags_inc']
     ids = []
