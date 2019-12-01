@@ -25,7 +25,7 @@ from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, 
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_from_nix
-from helpers_db import get_all_recipe_ids_with_any_tags
+from helpers_db import process_search
 from helpers_db import get_user_info_dict, update_user_info_dict, get_search_settings_dict
 
 from helpers_tracker import get_daily_tracker_from_DB, store_daily_tracker_to_DB, post_DTK_info_for_processing, post_interface_file
@@ -337,8 +337,12 @@ def settings():
     
     return render_template('settings_t.html', user_info=user_info)
 
+
+last_search_result_recipes = {}
+
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
+    global last_search_result_recipes # what the point of a global if it isn't implicitly global?
     user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
     
     # process search post - query database
@@ -359,12 +363,12 @@ def search_ingredient():
         
         ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]
         #search = ''
-        ri_ids = get_all_recipe_ids_with_any_tags(search, user_info['default_filters'])
+        ri_ids = process_search(search, user_info['default_filters'])
         
-        recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
+        last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
         
         #return render_template('gallery.html', recipes=recipes)
-        return json.dumps(recipes), 200
+        return json.dumps(last_search_result_recipes), 200
     
     else:
         print(f"search_ingredient: {request.method}")
@@ -373,15 +377,12 @@ def search_ingredient():
         
         #ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]        
         #recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)                
-        dbg_user_info = dict(user_info)
+        dbg_user_info = dict(user_info) # duplicate so as not to interfere with 'db' (dev only)
         dbg_user_info.pop('tag_sets')
         pprint(dbg_user_info)
-    
-    # pass list to gallery
-    
-    # GET route
-    #return render_template('gallery.html', recipes=recipes)
-    return render_template('recipe_search_t.html')
+        
+    # GET route                                     # TODO implement --\
+    return render_template('recipe_search_t.html', recipes=last_search_result_recipes)
 
 
 @app.route('/buton_2', methods=["GET", "POST"])
