@@ -273,6 +273,7 @@ def return_recipe_dictionary():
         'atomic': 1,        # 0 if component / further recipe info available
         'user_rating': 1,
         'dt_date': nix_time_in_ms,
+        'dt_date_readable': hr_readable_date_from_nix(nix_time_in_ms),
         'dt_day': day_from_nix_time(nix_time_in_ms),
         'dt_time': time24h_from_nix_time(nix_time_in_ms),
         'dt_rollover': roll_over_from_nix_time(nix_time_in_ms),
