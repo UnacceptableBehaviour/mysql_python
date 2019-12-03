@@ -434,8 +434,7 @@ def track_items():
         dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
         dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
         #print(f"TRACKING: {dro} <  NOW: {hr_readable_from_nix(nix_time_ms())} TS: {dts} <    LUP: {dlu} <")
-    
-    #pprint(dtk)
+        
         
     return render_template('track_items.html', daily_tracker=dtk)
 
@@ -623,12 +622,12 @@ if __name__ == '__main__':
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
     #app.run(host='0.0.0.0', port=50015)
-    app.run(host='192.168.0.8', port=50015 )
+    app.run(host='192.168.1.13', port=50015 )
     
     # setting up SSL for image capture:
     # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
     # pip install pyOpenSSL
-    #app.run(host='192.168.0.8', port=50015, ssl_context='adhoc')
+    #app.run(host='192.168.1.13', port=50015, ssl_context='adhoc')
     
     # Note for deployment:
     # http://flask.pocoo.org/docs/1.0/deploying/#deployment
