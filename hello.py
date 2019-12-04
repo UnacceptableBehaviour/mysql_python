@@ -382,7 +382,7 @@ def search_ingredient():
         pprint(dbg_user_info)
         
     # GET route                                     # TODO implement --\
-    return render_template('recipe_search_t.html', recipes=last_search_result_recipes)
+    return render_template('search_t.html', recipes=last_search_result_recipes)
 
 
 @app.route('/buton_2', methods=["GET", "POST"])
