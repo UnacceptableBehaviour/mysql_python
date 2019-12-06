@@ -84,10 +84,11 @@ function loadServingModifierLUT(){
   var lut = {
     'onions': { 'small': 100.0, 'medium': 150.0, 'large': 200.0, 'density': 1.0 },
     'apple': { 'small': 90.0, 'medium': 120.0, 'large': 140.0, 'density': 1.0 },
-    'apples': { 'small': 90.0, 'medium': 120.0, 'large': 140.0, 'density': 1.0 },
+    'apples': { 'small': 90.0, 'medium': 120.0, 'large': 140.0, 'density': 1.0 },    
     'red onions' : { 'small': 50.0, 'medium': 100.0, 'large': 150.0, 'density': 1.0 },
     'banana' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
     'bananas' : { 'small': 90.0, 'medium': 120.0, 'large': 150.0, 'density': 1.0 },
+    'dcx' : { 'small':  0.1, 'medium': 0.1, 'large':  0.1, 'density': 1.0 },
     'pringles' : { 'small': 2.33, 'medium': 2.33, 'large': 2.33, 'density': 1.0 },
     'red peppers': { 'small': 120.0, 'medium': 150.0, 'large': 180.0, 'density': 1.0 },
     'pork cheeks': { 'small': 70.0, 'medium': 83.0, 'large': 96.0, 'density': 1.0 },
