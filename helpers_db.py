@@ -871,6 +871,51 @@ def get_user_info_name_uuid_dict(uuid):
         return None
 
 
+
+def update_settings_table_for_uuid(db, uuid, dict_w_table):
+    # create DB INSERT command
+    # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
+    # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
+    #create_sql_insert_tags_array_text(tags)
+     # 'default_filters': { 'allergens': [],
+     #         ^            'ingredient_exc': ['coriander', 'bad sausage'],
+     #         ^            'tags_exc': [],
+     #         ^            'tags_inc': ['ns_pregnant'] },
+     #         ^              ^
+     #         ^              ^
+     #      first key > dict of arrays
+        
+    # dict.values().first?
+    # dict.keys().first - next(iter(dict)) - get first key
+    first_key = next(iter(dict_w_table))
+    settings = dict_w_table[first_key]
+        
+    #column_names = ','.join([ f"{tag_set}" for tag_set in settings ])
+
+    rows_data = ""
+    for column_name in settings:
+        if rows_data != "": rows_data += ','                              # comma between sets
+        
+        row = ','.join([ f'"{entry}"' for entry in settings[column_name] ])   # create list of array entries
+                                      #  array1              array2
+        rows_data += f"{column_name} = '{{{row}}}'"   # '{"item1","item2"}', '{"item1","item2"}' correct format for sql
+
+    # assemble into sql command
+    #sql_command = f"INSERT INTO {table} (uuid_user, {column_names} ) VALUES ('{uuid}', {rows_data});"
+    
+    # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
+    sql_command = f"UPDATE {first_key} SET {rows_data} WHERE uuid_user = '{uuid}';"
+    
+    print(db)
+    print(sql_command)    
+    #db.execute(sql_command)
+    #db.commit()
+    
+
+# EG DB write
+# UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
+# UPDATE default_filters
+# UPDATE tag_sets
 def update_user_info_dict(user_settings):
     uuid = user_settings['UUID']
     
@@ -1055,4 +1100,12 @@ if __name__ == '__main__':
     print( construct_sql_query_to_include_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_inc') )
     
     print(build_search_query(' prawn , crab , mango ', default_filters))
+    
+    test_default_filters = { 'default_filters': {'allergens': ['greedy twats', 'fake people'],
+                             'ingredient_exc': ['coriander'],
+                             'tags_exc': [],
+                             'tags_inc': ['ns_pregnant']} }
+    
+    update_settings_table_for_uuid('theDB', '014752da-b49d-4fb0-9f50-23bc90e44298', test_default_filters)
+    
     

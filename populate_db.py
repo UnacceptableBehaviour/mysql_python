@@ -157,6 +157,17 @@ def create_sql_insert_tags_array_text(tags):
     
     return sql_insert
 
+#
+def get_default_tag_sets_dictionary():
+    return { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','shellfish','alcohol','celery','gluten','soya','sulphur_dioxide'],
+             'ingredient_exc': [],
+             'tags_exc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
+             'tags_inc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
+             'type_exc': [],
+             'type_inc': ['component','amuse','side','starter','fish','lightcourse','main','crepe','dessert','p4','cheese','comfort','low_cal','serve_cold','serve_rt','serve_warm','serve_hot']
+            }        
+
+
 
 def create_entry_in_db(db, table, entry):
 
@@ -243,6 +254,32 @@ def drop_tables_for_fresh_start(data_base, tables):
     
     return
 
+def insert_default_tag_sets_for_user(db, uuid, table = 'tag_sets'):
+    # create DB INSERT command
+    # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
+    #create_sql_insert_tags_array_text(tags)
+        
+    tag_sets = get_default_tag_sets_dictionary()
+        
+    column_names = ','.join([ f"{tag_set}" for tag_set in tag_sets ])
+
+    rows_data = ""
+    for tag_set in tag_sets:
+        if rows_data != "": rows_data += ','                              # comma between sets
+        
+        row = ','.join([ f'"{entry}"' for entry in tag_sets[tag_set] ])   # create list of array entries
+                                      #  array1              array2
+        rows_data += f"'{{{row}}}'"   # '{"item1","item2"}', '{"item1","item2"}' correct format for sql
+
+    # assemble into sql command
+    sql_command = f"INSERT INTO {table} (uuid_user, {column_names} ) VALUES ('{uuid}', {rows_data});"
+
+    print(sql_command)
+    db.execute(sql_command)
+    db.commit()
+
+
+
 
 def main():
     # execute this query
@@ -281,11 +318,16 @@ def main():
     db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
 
+    # TODO - includes above tables in this loop
     # create setings tables
     for table in settings_tables_templates:
         sql_template = template_folder.joinpath(table)        
         db_lines = create_table_in_database_from_sql_template(db, sql_template)        
         print(db_lines)
+
+    # insert default values into tag_sets
+    uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    insert_default_tag_sets_for_user(db, uuid)
         
 
     # http-server -p 8000 --cors
@@ -356,3 +398,8 @@ if __name__ == '__main__':
     main()
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
+    
+    # tests
+    
+    
+    
