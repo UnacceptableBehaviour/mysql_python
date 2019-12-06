@@ -28,6 +28,7 @@ include=[
 graphviz = GraphvizOutput(output_file='filter_A.png')
 # add profiling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+from pathlib import Path
 
 # loads csv file from server and loads into database LIVE
 
@@ -253,26 +254,39 @@ def main():
     
     force_drop_tables = True # False
     
+    settings_tables_templates = ['db_table_default_filters.sql','db_table_devices.sql','db_table_tag_sets.sql','db_table_user_devices.sql']
+    
+    settings_tables = ['default_filters','devices','tag_sets','user_devices']
+    recipe_tables = ['recipes','exploded','atomic_ingredients']
+    
+    template_folder = Path('/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/')
+    
     if (force_drop_tables == True or force_complete_rebuild == True):
         # DROP TABLES
-        drop_tables_for_fresh_start(db, ['recipes','exploded','atomic_ingredients'])
+        drop_tables_for_fresh_start(db, settings_tables + recipe_tables)
     
     
     # create recipes table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_table_def.sql'    
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_recipe_table_def.sql'    
     db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
 
     # create exploded recipes table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/recipe_exploded_table_def.sql'
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_recipe_exploded_table_def.sql'
     db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
     
     # create ingredients table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/atomic_ingredients_table_def.sql'
+    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_atomic_ingredients_table_def.sql'
     db_lines = create_table_in_database_from_sql_template(db, sql_template)        
     print(db_lines)
 
+    # create setings tables
+    for table in settings_tables_templates:
+        sql_template = template_folder.joinpath(table)        
+        db_lines = create_table_in_database_from_sql_template(db, sql_template)        
+        print(db_lines)
+        
 
     # http-server -p 8000 --cors
     # url_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'

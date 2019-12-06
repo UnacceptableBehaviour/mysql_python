@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS user_devices (
+  uuid_user VARCHAR(100) NOT NULL UNIQUE PRIMARY KEY,
+  uuid_dev VARCHAR(100) NOT NULL
+);
