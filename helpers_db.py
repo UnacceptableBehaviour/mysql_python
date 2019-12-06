@@ -871,7 +871,7 @@ def get_user_info_name_uuid_dict(uuid):
         return None
 
 
-
+# WORKS - integrate
 def update_settings_table_for_uuid(db, uuid, dict_w_table):
     # create DB INSERT command
     # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
