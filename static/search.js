@@ -152,7 +152,7 @@ function renderGalleryFromResult(recipeList){
 
   var html_gallery = `<div class="row padding">
       <div class="card-columns">
-          <form action='/db_recipe_page' method='POST'>
+          <form action='/recipe_page' method='POST'>
             ${htmlInnerGallery}
           </form>
       </div>

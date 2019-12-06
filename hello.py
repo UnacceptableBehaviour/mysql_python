@@ -564,13 +564,19 @@ def db_nutrients_compare():
 
 
 
-@app.route('/db_recipe_page/<ri_id>', methods=["GET", "POST"])
-def db_recipe_page(ri_id):
+@app.route('/recipe_page', methods=["GET", "POST"])
+def db_recipe_page():        
     
-    print(f"db_recipe_page: {ri_id} - {type(ri_id)}")
+    ri_id = 3202
     
     # route from gallery or other recipe request routes
-    if request.method =='POST':    
+    if request.method =='POST':
+        print("POST                            - - - < db_recipe_page - S = = = =*=*")
+        pprint(request.args.to_dict())
+        print("POST                            - - - < db_recipe_page - M = = = =*=*")
+        pprint(request)
+        print("POST                            - - - < db_recipe_page - E = = = =*=*")
+        
         for key, val in request.form.items():
             print(f"POST k: {key} - v: {val} <")
             if re.match(r'gallery_button_', key):
@@ -583,16 +589,7 @@ def db_recipe_page(ri_id):
         print("GET                            - - - < db_recipe_page")        
         pprint(incoming_dict)
         if 'text' in incoming_dict:
-            ri_id = int(incoming_dict['text'])
-        
-    if request.method =='POST':
-        print("POST                            - - - < db_recipe_page - S = = = =*=*")
-        pprint(request.args.to_dict())
-        print("POST                            - - - < db_recipe_page - M = = = =*=*")
-        pprint(request)
-        print("POST                            - - - < db_recipe_page - E = = = =*=*")
-
-    headline_py = "single recipe page"
+            ri_id = int(incoming_dict['text'])    
     
     #recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
     recipe = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id)
@@ -603,7 +600,7 @@ def db_recipe_page(ri_id):
     pprint(recipes)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
     
-    return render_template("recipe_t.html", headline=headline_py, recipes=recipes)
+    return render_template("recipe_t.html", recipes=recipes)
 
 
 @app.route('/buton_7', methods=["GET", "POST"])
