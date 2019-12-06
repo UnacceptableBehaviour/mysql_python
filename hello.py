@@ -180,7 +180,7 @@ def query_status_w_js():
 def weigh_in():
     # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
     #                                <!--and _page for the content-->
-    # <!--TODO - recipe_t.html recipe_page.html-->
+    # <!--TODO - recipe_t.html recipe_page.html--> DONE
     # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
 
     dtk = get_daily_tracker_from_DB() # TODO uuid/session
@@ -206,6 +206,7 @@ def buttons_inputs():
     rxD = '*'
     arr_get = ['A','B','C','D']
     arr_post = ['L','M','N','O']
+    data = {}
         
     incoming_dict = request.args.to_dict()          # for method=GET - contents of query string which is part of URL after question mark 
     print(f">-----> requesting: {type(request)}")
@@ -563,8 +564,10 @@ def db_nutrients_compare():
 
 
 
-@app.route('/db_recipe_page', methods=["GET", "POST"])
-def db_recipe_page():
+@app.route('/db_recipe_page/<ri_id>', methods=["GET", "POST"])
+def db_recipe_page(ri_id):
+    
+    print(f"db_recipe_page: {ri_id} - {type(ri_id)}")
     
     # route from gallery or other recipe request routes
     if request.method =='POST':    
@@ -573,9 +576,6 @@ def db_recipe_page():
             if re.match(r'gallery_button_', key):
                 ri_id = int(val)
     
-    else:
-        # default recipe
-        ri_id = 2403 # loaded by GET below
     
     incoming_dict = request.args.to_dict()
     
@@ -603,7 +603,7 @@ def db_recipe_page():
     pprint(recipes)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
     
-    return render_template("recipe_page.html", headline=headline_py, recipes=recipes)
+    return render_template("recipe_t.html", headline=headline_py, recipes=recipes)
 
 
 @app.route('/buton_7', methods=["GET", "POST"])

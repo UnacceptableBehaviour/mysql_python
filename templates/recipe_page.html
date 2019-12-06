@@ -1,46 +1,83 @@
-{% extends 'nav_buttons.html' %}
-
-{% block header %}
-    <!-- NO WORK - recipe.css not included ?? Works fine for gallery.html ??? -->
-    <!--<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='recipe.css') }}">-->
-
-    <!--<link rel="stylesheet" href="/static/recipe.css">    <!-- NO WORK not included -->
-    <!--<link rel="stylesheet" type="text/css" href="/static/recipe.css">  <!-- NO WORK not included -->
-    <!--<link rel="stylesheet" type="text/css" href="static/recipe.css">  <!-- NO WORK not included -->
-    
-    <!--<link rel= "stylesheet" type="text/css" href="{{ url_for('static',filename='static/recipe.css') }}">-->
-                                                                        <!-- NO WORK ^ extra static -->
-                                                                        
-    <!--<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='recipe.css') }}">-->
-
-    <!--<link rel="stylesheet" href="{{ url_for( 'static', filename='recipe.css') }}"> <!-- NO WORK not included -->
-
-    <!-- WORKS -->
-    <style>     
-    
-    .btn-group-xs > .btn, .btn-xs {
-      padding: .25rem .4rem;
-      font-size: .875rem;
-      line-height: .5;
-      border-radius: .2rem;
-    }
-        
-    </style>
-
-    <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->
-
-{% endblock %}
-
-
 {% block content %}
+<div class="container-fluid padding">
+	<div class="row padding">   
+        
+		<!-- if re-writing in JS . . ?
+        rename so there is a root variable tha allows multiple recipe
+        de-reference into the leaf? 
+        -->
+        <script>      
+          var recipes = {{ recipes|tojson }};                       // convert info using tojson filter		  
+          console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check      
+        </script>
 
-    {% include 'recipe_t.html' %}
-    
-    <br>
+		
+        <!--<div class="col-md-12">-->
+		<div>
+            <div class="card">
+                <img class="card-img-top" src="http://192.168.1.13:8000/static/recipe/{{recipes[0]['image_file']}}"></img>
+                <div class="card-body">
+                    <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
+                    <p class="card-text">{{ recipes[0]['description'] }}</p>
+                    <h4 class="card-title">components
+                        <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
+                    </h4>
+					<h5>(makes {{recipes[0]['nutrinfo']['yield']|int}}g / {{recipes[0]['nutrinfo']['servings']|int}} servings)</h6></h5>
+                    
+					<!--headline ingredients--> 
+					<table class="card-text" width='100%'>
+						{% for ingd_line in recipes[0]['ingredients'] %}
+						<tr>  <!--ingredient row items-->
+							<td>{{ingd_line[1]}}</td>			<!-- qty -->
+							  {% if ingd_line[2] == '(0)' %}	<!-- servings -->
+								  <td></td>
+							  {% else %}
+								  <td>{{ingd_line[2]}}</td>
+							  {% endif %}                          
+							<td>{{ingd_line[3]}}</td>			<!-- ingredient -->
+							  {% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
+							  {% else %}
+								<td></td>
+							  {% endif %}
+							<!--extra small button - relies on additional styling recipe.css-->
+							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->							  
+						</tr>
+						{% endfor %}
+					</table>
+					<br>
+					{% if recipes[0]['components']|length > 0 %}
+                    <h5 class="card-title">ingredients</h5>
+					{% endif %}
+					<table class="card-text" width='100%'>
+						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}	<!-- ingredients for each component -->				  
+						  <tr><td colspan="4"><h6><b>{{cmp_name}}</b> (makes {{cmp_rcp['nutrinfo']['yield']|int}}g / {{cmp_rcp['nutrinfo']['servings']|int}} servings)</h6></td></tr>
+							  {% for ingd_line in cmp_rcp['ingredients'] %}
+								  <tr>  <!--ingredient row items-->
+									  <td>{{ingd_line[1]}}</td>			<!-- qty -->
+										{% if ingd_line[2] == '(0)' %}	<!-- servings -->
+											<td></td>
+										{% else %}
+											<td>{{ingd_line[2]}}</td>
+										{% endif %}                          
+									  <td>{{ingd_line[3]}}</td>			<!-- ingredient -->
+										{% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+										  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
+										{% else %}
+										  <td></td>
+										{% endif %} 
+								  </tr>
+							  {% endfor %}						
+						  <tr><td><br></td></tr>
+						{% endfor %}
+					</table>
+                </div>
+            </div>
 
-    <p>{{ recipes[0]['ri_id'] }} : {{ recipes[0]['ri_name'] }} <br>
-    Serving size {{ recipes[0]['nutrinfo']['serving_size'] }}g <br>
-    Yield: {{ recipes[0]['nutrinfo']['yield'] }}g - Servings: {{ recipes[0]['nutrinfo']['servings'] }} 
-    </p>
+            {% include 'nutrient_traffic_lights.html' %}
+        </div>    
+    </div>
+</div>
+
 
 {% endblock %}

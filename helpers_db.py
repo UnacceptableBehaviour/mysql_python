@@ -12,6 +12,7 @@
 import itertools
 import re
 import copy                 # copy.deepcopy()
+import os
 
 from datetime import datetime
 #datetime.now()
@@ -27,7 +28,8 @@ from pprint import pprint # giza a look
 print("----- helpers_db: attaching to DB ------------------------------------S")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
+#engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
+engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 

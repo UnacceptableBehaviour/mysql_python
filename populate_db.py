@@ -105,7 +105,10 @@ force_complete_rebuild = False
 force_complete_rebuild = True
 
 if ( force_complete_rebuild == True ):
-    population_data = subprocess.check_output(['populate_asset_server.rb'])
+    # .rb find txt recipes and jpgs of those recipes
+    # resizes images and copies both to asset server
+    # also creates a CSV file with synopsis, and nutrition info for creating DB (done by this script)
+    population_data = subprocess.check_output(['populate_asset_server.rb'])    
     print(population_data)
 else:
     print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
