@@ -926,44 +926,39 @@ def update_settings_table_for_uuid(db, uuid, dict_w_table):
 #         ^           column_name       rows_data
 #      table_key > dict of arrays  
 def update_settings_tables_for_uuid(db, user_settings):
+    pprint(user_settings)
+    
     uuid = user_settings['UUID']
     
-    table_list = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+    #table_list = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+    table_list = ['default_filters','tag_sets']
     
-    tables_data = ""    
     for table_key in iter(user_settings):
-        print(f"- - - - - - - - - - - - - - - - - - - - - - - - table_key:{table_key}")
+        #print(f"- - - - - - - - - - - - - - - - - - - - - - - - table_key:{table_key}")
         if table_key not in table_list: continue
-        
-        if tables_data != "": tables_data += ','            # comma between sets                                                        
             
-        settings = user_settings[table_key]            
+        settings = user_settings[table_key]
     
-        rows_data = ""
+        column_update = ""
         for column_name in settings:
-            if rows_data != "": rows_data += ','            # comma between sets                                                        
+            if column_update != "": column_update += ','            # comma between sets                                                        
                                                             # create list of array entries
             row = ','.join([ f'"{entry}"' for entry in settings[column_name] ])                                                           
-                                                            #  array1              array2
-            rows_data += f"{column_name} = '{{{row}}}'"     # '{"item1","item2"}', '{"item1","item2"}' 
-    
-        tables_data += rows_data
+                                                            # col     array1              col          array2
+            column_update += f"{column_name} = '{{{row}}}'"     # tags = '{"item1","item2"}', allergens = '{"item1","item2"}'             
         
-    # assemble into sql command
-    # UPDATE tag_sets SET
-    #                   ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}',
-    #                   tags_inc = '{"vegan","veggie"}'
-    #                 WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
-    sql_command = f"UPDATE {table_key} SET {tables_data} WHERE uuid_user = '{uuid}';"
+        # assemble into sql command
+        # UPDATE tag_sets SET
+        #                   ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}',
+        #                   tags_inc = '{"vegan","veggie"}'
+        #                 WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
+        sql_command = f"UPDATE {table_key} SET {column_update} WHERE uuid_user = '{uuid}';"
+        
+        #print(f"TK:{table_key}\nROW:{column_update}\nSQL:{sql_command}")
+        db.execute(sql_command)
+        db.commit()
 
 
-# UPDATE default_filters SET allergens = '{"greedy twats","fake people"}',ingredient_exc = '{"coriander"}',tags_exc = '{}',tags_inc = '{"ns_pregnant"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
-# UPDATE tag_sets SET  WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
-        
-    print(sql_command)    
-    #db.execute(sql_command)
-    #db.commit()
-    
     
 
 # EG DB write
@@ -977,7 +972,8 @@ def update_user_info_dict(user_settings):
         user_db[uuid].update(user_settings)
         commit_User_DB()
         
-        update_settings_tables_for_uuid
+        # 
+        update_settings_tables_for_uuid(helper_db_class_db, user_settings)
         return True
     
     except KeyError as e:
@@ -1166,11 +1162,11 @@ if __name__ == '__main__':
     update_settings_table_for_uuid('theDB', '014752da-b49d-4fb0-9f50-23bc90e44298', test_default_filters)
     
     print("\n\nMulti UPDATE Command < - - - <<")
-    user_settings = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298',
- 'default_filters': {'allergens': [],
+    user_settings = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44297',
+ 'default_filters': {'allergens': ['dairy'],
                      'ingredient_exc': ['coriander'],
-                     'tags_exc': [],
-                     'tags_inc': ['ns_pregnant', 'gluten_free']},
+                     'tags_exc': ['ns_pregnant'],
+                     'tags_inc': ['gluten_free']},   # difficult customer
  'name': 'Simon',
  'tag_sets': {'allergens': ['dairy',
                             'sulphur_dioxide'],

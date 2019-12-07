@@ -319,6 +319,7 @@ def main():
     print(db_lines)
 
     # TODO - includes above tables in this loop
+    # insert default_filters                                TODO -
     # create setings tables
     for table in settings_tables_templates:
         sql_template = template_folder.joinpath(table)        
