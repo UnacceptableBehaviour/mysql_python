@@ -29,47 +29,20 @@
 searchButton = document.getElementById('but-recipe-search');
 searchButton.addEventListener('click', searchForRecipe);
 
-formField = document.getElementById('recipe-search-1-inrow');
-formValue = document.getElementById('recipe-search-2-inrow');
-formLogic = document.getElementById('recipe-search-3-inrow');
 
-formField.placeholder = 'tags';
-formValue.placeholder = 'search string';
-formLogic.placeholder = 'contains';
-
+searchFrom = document.getElementById('recipe-search-2-inrow');
+searchFrom.placeholder = 'search string';
+searchFrom.addEventListener('keyup', function(event) {   // act on hit return key
+  if (event.key === "Enter") { searchForRecipe(); }
+});
 
 
 function searchForRecipe (){
-  formField.value = 'tags';
-  //formValue.value = 'vegan';            << USE ACTUAL FORM VALUE!
-  formLogic.value = 'contains';
   
-  if ( (formField.value === "")|| (formValue.value === "")|| (formLogic.value === "") ) {
-    // user pressed SEARCH w/o entering values - see if place holder values valid        
-    console.log("INVALID SEARCH VALUES");
-    
-    // TODO flash the form(s) missing data in red then fade to normal
-    
-    return;
-  }
-
-  //var query = {
-  //  field: formField.value,
-  //  value: formValue.value,
-  //  logic: formLogic.value,
-  //}
-  //
-  //var search = [query];
+  search = searchFrom.value;
   
-  search = formValue.value;
-
-  //query =  = {
-  //  field: [formField.value],
-  //  value: [formValue.value],
-  //  logic: [formLogic.value],
-  //}
-  
-  
+  if (search === "") search ='%';
+ 
   // post info to DB
   fetch( '/search_ingredient', {
     method: 'POST',                                             // method (default is GET)

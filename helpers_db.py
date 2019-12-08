@@ -575,9 +575,12 @@ def build_search_query(search, default_filters):
         filter_sub_queries = construct_sql_query_to_include_tags(default_filters['tags_inc'], bubble_columns, filter_sub_queries, 'tags_inc')
                                                   #//\\#
         print("filter_sub_queries:", filter_sub_queries)
-    
-    #search_query = f"SELECT ri_id,ri_name FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters WHERE -*insert*-;"
-    search_query = f"SELECT ri_id FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters WHERE -*insert*-;"
+        
+    #search_query = f"SELECT ri_id FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters WHERE -*insert*-;"
+    # returns duplicates! ^^
+    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters ) distict_ids WHERE -*insert*-;"
+    # added DISTINCT to remove duplicates    
+    # SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM ( SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE ('vegan' = ANY(tags)) ) tags_inc ) all_filters) distict_ids WHERE (igd LIKE '%');
 
     insert = ""
     for ingredient in search_words:

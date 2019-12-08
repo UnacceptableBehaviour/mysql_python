@@ -26,7 +26,7 @@ from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_from_nix
 from helpers_db import process_search
-from helpers_db import get_user_info_dict, update_user_info_dict, get_search_settings_dict
+from helpers_db import get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
 
 from helpers_tracker import get_daily_tracker_from_DB, store_daily_tracker_to_DB, post_DTK_info_for_processing, post_interface_file
 from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
@@ -333,7 +333,7 @@ def settings():
     #     'type_exc': [],
     #     'ingredient_exc': [] }
         
-    user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
     
     return render_template('settings_t.html', user_info=user_info)
@@ -343,8 +343,9 @@ last_search_result_recipes = {}
 
 @app.route('/search_ingredient', methods=["GET", "POST"])
 def search_ingredient():
-    global last_search_result_recipes # what the point of a global if it isn't implicitly global?
-    user_info = get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298')
+    global last_search_result_recipes # what the point of a global if it isn't implicitly global? TODO
+    
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
     
     # process search post - query database
     # get all recipes with search criterea    
