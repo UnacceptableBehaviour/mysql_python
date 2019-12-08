@@ -158,15 +158,22 @@ def create_sql_insert_tags_array_text(tags):
     return sql_insert
 
 #
-def get_default_tag_sets_dictionary():
-    return { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','shellfish','alcohol','celery','gluten','soya','sulphur_dioxide'],
-             'ingredient_exc': [],
-             'tags_exc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
-             'tags_inc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
-             'type_exc': [],
-             'type_inc': ['component','amuse','side','starter','fish','lightcourse','main','crepe','dessert','p4','cheese','comfort','low_cal','serve_cold','serve_rt','serve_warm','serve_hot']
-            }        
+def get_default_tag_sets_dictionary(state = 'with_defaults'):
+    # defaults
+    tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','shellfish','alcohol','celery','gluten','soya','sulphur_dioxide'],
+                'ingredient_exc': [],
+                'tags_exc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
+                'tags_inc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
+                'type_exc': [],
+                'type_inc': ['component','amuse','side','starter','fish','lightcourse','main','crepe','dessert','p4','cheese','comfort','low_cal','serve_cold','serve_rt','serve_warm','serve_hot']
+               }        
 
+    # clear lists
+    if state == 'empty':
+        for name_of_tagset in tag_sets:
+            tag_sets[name_of_tagset] = []
+
+    return tag_sets
 
 
 def create_entry_in_db(db, table, entry):
@@ -254,12 +261,20 @@ def drop_tables_for_fresh_start(data_base, tables):
     
     return
 
-def insert_default_tag_sets_for_user(db, uuid, table = 'tag_sets'):
+def insert_empty_default_filters_for_user(db, uuid):
+    empty_default_filters = get_default_tag_sets_dictionary('empty')
+    insert_tags_for_table_for_user(db, uuid, 'default_filters', empty_default_filters)
+
+
+def insert_default_tag_sets_for_user(db, uuid):
+    tag_sets = get_default_tag_sets_dictionary('with_defaults')
+    insert_tags_for_table_for_user(db, uuid, 'tag_sets', tag_sets)
+
+
+def insert_tags_for_table_for_user(db, uuid, table, tag_sets):
     # create DB INSERT command
     # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
-    #create_sql_insert_tags_array_text(tags)
-        
-    tag_sets = get_default_tag_sets_dictionary()
+    #create_sql_insert_tags_array_text(tags)            
         
     column_names = ','.join([ f"{tag_set}" for tag_set in tag_sets ])
 
@@ -277,8 +292,6 @@ def insert_default_tag_sets_for_user(db, uuid, table = 'tag_sets'):
     print(sql_command)
     db.execute(sql_command)
     db.commit()
-
-
 
 
 def main():
@@ -329,7 +342,8 @@ def main():
     # insert default values into tag_sets
     uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
     insert_default_tag_sets_for_user(db, uuid)
-        
+    insert_empty_default_filters_for_user(db, uuid)
+
 
     # http-server -p 8000 --cors
     # url_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'
