@@ -871,40 +871,40 @@ def get_user_info_name_uuid_dict(uuid):
         return None
 
 
-# WORKS - integrate
-def update_settings_table_for_uuid(db, uuid, dict_w_table):
-    # create DB INSERT command
-    # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
-    # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
-    #create_sql_insert_tags_array_text(tags)
-     # 'default_filters': { 'allergens': [],
-     #         ^            'ingredient_exc': ['coriander', 'bad sausage'],
-     #         ^            'tags_exc': ['ns_pregnant'],
-     #         ^            'tags_inc': },
-     #         ^              ^
-     #         ^              ^
-     #      first key > dict of arrays
-        
-    # dict.values().first?
-    # dict.keys().first - next(iter(dict)) - get first key
-    first_key_table = next(iter(dict_w_table))
-    settings = dict_w_table[first_key_table]
-
-    rows_data = ""
-    for column_name in settings:
-        if rows_data != "": rows_data += ','            # comma between sets                                                        
-                                                        # create list of array entries
-        row = ','.join([ f'"{entry}"' for entry in settings[column_name] ])                                                           
-                                                        #  array1              array2
-        rows_data += f"{column_name} = '{{{row}}}'"     # '{"item1","item2"}', '{"item1","item2"}' 
-
-    # assemble into sql command
-    # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
-    sql_command = f"UPDATE {first_key_table} SET {rows_data} WHERE uuid_user = '{uuid}';"
-    
-    print(sql_command)    
-    #db.execute(sql_command)
-    #db.commit()
+# # WORKS - integrate
+# def update_settings_table_for_uuid(db, uuid, dict_w_table):
+#     # create DB INSERT command
+#     # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
+#     # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
+#     #create_sql_insert_tags_array_text(tags)
+#      # 'default_filters': { 'allergens': [],
+#      #         ^            'ingredient_exc': ['coriander', 'bad sausage'],
+#      #         ^            'tags_exc': ['ns_pregnant'],
+#      #         ^            'tags_inc': },
+#      #         ^              ^
+#      #         ^              ^
+#      #      first key > dict of arrays
+#         
+#     # dict.values().first?
+#     # dict.keys().first - next(iter(dict)) - get first key
+#     first_key_table = next(iter(dict_w_table))
+#     settings = dict_w_table[first_key_table]
+# 
+#     rows_data = ""
+#     for column_name in settings:
+#         if rows_data != "": rows_data += ','            # comma between sets                                                        
+#                                                         # create list of array entries
+#         row = ','.join([ f'"{entry}"' for entry in settings[column_name] ])                                                           
+#                                                         #  array1              array2
+#         rows_data += f"{column_name} = '{{{row}}}'"     # '{"item1","item2"}', '{"item1","item2"}' 
+# 
+#     # assemble into sql command
+#     # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
+#     sql_command = f"UPDATE {first_key_table} SET {rows_data} WHERE uuid_user = '{uuid}';"
+#     
+#     print(sql_command)    
+#     db.execute(sql_command)
+#     db.commit()
 
 
 
@@ -954,9 +954,12 @@ def update_settings_tables_for_uuid(db, user_settings):
         #                 WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
         sql_command = f"UPDATE {table_key} SET {column_update} WHERE uuid_user = '{uuid}';"
         
-        #print(f"TK:{table_key}\nROW:{column_update}\nSQL:{sql_command}")
+        #print(f"TK:{table_key}\nROW:{column_update}\nSQL:{sql_command}")        
         db.execute(sql_command)
-        db.commit()
+        print(f"***** SQL WRITE:\n{sql_command}\n\nRESULT: {db.commit()} <\n\n")
+        # TODO - commit return None on success?
+        # how is failure reporte?
+        
 
 
     
