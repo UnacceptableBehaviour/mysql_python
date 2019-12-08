@@ -157,7 +157,8 @@ def create_sql_insert_tags_array_text(tags):
     
     return sql_insert
 
-#
+# TODO DRY out - USE helpers_db.get_search_settings_dict()
+# single unified source of default tag sets
 def get_default_tag_sets_dictionary(state = 'with_defaults'):
     # defaults
     tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','shellfish','alcohol','celery','gluten','soya','sulphur_dioxide'],
@@ -303,10 +304,16 @@ def main():
     #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine
     
     force_drop_tables = True # False
+
+    # insert default_filters
+    # create setings tables    
+    user_settings_tables_templates = ['db_table_default_filters.sql','db_table_devices.sql','db_table_tag_sets.sql','db_table_user_devices.sql','db_table_usernames.sql']
+    # create recipes table
+    # create exploded recipes table
+    # create ingredients table
+    recipe_table_templates = ['db_table_recipe_table_def.sql','db_table_recipe_exploded_table_def.sql','db_table_atomic_ingredients_table_def.sql']
     
-    settings_tables_templates = ['db_table_default_filters.sql','db_table_devices.sql','db_table_tag_sets.sql','db_table_user_devices.sql']
-    
-    settings_tables = ['default_filters','devices','tag_sets','user_devices']
+    settings_tables = ['default_filters','devices','tag_sets','user_devices','usernames']
     recipe_tables = ['recipes','exploded','atomic_ingredients']
     
     template_folder = Path('/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/')
@@ -315,26 +322,9 @@ def main():
         # DROP TABLES
         drop_tables_for_fresh_start(db, settings_tables + recipe_tables)
     
-    
-    # create recipes table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_recipe_table_def.sql'    
-    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
-    print(db_lines)
+    table_templates_to_initialize = recipe_table_templates + user_settings_tables_templates
 
-    # create exploded recipes table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_recipe_exploded_table_def.sql'
-    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
-    print(db_lines)
-    
-    # create ingredients table
-    sql_template = '/Users/simon/a_syllabus/lang/python/repos/mysql_python/static/db_table_atomic_ingredients_table_def.sql'
-    db_lines = create_table_in_database_from_sql_template(db, sql_template)        
-    print(db_lines)
-
-    # TODO - includes above tables in this loop
-    # insert default_filters                                TODO -
-    # create setings tables
-    for table in settings_tables_templates:
+    for table in table_templates_to_initialize:
         sql_template = template_folder.joinpath(table)        
         db_lines = create_table_in_database_from_sql_template(db, sql_template)        
         print(db_lines)

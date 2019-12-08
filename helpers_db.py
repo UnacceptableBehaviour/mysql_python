@@ -684,7 +684,6 @@ def bootstrap_daily_tracker_create(uuid):
     return dtk
 
 
-
 def commit_dict_to_DB(db, data_set):
     '''
     commit data for key data_set - if no file - create it
@@ -825,7 +824,8 @@ def get_search_settings_dict(empty=False):
     return default_filters
 
 
-def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):    
+def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
+    # Tables for get_user: user_devices, devices, default_filters, tag_sets, usernames, dtk
     # https://docs.python.org/3/library/uuid.html
     # maybe use domain version, have a think
     default_user_settings = {
@@ -851,6 +851,44 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
     except e:
         raise('What could possibly go wrong!?', e)
 
+# DATABASE_URL
+def get_user_info_dict_from_DB(uuid):
+    request_tables = ['default_filters','tag_sets']#,'usernames']
+    # get_filter_colums(from_central_source)
+    filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+    
+    username = helper_db_class_db.execute("SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+    if username == None: username = 'Aardvark' # Place holder until logins implemented
+    
+    
+    return_user_info = {'UUID':uuid, 'name':username}
+    
+    print(f"RETRIEVING FROM DB - {uuid} ( -o- )")
+    
+
+    tag_sets_and_filters = {}
+    
+    for table in request_tables:
+        tag_sets_and_filters[table] = {}
+        # SELECT * FROM default_filters WHERE uuid_user='014752da-b49d-4fb0-9f50-23bc90e44298';    
+        sql_query = f"SELECT * FROM {table} WHERE uuid_user='{uuid}';"
+        print(f"\nTABLE {table} - SQL: {sql_query} < - - - - - < <")
+        
+        #db_lines = helper_db_class_db.execute(sql_query).fetchall()  - returns list of RowProxy
+        #pprint(db_lines[0]['allergens'])
+        
+        tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy
+        
+        for col in filter_cols:
+            tag_sets_and_filters[table][col] = tagdata_for_table[col]                
+        
+    return_user_info.update(tag_sets_and_filters)
+    
+    #pprint(return_user_info)
+    
+    print(f"RETRIEVING FROM DB - {uuid} ( -o- )")    
+    return return_user_info
+
 
 def get_user_info_dict(uuid):
     try:
@@ -861,7 +899,7 @@ def get_user_info_dict(uuid):
 
 
 def get_user_info_name_uuid_dict(uuid):
-    u_info = get_user_info_dict(uuid)
+    u_info = get_user_info_dict_from_DB(uuid)
 
     try:
         return { 'UUID': u_info['UUID'],'name':u_info['name'] }
@@ -869,44 +907,6 @@ def get_user_info_name_uuid_dict(uuid):
     except KeyError as e:
         raise(DBAccessKeyError("get_user_info_name_uuid_dict ERROR", e))
         return None
-
-
-# # WORKS - integrate
-# def update_settings_table_for_uuid(db, uuid, dict_w_table):
-#     # create DB INSERT command
-#     # INSERT INTO tag_sets ('uuid_user', 'allergens', 'ingredient_exc', . . ) VALUES (uuid, {tags}, {tags});
-#     # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
-#     #create_sql_insert_tags_array_text(tags)
-#      # 'default_filters': { 'allergens': [],
-#      #         ^            'ingredient_exc': ['coriander', 'bad sausage'],
-#      #         ^            'tags_exc': ['ns_pregnant'],
-#      #         ^            'tags_inc': },
-#      #         ^              ^
-#      #         ^              ^
-#      #      first key > dict of arrays
-#         
-#     # dict.values().first?
-#     # dict.keys().first - next(iter(dict)) - get first key
-#     first_key_table = next(iter(dict_w_table))
-#     settings = dict_w_table[first_key_table]
-# 
-#     rows_data = ""
-#     for column_name in settings:
-#         if rows_data != "": rows_data += ','            # comma between sets                                                        
-#                                                         # create list of array entries
-#         row = ','.join([ f'"{entry}"' for entry in settings[column_name] ])                                                           
-#                                                         #  array1              array2
-#         rows_data += f"{column_name} = '{{{row}}}'"     # '{"item1","item2"}', '{"item1","item2"}' 
-# 
-#     # assemble into sql command
-#     # UPDATE tag_sets SET ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}', tags_inc = '{"1","2"}' WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';    
-#     sql_command = f"UPDATE {first_key_table} SET {rows_data} WHERE uuid_user = '{uuid}';"
-#     
-#     print(sql_command)    
-#     db.execute(sql_command)
-#     db.commit()
-
-
 
   
 # Go through list of tables to update
@@ -924,7 +924,9 @@ def get_user_info_name_uuid_dict(uuid):
 #         ^              ^                  ^
 #         ^              ^                  ^
 #         ^           column_name       rows_data
-#      table_key > dict of arrays  
+#      table_key > dict of arrays
+#
+# DATABASE_URL
 def update_settings_tables_for_uuid(db, user_settings):
     pprint(user_settings)
     
@@ -972,10 +974,11 @@ def update_user_info_dict(user_settings):
     uuid = user_settings['UUID']
     
     try:
+        # local filesystem
         user_db[uuid].update(user_settings)
         commit_User_DB()
         
-        # 
+        # db defined in DATABASE_URL
         update_settings_tables_for_uuid(helper_db_class_db, user_settings)
         return True
     
@@ -1140,46 +1143,53 @@ if __name__ == '__main__':
     print("CREATE USER. . .")
     pprint(create_user('8e4475a5-218d-4153-8103-000764cf5555', {'name':'Candice'}))    
     print("ACCESS GRANTED?")
-    pprint(get_user_info_name_uuid_dict('014752da-b49d-4fb0-9f50-23bc90e44298'))
-    pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5ef6'))
-    #pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5555'))
-    
-    pprint(get_search_settings_dict())
-    pprint(get_search_settings_dict(True))
-    
-    bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
-    print("\n\nConstructing Query")
-          #construct_sql_query_to_exclude_tags(tag_list,                 bubble_columns,  db_name,    table_name_from_filter):
-    print( construct_sql_query_to_exclude_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_exc') )
+    pprint(get_user_info_name_uuid_dict('014752da-b49d-4fb0-9f50-23bc90e44298'))               
+
+ #    pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5ef6'))
+ #    #pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5555'))
+ #    
+ #    pprint(get_search_settings_dict())
+ #    pprint(get_search_settings_dict(True))
+ #    
+ #    bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
+ #    print("\n\nConstructing Query")
+ #          #construct_sql_query_to_exclude_tags(tag_list,                 bubble_columns,  db_name,    table_name_from_filter):
+ #    print( construct_sql_query_to_exclude_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_exc') )
+ #        
+ #    print( construct_sql_query_to_include_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_inc') )
+ #    
+ #    print(build_search_query(' prawn , crab , mango ', default_filters))
+ #    
+ #    print("\n\nSinge UPDATE Command < - - - <<")
+ #    test_default_filters = { 'default_filters': {'allergens': ['greedy twats', 'fake people'],
+ #                             'ingredient_exc': ['coriander'],
+ #                             'tags_exc': [],
+ #                             'tags_inc': ['ns_pregnant']} }
+ #    
+ #    update_settings_table_for_uuid('theDB', '014752da-b49d-4fb0-9f50-23bc90e44298', test_default_filters)
+ #    
+ #    print("\n\nMulti UPDATE Command < - - - <<")
+ #    user_settings = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44297',
+ # 'default_filters': {'allergens': ['dairy'],
+ #                     'ingredient_exc': ['coriander'],
+ #                     'tags_exc': ['ns_pregnant'],
+ #                     'tags_inc': ['gluten_free']},   # difficult customer
+ # 'name': 'Simon',
+ # 'tag_sets': {'allergens': ['dairy',
+ #                            'sulphur_dioxide'],
+ #              'ingredient_exc': ['coriander'],
+ #              'tags_exc': ['vegan',
+ #                           'ns_pregnant'],
+ #              'tags_inc': ['vegan',
+ #                           'ns_pregnant'],
+ #              'type_exc': [],
+ #              'type_inc': ['component',
+ #                           'serve_hot']}}
+ #    
+ #    update_settings_tables_for_uuid(helper_db_class_db, user_settings)
+ #    
+    pprint(get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298'))
         
-    print( construct_sql_query_to_include_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_inc') )
+    pprint( get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') )
     
-    print(build_search_query(' prawn , crab , mango ', default_filters))
-    
-    print("\n\nSinge UPDATE Command < - - - <<")
-    test_default_filters = { 'default_filters': {'allergens': ['greedy twats', 'fake people'],
-                             'ingredient_exc': ['coriander'],
-                             'tags_exc': [],
-                             'tags_inc': ['ns_pregnant']} }
-    
-    update_settings_table_for_uuid('theDB', '014752da-b49d-4fb0-9f50-23bc90e44298', test_default_filters)
-    
-    print("\n\nMulti UPDATE Command < - - - <<")
-    user_settings = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44297',
- 'default_filters': {'allergens': ['dairy'],
-                     'ingredient_exc': ['coriander'],
-                     'tags_exc': ['ns_pregnant'],
-                     'tags_inc': ['gluten_free']},   # difficult customer
- 'name': 'Simon',
- 'tag_sets': {'allergens': ['dairy',
-                            'sulphur_dioxide'],
-              'ingredient_exc': ['coriander'],
-              'tags_exc': ['vegan',
-                           'ns_pregnant'],
-              'tags_inc': ['vegan',
-                           'ns_pregnant'],
-              'type_exc': [],
-              'type_inc': ['component',
-                           'serve_hot']}}
-    
-    update_settings_tables_for_uuid(helper_db_class_db, user_settings)
+               
