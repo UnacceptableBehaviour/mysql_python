@@ -41,7 +41,7 @@ function searchForRecipe (){
   
   search = searchFrom.value;
   
-  if (search === "") search ='%';
+  if (search === "") search ='%'; // match anything - just use filters & tags - TODO randomise for roulette!
  
   // post info to DB
   fetch( '/search_ingredient', {
