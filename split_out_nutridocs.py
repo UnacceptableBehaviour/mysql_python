@@ -8,6 +8,7 @@
 from random import randint  # TODO - remove
 
 from pathlib import Path
+from shutil import copy2
 from pprint import pprint
 import re
 
@@ -18,6 +19,7 @@ from striprtf.striprtf import rtf_to_text
 FILE_LOC = 0
 TMP_PATH = 1
 NEW_FILE_PATH = 2
+ROOT_DATE = 3
 #
 def get_nutridoc_list_rtf():
     base_dir = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components')
@@ -79,9 +81,22 @@ def get_type_from_ingredients(igds):
 def get_images_from_lead_image(image):
     return 'implement_image_search.jpg'
 
+recipe_count = 0
+def get_zero_pad_6dig_count():
+    global recipe_count
+    recipe_count+=1
+    secs = recipe_count % 60
+    mins = int(recipe_count / 60 % 60)
+    hrs = int(recipe_count / 3600 % 24)
+    return f"{hrs:02}{mins:02}{secs:02}"
+
 
 TEMPLATE = Path('./scratch/date_time_recipe_name_template.txt')
-def produce_recipe_txts_from_costing_section(costing_section, target_path):
+def produce_recipe_txts_from_costing_section(costing_section, fileset):
+    
+    target_file_name = ''
+    target_path = fileset[TMP_PATH]
+    root_date = fileset[ROOT_DATE]
     
     # create regex
     PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)---", re.M | re.S)
@@ -93,17 +108,20 @@ def produce_recipe_txts_from_costing_section(costing_section, target_path):
         if 'calories' in name: continue        
         #print(f"name: {name},\n {serving_info},\n {ingredients},\n {tot_yield},\n {method}\n-\n")
         
-        lead_image = '20190101_165049_p_l_a_c_e__f_i_l_l_e_r__i_m_a_g_e.jpg'
+        lead_image = ''#'20190101_165049_p_l_a_c_e__f_i_l_l_e_r__i_m_a_g_e.jpg'
         
         # get lead image out of method (and remove line)
         try:
             image_match = re.search(r'^(image:(.*?)$)', method, re.M | re.S)
             remove_line,lead_image = image_match.groups()
             method = method.replace(remove_line, '')
+            target_file_name = lead_image.replace('.jpg', '.txt')
         except:
             pass
         
-        
+        # if no lead_image to base filename on - use root_date
+        if target_file_name == '':
+            target_file_name = f"{root_date}_{get_zero_pad_6dig_count()}_{name}.txt"
         
         insertion_dict = {  '__recipe_name__' : name,
                     '__serving_info__' : serving_info,
@@ -126,7 +144,25 @@ def produce_recipe_txts_from_costing_section(costing_section, target_path):
         for marker in insertion_dict:
             rcp = rcp.replace(marker, insertion_dict[marker])
         
+        place_txt_file = target_path.joinpath(target_file_name)
+        place_img_file = target_path.joinpath(lead_image)
+        source_img_file = target_path.parent.joinpath(lead_image)
+        print(place_txt_file)
+        print(source_img_file)
+        print(place_img_file)
         print(rcp)
+        
+        # write the recipe to folder
+        with place_txt_file.open('w') as f:
+            f.write(rcp)
+        
+        #if image exist copy it over
+        if lead_image != '':
+            copy2(source_img_file, place_img_file)
+            
+            
+            
+        
         # get the date_time_from lead image
         # recipe_file = target_path.joinpath(f"{root_date}_{incrementing_time}_{name})
         
@@ -161,32 +197,8 @@ if __name__ == '__main__':
         costing_section = get_costing_section_from_main_doc(nutridoc_text)
         #print(costing_section)
         
-        produce_recipe_txts_from_costing_section(costing_section, fileset[TMP_PATH])
+        produce_recipe_txts_from_costing_section(costing_section, fileset)
         
         print(fileset[FILE_LOC])
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
         if 'y951' in str(fileset[FILE_LOC]):break
-
-# Place __nutridoc.txt in dir
-# 
-# Scan txt with pattern
-# 
-# Template = open file
-# 
-# Insert matches into template:
-# T.replace (__tag__ ,match ?!
-# REGEX to 
-# 
-# For each
-
-
-
-
-
-
-
-
-
-
-
-
