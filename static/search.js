@@ -44,7 +44,7 @@ function searchForRecipe (){
   if (search === "") search ='%'; // match anything - just use filters & tags - TODO randomise for roulette!
  
   // post info to DB
-  fetch( '/search_ingredient', {
+  fetch( '/search', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
     body: JSON.stringify( { 'user':userUUID, 'search':search } )      // Payload        
@@ -88,7 +88,12 @@ function renderRecipeCard(rcpInfo){
   //    </div>
   //</div>
   
-  assets_url = 'http://192.168.1.13:8000/static/recipe/';
+  // TODO - serve from environment  
+  ASSET_ROOT = 'http://192.168.1.13:8000/'
+  assets_url = `${ASSET_ROOT}static/recipe/`; // local dev
+  
+  //ASSET_ROOT = ''
+  //assets_url = `${ASSET_ROOT}static/images/`; // heroku 
 
   var html_stars = '';
   for ( var i = 0; i < 5; i++ ) {

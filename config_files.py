@@ -28,6 +28,7 @@ if __name__ == '__main__':
     
     for key in __iface_files:
         file_info = Path(__iface_files[key])
+        # Path - examples
         # print(f"anchor: {file_info.anchor}")      #
         # print(f"parent:{file_info.parent}")       # path
         # print(f"stem: {file_info.stem}")          # basename no ext

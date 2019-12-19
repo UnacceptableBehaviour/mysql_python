@@ -341,10 +341,10 @@ def settings():
 
 last_search_result_recipes = {}
 
-@app.route('/search_ingredient', methods=["GET", "POST"])
+@app.route('/search', methods=["GET", "POST"])
 def search_ingredient():
     global last_search_result_recipes # what the point of a global if it isn't implicitly global? TODO
-    
+    search = ''    
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
     
     # process search post - query database
@@ -361,15 +361,11 @@ def search_ingredient():
             pprint(search)
         else:
             raise('Come on!!')
-        
-        
-        ri_ids = [301,1101,1202,1701,2301,2501,2902,3301,3401]
-        #search = ''
+                                
         ri_ids = process_search(search, user_info['default_filters'])
         
         last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
         
-        #return render_template('gallery.html', recipes=recipes)
         return json.dumps(last_search_result_recipes), 200
     
     else:
@@ -576,12 +572,17 @@ def db_recipe_page():
         pprint(request.args.to_dict())
         print("POST                            - - - < db_recipe_page - M = = = =*=*")
         pprint(request)
+        #pprint(request.value)
+        pprint(request.form['ri_id'])
         print("POST                            - - - < db_recipe_page - E = = = =*=*")
+        if ('ri_id' in request.form):
+            ri_id = int(request.form['ri_id'])
         
-        for key, val in request.form.items():
-            print(f"POST k: {key} - v: {val} <")
-            if re.match(r'gallery_button_', key):
-                ri_id = int(val)
+        else: 
+            for key, val in request.form.items():
+                print(f"POST k: {key} - v: {val} <")
+                if re.match(r'gallery_button_', key):
+                    ri_id = int(val)
     
     
     incoming_dict = request.args.to_dict()
@@ -589,6 +590,8 @@ def db_recipe_page():
     if request.method =='GET':
         print("GET                            - - - < db_recipe_page")        
         pprint(incoming_dict)
+        pprint(request.value)
+        pprint(request.value)
         if 'text' in incoming_dict:
             ri_id = int(incoming_dict['text'])    
     

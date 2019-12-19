@@ -961,9 +961,9 @@ def update_settings_tables_for_uuid(db, user_settings):
         
         #print(f"TK:{table_key}\nROW:{column_update}\nSQL:{sql_command}")        
         db.execute(sql_command)
-        print(f"***** SQL WRITE:\n{sql_command}\n\nRESULT: {db.commit()} <\n\n")
+        print(f"***** SQL WRITE:\n{sql_command}\n\nRESULT: {db.commit()} <\n\n") # < < COMMIT 
         # TODO - commit return None on success?
-        # how is failure reporte?
+        # how is failure report?
         
 
 
