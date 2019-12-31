@@ -11,9 +11,12 @@ from pathlib import Path
 from shutil import copy2
 from pprint import pprint
 import re
+import sys
 
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
+
+from auto_tagging import get_allergens_from_ingredients, get_tags_from_ingredients, get_type_from_ingredients
 
 
 FILE_LOC = 0
@@ -45,7 +48,7 @@ def get_nutridoc_list_rtf():
         # print(type(tmp_path))
         from_to.append([file_loc, tmp_path, new_file_path, root_date])
         tmp_path.mkdir(parents=True, exist_ok=True)
-        print(f"RootDate-{root_date}")
+        #print(f"RootDate-{root_date}")
 
     return from_to
 
@@ -55,7 +58,7 @@ def get_text_content_of_file(rtf_filepath):
     with open(rtf_filepath,'r') as f:
         rtf = f.read()
             
-    return rtf_to_text(rtf)
+    return rtf_to_text(rtf)             # convert to text and return
 
 
 def get_costing_section_from_main_doc(text):
@@ -69,17 +72,12 @@ def get_costing_section_from_main_doc(text):
     return recipe_text
 
 
-def get_allergens_from_ingredients(igds):
-    return 'dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide'
 
-def get_tags_from_ingredients(igds):
-    return 'vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant'
-
-def get_type_from_ingredients(igds):
-    return 'component, amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot'
-
+    
 def get_images_from_lead_image(image):
     return 'implement_image_search.jpg'
+    
+
 
 recipe_count = 0
 def get_zero_pad_6dig_count():
@@ -99,25 +97,28 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
     root_date = fileset[ROOT_DATE]
     
     # create regex
-    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)---", re.M | re.S)
+    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
     
     # scan text for recipes    
     for match in PATTERN.finditer(costing_section):
-        name, serving_info, notes, ingredients, tot_yield, method = match.groups()
+        name, serving_info, notes, ingredients, tot_yield, method, lead_image, username = match.groups()
         
         if 'calories' in name: continue        
         #print(f"name: {name},\n {serving_info},\n {ingredients},\n {tot_yield},\n {method}\n-\n")
         
-        lead_image = ''#'20190101_165049_p_l_a_c_e__f_i_l_l_e_r__i_m_a_g_e.jpg'
+        lead_image = str(lead_image).strip() #'20190101_165049_p_l_a_c_e__f_i_l_l_e_r__i_m_a_g_e.jpg'
+        username = str(username).strip()
         
-        # get lead image out of method (and remove line)
-        try:
-            image_match = re.search(r'^(image:(.*?)$)', method, re.M | re.S)
-            remove_line,lead_image = image_match.groups()
-            method = method.replace(remove_line, '')
-            target_file_name = lead_image.replace('.jpg', '.txt')
-        except:
-            pass
+        # # get lead image out of method (and remove line)
+        # try:
+        #     image_match = re.search(r'^(image:(.*?)$)', method, re.M | re.S)
+        #     remove_line,lead_image = image_match.groups()
+        #     method = method.replace(remove_line, '')
+        #     target_file_name = lead_image.replace('.jpg', '.txt')
+        # except:
+        #     pass
+        
+        target_file_name = lead_image.replace('.jpg', '.txt')
         
         # if no lead_image to base filename on - use root_date
         if target_file_name == '':
@@ -135,7 +136,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
                     '__tags__' : get_tags_from_ingredients(ingredients),
                     '__type__' : get_type_from_ingredients(ingredients),
                     '__images__' : get_images_from_lead_image(lead_image),
-                    '__lead_image__' : lead_image}
+                    '__lead_image__' : lead_image,
+                    '__username__' : username}
         
         rcp = ''
         with TEMPLATE.open('r') as f:
@@ -158,10 +160,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
         
         #if image exist copy it over
         if lead_image != '':
-            copy2(source_img_file, place_img_file)
-            
-            
-            
+            copy2(source_img_file, place_img_file)            
         
         # get the date_time_from lead image
         # recipe_file = target_path.joinpath(f"{root_date}_{incrementing_time}_{name})
@@ -179,17 +178,32 @@ if __name__ == '__main__':
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
     
+    #parse_igdt_lines_into_sets()
+    
+    #sys.exit()
+    
     # 'recipe_name' : recipe_text
     processed_recipes = {}
     
     # Create directories from nutridocd
     files_to_process = get_nutridoc_list_rtf()
     
+    for f in files_to_process:
+        print(str(f[0].name))
+    
+    #sys.exit()
+    
     # FILE_LOC = 0
     # TMP_PATH = 1
     # NEW_FILE_PATH = 2
     # take contents out of each file and create text docs
     for fileset in files_to_process:        
+        if 'y962' not in str(fileset[FILE_LOC]):
+            print(f"SKIPPING: {str(fileset[FILE_LOC])}")
+            continue
+        else:
+            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *")
+        
         #convert file from RTF to txt
         nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
         #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
@@ -201,4 +215,4 @@ if __name__ == '__main__':
         
         print(fileset[FILE_LOC])
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
-        if 'y951' in str(fileset[FILE_LOC]):break
+        
