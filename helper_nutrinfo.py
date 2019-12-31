@@ -180,6 +180,7 @@ class NutrientsDB:
     __nutrients_loaded = False
     __instance = None
     __file_lock = False # threading.Lock()  # import threading
+    __iterator = None
 
     @classmethod
     def getInstance(cls):
@@ -262,6 +263,15 @@ class NutrientsDB:
         return len(NutrientsDB.__nutrients_db.keys()) 
 
     @classmethod
+    def __iter__(cls):
+        NutrientsDB.__iterator = iter(NutrientsDB.__nutrients_db)
+        return NutrientsDB.__iterator
+    
+    @classmethod
+    def __next__(cls):
+        return NutrientsDB.__iterator.next()
+
+    @classmethod
     def list_seek_misses(cls):
         pprint(NutrientsDB.__seek_misses)
         return NutrientsDB.__seek_misses
@@ -308,6 +318,10 @@ if __name__ == '__main__':
     print("t_dict")
     pprint(t_dict)
 
+    for igdt in iter(i_db):
+        print(igdt)
+
+        
 
 
 
