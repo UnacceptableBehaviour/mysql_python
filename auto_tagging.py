@@ -9,6 +9,7 @@ from pprint import pprint
 from pathlib import Path
 
 from helper_nutrinfo import i_db
+from food_sets import build_fish_set
 
 # def test_set_have_arithmetic_operators(self):
 #     scotsmen = {'MacLeod', 'Wallace', 'Willie'}
@@ -63,10 +64,20 @@ def parse_igdt_lines_into_sets(lines=[]):
 
 
 if __name__ == '__main__':
-    pprint( i_db.get('apple') )
+    #pprint( i_db.get('apple') )
     
-    # i_list = parse_igdt_lines_into_sets()
-    # 
-    # for i in i_list:
-    #     pprint( i_db.get(i) )
+    i_list = parse_igdt_lines_into_sets()
+    fish = build_fish_set()
+    
+    for i in i_list:
+        #pprint( i_db.get(i) )
+        report = '    '
+        if i in fish:
+            report = 'fish'
+            
+        print(f"{report} - {i}")
+        
+    # next check ingredient to see if atomic, EG: 'roast trout and potatoes'
+    # if not pull it from the DB turn it into a list and add items to list to be checked
+        
     
