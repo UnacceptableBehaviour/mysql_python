@@ -198,7 +198,7 @@ if __name__ == '__main__':
     # NEW_FILE_PATH = 2
     # take contents out of each file and create text docs
     for fileset in files_to_process:        
-        if 'y962' not in str(fileset[FILE_LOC]):
+        if 'y964' not in str(fileset[FILE_LOC]):
             print(f"SKIPPING: {str(fileset[FILE_LOC])}")
             continue
         else:

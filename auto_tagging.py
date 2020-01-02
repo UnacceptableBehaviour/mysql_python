@@ -10,6 +10,17 @@ from pathlib import Path
 
 from helper_nutrinfo import i_db
 
+# def test_set_have_arithmetic_operators(self):
+#     scotsmen = {'MacLeod', 'Wallace', 'Willie'}
+#     warriors = {'MacLeod', 'Wallace', 'Leonidas'}
+#                                                                                          # non-commutative?
+#     self.assertEqual({'Willie'}, scotsmen - warriors)                                    # difference - has direction A-B B-A
+#     self.assertEqual({'Leonidas', 'MacLeod', 'Wallace', 'Willie'}, scotsmen | warriors)  # union
+#     self.assertEqual({'MacLeod', 'Wallace'}, scotsmen & warriors)                        # intersection
+#     self.assertEqual({'Leonidas', 'Willie'}, scotsmen ^ warriors)                        # symmetric difference
+#                                                                                          # both side sides intead of one 
+
+# tag atomic - everythings should bubble up through the recipe / nutrients
 
 
 def get_allergens_from_ingredients(igds):    
