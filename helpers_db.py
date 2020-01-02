@@ -438,10 +438,38 @@ def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
 
     return recipe_list
 
-
-def get_ingredients_as_text_list(ri_id):
+#
+#
+#
+#
+# query DB to see if a recipe or ingredient has sub ingredients
+#
+# should query ots_ingredients to see if its an Off The Shelf item
+# should have a URL to get ingredients and other info
+# 
+def get_ingredients_as_text_list(recipe_component_or_ingredient):
+     
+    # this queries recipes recursively    
+    #rcp = get_single_recipe_from_db_for_display_as_dict(ri_id_or_name)
+    #pprint(rcp)
     
+    # simpler to query exploded directly
+    db_lines = 'QUERY FAILURE'
+    if recipe_component_or_ingredient.__class__.__name__ == 'str':
+        qry_string = 'ingredients'
+        sql_query = f"SELECT {qry_string} FROM exploded WHERE ri_name ='{recipe_component_or_ingredient}';"
+        #db_lines = helper_db_class_db.execute(sql_query).fetchall()
+        db_lines = helper_db_class_db.execute(sql_query).fetchone()
+    else:
+        raise(f"ingredient: {recipe_component_or_ingredient} < must be a string")
+        
     ingredients = []
+    
+    if db_lines == None:
+        ingredients = None
+    else: # <class 'sqlalchemy.engine.result.RowProxy'>
+        for line_array in db_lines[0]:
+            ingredients.append(line_array[INGREDIENT_INDEX])    
     
     return ingredients
 

@@ -9,7 +9,7 @@ from pprint import pprint
 from pathlib import Path
 
 from helper_nutrinfo import i_db
-from food_sets import build_fish_set
+from food_sets import does_component_contain_allergen
 
 # def test_set_have_arithmetic_operators(self):
 #     scotsmen = {'MacLeod', 'Wallace', 'Willie'}
@@ -62,22 +62,21 @@ def parse_igdt_lines_into_sets(lines=[]):
     
     return i_list   #print(i_list)
 
+    
+
 
 if __name__ == '__main__':
     #pprint( i_db.get('apple') )
     
-    i_list = parse_igdt_lines_into_sets()
-    fish = build_fish_set()
+    i_list = parse_igdt_lines_into_sets() # test list from file
+    #fish = allergenLUT['fish']
     
     for i in i_list:
-        #pprint( i_db.get(i) )
         report = '    '
-        if i in fish:
+
+        if does_component_contain_allergen(i, 'fish'):
             report = 'fish'
             
         print(f"{report} - {i}")
-        
-    # next check ingredient to see if atomic, EG: 'roast trout and potatoes'
-    # if not pull it from the DB turn it into a list and add items to list to be checked
         
     
