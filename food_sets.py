@@ -16,6 +16,10 @@ class UnkownAllergenType(FoodSetsError):
     '''Raised when interface used incorrectly - non existent allergen type passed in'''
     pass
 
+class IncorrectTypeForIngredients(FoodSetsError):
+    '''Ingredients should be str or list'''
+    pass
+
 # simple allergen detection - this could explode into a massively time consuming exersize so keep it simple!
 # Brief: should work with the ingredients in the current data set ~1400 ingredients
 #
@@ -24,6 +28,135 @@ class UnkownAllergenType(FoodSetsError):
 #
 # alcohol classification should be limited to rum, vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
 # - that's enough for scope of this exersize
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# DAIRY
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# EGGS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
+              'egg solids','egg white','egg yolk'}
+
+# usually product of some type katsuobushi or fish sauce for example
+eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
+                           'mayo','mayonnaise','meringue','meringue powder','ovalbumin','surimi','egg tofu'}
+
+def build_eggs_set():
+    eggs = {'eggs'}
+        
+    eggs = eggs | eggs_derived_no_recipe
+    
+    eggs = eggs | eggs_basic
+    
+    return eggs
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PEANUTS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+peanuts_basic = {'peanuts', 'peanut'}
+
+# usually product of some type katsuobushi or fish sauce for example
+peanuts_derived_no_recipe =  {'peanut butter'}
+
+def build_peanuts_set():
+    peanuts = {'peanuts'}
+        
+    peanuts = peanuts | peanuts_derived_no_recipe
+    
+    peanuts = peanuts | peanuts_basic
+    
+    return peanuts
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# NUTS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
+              'pecans','pistachios','walnuts'}
+
+nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews'}
+
+def build_nuts_set():
+    nuts = {'nuts'}
+    
+    nuts = nuts | nuts_derived_no_recipe
+    
+    nuts = nuts | nuts_basic
+    
+    return nuts
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SEEDS_LUPIN
+# SEEDS_SESAME
+# SEEDS_MUSTARD
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FISH
@@ -36,7 +169,7 @@ fish_basic = {'anchovies','barracuda','basa','bass','black cod','blowfish','blue
               'smelt','snakehead','snapper','sole','sprat','sturgeon','surimi','swordfish','tilapia','tilefish',
               'trout','tuna','turbot','wahoo','whitefish','whiting','witch','whitebait'}
 
-fish_derived_no_recipe = {'katsuobushi','dashi','fish stock cube','fish sauce' }
+fish_derived_no_recipe = {'katsuobushi','dashi','fish stock cube','fish sauce','cured salmon','smoked salmon'}
 
 # exceptions, sub sets & alternate names
 # different name same fish
@@ -47,22 +180,31 @@ fish_alt = [
     {'witch','righteye flounder'},      # there's about 10 righteye type around australias coast!
     {'sea bass','seabass'},             # the correct spelling is sea bass
     {'summer flounder','fluke'},
-    {'river cobler','pangaseus'}    
+    {'river cobler','pangaseus','basa','swai'},
+    {'caviar','sturgeon roe'},
+    {'ikura','salmon roe'},
+    {'kazunoko','herring roe'},
+    {'masago','capelin roe'},
+    {'tobiko','flying-fish roe'},
+    {'anchovies','anchovy'}
 ]
 
 # subsets
 fish_subsets = {
+    'catfish' : {'river cobler','pangaseus','basa','channel catfish','blue catfish','ikan keli','magur','hedu','etta','swai'},
     'cod' : { 'pacific cod', 'atlantic cod' },
     'bass' : {'bass','striped bass'},
     'eel' : {'eel','conger eel'},
     'flounder' : {'plaice','gulf flounder','summer flounder','winer flounder','european flounder','which flounder','halibut','olive flounder'},
-    'salmon' : {'cured salmon','smoked salmon','sockeye salmon','alaskan salmon','chinook salmon','pink salmon','coho salmon'},    
+    'salmon' : {'sockeye salmon','alaskan salmon','chinook salmon','pink salmon','coho salmon'},    
     'sanddab' : {'pacific sanddab'},   # there are a lot of these
     'shad' : {'alewife','american shad'},
     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
     'trout' : {'trout','rainbow trout'},    
     'tuna' : {'albacore tuna','bigeye tuna','bluefin tuna','dogtooth tuna','skipjack tuna','yellowfin tuna'},
+    'roe' : {'caviar','sturgeon roe','ikura','salmon roe','kazunoko','herring roe','lumpfish roe','masago','capelin roe','shad roe','tobiko','flying-fish roe'}
 }
+
 
 def build_fish_set():
     fish = {'fish'}
@@ -80,41 +222,236 @@ def build_fish_set():
     
     return fish
 
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# NUTS
+# MOLLUSCS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
-              'pecans','pistachios','walnuts'}
-
-nuts_derived_no_recipe = {}
-
-def build_nut_set():
-    nuts = {'nuts'}
-    
-    
-    nuts = nuts | nuts_basic
-    
-    return nuts
-
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# # 
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# _basic = {'',''}
+# allergen_basic = {'',''}
 # 
 # # usually product of some type katsuobushi or fish sauce for example
-# _derived_no_recipe =  {'',''}
+# allergen_derived_no_recipe =  {'',''}
 # 
 # # different names same thing
-# _alt = [
+# allergen_alt = [
 #     {'name1','name2'},
 #     {'another1', 'another2'},
 # ]
 # 
 # # subsets - common name with various types
-# _subsets = {
+# allergen_subsets = {
 #     'cod' : { 'pacific cod', 'atlantic cod' },
 #     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# } 
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SHELLFISH
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ALCOHOL
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# CELERY
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+celery_basic = {'celery','celery sticks','celery leaves','celery spice','celery seeds','celery salt','celeriac'}
+
+# usually product of some type katsuobushi or fish sauce for example
+celery_derived_no_recipe =  {'chicken stock','lamb stock', 'beef stock', 'fish stock', 'pork stock', 'veggie stock',
+                             'vegetable stock', 'veg stock', 'chicken stock cube','lamb stock cube', 'beef stock cube',
+                             'fish stock cube', 'pork stock cube', 'veggie stock cube', 'vegetable stock cube',
+                             'veg stock cube', 'marmite'}
+
+def build_celery_set():
+    celery = {'celery'}
+        
+    celery = celery | celery_derived_no_recipe
+    
+    celery = celery | celery_basic
+    
+    return celery
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# GLUTEN
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SOYA
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+soya_basic = {'soya','edamame','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
+              'teriyaki','tempeh','textured soy protein','tsp','textured vegetable protein','tvp','soy flour',
+              'soybean oil','soy lecithin','natto','kinako'}
+
+# usually product of some type katsuobushi or fish sauce for example
+soya_derived_no_recipe =  {'condensed soy milk','tofu','douhua'}
+
+# different names same thing
+soya_alt = [
+    {'soy milk','soymilk'},
+    {'soy sauce','tamari','shoyu'},     # tamari is traditionally made soy sauce - does not use wheat and is gluten free
+                                        # shoyu is japanese for soy sauce
+    {'textured soy protein','tsp'},
+    {'textured vegetable protein ','tvp'},
+    {'white miso','shiro miso'},
+    {'yellow miso','shinshu miso'},
+    {'red miso','aka miso'},    
+    
+]
+
+# subsets - common name with various types
+soya_subsets = {
+    'tofu' : {'silken tofu','extra soft tofu','soft tofu','medium tofu','firm tofu','extra firm tofu','super firm tofu',
+              'noodling','tofu noodles','tofu sponge','egg tofu','pressed tofu','fermented tofu','tofu skin','tofu sticks',
+              'fried tofu','tofu pockets','tofu puffs'},    
+    'miso' : {'red miso','yellow miso','white miso','awase miso','barley miso',}
+}
+
+def build_soya_set():
+    soya = {'soya'}
+    
+    for key, val in soya_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        soya = soya | union
+        
+    for val in soya_alt:
+        soya = soya | val       # include different names for each soya
+    
+    soya = soya | soya_derived_no_recipe
+    
+    soya = soya | soya_basic
+    
+    return soya
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SULPHUR_DIOXIDE
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites'}
+
+# usually product of some type katsuobushi or fish sauce for example
+#sulphur_dioxide_derived_no_recipe =  {'',''}
+
+def build_sulphur_dioxide_set():
+    sulphur_dioxide = {'sulphur_dioxide'}
+        
+    #sulphur_dioxide = sulphur_dioxide | sulphur_dioxide_derived_no_recipe
+    
+    sulphur_dioxide = sulphur_dioxide | sulphur_dioxide_basic
+    
+    return sulphur_dioxide
+
+
+
+
+
 conv_list ='''
 plain text list here
 '''
@@ -150,7 +487,21 @@ def get_allergens_headings():
 
 
 allergenLUT = {
-    'fish' : build_fish_set()
+    #'dairy' : build_dairy_set(),
+    'eggs' : build_eggs_set(),
+    'peanuts' : build_peanuts_set(),
+    'nuts' : build_nuts_set(),               
+    # 'seeds_lupin' : build_seeds_lupin_set(),
+    # 'seeds_sesame' : build_seeds_sesame_set(),
+    # 'seeds_mustard' : build_seeds_mustard_set(),
+    'fish' : build_fish_set(),
+    #'molluscs' : build_molluscs_set(),
+    #'shellfish' : build_shellfish_set(),
+    #'alcohol' : build_alcohol_set(),
+    'celery' : build_celery_set(),
+    #'gluten' : build_gluten_set(),
+    'soya' : build_soya_set(),
+    'sulphur_dioxide' : build_sulphur_dioxide_set()    
 }
 
 # ingredeints for each component already recursed and stored in exploded
@@ -172,6 +523,42 @@ def does_component_contain_allergen(component, allergen):
         for i in ingredients_of_component:            
             if i in allergen_set:
                 return True
+
+
+def get_allergens_for(list_of_ingredients):
+    allergens_detected = []
+    
+    if list_of_ingredients.__class__ == str:
+        list_of_ingredients = [list_of_ingredients]    
+    
+    if list_of_ingredients.__class__ == list:
+        # build complete list - from local DB
+        # will not follow URL to inet for ingredients of off the shelf items
+        
+        add_ingredients = []
+        for i in list_of_ingredients:
+            add_me = get_ingredients_as_text_list(i)
+            if add_me:
+                add_ingredients = add_ingredients + add_me
+            else:   # ingredient not in DB
+                #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
+                #print(f"NF:{i}<")
+                pass # TODO - log
+                    
+        
+        # flatten so there's only one of each
+        list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
+        
+        for i in list_of_ingredients:
+            for allergen in allergenLUT:
+                if i in allergenLUT[allergen]:
+                    allergens_detected.append(allergen)
+    else:
+        raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
+    
+    return allergens_detected
+
+
 
 def main():
     pass
