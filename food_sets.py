@@ -360,37 +360,44 @@ def build_fish_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ALCOHOL
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+alcohol_basic = {'alcohol','rum','vodka','gin','whisky','red wine','white wine','wine','champagne','cava','scrumpy',
+                 'scrumpy jack','larger','cider abv5','corona','corona extra','red wine abv12.5','white wine 12.5',
+                 'white wine abv12.5','white wine','tennessee honey lemonade abv5.0','tennessee honey lemonade',
+                 'disaronno amaretto liqueur 28%ABV','disaronno amaretto liqueur','disaronno amaretto liqueur abv28',
+                 'amaretto liqueur','amaretto','omega cider','port wine','port wine abv18','malbec port','baileys abv17',
+                 'baileys','baileys irish cream abv17','mrs irish meadow abv14','mrs irish meadow','sbs madeira abv17.5',
+                 'sbs madeira','madeira','marsala','marsala abv18','old rosie'}
+
+# usually product of some type katsuobushi or fish sauce for example
+alcohol_derived_no_recipe =  {'rum baba','tiramisu','cocktail'}
+
+# different names same thing
+alcohol_alt = [
+    {'scrumpy','scrumpy jack'},
+    {'larger', 'red stripe'},
+    {'cocktails','cocktail'},
+]
+
+# subsets - common name with various types
+alcohol_subsets = {
+    'cocktails' : {'tequila sunrise','black russian','margarita','mojito','caipirina'}
+}
+
+def build_alcohol_set():
+    alcohol = {'alcohol'}
+    
+    for key, val in alcohol_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        alcohol = alcohol | union
+        
+    for val in alcohol_alt:
+        alcohol = alcohol | val       # include different names for each 
+    
+    alcohol = alcohol | alcohol_derived_no_recipe
+    
+    alcohol = alcohol | alcohol_basic
+    
+    return alcohol
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # CELERY
@@ -561,7 +568,7 @@ allergenLUT = {
     'fish' : build_fish_set(),
     #'molluscs' : build_molluscs_set(),
     #'shellfish' : build_shellfish_set(),
-    #'alcohol' : build_alcohol_set(),
+    'alcohol' : build_alcohol_set(),
     'celery' : build_celery_set(),
     #'gluten' : build_gluten_set(),
     'soya' : build_soya_set(),
