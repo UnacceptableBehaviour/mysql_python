@@ -109,7 +109,7 @@ def build_peanuts_set():
 nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
               'pecans','pistachios','walnuts'}
 
-nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews'}
+nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava'}
 
 def build_nuts_set():
     nuts = {'nuts'}
@@ -153,9 +153,41 @@ def build_seeds_lupin_set():
     
     return seeds_lupin
 
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SEEDS_SESAME
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+seeds_sesame_basic = {'sesame','sesame seeds','sesame paste','sesame oil','sesame flour'}
+
+# https://allergyfacts.org.au/images/pdf/sesamef.pdf
+seeds_sesame_derived_no_recipe =  {'falafel','sesame burger bun', 'sesame bap','gomashio','halva','baklava','pretzels',
+                                   'tahina','aqua libra','benne','benniseed','dukkah','gingelly seeds','hummus','pasteli',
+                                   'sesarmol','sesomolina','sim sim','til'} # 'tahina' is a sesame sauce!
+# different names same thing
+seeds_sesame_alt = [
+    {'sesame paste','tahini'},
+    {'gomasio','gomashio','sesame salt'},
+]
+
+# subsets - common name with various types
+#seeds_sesame_subsets = {}
+
+def build_seeds_sesame_set():
+    seeds_sesame = {'seeds_sesame'}
+    
+    # for key, val in seeds_sesame_subsets.items():
+    #     union = val | {key}     # include the categegory generalisation
+    #     seeds_sesame = seeds_sesame | union
+        
+    for val in seeds_sesame_alt:
+        seeds_sesame = seeds_sesame | val       # include different names for each seeds_sesame
+    
+    seeds_sesame = seeds_sesame | seeds_sesame_derived_no_recipe
+    
+    seeds_sesame = seeds_sesame | seeds_sesame_basic
+    
+    return seeds_sesame
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SEEDS_MUSTARD
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # allergen_basic = {'',''}
