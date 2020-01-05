@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import re
 import sys
 from pprint import pprint
@@ -288,39 +287,48 @@ def build_fish_set():
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# MOLLUSCS
+# MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
+                  'oyster','scallop','octopus','squid','cuttlefish'}
+
+# usually product of some type katsuobushi or fish sauce for example
+molluscs_derived_no_recipe =  {'',''}
+
+# different names same thing
+molluscs_alt = [
+    {'snails','escargot','helix aspersa'},
+    {'cuttlefish', 'sepia'},
+]
+
+# subsets - common name with various types
+molluscs_subsets = {
+    'clams' : { 'blood cockle','cockles','mussels','hard clams','grooved carpet shell','quahog','leukoma','paphies',
+               'pismo clam','smooth clam','tuatua' },
+    'abalone' : { 'black abalone','blacklip abalone','green abalone','green ormer','haliotis corrugata','red abalone',
+                 'white abalone','pāua' },
+    'mussels' : { 'blue mussels','blue mussel','california mussel','mediterranean mussel' },
+    'oyster' : { 'auckland oyster','dredge oyster','mangrove oyster','ostrea angasi','ostrea edulis','pacific oyster',
+                'rock oyster','sydney rock oyster','portuguese oyster'},
+    'razor clams' : { 'atlantic jackknife clam','ensis','ensis macha','pacific razor clam','pod razor','razor shell',
+                     'sinonovacula' },
+}
+
+def build_molluscs_set():
+    molluscs = {'molluscs'}
+    
+    for key, val in molluscs_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        molluscs = molluscs | union
+        
+    for val in molluscs_alt:
+        molluscs = molluscs | val       # include different names for each molluscs
+    
+    molluscs = molluscs | molluscs_derived_no_recipe
+    
+    molluscs = molluscs | molluscs_basic
+    
+    return molluscs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SHELLFISH
@@ -566,7 +574,7 @@ allergenLUT = {
     'seeds_sesame' : build_seeds_sesame_set(),
     'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
-    #'molluscs' : build_molluscs_set(),
+    'molluscs' : build_molluscs_set(),
     #'shellfish' : build_shellfish_set(),
     'alcohol' : build_alcohol_set(),
     'celery' : build_celery_set(),
