@@ -26,7 +26,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # a call to get_allergens_from_ingredients(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
 # should return ['dairy', 'eggs', 'fish', 'gluten']
 #
-# alcohol classification should be limited to rum, vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
+# 'alcohol classification should be limited to rum', vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
 # - that's enough for scope of this exersize
 
 
@@ -248,7 +248,7 @@ fish_alt = [
     {'kazunoko','herring roe'},
     {'masago','capelin roe'},
     {'tobiko','flying-fish roe'},
-    {'anchovies','anchovy'}.
+    {'anchovies','anchovy'},
     {'worcestershire sauce','lea and perrins'}
 ]
 
@@ -287,7 +287,7 @@ def build_fish_set():
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
+# SHELLFISH - MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
                   'oyster','scallop','octopus','squid','cuttlefish'}
@@ -331,39 +331,45 @@ def build_molluscs_set():
     return molluscs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# SHELLFISH
+# SHELLFISH - CRUSTACEANS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+crustaceans_basic = {'crustaceans','langoustine','crab','crayfish','prawns','shrimp','langostino','lobster'}
+
+# usually product of some type katsuobushi or fish sauce for example
+crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque'}
+
+# different names same thing
+crustaceans_alt = [
+    {'langostino', 'squat lobster'},
+    {'norway lobster', 'dublin bay prawn', 'langoustine','langostine'},
+    {'prawns','shrimp'},
+    {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
+     'cangrejo de rio'},
+    {'cangrejo', 'crab', 'crab meat', 'crab claws', 'white crab meat', 'brown crab meat'}
+]
+
+# subsets - common name with various types
+crustaceans_subsets = {
+    'crab' : { 'brown crab','dungeness crab','mud crab','sand crab','alaskan king crab','norwegian king crab','king crab','snow crab','blue crab','soft shell crab' },
+    'lobster' : {'american lobster','rock lobster','spiny lobster','red lobster','canadian lobster'},
+    'crayfish' : {'marron','koura'},
+    'prawns' : {'tiger prawns','king prawns','cooked prawns','fresh prawns','fresh water prawns'}
+}
+def build_crustaceans_set():
+    crustaceans = {'crustaceans'}
+    
+    for key, val in crustaceans_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        crustaceans = crustaceans | union
+        
+    for val in crustaceans_alt:
+        crustaceans = crustaceans | val       # include different names for each
+    
+    crustaceans = crustaceans | crustaceans_derived_no_recipe
+    
+    crustaceans = crustaceans | crustaceans_basic
+    
+    return crustaceans
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ALCOHOL
