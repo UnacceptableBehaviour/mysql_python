@@ -122,7 +122,39 @@ def build_nuts_set():
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# SEEDS_LUPIN
+# SEEDS_LUPIN       - related to peanut
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+seeds_lupin_basic = {'lupin','lupin seeds','lupin flour'}
+
+#seeds_lupin_derived_no_recipe =  {'',''}
+
+# different names same thing
+# seeds_lupin_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+
+# subsets - common name with various types
+#seeds_lupin_subsets = { }
+
+def build_seeds_lupin_set():
+    seeds_lupin = {'seeds_lupin'}
+    
+    # for key, val in seeds_lupin_subsets.items():
+    #     union = val | {key}     # include the categegory generalisation
+    #     seeds_lupin = seeds_lupin | union
+    #     
+    # for val in seeds_lupin_alt:
+    #     seeds_lupin = seeds_lupin | val       # include different names for each
+    # 
+    # seeds_lupin = seeds_lupin | seeds_lupin_derived_no_recipe
+    
+    seeds_lupin = seeds_lupin | seeds_lupin_basic
+    
+    return seeds_lupin
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SEEDS_SESAME
 # SEEDS_MUSTARD
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -491,7 +523,7 @@ allergenLUT = {
     'eggs' : build_eggs_set(),
     'peanuts' : build_peanuts_set(),
     'nuts' : build_nuts_set(),               
-    # 'seeds_lupin' : build_seeds_lupin_set(),
+    'seeds_lupin' : build_seeds_lupin_set(),
     # 'seeds_sesame' : build_seeds_sesame_set(),
     # 'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
