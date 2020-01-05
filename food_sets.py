@@ -22,6 +22,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 
 # simple allergen detection - this could explode into a massively time consuming exersize so keep it simple!
 # Brief: should work with the ingredients in the current data set ~1400 ingredients
+# Basic guide: https://www.food.gov.uk/sites/default/files/media/document/top-allergy-types.pdf
 #
 # a call to get_allergens_from_ingredients(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
 # should return ['dairy', 'eggs', 'fish', 'gluten']
@@ -156,7 +157,7 @@ def build_seeds_lupin_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SEEDS_SESAME
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-seeds_sesame_basic = {'sesame','sesame seeds','sesame paste','sesame oil','sesame flour'}
+seeds_sesame_basic = {'sesame','sesame seeds','sesame paste','sesame oil','sesame flour','sesame salt'}
 
 # https://allergyfacts.org.au/images/pdf/sesamef.pdf
 seeds_sesame_derived_no_recipe =  {'falafel','sesame burger bun', 'sesame bap','gomashio','halva','baklava','pretzels',
@@ -190,37 +191,35 @@ def build_seeds_sesame_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SEEDS_MUSTARD
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+seeds_mustard_basic = {'mustard','mustard seeds','french mustard','english mustard','american mustard','yellow mustard',
+                       'dijon mustard','dijon','liquid mustard','mustard powder'}
+
+# usually product of some type katsuobushi or fish sauce for example
+seeds_mustard_derived_no_recipe =  {'ham sandwich','mayo','mayonnaise','brown mustard','beer mustard','honey mustard','hot mustard','sweet mustard'}
+
+# different names same thing
+seeds_mustard_alt = [
+    {'whole grain mustard','whole-grain mustard'},
+    {'american mustard','yellow mustard'},
+]
+
+# subsets - common name with various types
+#seeds_mustard_subsets = {}
+def build_seeds_mustard_set():
+    seeds_mustard = {'seeds_mustard'}
+    
+    # for key, val in seeds_mustard_subsets.items():
+    #     union = val | {key}     # include the categegory generalisation
+    #     seeds_mustard = seeds_mustard | union
+        
+    for val in seeds_mustard_alt:
+        seeds_mustard = seeds_mustard | val       # include different names for each seeds_mustard
+    
+    seeds_mustard = seeds_mustard | seeds_mustard_derived_no_recipe
+    
+    seeds_mustard = seeds_mustard | seeds_mustard_basic
+    
+    return seeds_mustard
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FISH
@@ -233,7 +232,7 @@ fish_basic = {'anchovies','barracuda','basa','bass','black cod','blowfish','blue
               'smelt','snakehead','snapper','sole','sprat','sturgeon','surimi','swordfish','tilapia','tilefish',
               'trout','tuna','turbot','wahoo','whitefish','whiting','witch','whitebait'}
 
-fish_derived_no_recipe = {'katsuobushi','dashi','fish stock cube','fish sauce','cured salmon','smoked salmon'}
+fish_derived_no_recipe = {'katsuobushi','dashi','fish stock cube','fish sauce','cured salmon','smoked salmon','worcestershire sauce'}
 
 # exceptions, sub sets & alternate names
 # different name same fish
@@ -250,7 +249,8 @@ fish_alt = [
     {'kazunoko','herring roe'},
     {'masago','capelin roe'},
     {'tobiko','flying-fish roe'},
-    {'anchovies','anchovy'}
+    {'anchovies','anchovy'}.
+    {'worcestershire sauce','lea and perrins'}
 ]
 
 # subsets
@@ -556,8 +556,8 @@ allergenLUT = {
     'peanuts' : build_peanuts_set(),
     'nuts' : build_nuts_set(),               
     'seeds_lupin' : build_seeds_lupin_set(),
-    # 'seeds_sesame' : build_seeds_sesame_set(),
-    # 'seeds_mustard' : build_seeds_mustard_set(),
+    'seeds_sesame' : build_seeds_sesame_set(),
+    'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
     #'molluscs' : build_molluscs_set(),
     #'shellfish' : build_shellfish_set(),
