@@ -545,7 +545,7 @@ plain text list here
 # HEADINGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_allergens_headings():    
-    return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
+    return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
 #
 # DONE - as it wit will work for the dataset - this could be massively expanded!
 #
@@ -558,7 +558,7 @@ def get_allergens_headings():
 # 'seeds_mustard',
 # 'fish',               DONE
 # 'molluscs',
-# 'shellfish',
+# 'crustaceans',
 # 'alcohol',
 # 'celery',
 # 'gluten',
@@ -567,7 +567,7 @@ def get_allergens_headings():
 
 # 
 # def get_tags_from_ingredients(igds):
-#     return 'vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant'
+#     return 'vegan, veggie, cbs, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
 # 
 
 
@@ -581,7 +581,7 @@ allergenLUT = {
     'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
     'molluscs' : build_molluscs_set(),
-    #'shellfish' : build_shellfish_set(),
+    'crustaceans' : build_crustaceans_set(),
     'alcohol' : build_alcohol_set(),
     'celery' : build_celery_set(),
     #'gluten' : build_gluten_set(),
