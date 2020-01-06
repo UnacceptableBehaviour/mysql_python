@@ -82,7 +82,7 @@ for cheese_cat, cheese_set in cheese_subsets.items():
 
 # subsets - common name with various types
 dairy_subsets = {
-    'milk' : {'skimmed milk','semi skimmed milk','full fat milk','whole milk','1% skimmed milk','1% milk','2% milk','bob'}
+    'milk' : {'skimmed milk','semi skimmed milk','full fat milk','whole milk','1% skimmed milk','1% milk','2% milk','bob'},
     'fermented milk' : {'sour cream','soured milk'},
     'yogurt' : {'greek yoghurt','natural yoghurt','skyr'},
     'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
@@ -482,40 +482,68 @@ def build_celery_set():
     return celery
 
 
+
+'wheat',
+'wheat germ',
+'rye',
+'barley',
+'bulgur',
+'couscous',
+'farina',
+'graham flour',
+'kamut',
+'khorasan wheat',
+'semolina',
+'spelt',
+'triticale',
+'oats',
+'oat bran',
+'flour'
+
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # GLUTEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+gluten_basic = {'gluten'}
+
+# usually product of some type katsuobushi or fish sauce for example
+gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread'}
+
+# different names same thing
+gluten_alt = [
+    {'nan','naan','naaan bread',},
+    {'pita','pitta bread'},
+    {'rotti','roti'},
+]
+
+# subsets - common name with various types
+gluten_subsets = {
+    'flour' : { 'plain flour','self raising flour','strong flour','bread flour' },
+    'flat bread' : {'torta','matzo','pita','naan','roti','paratha','banh','tortilla','wrap','injera','pancake'}, # injera is gluten free if made of 100% teff flour
+    'pasta' : {'orzo','spaghetti','macaroni','tagliatele','linguini','fusili','lasagna','rigatoni','farfale','ravioli',
+               'fettuccini','penne'}, # a a million other types!
+    'bread' : {'sliced bread','sourdough','brown bread','tiger loaf','french stick','giraffe bread','baguette','burger bun',
+               'brioche','demi brioche','baton','biscuit','bagel','cornbread','rye bread','milk bread','galic pizza',
+               'garlic bread','turkish bread','ciabata','bun','focaccia','mgt','multi grain','seeded batch','thick sliced bread',
+               'thick sliced seeded bread','sandwich loaf','white bread','olive bread','poppy seed roll','bap', 'crumpet',
+               'seeded baguette','seeded baguette round','baguette round','sourdough round'},
+}
+def build_gluten_set():
+    gluten = {'gluten'}
+    
+    for key, val in gluten_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        gluten = gluten | union
+        
+    for val in gluten_alt:
+        gluten = gluten | val       # include different names for each gluten
+    
+    gluten = gluten | gluten_derived_no_recipe
+    
+    gluten = gluten | gluten_basic
+    
+    return gluten
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOYA
@@ -622,7 +650,7 @@ allergenLUT = {
     'crustaceans' : build_crustaceans_set(),
     'alcohol' : build_alcohol_set(),
     'celery' : build_celery_set(),
-    #'gluten' : build_gluten_set(),
+    'gluten' : build_gluten_set(),
     'soya' : build_soya_set(),
     'sulphur_dioxide' : build_sulphur_dioxide_set()    
 }
