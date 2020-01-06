@@ -33,37 +33,48 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+dairy_basic = {'milk','cows milk','goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
+               'casein','custard','ice cream','milk powder','','','',''}
+
+# usually product of some type katsuobushi or fish sauce for example
+dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere'}
+
+# different names same thing
+dairy_alt = [
+    {'yoghurt','yogurt'},
+    {'custard', 'creme anglaise'},
+    {'creme patissiere', 'creme patissier'},
+    {'whippy-san','whippy san'}
+]
+
+# subsets - common name with various types
+dairy_subsets = {
+    'fermented milk' : {'sour cream','soured milk'},
+    'yogurt' : {'greek yoghurt','natural yoghurt','skyr'},
+    'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
+    'butter' : {'salted butter','cornish butter','ghee','clarified butter'},
+    'cheese' : {'mozzarella','parmesan','','','','','','','',},
+    'casein' : {'milk protein','whey protein'},    
+    'ice cream' : {'gelato','ice milk','whippy san','frozen custard','frozen yoghurt'},
+}
+
+
+
+def build_dairy_set():
+    dairy = {'dairy'}
+    
+    for key, val in dairy_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        dairy = dairy | union
+        
+    for val in dairy_alt:
+        dairy = dairy | val       # include different names for each dairy
+    
+    dairy = dairy | dairy_derived_no_recipe
+    
+    dairy = dairy | dairy_basic
+    
+    return dairy
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EGGS
@@ -336,7 +347,7 @@ def build_molluscs_set():
 crustaceans_basic = {'crustaceans','langoustine','crab','crayfish','prawns','shrimp','langostino','lobster'}
 
 # usually product of some type katsuobushi or fish sauce for example
-crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque'}
+crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shrimp paste'}
 
 # different names same thing
 crustaceans_alt = [
@@ -572,7 +583,7 @@ def get_allergens_headings():
 
 
 allergenLUT = {
-    #'dairy' : build_dairy_set(),
+    'dairy' : build_dairy_set(),
     'eggs' : build_eggs_set(),
     'peanuts' : build_peanuts_set(),
     'nuts' : build_nuts_set(),               
