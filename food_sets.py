@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
+import itertools
 from pprint import pprint
 from pathlib import Path
 
@@ -34,26 +35,59 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 dairy_basic = {'milk','cows milk','goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
-               'casein','custard','ice cream','milk powder','','','',''}
+               'casein','custard','ice cream','milk powder'}
 
 # usually product of some type katsuobushi or fish sauce for example
-dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere'}
+dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade'}
 
 # different names same thing
 dairy_alt = [
     {'yoghurt','yogurt'},
     {'custard', 'creme anglaise'},
     {'creme patissiere', 'creme patissier'},
-    {'whippy-san','whippy san'}
-]
+    {'whippy-san','whippy san'},
+    {'parmesan','parmigiano-reggiano'},
+    {'mature cheddar','mature cheddar cheese'},
+    {'roquefort','roquetfort'},   # 2nd is misspelling
+    {'st agur','st agur cheese','saint agur blue cheese'},
+    {'feta','feta cheese','greek feta'},
+    {'philadelphia','philadelphia soft cheese','cream cheese','soft cheese','soft white cheese'},
+    {'brie','somerset brie'},  
+]  
+
+# have to give cheese a super set of its own!
+# notes on categories here: https://recipes.howstuffworks.com/food-facts/different-types-of-cheese.htm
+cheese_subsets = {
+    'fresh cheese' : {'cottage cheese','queso fresco','cream cheese','mascarpone','ricotta','ricotta lite','chevre','feta','feta light','cotija','panela','halloumi','fromage blanc','queso blanco'}, # feta can be an aged cheese too
+    'cream cheese' : {'philadelphia','roule','garlic roule','garlic & herb roule','boursin'},
+    'pasta filata' : {'mozzarella','burrata','provolone','queso oaxaca','scamorza affumicata','caciocavallo','cheddar mozzarella 50/50 mix','chefs larder grated mozzarella and cheddar','chedoza','grated mozzarella and cheddar'},
+    'soft-ripened cheese' : {'brie','camembert','cambozola','goats cheese','chavroux goats cheese'},       # bloomy rind
+    'semi-soft cheese' : {'havarti','muenster','jarlsberg','chaumes','red leicester'},
+    'washed-rind cheese' : {'limburger','taleggio','epoisses','alsatian munster'},
+    'blue cheese' : {'roquefort','stilton','gorgonzola','sweet gorgonzola','danish blue', 'st agur'},
+    'semi-hard cheese' : {'cheddar','gouda','mature gouda','edam','monterey jack','emmental','swiss','gruyere','extra mature cheddar',
+                          'mature cheddar','mild cheddar','leerdammer light cheese','leerdammer'},
+    'hard cheese' : {'parmesan','parmigiano-reggiano','asiago','pecorino','manchego',},
+    'unsorted' : {'cheese slices','wensleydale cheese','port salut cheese','president brie','edam mild wedge','french camembert',
+                  'president camembert','jarlsberg cheese','german cambozola','swiss le gruyere','cinco lanzas 16 months',
+                  'taleggio cheese','petit pont leveque cheese','hochland sortett','castello extra creamy brie',
+                  'grated mozzarella','austrian smoked cheese','blue stilton standard','saint agur creme',
+                  'butlers blacksticks blue','inglewhite farmhouse blue cheese','castello creamy blue ',
+                  'abergavenny goats cheese'}
+}
+
+cheese = {'cheese'}
+for cheese_cat, cheese_set in cheese_subsets.items():
+    cheese = cheese | {cheese_cat} | cheese_set
 
 # subsets - common name with various types
 dairy_subsets = {
+    'milk' : {'skimmed milk','semi skimmed milk','full fat milk','whole milk','1% skimmed milk','1% milk','2% milk','bob'}
     'fermented milk' : {'sour cream','soured milk'},
     'yogurt' : {'greek yoghurt','natural yoghurt','skyr'},
     'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
     'butter' : {'salted butter','cornish butter','ghee','clarified butter'},
-    'cheese' : {'mozzarella','parmesan','','','','','','','',},
+    'cheese' : cheese,
     'casein' : {'milk protein','whey protein'},    
     'ice cream' : {'gelato','ice milk','whippy san','frozen custard','frozen yoghurt'},
 }
@@ -120,7 +154,7 @@ def build_peanuts_set():
 nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
               'pecans','pistachios','walnuts'}
 
-nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava'}
+nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava','cantuccini'}
 
 def build_nuts_set():
     nuts = {'nuts'}
@@ -236,7 +270,7 @@ def build_seeds_mustard_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 fish_basic = {'anchovies','barracuda','basa','bass','black cod','blowfish','bluefish','bombay duck','bonito','bream',
               'brill','butter fish','catfish','cod','dogfish','dorade','eel','flounder','grouper','gurnard','haddock',
-              'hake','halibut','herring','ilish','john dory','lamprey','lingcod','mackerel','mahi mahi','monkfish',
+              'hake','halibut','herring','ilish','john dory','lamprey','ling','lingcod','mackerel','mahi mahi','monkfish',
               'mullet','orange roughy','parrotfish','patagonian toothfish','perch','pike','pilchard','plaice','pollock',
               'pomfret','pompano','sablefish','salmon','sanddab','sardine','sea bass','shad','shark','skate',
               'smelt','snakehead','snapper','sole','sprat','sturgeon','surimi','swordfish','tilapia','tilefish',
@@ -260,7 +294,9 @@ fish_alt = [
     {'masago','capelin roe'},
     {'tobiko','flying-fish roe'},
     {'anchovies','anchovy'},
-    {'worcestershire sauce','lea and perrins'}
+    {'worcestershire sauce','lea and perrins'},
+    {'ling','cooked ling'},
+    {'mackerel','smoked mackerel fillet','mackerel fillet'}
 ]
 
 # subsets
@@ -310,6 +346,7 @@ molluscs_derived_no_recipe =  {'',''}
 molluscs_alt = [
     {'snails','escargot','helix aspersa'},
     {'cuttlefish', 'sepia'},
+    {'small squid','small squid tubes','squid tubes','squid'},
 ]
 
 # subsets - common name with various types
@@ -483,7 +520,7 @@ def build_celery_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOYA
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-soya_basic = {'soya','edamame','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
+soya_basic = {'soy','soya','edamame','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
               'teriyaki','tempeh','textured soy protein','tsp','textured vegetable protein','tvp','soy flour',
               'soybean oil','soy lecithin','natto','kinako'}
 
@@ -499,7 +536,8 @@ soya_alt = [
     {'textured vegetable protein ','tvp'},
     {'white miso','shiro miso'},
     {'yellow miso','shinshu miso'},
-    {'red miso','aka miso'},    
+    {'red miso','aka miso'},
+    {'teriyaki','teriyaki sauce','teriyake','teriyake sauce'},
     
 ]
 
@@ -546,7 +584,13 @@ def build_sulphur_dioxide_set():
 
 
 
-
+#pork
+# coppa
+# milano salami
+# milano salami pre crisp
+# milano salami crisp
+# modena salami
+# modena crisps
 
 conv_list ='''
 plain text list here
@@ -557,24 +601,7 @@ plain text list here
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_allergens_headings():    
     return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
-#
-# DONE - as it wit will work for the dataset - this could be massively expanded!
-#
-# 'dairy',              ** BROAD
-# 'eggs',               recipe search
-# 'peanuts',
-# 'nuts',               
-# 'seeds_lupin',
-# 'seeds_sesame',
-# 'seeds_mustard',
-# 'fish',               DONE
-# 'molluscs',
-# 'crustaceans',
-# 'alcohol',
-# 'celery',
-# 'gluten',
-# 'soya',
-# 'sulphur_dioxide'
+
 
 # 
 # def get_tags_from_ingredients(igds):
@@ -693,7 +720,17 @@ if __name__ == '__main__':
     # 
     # print(len(fish), fish)
     
-    print(build_fish_set())
+    #print(build_fish_set())
+    
+    #print(cheese_subsets)
+    
+    cheese = {'cheese'}
+    #[cheese | cheese_set for cheese_set in cheese_subsets ]
+    for cheese_cat, cheese_set in cheese_subsets.items():
+        cheese = cheese | {cheese_cat} | cheese_set
+    
+    print(cheese) # all the cheese
+    
     
 # ELEMENTS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
