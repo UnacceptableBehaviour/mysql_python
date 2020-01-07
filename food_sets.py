@@ -344,7 +344,7 @@ def build_fish_set():
 molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
                   'oyster','scallop','octopus','squid','cuttlefish'}
 
-molluscs_derived_no_recipe =  {'oyster sauce',''}
+molluscs_derived_no_recipe =  {'oyster sauce'}
 
 # different names same thing
 molluscs_alt = [
@@ -512,7 +512,8 @@ def build_celery_set():
 gluten_basic = {'gluten'}
 
 # usually product of some type katsuobushi or fish sauce for example
-gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread'}
+gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread','lamb samosa','veg samosa',
+                             'samosa'}
 
 # different names same thing
 gluten_alt = [
@@ -737,7 +738,7 @@ chicken_basic = {'chicken dark meat','chicken breast','chicken','chicken','chick
                  'chicken thigh','chicken brown meat','chicken dark meat','chicken breast','poached chicken thigh',
                  'chicken stock','chicken liver','chicken gravy','home made chicken gravy','roast chicken',
                  'fried chicken breast','fried chicken thigh','fried chicken wing','fried chicken quarter',
-                 'chicken mince','minced chicken','chicken skin'
+                 'chicken mince','minced chicken','chicken skin', 'chicken heart'
                  }
 
 # usually product of some type katsuobushi or fish sauce for example
@@ -784,7 +785,7 @@ pork_basic = {'pork','carvery pork','pork belly','roast pork','trotters','pigs t
 # usually product of some type katsuobushi or fish sauce for example
 pork_derived_no_recipe =  {'sweet and sour pork balls in batter','crispy pork','sweet and sour pork','pork gyoza'}
 
-# different names same thing
+# different names same thing - go through cured pork add to this list
 pork_alt = [
     {'streaky bacon','bacon rashers'},
     {'trotters','pigs trotters'},
@@ -797,7 +798,11 @@ pork_subsets = {
     'ham' : {'pepper ham','cooked ham','ldl smoked ham','smoked ham','w&s breadcrumb ham','parma ham','sbs parma ham',
              'sandwich ham','cooked ham trimmings lidl','sbs cooked ham','sbs basics ham','smoked ham was','smoked ham trimmings',
              'boiled ham'},
-    'cured pork' : {'milano','salami','parma','parma ham','serano ham','serano','lomo','chorizo','fuet','charcuterie','pancetta'},
+    'cured pork' : {'milano','salami','parma','parma ham','serano ham','serano','lomo','chorizo','fuet','charcuterie','pancetta',
+                    'brawn','jamon','jamon iberico','lardo','bologna','bauernschinken','butifarra','butifarra negra','butifarra blanca',
+                    'morcilla','boudin','boudin blanc','zungenwurst','boudin noir','chorizo','coppa','culatello','finocchiona',
+                    'guanciale','kabanos','landjager','liverwurst','lonzino','mortadella','nduja','paio','pepperoni','prosciutto',
+                    'saucisson','saucisson sec','saucisson darles','soppressata','summer sausage','speck','zungenwurst'},
     'bacon' : {'thick smoked bacon','smoked bacon','bacon lean','smoked rindless bacon','streaky bacon','bacon rashers','lardons',
                'back bacon','smoked streaky bacon'},
 }
@@ -820,71 +825,28 @@ def build_pork_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # BEEF
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-beef_basic = {'',''}
-
-# beef
-# shortribs
-# roast beef
-# beef monster munch
-# beef pie
-# bisto best beef gravy
-# beef tomato
-# beef tomatoes
-# 20% minced beef
-# beef silverside w&s
-# sbs ttd beef steak burger
-# beef burger
-# beef stock cube
-# mrs beef stock cube as prepared
-# beef stock
-# mrs beef stock cube
-# 12% beef mince
-# 15% beef mince
-# 20% beef mince
-# beef brisket
-# beef jerky
-# beef fillet
-# beef & jalapeno burger
-# fast beef gravy
-# fast garlic beef chicken gravy
-# mushroom risotto broth w beef
-# beef and mushroom broth w marmalade and asauce
-# beef and mushroom broth w marmalade and asauce
-# sliced beef and beefy mushroom broth w spring onion
-# beef stock and bean broth
-# lamb and beef stock and bean broth w spring onion
-# simple beef and onion broth
-# beef brisket and lettuce broth
-# beef brisket and lettuce broth
-# beef and sunchoke and salami broth
-# beef kofte
-# beef broth & greens
-# beef and chicken chunk on beetroot brioche
-# beef and chicken burger w cranberry apple on ciabatta
-# beef and mushroom broth 2
-# beef pie dinner
-# beef brisket dinner
-# beef broth onions rings and naan bread
-# beefy mushroom gravy
-# beef and mushroom pie w stuffed tomato
-# ham aubergine & courgette in beef broth
-# beef on mini brioche
-# beef on mini brioche w veg pate
-# beef & been sprouts w mushroom broth
+beef_basic = {'beef','shortribs','roast beef','beef silverside w&s','sbs ttd beef steak burger','beef burger','beef stock cube',
+              'mrs beef stock cube as prepared','beef stock','mrs beef stock cube','5% beef mince','12% beef mince','15% beef mince',
+              '20% beef mince','5% minced beef','12% minced beef','15% minced beef','20% minced beef','beef brisket','beef fillet',
+              'flat iron steak','rump steak','sirloin steak','fillet steak','ribeye','ribeye steak','forerib','forerib joint',
+              'beef joint','silverside','topside','top rump','ox cheek','beef shin','oxtail','beef meatballs','beef sausages',
+              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak'}
 
 # usually product of some type katsuobushi or fish sauce for example
-beef_derived_no_recipe =  {'',''}
+beef_derived_no_recipe =  {'shredded beef'}
 
 # different names same thing
 beef_alt = [
-    {'name1','name2'},
+    {'beef tataki','tataki','beef carpaccio','carpaccio'},
     {'another1', 'another2'},
 ]
 
 # subsets - common name with various types
 beef_subsets = {
-    'cod' : { 'pacific cod', 'atlantic cod' },
-    'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+    'cured beef' : {'cecina vacuno','billtong','beef jerky','pastrami','bologna','landjager','pepperoni','soujouk','zungenwurst',
+                    'bresaola'},
+    'beef cold cuts' : {'carvery beef','corned beef','tongue','roast beef slices','tataki','carpaccio'},
+    #'beef cold cuts' : {'','','','','','','','','','','','','','','','' },
 }
 def build_beef_set():
     beef = {'beef'}
@@ -901,6 +863,127 @@ def build_beef_set():
     beef = beef | beef_basic
     
     return beef
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# LAMB 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+lamb_basic = {'lamb','hogget','mutton','roast lamb shoulder','lamb shoulder','lamb leg','lamb shank','lamb leg kabob',
+              'lamb leg kabab','roast leg lamb lean','lamb chop lean','lamb chops lean','lamb chop wfat','lamb chops wfat',
+              'barnsley chop','lamb chop rounds','diced lamb','lambs liver','lamb neck','rack of lamb','lamb cutlets',
+              'leg of lamb','roast lamb','roast leg of lamb','lamb rump','lamb breast','lamb belly','lamb flank',
+              'lamb chuck','lamb loin','saddle of lamb'}
+
+# usually product of some type katsuobushi or fish sauce for example
+lamb_derived_no_recipe =  {'lamb samosa','lamb kofte','donner kebab','lamb bao bun'}
+
+# different names same thing
+lamb_alt = [
+    {'lamb breast','lamb belly'},
+    {'lamb gyoza','lamb dumpling'},
+]
+
+# subsets - common name with various types
+lamb_subsets = {
+    'lamb kebab' : { 'donner','donner meat','shish kebab','souvlaki','giros','gyro','diced lamb kebab','diced lamb' },
+}
+def build_lamb_set():
+    lamb = {'lamb'}
+    
+    for key, val in lamb_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        lamb = lamb | union
+        
+    for val in lamb_alt:
+        lamb = lamb | val       # include different names for each lamb
+    
+    lamb = lamb | lamb_derived_no_recipe
+    
+    lamb = lamb | lamb_basic
+    
+    return lamb
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# DUCK
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+duck_basic = {'duck','duck fat','duck breast meat only raw','duck meat only raw','duck leg quarter','duck thigh','duck breast',
+              'whole duck','duck heart','duck tongue','duck neck','duck wing'}
+
+duck_derived_no_recipe =  {'peking duck','crispy duck','aunt bessies duck fat roast potatoes','skewered duck hearts'}
+
+# different names same thing
+# duck_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+
+# subsets - common name with various types
+# duck_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+def build_duck_set():
+    duck = {'duck'}
+    
+    # for key, val in duck_subsets.items():
+    #     union = val | {key}     # include the categegory generalisation
+    #     duck = duck | union
+        
+    for val in duck_alt:
+        duck = duck | val       # include different names for each duck
+    
+    duck = duck | duck_derived_no_recipe
+    
+    duck = duck | duck_basic
+    
+    return duck
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# GAME
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+game_basic =  {'dove','snipes','goose','woodcock','wild turkey','quail','pheasant','partridge','grouse','pigeon','teal',
+               'hare','rabbit','venison','deer'}
+
+game_derived_no_recipe = {'pigeon stew'}
+
+# different names same thing
+game_alt = [
+    {'grouse', 'red grouse'},
+    {'snipe','common snipe'},
+]
+
+# subsets - common name with various types
+game_subsets = {
+    'partridge' : { 'grey partridge', 'red legged partridge' },
+}
+def build_game_set():
+    game = {'game'}
+    
+    for key, val in game_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        game = game | union
+        
+    for val in game_alt:
+        game = game | val       # include different names for each game
+    
+    game = game | game_derived_no_recipe
+    
+    game = game | game_basic
+    
+    return game
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# other_edible_animal
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+other_edible_animal_basic = {'frogs','frog','frogs legs','empala','kangaroo','antelope','elk','deer','alligator','bat','crocodile',
+                             'guinea pig','kangaroo','ostrich','rat','snake','crickets'}
+
+def build_other_edible_animal_set():
+    other_edible_animal = {'other_edible_animal'}
+    
+    other_edible_animal = other_edible_animal | other_edible_animal_basic
+    
+    return other_edible_animal
 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # # NS_PREGNANT
@@ -940,56 +1023,10 @@ def build_beef_set():
 #     
 #     return allergen
 
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# # DUCK & GAME
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# duck_n_game
-
-# duck
-# duck fat
-# aunt bessies duck fat roast potatoes
-# duck breast meat only raw
-# duck meat only raw
-# duck leg quarter
-# duck thigh
-# duck breast
-# duck and baked potato w red cabbage
 
 
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# # LAMB 
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# allergen_basic = {'',''}
-# 
-# # usually product of some type katsuobushi or fish sauce for example
-# allergen_derived_no_recipe =  {'',''}
-# 
-# # different names same thing
-# allergen_alt = [
-#     {'name1','name2'},
-#     {'another1', 'another2'},
-# ]
-# 
-# # subsets - common name with various types
-# allergen_subsets = {
-#     'cod' : { 'pacific cod', 'atlantic cod' },
-#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-# }
-# def build_allergen_set():
-#     allergen = {'allergen'}
-#     
-#     for key, val in allergen_subsets.items():
-#         union = val | {key}     # include the categegory generalisation
-#         allergen = allergen | union
-#         
-#     for val in allergen_alt:
-#         allergen = allergen | val       # include different names for each allergen
-#     
-#     allergen = allergen | allergen_derived_no_recipe
-#     
-#     allergen = allergen | allergen_basic
-#     
-#     return allergen
+
+
 
 
 # ELEMENTS
@@ -1037,10 +1074,29 @@ def build_beef_set():
 # not striclty true but from a vegan perspective ok
 #seafood = fish | molluscs | crustaceans
 
-# vegan = not animal
-#animal = pork | beef | chicken | seafood | dairy | eggs | {'frogs','frog','frogs legs'}
+# NOT veggie 
+def build_not_veggie_set():
+    not_veggie = build_chicken_set() |               \
+                 build_pork_set() |                  \
+                 build_beef_set() |                  \
+                 build_molluscs_set() |              \
+                 build_crustaceans_set() |           \
+                 build_lamb_set() |                  \
+                 build_fish_set() |                  \
+                 build_game_set() |                  \
+                 build_other_edible_animal_set()     
+    
+    return not_veggie
 
-# veggie = not (animal - dairy - eggs)
+# NOT vegan
+def build_not_vegan_set():
+    not_vegan = build_not_veggie_set() | \
+                build_dairy_set() |      \
+                build_eggs_set()
+
+    return not_vegan
+
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # def get_tags_from_ingredients_heading(igds):
@@ -1056,18 +1112,20 @@ def build_beef_set():
 containsTAGS_LUT = {
     'chicken' : build_chicken_set(),
     'pork' : build_pork_set(),
-    # 'beef' : build_beef_set(),
+    'beef' : build_beef_set(),
     'shellfish' : build_molluscs_set() | build_crustaceans_set(),
-    # 'crustaceans' : build_crustaceans_set(),
-    # 'lamb' : build_lamb_set(),
-    # 'fish' : build_fish_set(),    
+    #'crustaceans' : build_crustaceans_set(),
+    'lamb' : build_lamb_set(),
+    'fish' : build_fish_set(),
+    'game' : build_game_set(),
+    'other' : build_other_edible_animal_set(),
     # 'set_name' : build_XXX_set(),
 }
 inverse_containsTAGS_LUT = {
-    'gluten_free' : build_gluten_set(),     # if its not in this set its gluten free!
+    #'gluten_free' : build_gluten_set(),     # if its not in this set its gluten free!
     # 'ns_pregnant' : build_XXX_set(),
-    # 'veggie' : build_not_veggie_set(),    # if its not in this set its veggie!
-    # 'vegan' : build_not_vegan_set(),      # if its not in this set its vegan!
+    'veggie' : build_not_veggie_set(),    # if its not in this set its veggie!
+    'vegan' : build_not_vegan_set(),      # if its not in this set its vegan!
 }
 
 def get_containsTAGS_for(list_of_ingredients):
@@ -1172,8 +1230,13 @@ if __name__ == '__main__':
 
     for m in re.finditer( r'--- for the nutrition information(.*?)\(', content, re.MULTILINE | re.DOTALL ):
         ingredient = m.group(1)
-        if re.search("duck", ingredient):
+        if re.search("lamb", ingredient):
             print(ingredient.strip())
+            
+    #print('NON VEGAN')        
+    #print(build_not_vegan_set())
+    
+    print(get_ingredients_as_text_list('beef & jalapeno burger')) 
             
     
     
