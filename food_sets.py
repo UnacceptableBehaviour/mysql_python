@@ -519,6 +519,8 @@ gluten_alt = [
     {'nan','naan','naaan bread',},
     {'pita','pitta bread'},
     {'rotti','roti'},
+    {'tortilla wrap','tortilla','wrap'},
+    {'sbs wholemeal tortilla wrap','wholemeal tortilla wrap'}
 ]
 
 # subsets - common name with various types
@@ -531,7 +533,7 @@ gluten_subsets = {
                'brioche','demi brioche','baton','biscuit','bagel','cornbread','rye bread','milk bread','galic pizza',
                'garlic bread','turkish bread','ciabata','bun','focaccia','mgt','multi grain','seeded batch','thick sliced bread',
                'thick sliced seeded bread','sandwich loaf','white bread','olive bread','poppy seed roll','bap', 'crumpet',
-               'seeded baguette','seeded baguette round','baguette round','sourdough round'},
+               'seeded baguette','seeded baguette round','baguette round','sourdough round','wholemeal tortilla wrap'},
 }
 def build_gluten_set():
     gluten = {'gluten'}
@@ -708,14 +710,17 @@ def get_allergens_for(list_of_ingredients):
             for allergen in allergenLUT:
                 if i in allergenLUT[allergen]:
                     allergens_detected.append(allergen)
+                    
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
+    
+    allergens_detected = list(set(allergens_detected))
     
     return allergens_detected
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# SETS - CONTAINS FOOD TYPE
+# SETS - CONTAINS FOOD TYPE - containsTAGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # def get_tags_from_ingredients_heading(igds):
 #     return 'vegan, veggie, cbs, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
@@ -770,136 +775,31 @@ def build_chicken_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PORK
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pork_basic = {'',''}
-
-#pork
-# carvery pork
-# pork belly
-# roast pork
-# trotters
-# pigs ears
-# roast peppered pork loin
-# pork ribs
-# pancetta coated pork tenderloin
-# pork tenderloin
-# pork shoulder
-# sweet and sour pork balls in batter
-# pork and blue cheese kebab
-# pork shoulder stew
-# pimped pork shoulder stew
-# roast pork w egg on toast and salad
-# pork feijoada
-# roast pork w feijoada yorkshire pudding
-# roast pork mini pitta
-# roast pork mini pitta w apple sauce
-# roast pork mini pitta and fish fingers
-# open roast pork mini pitta w apple sauce
-# small pork and egg breakfast
-# small pork and egg w red pepper breakfast
-# pork stuffing
-# stuffed pork and veg stew
-# sweetheart cabbage noodles w pork
-# pork stew
-# pork stew and sweetheart cabbage noodles
-# pork shoulder chop
-# pork and leek stew
-# pork stew w leek and courgette salad
-
-#bacon
-# thick smoked bacon
-# smoked bacon
-# bacon
-# bacon lean
-# smoked rindless bacon
-# bacon frazzles
-# bacon and tomato giraffe baguette
-
-# cured
-# milano
-# salami
-# parma
-# parma ham
-# serano ham
-# serano
-# lomo
-# chorizo
-# fuet
-# Cumberland sausage
-# hot dogs
-# breakfast sausages
-# charcuterie.
-
-# sausage
-# asda chorizo sausages
-# cumberland sausage
-# bc cumberland sausages
-# ttd cumberland sausages
-# cumberland sausages
-# sausages
-# milano cured sausage
-# sausage roll dough
-# sunchoke mushroom and cured milano sausage broth
-# sausage casserole
-
-# pancetta
-
-# ham
-# pepper ham
-# cooked ham
-# ldl smoked ham
-# smoked ham
-# w&s breadcrumb ham
-# parma ham
-# sbs parma ham
-# sandwich ham
-# cooked ham trimmings lidl
-# sbs cooked ham
-# sbs basics ham
-# smoked ham was
-# smoked ham trimmings
-# ham
-# sticky cheese & ham sandwich filling
-# mini fish lunch with ham
-# ham green beans and cous cous w egg
-# king prawn and ham cous cous
-# king prawn and ham cous cous amuse bouche
-# ham salmon and eggs on tomato toast
-# emergency ham and tomato soup small
-# tortilla tortilla chips and ham
-# leek and ham cous cous
-# mini ham and red pepper baguette
-# broad bean and potato w/ cured ham salad
-# pepper ham and tomato sandwich
-# pepper ham and tomato baguette round
-# bechamel sauce
-# potato salad w ham and grapes
-# potato salad and ham snack
-# ham frazzles and onion rings
-# fruit salad and ham
-# fruit ham and nuts
-# carbless courgette and ham lasagna
-# ham chicken and tomato garlic bread
-# fruit and ham breakfast
-# ham spinach tortilla
-# ham aubergine & courgette in beef broth
-# ham apple & lemon basil pizza
-
-
-
+pork_basic = {'pork','carvery pork','pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
+              'pork ribs','pork_alt loin','pork_alt chop','pork tenderloin','pork shoulder chop','pork shoulder','pork leg',
+              'pigs cheeks','pig cheeks','pigs cheeks oyesters','osso buco','pigs hock','spare ribs','rack of ribs','bacon',
+              'cured pork','pork sausage','ham',
+              }
 
 # usually product of some type katsuobushi or fish sauce for example
-pork_derived_no_recipe =  {'',''}
+pork_derived_no_recipe =  {'sweet and sour pork balls in batter','crispy pork','sweet and sour pork','pork gyoza'}
 
 # different names same thing
 pork_alt = [
-    {'name1','name2'},
-    {'another1', 'another2'},
+    {'streaky bacon','bacon rashers'},
+    {'trotters','pigs trotters'},
 ]
 
 # subsets - common name with various types
 pork_subsets = {
-    'cod' : { 'pacific cod', 'atlantic cod' },
-    'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+    'pork sausage' : {'breakfast sausages','hot dogs','asda chorizo sausages','cumberland sausage','bc cumberland sausages',
+                      'ttd cumberland sausages','cumberland sausages','pork sausages','milano cured sausage'},
+    'ham' : {'pepper ham','cooked ham','ldl smoked ham','smoked ham','w&s breadcrumb ham','parma ham','sbs parma ham',
+             'sandwich ham','cooked ham trimmings lidl','sbs cooked ham','sbs basics ham','smoked ham was','smoked ham trimmings',
+             'boiled ham'},
+    'cured pork' : {'milano','salami','parma','parma ham','serano ham','serano','lomo','chorizo','fuet','charcuterie','pancetta'},
+    'bacon' : {'thick smoked bacon','smoked bacon','bacon lean','smoked rindless bacon','streaky bacon','bacon rashers','lardons',
+               'back bacon','smoked streaky bacon'},
 }
 def build_pork_set():
     pork = {'pork'}
@@ -1004,6 +904,9 @@ def build_beef_set():
 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # # NS_PREGNANT
+# # pregnant: alcohol, uncooked mould-ripened soft cheese, uncooked blue cheese, raw eggs, raw or rare meat (toxoplasmosis),
+# #           cured meats, pate, liver, Vit A, raw fish that has not been pre-frozen (worms), shark, swordfish or marlin,
+# #           minimise tuna (mercury)# quite a few soft cheeses are fine! Source NHS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # allergen_basic = {'',''}
 # 
@@ -1052,32 +955,41 @@ def build_beef_set():
 # duck breast
 # duck and baked potato w red cabbage
 
+
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# # COMBINATIONS
+# # LAMB 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#'vegan, veggie, cbs, , , , ns_pregnant'
-
-# not striclty true but from a vegan perspective ok
-#seafood = fish | molluscs | crustaceans
-
-# vegan = not animal
-#animal = pork | beef | chicken | seafood | dairy | eggs | {'frogs'}
-
-# veggie = not (animal - dairy - eggs)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# allergen_basic = {'',''}
+# 
+# # usually product of some type katsuobushi or fish sauce for example
+# allergen_derived_no_recipe =  {'',''}
+# 
+# # different names same thing
+# allergen_alt = [
+#     {'name1','name2'},
+#     {'another1', 'another2'},
+# ]
+# 
+# # subsets - common name with various types
+# allergen_subsets = {
+#     'cod' : { 'pacific cod', 'atlantic cod' },
+#     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
+# }
+# def build_allergen_set():
+#     allergen = {'allergen'}
+#     
+#     for key, val in allergen_subsets.items():
+#         union = val | {key}     # include the categegory generalisation
+#         allergen = allergen | union
+#         
+#     for val in allergen_alt:
+#         allergen = allergen | val       # include different names for each allergen
+#     
+#     allergen = allergen | allergen_derived_no_recipe
+#     
+#     allergen = allergen | allergen_basic
+#     
+#     return allergen
 
 
 # ELEMENTS
@@ -1115,6 +1027,92 @@ def build_beef_set():
 #     allergen = allergen | allergen_basic
 #     
 #     return allergen
+
+
+# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# # COMBINATIONS
+# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#'vegan, veggie, cbs, , , , ns_pregnant'
+
+# not striclty true but from a vegan perspective ok
+#seafood = fish | molluscs | crustaceans
+
+# vegan = not animal
+#animal = pork | beef | chicken | seafood | dairy | eggs | {'frogs','frog','frogs legs'}
+
+# veggie = not (animal - dairy - eggs)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# def get_tags_from_ingredients_heading(igds):
+#     return 'vegan, veggie, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
+#                                                        
+# allegen sets
+# 'dairy', 'cheese,' 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 'CONTAINS' TAG SETS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+containsTAGS_LUT = {
+    'chicken' : build_chicken_set(),
+    'pork' : build_pork_set(),
+    # 'beef' : build_beef_set(),
+    'shellfish' : build_molluscs_set() | build_crustaceans_set(),
+    # 'crustaceans' : build_crustaceans_set(),
+    # 'lamb' : build_lamb_set(),
+    # 'fish' : build_fish_set(),    
+    # 'set_name' : build_XXX_set(),
+}
+inverse_containsTAGS_LUT = {
+    'gluten_free' : build_gluten_set(),     # if its not in this set its gluten free!
+    # 'ns_pregnant' : build_XXX_set(),
+    # 'veggie' : build_not_veggie_set(),    # if its not in this set its veggie!
+    # 'vegan' : build_not_vegan_set(),      # if its not in this set its vegan!
+}
+
+def get_containsTAGS_for(list_of_ingredients):
+    containsTAGS_detected = []
+    
+    if list_of_ingredients.__class__ == str:
+        list_of_ingredients = [list_of_ingredients]    
+    
+    if list_of_ingredients.__class__ == list:
+        # build complete list - from local DB
+        # will not follow URL to inet for ingredients of off the shelf items
+        
+        add_ingredients = []
+        for i in list_of_ingredients:
+            add_me = get_ingredients_as_text_list(i)
+            if add_me:
+                add_ingredients = add_ingredients + add_me
+            else:   # ingredient not in DB
+                #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
+                #print(f"NF:{i}<")
+                pass # TODO - log
+                    
+        
+        # flatten so there's only one of each
+        list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
+        
+        # TRUE LOOKUP
+        for i in list_of_ingredients:
+            for containsTAG in containsTAGS_LUT:
+                if i in containsTAGS_LUT[containsTAG]:
+                    containsTAGS_detected.append(containsTAG)
+
+        # INVERSE LOOKUP
+        for i in list_of_ingredients:
+            for containsTAG in inverse_containsTAGS_LUT:
+                if i not in inverse_containsTAGS_LUT[containsTAG]:
+                    containsTAGS_detected.append(containsTAG)
+
+    else:
+        raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
+    
+    
+    containsTAGS_detected = list(set(containsTAGS_detected))    # remove duplicates
+    
+    return containsTAGS_detected
 
 
 
@@ -1159,12 +1157,12 @@ if __name__ == '__main__':
     
     #print(cheese_subsets)
     
-    cheese = {'cheese'}
-    #[cheese | cheese_set for cheese_set in cheese_subsets ]
-    for cheese_cat, cheese_set in cheese_subsets.items():
-        cheese = cheese | {cheese_cat} | cheese_set
-    
-    print(cheese) # all the cheese
+    # cheese = {'cheese'}
+    # #[cheese | cheese_set for cheese_set in cheese_subsets ]
+    # for cheese_cat, cheese_set in cheese_subsets.items():
+    #     cheese = cheese | {cheese_cat} | cheese_set
+    # 
+    # print(cheese) # all the cheese
     
     nutrients = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
     content = ''
@@ -1177,12 +1175,6 @@ if __name__ == '__main__':
         if re.search("duck", ingredient):
             print(ingredient.strip())
             
-    # for line in content:
-    #     print(line)
-    #     match = re.match(r'--- for the nutrition information(.*?)\(', line, re.MULTILINE | re.DOTALL)
-    #     pprint(match)
-    #     if match:
-    #         print(match.group(1))
     
     
 # ELEMENTS

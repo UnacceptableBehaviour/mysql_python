@@ -10,7 +10,7 @@ from pathlib import Path
 
 from helper_nutrinfo import i_db
 #from food_sets import does_component_contain_allergen
-from food_sets import get_allergens_for
+from food_sets import get_allergens_for, get_containsTAGS_for
 
 # def test_set_have_arithmetic_operators(self):
 #     scotsmen = {'MacLeod', 'Wallace', 'Willie'}
@@ -75,6 +75,6 @@ if __name__ == '__main__':
     for i in i_list:
         width = len('surlphur_dioxide')+2
 
-        print(f"{str(get_allergens_for(i)).ljust(width)} - {i}")
+        print(f"{i}\n\t- {str(get_allergens_for(i))}\n\t- {str(get_containsTAGS_for(i))}")
         
     
