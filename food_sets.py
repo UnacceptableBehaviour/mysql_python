@@ -732,13 +732,13 @@ def get_allergens_for(list_of_ingredients):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # CHICKEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-chicken_basic = {'chicken dark meat','chicken breast','chicken','chicken','chicken','chicken','chicken','chicken',
+chicken_basic = {'chicken','chicken dark meat','chicken breast',
                  'chicken fat','chicken wing w skin','cornfed chicken','chicken wing','chicken roll',
                  'crispy chicken skin','chicken bites','chicken liver','chicken stock cube','chicken stock cubes',
                  'chicken thigh','chicken brown meat','chicken dark meat','chicken breast','poached chicken thigh',
                  'chicken stock','chicken liver','chicken gravy','home made chicken gravy','roast chicken',
                  'fried chicken breast','fried chicken thigh','fried chicken wing','fried chicken quarter',
-                 'chicken mince','minced chicken','chicken skin', 'chicken heart'
+                 'chicken mince','minced chicken','chicken skin','chicken heart','chicken crown'
                  }
 
 # usually product of some type katsuobushi or fish sauce for example
@@ -907,7 +907,7 @@ def build_lamb_set():
 # DUCK
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 duck_basic = {'duck','duck fat','duck breast meat only raw','duck meat only raw','duck leg quarter','duck thigh','duck breast',
-              'whole duck','duck heart','duck tongue','duck neck','duck wing'}
+              'whole duck','duck heart','duck tongue','duck neck','duck wing','duck crown'}
 
 duck_derived_no_recipe =  {'peking duck','crispy duck','aunt bessies duck fat roast potatoes','skewered duck hearts'}
 
@@ -944,17 +944,42 @@ def build_duck_set():
 game_basic =  {'dove','snipes','goose','woodcock','wild turkey','quail','pheasant','partridge','grouse','pigeon','teal',
                'hare','rabbit','venison','deer'}
 
-game_derived_no_recipe = {'pigeon stew'}
+game_derived_no_recipe = {'pigeon stew','venison pot pie'}
 
 # different names same thing
 game_alt = [
     {'grouse', 'red grouse'},
     {'snipe','common snipe'},
+    {'venison', 'deer'},
+    {'venison backstrap','venison loin'},
+    {'venison shoulder','venison chuck'},
+    {'venison shank','venison osso buco'},
+    {'venison leg','venison round'},
+    {'minced venison','venison mince'},
 ]
 
 # subsets - common name with various types
+# TODO sort this list & remove duplicates
+# bird cuts {'bird','bird fat','bird breast meat only raw','bird meat only raw','bird leg quarter','bird thigh','bird breast',
+#            'whole bird','bird heart','bird tongue','bird neck','bird wing','bird crown',
+#            'bird dark meat','bird breast', 'bird fat','bird wing w skin','cornfed bird','bird wing','bird roll',
+#            'crispy bird skin','bird bites','bird liver','bird stock cube','bird stock cubes',
+#            'bird thigh','bird brown meat','bird dark meat','bird breast','poached bird thigh',
+#            'bird stock','bird liver','bird gravy','home made bird gravy','roast bird',
+#            'fried bird breast','fried bird thigh','fried bird wing','fried bird quarter',
+#            'bird mince','minced bird','bird skin','bird heart'}
 game_subsets = {
-    'partridge' : { 'grey partridge', 'red legged partridge' },
+    'partridge' : { 'grey partridge','red legged partridge' },
+    'deer' : {'venison rump','venison loin','venison tenderloin','venison shoulder','venison shank','venison ribs',
+              'venison neck','venison flank','venison leg','venison mince','venison saddle'},
+    'turkey' : {'turkey breast meat only raw','turkey meat only raw','turkey leg quarter','turkey thigh','turkey breast',
+                'whole turkey','turkey wing','turkey crown','turkey leg','turkey thigh','turkey breast','turkey dark meat',
+                'turkey breast', 'turkey fat','turkey wing w skin','cornfed turkey','turkey wing','turkey roll',
+                'crispy turkey skin','turkey thigh','turkey brown meat','turkey dark meat','poached turkey thigh',
+                'turkey stock','turkey gravy','home made turkey gravy','roast turkey','fried turkey breast',
+                'fried turkey thigh','fried turkey wing','fried turkey quarter','turkey mince','minced turkey',
+                'turkey skin','turkey burger'}
+    
 }
 def build_game_set():
     game = {'game'}
@@ -975,11 +1000,30 @@ def build_game_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # other_edible_animal
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-other_edible_animal_basic = {'frogs','frog','frogs legs','empala','kangaroo','antelope','elk','deer','alligator','bat','crocodile',
+other_edible_animal_basic = {'aligator','frog', 'empala','emu','kangaroo','antelope','elk','alligator','bat','crocodile',
                              'guinea pig','kangaroo','ostrich','rat','snake','crickets'}
+
+# subsets - common name with various types
+other_edible_animal_subsets = {
+    'frog' : { 'frogs','frogs legs' },
+    'aligator' : { 'aligator collar','aligator knuckle','aligator chuck tender','aligator front hock',
+                   'aligator flank steak','aligator thin ribs','aligator prime ribs','aligator sirloin',
+                   'aligator fillet','aligator ribeye','aligator tail','aligator hind hock' },
+    'crocodile' : { 'crocodile collar','crocodile knuckle','crocodile chuck tender','crocodile front hock',
+                   'crocodile flank steak','crocodile thin ribs','crocodile prime ribs','crocodile sirloin',
+                   'crocodile fillet','crocodile ribeye','crocodile tail','crocodile hind hock' },
+    'kangaroo' : { 'kangaroo steak','kangaroo ribs','kangaroo tail','kangaroo rump','kangaroo tenderloin',
+                  'kangaroo shoulder','kangaroo ribs','kangaroo neck','kangaroo flank','kangaroo leg','kangaroo mince',
+                  'kangaroo saddle','kangaroo loin','kangaroo striploin','kangaroo diced','kangaroo mince',
+                  'minced kangaroo'},
+}
 
 def build_other_edible_animal_set():
     other_edible_animal = {'other_edible_animal'}
+    
+    for key, val in other_edible_animal_subsets.items():
+        union = val | {key}     # include the categegory generalisation
+        other_edible_animal = other_edible_animal | union
     
     other_edible_animal = other_edible_animal | other_edible_animal_basic
     
