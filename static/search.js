@@ -73,7 +73,7 @@ function searchForRecipe (){
 
 function renderRecipeCard(rcpInfo){
   //<div class="card">
-  //    <img class="card-img-top" src="http://192.168.1.13:8000/static/recipe/{{recipe_info['image_file']}}"></img>
+  //    <img class="card-img-top" src="http://192.168.1.13:8000/static/recipe/{{recipe_info['lead_image']}}"></img>
   //    <div class="card-body">
   //        <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
   //        <p class="card-text">{{ recipe_info['description'] }}</p>
@@ -105,7 +105,7 @@ function renderRecipeCard(rcpInfo){
   }
   
   html_card = `<div class="card">
-      <img class="card-img-top" src="${assets_url}${rcpInfo['image_file']}"></img>
+      <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
       <div class="card-body">
           <h5 class="card-title">${rcpInfo['ri_name']}</h5>
           <p class="card-text">${rcpInfo['description']}</p>

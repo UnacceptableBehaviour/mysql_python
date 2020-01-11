@@ -96,7 +96,21 @@ def log_exception(message, exception):
 # ((^-+- for the.*?Total) \(.*?\)).*?(allergens:.*?$.*?tags:.*?$)   RECIPE w/ allergens following
 # ((^-+- for the.*?Total) \(.*?\)).*?((allergens:(.*?)$.*?tags:(.*?)$)) RECIPE capture allergens & tags
 # (^-+- for the.*?(tags:.*?$))  simplified RECIPE w tags
-
+# example text:
+# ------------------ for the swiss breakfast (1)
+# 40g		swiss meusli no added sugar
+# 10g		sugar
+# 150g		semi skimmed milk
+# 													Total (200g)
+# method: put everything in bowl
+# notes: 
+# description: describe me
+# stars: 2
+# allergens: dairy, nuts, seeds_lupin, gluten
+# tags: veggie
+# images: 
+# lead_image: 20200101_063015_swiss breakfast.jpg
+# __end_recipe__
 def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt'):
     recipe_info = None    
     
@@ -113,14 +127,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
     
     
     # try 'allergens & tags below recipe' match first since 'recipe' will match both
-    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?description:(.*?)$.*?stars:(.*?)$.*?allergens:(.*?)$.*?tags:(.*?)$', recipe_text, re.MULTILINE | re.DOTALL )
-    we_have_tags = True
-    
-    if (match == None):
-        match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
-        we_have_tags = False
-        #recipe_regex.search( recipe_text, re.MULTILINE | re.DOTALL )
-        #match = recipe_regex
+    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)$.*?notes:(.*?)$.*?description:(.*?)$.*?stars:(.*?)$.*?allergens:(.*?)$.*?tags:(.*?)$.*?images:(.*?)$.*?lead_image:(.*?)$.*?username:(.*?)$.?^__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
 
     #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
@@ -129,17 +136,27 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         # 2 - servings
         # 3 - ingredients
         # 4 - yield
-        # 5 - description
-        # 6 - stars (user_rating)
-        # 7 - allergens
-        # 8 - tags
+        # 5 - method 
+        # 6 - notes
+        # 7 - description
+        # 8 - stars (user_rating)
+        # 9 - allergens
+        # 10 - tags
+        # 11 - steps, image list
+        # 12 - lead image
+        # 13 - username
         
         # easy to detect failure in the data
         recipe_info = {
             'ri_name':"Initialised as NO MATCH",
+            'lead_image':'slms.jpg',
             'ingredients':"Pure green",
+            'steps':[ 'image_list.jpg' ],
+            'method':'use your instinct, be creative',
+            'notes':"it'll turn out better next time if you do this",
             'description':'invent_me',
             'user_rating':0,
+            'username':'carter',
             'allergens': [ 'none_listed' ],
             'tags': [ 'none_listed' ],
             'servings': 0,
@@ -148,6 +165,18 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         recipe_info['ri_name'] = match.group(1).strip()
         recipe_info['servings'] = match.group(2).strip()
         recipe_info['yield'] = match.group(4).strip()
+        recipe_info['method'] = match.group(5).strip()
+        recipe_info['notes'] = match.group(6).strip()        
+        recipe_info['description'] = match.group(7).strip()
+        stars = match.group(8).strip()
+        if stars == '':
+            stars = 0
+        recipe_info['user_rating'] = int(stars)
+        recipe_info['allergens'] = [ a.strip() for a in match.group(9).strip().rstrip(",").split(',') ]    # create list of strings
+        recipe_info['tags'] = [ a.strip() for a in match.group(10).strip().rstrip(",").split(',') ]                
+        recipe_info['steps'] = match.group(11).strip()
+        recipe_info['lead_image'] = match.group(12).strip()
+        recipe_info['username'] = match.group(13).strip()
 
         
         # fix broken lines before processing
@@ -177,17 +206,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
 
         
-        # create tag & allergens entries, populate them if they exist
-        if we_have_tags:
-            recipe_info['description'] = match.group(5).strip()
-            stars = match.group(6).strip()
-            if stars == '':
-                stars = 0
-            recipe_info['user_rating'] = int(stars)
-            recipe_info['allergens'] = [ a.strip() for a in match.group(7).strip().rstrip(",").split(',') ]    # create list of strings
-            recipe_info['tags'] = [ a.strip() for a in match.group(8).strip().rstrip(",").split(',') ]                
-
-        # TODO remove after schema redisgn
+        # TODO remove after schema redesign
         if recipe_info['allergens'][0] == "":
             recipe_info['allergens'] = [ 'none_listed' ]
         if recipe_info['tags'][0] == "":
@@ -259,15 +278,16 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # load a text file from asset server
-#                  - convert into partial recipe dictionary
+#                  - convert into recipe dictionary for each component
 #                  - ingredients, yield & servings
+#                  - end of reipe denoted by marker __end_recipe__
 #
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name):
-    recipe_without_tags = {}
+    recipe_with_tags = {}
     recipe_info = {}
     recipies_and_subcomponents = []
         
@@ -279,46 +299,47 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
     print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")    
     
     # create list of recipes - these have optionally listed fields - 'tags:', 'allergens:', 'notes:', 'description:', 'stars:' 
-    for m in re.finditer( r'(^-+- for the (.*?) \(.*?Total \(.*?\))', orig_recipe_text, re.MULTILINE | re.DOTALL ):    
-        recipe_without_tags[m.group(2)] = m.group(1)
+    for m in re.finditer( r'(^-+- for the (.*?) \(.*?__end_recipe__)', orig_recipe_text, re.MULTILINE | re.DOTALL ):    
+        recipe_with_tags[m.group(2)] = m.group(1)
         #                    name         whole component / recipe
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    # add optionally listed tags: & allergens: fields to recipes found
-    # go through recipe line by aline and pull out tags & allergens
-    recipe_title = ''
-    for line in iter(orig_recipe_text.splitlines()):
-        print(f"L: {line}")
-        # check for start of recipe
-        m = re.match( r'(^-+- for the (.*?) \()', line)
-        if m:
-            recipe_title = m.group(2)
-            print(f"RECORDING R:{recipe_title} <")
-            continue
-        
-        # ADD processing for:
-        # notes: // multiline - later
-        # description:
-        # stars:
-        # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
-        # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant, 
-        # type: amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
-        
-        m = re.match( r'((^tags:)|(^allergens:)|(^description:)|(^stars:))', line)
-        if m:
-            recipe_without_tags[recipe_title] += f"\n{line}"
-            print(f"APPENDED R:{recipe_title} < {line}")
-        
-    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==E")
-    
-    pprint(recipe_without_tags)    
+
+    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # # add optionally listed tags: & allergens: fields to recipes found
+    # # go through recipe line by aline and pull out tags & allergens
+    # recipe_title = ''
+    # for line in iter(orig_recipe_text.splitlines()):
+    #     print(f"L: {line}")
+    #     # check for start of recipe
+    #     m = re.match( r'(^-+- for the (.*?) \()', line)
+    #     if m:
+    #         recipe_title = m.group(2)
+    #         print(f"RECORDING R:{recipe_title} <")
+    #         continue
+    #     
+    #     # ADD processing for:
+    #     # notes: // multiline - later
+    #     # description:
+    #     # stars:
+    #     # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
+    #     # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant, 
+    #     # type: amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+    #     
+    #     m = re.match( r'((^tags:)|(^allergens:)|(^description:)|(^stars:))', line)
+    #     if m:
+    #         recipe_with_tags[recipe_title] += f"\n{line}"
+    #         print(f"APPENDED R:{recipe_title} < {line}")
+    #     
+    # print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==E")
+    # 
+    # pprint(recipe_with_tags)    
     
     # for key in dict.iterkeys(): ...
     # for value in dict.itervalues(): ...
     # for key, value in dict.iteritems(): ...
     #
-    # recipe_without_tags now has tags!
-    for title, recipe_text in recipe_without_tags.items():
+    # recipe_with_tags now has tags!
+    for title, recipe_text in recipe_with_tags.items():
         print(recipe_text)
         
         # create a dictionary for each recipe / subcoponent        

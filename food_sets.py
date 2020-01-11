@@ -487,29 +487,14 @@ def build_celery_set():
 
 
 
-'wheat',
-'wheat germ',
-'rye',
-'barley',
-'bulgur',
-'couscous',
-'farina',
-'graham flour',
-'kamut',
-'khorasan wheat',
-'semolina',
-'spelt',
-'triticale',
-'oats',
-'oat bran',
-'flour'
 
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # GLUTEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-gluten_basic = {'gluten'}
+gluten_basic = {'gluten','wheat','wheat germ','rye','barley','bulgur','couscous','farina','graham flour',
+                'kamut','khorasan wheat','semolina','spelt','triticale','oats','oat bran','flour' }
 
 # usually product of some type katsuobushi or fish sauce for example
 gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread','lamb samosa','veg samosa',
@@ -1203,10 +1188,28 @@ def get_containsTAGS_for(list_of_ingredients):
                     containsTAGS_detected.append(containsTAG)
 
         # INVERSE LOOKUP
+        remove_tags = []
         for i in list_of_ingredients:
+            
             for containsTAG in inverse_containsTAGS_LUT:
-                if i not in inverse_containsTAGS_LUT[containsTAG]:
+                if get_ingredients_as_text_list(i) != None:         # it has to be in the data base to work! 
                     containsTAGS_detected.append(containsTAG)
+            
+                #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
+                #print(f"checking SET:{containsTAG} for {i}")
+                if i in inverse_containsTAGS_LUT[containsTAG]:
+                    print(f"\tSET:{containsTAG} - {i} NOT PRESENT")
+                    remove_tags.append(containsTAG)
+        
+        # at on of this containsTAGS_detected may look like ['veggie','vegan','veggie','veggie','vegan']
+        # flatten it to ['veggie','vegan']
+        # if a single occurance of a non veggie or non vegan item occured remove the veggie or vegan tag
+        containsTAGS_detected = set(containsTAGS_detected)
+        print(f"containsTAGS_detected:{containsTAGS_detected} - - - - S")
+        print(f"remove_tags: {remove_tags}")        
+        remove_tags = set(remove_tags)
+        containsTAGS_detected = containsTAGS_detected - remove_tags
+        print(f"containsTAGS_detected:{containsTAGS_detected} - - - - E")
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
@@ -1280,9 +1283,28 @@ if __name__ == '__main__':
     #print('NON VEGAN')        
     #print(build_not_vegan_set())
     
-    print(get_ingredients_as_text_list('beef & jalapeno burger')) 
-            
-    
+    # print(get_ingredients_as_text_list('beef & jalapeno burger')) 
+    #         
+    # print(get_ingredients_as_text_list('hatchet salad'))
+    # 
+    # print(get_ingredients_as_text_list('tomatoes'))
+    # 
+    # print(get_containsTAGS_for('hatchet salad'))
+    # print(get_allergens_for('hatchet salad'))
+    # 
+    # containsTAGS_detected = []
+    # containsTAGS_detected = set(containsTAGS_detected) | {'blarny'}
+    # print(containsTAGS_detected)
+    # containsTAGS_detected = set(containsTAGS_detected) | {'double blarny'}
+    # print(containsTAGS_detected)
+    # # for tag in containsTAGS_detected:       < SORRY NO CAN DO - RuntimeError: Set changed size during iteration
+    # #     print(f"DISCARDING: {tag}")
+    # #     containsTAGS_detected.discard(tag)
+    # # containsTAGS_detected = set(containsTAGS_detected)  - {'blarny'}
+    # print(containsTAGS_detected)
+
+    # print('- - -')
+    # print(build_not_vegan_set())
     
 # ELEMENTS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

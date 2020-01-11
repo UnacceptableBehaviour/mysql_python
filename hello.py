@@ -60,15 +60,15 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route('/')
 def db_hello_world():
     # execute this query
-    # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
-    db_lines = db.execute("SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';").fetchall()
+    # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
+    db_lines = db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
     
     formatted_text = "<br>"
     
     for line in db_lines:
         pprint(line)
-        #print(f" | {round(line.yield, 0)} | {round(line.servings, 0)} | {line.ri_name} | {line.image_file} | <br>")
-        #formatted_text = formatted_text + f" | {int(line.yield)} | {int(line.servings)} | {line.ri_name} | {line.image_file} | <br>"
+        #print(f" | {round(line.yield, 0)} | {round(line.servings, 0)} | {line.ri_name} | {line.lead_image} | <br>")
+        #formatted_text = formatted_text + f" | {int(line.yield)} | {int(line.servings)} | {line.ri_name} | {line.lead_image} | <br>"
     
     print(f"\n\nProcess Query\n{formatted_text}\n")
     
@@ -288,7 +288,7 @@ def buttons_inputs():
 @app.route('/db_gallery')
 def db_gallery():
     # execute this query
-    # SELECT yield, servings, ri_name, image_file FROM exploded WHERE image_file <> '';
+    # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
     
     # do this in pages when larger db - use JS to reload
     ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()

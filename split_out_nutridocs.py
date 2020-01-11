@@ -16,7 +16,9 @@ import sys
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
 
-from auto_tagging import get_allergens_from_ingredients, get_tags_from_ingredients, get_type_from_ingredients
+#from auto_tagging import get_allergens_from_ingredients, get_tags_from_ingredients, get_type_from_ingredients
+from auto_tagging import get_type_from_ingredients
+from food_sets import get_allergens_for,get_containsTAGS_for
 
 
 FILE_LOC = 0
@@ -132,8 +134,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
                     '__notes__' : notes, #'add improvement comments',
                     '__description__' : 'describe me',
                     '__stars__' : str(randint(1,5)),
-                    '__allergens__' : get_allergens_from_ingredients(ingredients),
-                    '__tags__' : get_tags_from_ingredients(ingredients),
+                    '__allergens__' : get_allergens_for(ingredients),
+                    '__tags__' : get_containsTAGS_for(ingredients),
                     '__type__' : get_type_from_ingredients(ingredients),
                     '__images__' : get_images_from_lead_image(lead_image),
                     '__lead_image__' : lead_image,
@@ -172,6 +174,35 @@ def main():
     pass
 
 
+NUTRIDOC_LIST = [
+# 'y950',
+# 'y951',
+# 'y952',
+# 'y953',
+# 'y954',
+# 'y955',
+# 'y956',
+# 'y957',
+# 'y958',
+# 'y959',
+# 'y960',
+# 'y961',
+# 'y962',
+# 'y963',
+ 'y964',
+# 'y965',
+# 'y966',
+# 'y967',
+# 'y968',
+# 'y969',
+# 'y970',
+# 'y971',
+# 'y972',
+# 'y973',
+# 'y974',
+#'y979'
+]
+
 
 if __name__ == '__main__':
     #main()
@@ -189,7 +220,15 @@ if __name__ == '__main__':
     files_to_process = get_nutridoc_list_rtf()
     
     for f in files_to_process:
-        print(str(f[0].name))
+        check = 'NOT PRESENT'
+        filename = str(f[0].name)
+        m = re.match(r'^(y\d\d\d)', filename)
+        print(f"M: {m.group(1)} {m.group(1) in NUTRIDOC_LIST}<")
+        for nutridoc_no in NUTRIDOC_LIST:
+            if nutridoc_no in filename:
+                check = 'PRESENT'
+        #pprint(f)
+        print(filename, check)
     
     #sys.exit()
     
@@ -197,12 +236,15 @@ if __name__ == '__main__':
     # TMP_PATH = 1
     # NEW_FILE_PATH = 2
     # take contents out of each file and create text docs
-    for fileset in files_to_process:        
-        if 'y964' not in str(fileset[FILE_LOC]):
+    for fileset in files_to_process:
+        filename = str(fileset[0].name)
+        m = re.match(r'^(y\d\d\d)', filename)
+        
+        if m.group(1) in NUTRIDOC_LIST:
+            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *")            
+        else:
             print(f"SKIPPING: {str(fileset[FILE_LOC])}")
             continue
-        else:
-            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *")
         
         #convert file from RTF to txt
         nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])

@@ -236,7 +236,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 #  allergens    | character varying(150)[] |           |          | 
 #  tags         | character varying(150)[] |           |          | 
 #  user_tags    | character varying(150)[] |           |          | 
-#  image_file   | character varying(100)   |           |          | NULL::character varying
+#  lead_image   | character varying(100)   |           |          | NULL::character varying
 #  text_file    | character varying(100)   |           |          | NULL::character varying
 #  n_en         | numeric(9,2)             |           |          | NULL::numeric
 #  n_fa         | numeric(9,2)             |           |          | NULL::numeric
@@ -257,7 +257,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # all fields
 # ['id','ri_id','ri_name','yield','units','servings','density','serving_size','atomic','ingredients','allergens','tags',
-# 'user_tags','image_file','text_file','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al',]
+# 'user_tags','lead_image','text_file','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al',]
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -269,7 +269,7 @@ def return_recipe_dictionary():
         # header:       name image desc             EG gallery          
         'ri_id': 0,
         'ri_name':'none_listed',
-        'image_file':'none_listed',
+        'lead_image':'none_listed',
         'text_file':'none_listed',
         'description': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
         'atomic': 1,        # 0 if component / further recipe info available
@@ -280,6 +280,7 @@ def return_recipe_dictionary():
         'dt_time': time24h_from_nix_time(nix_time_in_ms),
         'dt_rollover': roll_over_from_nix_time(nix_time_in_ms),
         'dt_last_update': 0,
+        'username':'carter',
 
         # info:         nurients, servings, etc     Traffic Lights & Nutrition
         'nutrinfo': {
@@ -330,7 +331,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     # query db - the index from fields is used to retrive and alocate data to correct dictionary entry - -
     if fields == None:
         fields = ['id','ri_id','ri_name','yield','units','servings','density','serving_size',
-                  'atomic','ingredients','allergens','tags','user_tags','image_file','text_file',
+                  'atomic','ingredients','allergens','tags','user_tags','lead_image','text_file',
                   'n_En','n_Fa','n_Fs','n_Fm','n_Fp','n_Fo3','n_Ca','n_Su','n_Fb','n_St','n_Pr','n_Sa','n_Al']
 
     qry_string = ', '.join(fields)
@@ -428,7 +429,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
     
-    fields = ['ri_id', 'ri_name', 'image_file', 'description', 'user_rating']
+    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating']
     
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
@@ -477,7 +478,7 @@ def get_ingredients_as_text_list(recipe_component_or_ingredient):
 # get_next_page_recipe_ids()    
 def get_all_recipe_ids():
     
-    db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE image_file <> '';").fetchall()                
+    db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE lead_image <> '';").fetchall()                
     
     ids = [ int( str(line).lstrip('(').rstrip(',)') )  for line in db_lines ]
     
