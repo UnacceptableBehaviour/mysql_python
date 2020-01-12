@@ -125,8 +125,13 @@ eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen
 eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
                            'mayo','mayonnaise','meringue','meringue powder','ovalbumin','surimi','egg tofu'}
 
+eggs_alt = [{'mayo','hman mayo','chefs larder mayo','mayonaise'}]
+
 def build_eggs_set():
     eggs = {'eggs'}
+
+    for val in eggs_alt:
+        eggs = eggs | val
         
     eggs = eggs | eggs_derived_no_recipe
     
@@ -405,7 +410,8 @@ crustaceans_subsets = {
     'crab' : { 'brown crab','dungeness crab','mud crab','sand crab','alaskan king crab','norwegian king crab','king crab','snow crab','blue crab','soft shell crab' },
     'lobster' : {'american lobster','rock lobster','spiny lobster','red lobster','canadian lobster'},
     'crayfish' : {'marron','koura'},
-    'prawns' : {'tiger prawns','king prawns','cooked prawns','fresh prawns','fresh water prawns'}
+    'prawns' : {'tiger prawns','king prawns','cooked prawns','fresh prawns','fresh water prawns','tiger prawn',
+                'king prawn','cooked prawn','fresh prawn','fresh water prawn'}
 }
 def build_crustaceans_set():
     crustaceans = {'crustaceans'}
@@ -764,7 +770,7 @@ def build_chicken_set():
 pork_basic = {'pork','carvery pork','pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
               'pork ribs','pork_alt loin','pork_alt chop','pork tenderloin','pork shoulder chop','pork shoulder','pork leg',
               'pigs cheeks','pig cheeks','pigs cheeks oyesters','osso buco','pigs hock','spare ribs','rack of ribs','bacon',
-              'cured pork','pork sausage','ham',
+              'cured pork','pork sausage','ham','gelatine sheets'
               }
 
 # usually product of some type katsuobushi or fish sauce for example
@@ -815,7 +821,7 @@ beef_basic = {'beef','shortribs','roast beef','beef silverside w&s','sbs ttd bee
               '20% beef mince','5% minced beef','12% minced beef','15% minced beef','20% minced beef','beef brisket','beef fillet',
               'flat iron steak','rump steak','sirloin steak','fillet steak','ribeye','ribeye steak','forerib','forerib joint',
               'beef joint','silverside','topside','top rump','ox cheek','beef shin','oxtail','beef meatballs','beef sausages',
-              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak'}
+              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak','gelatine powder'}
 
 # usually product of some type katsuobushi or fish sauce for example
 beef_derived_no_recipe =  {'shredded beef'}
@@ -1126,7 +1132,25 @@ def build_not_vegan_set():
     return not_vegan
 
 
+def build_atomic_ingredients():
+    atomic_ingredients = set()
+    
+    nutrients = Path('../assest_server/scratch/nutrinfo.txt')
+    content = ''
+    with nutrients.open('r') as f:
+        #content = f.readlines()
+        content = f.read()
 
+    for m in re.finditer( r'--- for the nutrition information(.*?)\(.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
+        ingredient = m.group(1).strip()
+        igdt_type =  m.group(2).strip()
+        if igdt_type == 'atomic':       # ott = off the shelf, derived = in house recipe, atomic = basic ingredient
+            atomic_ingredients = atomic_ingredients | {ingredient}
+    
+    return atomic_ingredients
+    
+    
+    
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # def get_tags_from_ingredients_heading(igds):
 #     return 'vegan, veggie, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
@@ -1159,6 +1183,7 @@ inverse_containsTAGS_LUT = {
 
 def get_containsTAGS_for(list_of_ingredients):
     containsTAGS_detected = []
+    atomic_igdts = build_atomic_ingredients()
     
     if list_of_ingredients.__class__ == str:
         list_of_ingredients = [list_of_ingredients]    
@@ -1187,12 +1212,12 @@ def get_containsTAGS_for(list_of_ingredients):
                 if i in containsTAGS_LUT[containsTAG]:
                     containsTAGS_detected.append(containsTAG)
 
-        # INVERSE LOOKUP
+        # INVERSE LOOKUP - build_atomic_ingredients
         remove_tags = []
         for i in list_of_ingredients:
             
             for containsTAG in inverse_containsTAGS_LUT:
-                if get_ingredients_as_text_list(i) != None:         # it has to be in the data base to work! 
+                if (get_ingredients_as_text_list(i) != None) or (i in atomic_igdts) :         # it has to be in the data base to work! 
                     containsTAGS_detected.append(containsTAG)
             
                 #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
@@ -1285,7 +1310,9 @@ if __name__ == '__main__':
     
     # print(get_ingredients_as_text_list('beef & jalapeno burger')) 
     #         
-    # print(get_ingredients_as_text_list('hatchet salad'))
+    print(get_ingredients_as_text_list('tiger baguette round'))
+    print("\n\n - - - - ATOMIC - - - - \n\n")
+    print(build_atomic_ingredients())
     # 
     # print(get_ingredients_as_text_list('tomatoes'))
     # 

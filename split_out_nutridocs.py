@@ -17,7 +17,7 @@ import sys
 from striprtf.striprtf import rtf_to_text
 
 #from auto_tagging import get_allergens_from_ingredients, get_tags_from_ingredients, get_type_from_ingredients
-from auto_tagging import get_type_from_ingredients
+from auto_tagging import get_type_from_ingredients,parse_igdt_lines_into_igdt_list
 from food_sets import get_allergens_for,get_containsTAGS_for
 
 
@@ -99,11 +99,11 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
     root_date = fileset[ROOT_DATE]
     
     # create regex
-    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
+    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
     
     # scan text for recipes    
     for match in PATTERN.finditer(costing_section):
-        name, serving_info, notes, ingredients, tot_yield, method, lead_image, username = match.groups()
+        name, serving_info, notes, ingredients, tot_yield, method, description, lead_image, username = match.groups()
         
         if 'calories' in name: continue        
         #print(f"name: {name},\n {serving_info},\n {ingredients},\n {tot_yield},\n {method}\n-\n")
@@ -125,17 +125,17 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
         # if no lead_image to base filename on - use root_date
         if target_file_name == '':
             target_file_name = f"{root_date}_{get_zero_pad_6dig_count()}_{name}.txt"
-        
+                
         insertion_dict = {  '__recipe_name__' : name,
                     '__serving_info__' : serving_info,
                     '__ingredients__' : ingredients.strip(),
                     '__total_yield__' : tot_yield,
                     '__method__' : method.strip(),
                     '__notes__' : notes, #'add improvement comments',
-                    '__description__' : 'describe me',
+                    '__description__' : description.strip(),
                     '__stars__' : str(randint(1,5)),
-                    '__allergens__' : get_allergens_for(ingredients),
-                    '__tags__' : get_containsTAGS_for(ingredients),
+                    '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
+                    '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
                     '__type__' : get_type_from_ingredients(ingredients),
                     '__images__' : get_images_from_lead_image(lead_image),
                     '__lead_image__' : lead_image,
@@ -146,6 +146,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
             rcp = f.read()
         
         for marker in insertion_dict:
+            print(f"INSERTING: {marker} - {type(insertion_dict[marker])} - {insertion_dict[marker]}")
             rcp = rcp.replace(marker, insertion_dict[marker])
         
         place_txt_file = target_path.joinpath(target_file_name)
@@ -209,7 +210,7 @@ if __name__ == '__main__':
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
     
-    #parse_igdt_lines_into_sets()
+    #parse_igdt_lines_into_igdt_list()
     
     #sys.exit()
     
