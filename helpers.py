@@ -127,7 +127,9 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
     
     
     # try 'allergens & tags below recipe' match first since 'recipe' will match both
-    match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)$.*?notes:(.*?)$.*?description:(.*?)$.*?stars:(.*?)$.*?allergens:(.*?)$.*?tags:(.*?)$.*?images:(.*?)$.*?lead_image:(.*?)$.*?username:(.*?)$.?^__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
+    # should match template: date_time_recipe_name_template.txt
+    #                                   1      2     3                4                5          6                7          8              9         10        11         12               13           14
+    match = re.search( r'^-+- for the (.*) \((\w+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)notes:(.*?)description:(.*?)stars:(.*?)allergens:(.*?)tags:(.*?)type:(.*?)images:(.*?)lead_image:(.*?)username:(.*?)^.*?__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
 
     #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
@@ -142,16 +144,17 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         # 8 - stars (user_rating)
         # 9 - allergens
         # 10 - tags
-        # 11 - steps, image list
-        # 12 - lead image
-        # 13 - username
+        # 11 - type
+        # 12 - images (steps, image list)
+        # 13 - lead image
+        # 14 - username
         
         # easy to detect failure in the data
         recipe_info = {
             'ri_name':"Initialised as NO MATCH",
             'lead_image':'slms.jpg',
             'ingredients':"Pure green",
-            'steps':[ 'image_list.jpg' ],
+            'images':[ 'image_list.jpg' ],
             'method':'use your instinct, be creative',
             'notes':"it'll turn out better next time if you do this",
             'description':'invent_me',
@@ -159,6 +162,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             'username':'carter',
             'allergens': [ 'none_listed' ],
             'tags': [ 'none_listed' ],
+            #'type': [ 'none_listed' ],
             'servings': 0,
             'yield': '0g'
         }     
@@ -174,10 +178,11 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         recipe_info['user_rating'] = int(stars)
         recipe_info['allergens'] = [ a.strip() for a in match.group(9).strip().rstrip(",").split(',') ]    # create list of strings
         recipe_info['tags'] = [ a.strip() for a in match.group(10).strip().rstrip(",").split(',') ]                
-        recipe_info['steps'] = match.group(11).strip()
-        recipe_info['lead_image'] = match.group(12).strip()
-        recipe_info['username'] = match.group(13).strip()
-
+        #recipe_info['type'] = match.group(11).strip()
+        recipe_info['images'] = match.group(12).strip()
+        recipe_info['lead_image'] = match.group(13).strip()
+        recipe_info['username'] = match.group(14).strip()
+        # TODO fix magic numbers ^ 1-14
         
         # fix broken lines before processing
         # the return group is split mid line - this is used to fix that
@@ -210,14 +215,23 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         if recipe_info['allergens'][0] == "":
             recipe_info['allergens'] = [ 'none_listed' ]
         if recipe_info['tags'][0] == "":
-            recipe_info['tags'] = [ 'none_listed' ]        
+            recipe_info['tags'] = [ 'none_listed' ]
 
-        
-        print(f"NAME: {match.group(1).strip()}")
-        print(f"SERVINGS: ({match.group(2).strip()})")
+        # if there is a weight where no of servings SB it means there is no spceific servings
+        # its a by weigh component like flour rice or dough
+        # replace the weight EG 430g with -1
+        # DB is expecting a number not a string
+        if re.match(r'\d+g', recipe_info['servings']):
+            recipe_info['servings'] = -1
+        else:
+            pprint(re.match(r'g', recipe_info['servings']))
+
+        print('- - - - - process_single_recipe_text_into_dictionary')
+        print(f"NAME: {recipe_info['ri_name']}")
+        print(f"SERVINGS: ({recipe_info['servings']})")
         print(f"INGREDIENTS:\n")
         pprint(i_list)
-        print(f"YIELD: {match.group(4).strip()}")
+        print(f"YIELD: {recipe_info['yield']}")
         print(f"ALLERGENS: {' '.join(recipe_info['allergens'])}")
         print(f"TAGS: {' '.join(recipe_info['tags'])}")
         

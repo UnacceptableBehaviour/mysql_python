@@ -92,7 +92,7 @@ print("----- list.py -----------------------------------------------------------
 #engine = create_engine('mysql://root:meepmeep@localhost:3306/recipe_cs50')
 
 #postgresql connection
-#engine = create_engine('postgcreate_entry_in_dbresql://root:meepmeep@localhost:3306/recipe_cs50')
+#engine = create_engine('postgresql://root:meepmeep@localhost:3306/recipe_cs50')
 
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
 engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
