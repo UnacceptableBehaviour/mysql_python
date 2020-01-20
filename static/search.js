@@ -104,16 +104,16 @@ function renderRecipeCard(rcpInfo){
     }
   }
   
-  html_card = `<div class="card">
-      <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
-      <div class="card-body">
-          <h5 class="card-title">${rcpInfo['ri_name']}</h5>
-          <p class="card-text">${rcpInfo['description']}</p>
-          ${html_stars}        
-          <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
-      </div>
+  html_card = `<div class="card">    
+        <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
+        <div class="card-body">
+            <h5 class="card-title">${rcpInfo['ri_name']}</h5>
+            <p class="card-text">${rcpInfo['description']}</p>
+            ${html_stars}
+            <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
+        </div>    
   </div>`
-  
+
   return html_card;
 }
 
@@ -130,7 +130,7 @@ function renderGalleryFromResult(recipeList){
 
   var html_gallery = `<div class="row padding">
       <div class="card-columns">
-          <form action='/recipe_page' method='POST'>
+          <form action='/db_recipe_page' method='POST'>
             ${htmlInnerGallery}
           </form>
       </div>

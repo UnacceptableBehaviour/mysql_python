@@ -561,7 +561,7 @@ def db_nutrients_compare():
 
 
 
-@app.route('/recipe_page', methods=["GET", "POST"])
+@app.route('/db_recipe_page', methods=["GET", "POST"])
 def db_recipe_page():        
     
     ri_id = 3202
@@ -572,8 +572,6 @@ def db_recipe_page():
         pprint(request.args.to_dict())
         print("POST                            - - - < db_recipe_page - M = = = =*=*")
         pprint(request)
-        #pprint(request.value)
-        pprint(request.form['ri_id'])
         print("POST                            - - - < db_recipe_page - E = = = =*=*")
         if ('ri_id' in request.form):
             ri_id = int(request.form['ri_id'])
