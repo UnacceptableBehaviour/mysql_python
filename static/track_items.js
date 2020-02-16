@@ -79,11 +79,60 @@ function isIngredientAtomic(i){
   return String(ATOMIC);
 }
 
+function singular(ingredient){
+  let singular_ingredient = '';
+  
+  ingredient = ingredient.toLowerCase();
+
+  // end in s but are singular, or have no plural
+  const exceptions = new Set(['beef silverside w&s','lemon grass', 'vegetable samosa indian takeaway mrs']);
+  
+  // if it doesn't end in s and has no plural should come out fine!
+  // , 'fish', 'mutton', 'hogget'}
+  
+  if (exceptions.has(ingredient)) {
+    return ingredient;
+  }
+
+  // exceptions with singular version
+  const singular_from_plural = {
+    'radishes'          : 'radish',
+  };
+  
+  if (singular_from_plural.hasOwnProperty(ingredient) ) {
+    return(singular_from_plural[ingredient]);
+  }
+  
+  // ending with
+  // cloves > clove - superseed ves > f
+  if ( ingredient.match(/cloves$/) ) return( ingredient.replace(/cloves$/,'clove') );
+
+  // cookies > cookie - superseed ies > y - all sorts of cookie flavours
+  if ( ingredient.match(/cookies$/) ) return( ingredient.replace(/cookies$/,'cookie') );
+  
+  // cherries to cherry 
+  if ( ingredient.match(/ies$/) ) return( ingredient.replace(/ies$/,'y') );
+  
+  // various olive - superseed ves > f
+  if ( ingredient.match(/olives$/) ) return( ingredient.replace(/olives$/,'olive') );
+  
+  // leaves > leaf
+  if ( ingredient.match(/ves$/) ) return( ingredient.replace(/ves$/,'f') );
+  
+  // tomatoes > tomato
+  if ( ingredient.match(/oes$/) ) return( ingredient.replace(/oes$/,'o') );
+  
+  // octopii > opctpus
+  if ( ingredient.match(/ii$/) ) return( ingredient.replace(/ii$/,'us') );
+  
+  return(ingredient.replace(/s\b/i,''));  
+  
+}
+
 function loadServingModifierLUT(){
   // TODO load from DB
   // currently created by scan_for_each_data.py
-  // TODO - port singular(ingredient) from python
-  //        process ingredient before looking up here
+
   var lut = {
     'alpen breakfast': { 'small': 150.0, 'medium': 200.0, 'large': 250.0, 'density': 1.0 },
     'anchovy': { 'small': 2.6, 'medium': 3.5, 'large': 4.4, 'density': 1.0 },
@@ -237,32 +286,32 @@ function loadUnitsToVolume() {
   return unitsToVolume;
 }
 
+// 1 cup of veg oil
+// vol of unit * ingredient[density] 
 function convertToGrams(qty, units, ingredient){
   
-  // 1 cup of veg oil
-  // vol of unit * ingredient[density] 
-
   // load ingredient density info from DB
   var servingModifierLUT = loadServingModifierLUT();
 
   // load volume of units info from DB
   var unitsToVolume = loadUnitsToVolume();
   
+  singular_igdt = singular(ingredient);
+  
   try {
-    if ( servingModifierLUT[ingredient] === undefined) {
+    if ( servingModifierLUT[singular_igdt] === undefined) {
       return qty * unitsToVolume[units] * 1.0;      
     } else {
-      return qty * unitsToVolume[units] * servingModifierLUT[ingredient]['density'];  
+      return qty * unitsToVolume[units] * servingModifierLUT[singular_igdt]['density'];  
     }
     
   } catch(err) {
-    console.log(`**** WARNING: convertToGrams - DB lookup MISS: qty:${qty} units:${units} ingredient:${ingredient} vol:${unitsToVolume[units]}`);
+    console.log(`**** WARNING: convertToGrams - DB lookup MISS: qty:${qty} units:${units} ingredient:${ingredient}(${singular_igdt}) vol:${unitsToVolume[units]}`);
     return 99999;     // it's BIG to notice somethings wrong!
   }
   
-  
-  
 }
+
 
 // get serving data for ingredient from LUT
 function getServingWeight(qty, ingredient, modifier='medium'){
@@ -282,13 +331,14 @@ function getServingWeight(qty, ingredient, modifier='medium'){
   if ( (modifier === 'xl') || (modifier === 'mahoosive') )
     { modifier = 'large'; };
   
+  singular_igdt = singular(ingredient);
   
   try {    
-    size = servingModifierLUT[ingredient][modifier];
-    console.log(`*> servingModifierLUT: ${modifier} ${ingredient} = ${size} <`);
+    size = servingModifierLUT[singular_igdt][modifier];
+    console.log(`*> servingModifierLUT: ${modifier} ${ingredient}(${singular_igdt}) = ${size} <`);
   
   } catch(err) { 
-    console.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}`);
+    console.log(`**** WARNING: getServingWeight - DB lookup MISS: ${modifier} ${ingredient}(${singular_igdt})`);
     return 99999;     // it's BIG to notice somethings wrong!
   }
   
