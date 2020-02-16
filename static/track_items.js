@@ -151,7 +151,7 @@ function loadServingModifierLUT(){
     'mmgb': { 'small': 22.5, 'medium': 30.0, 'large': 37.5, 'density': 1.0 },
     'mrs veg samosa': { 'small': 30.0, 'medium': 40.0, 'large': 50.0, 'density': 1.0 },
     'nectarine': { 'small': 82.5, 'medium': 110.0, 'large': 137.5, 'density': 1.0 },
-    'olif': { 'small': 2.2, 'medium': 3.0, 'large': 3.8, 'density': 1.0 },
+    'olive': { 'small': 2.2, 'medium': 3.0, 'large': 3.8, 'density': 1.0 },
     'onion': { 'small': 112.5, 'medium': 150.0, 'large': 187.5, 'density': 1.0 },
     'onion ring': { 'small': 1.0, 'medium': 1.4, 'large': 1.7, 'density': 1.0 },
     'oxo cube': { 'small': 4.5, 'medium': 6.0, 'large': 7.5, 'density': 1.0 },
