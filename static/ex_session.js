@@ -1,11 +1,10 @@
 // module to gives guestimates for calories burnt
 
-
 // 1lb = ,453.592g
 
-
-accaloriesBurntByativity = {
-  'Weight Lifting: general':52832,
+// 'activity': microCals (ucals) / g / minute
+caloriesBurntByAtivity = {
+  'Weight Lifting: general':52832, 
   'Aerobics: water':70707,
   'Stretching, Hatha Yoga':70707,
   'Calisthenics: moderate':79446,
@@ -163,11 +162,13 @@ accaloriesBurntByativity = {
   'Heavy Tools, not power':141017,
   'Steel Mill: general':141017,
   'Firefighting':211723
-
 };
 
-export function caloriesForActivity(){};
+// kcalBurnt = ucals/g/m * minsOfActivity * weightInKg*1000 / 1000000000
+export function caloriesForActivity(weightInKg, activity, minsOfActivity=15){
+  return( (caloriesBurntByAtivity[activity] * minsOfActivity * weightInKg) / 1000000);
+};
 
 export function availableActivities(){
-  return(accaloriesBurntByativity.keys());
+  return(caloriesBurntByAtivity.keys());
 };
