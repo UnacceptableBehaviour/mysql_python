@@ -166,7 +166,7 @@ caloriesBurntByAtivity = {
 
 // kcalBurnt = ucals/g/m * minsOfActivity * weightInKg*1000 / 1000000000
 export function caloriesForActivity(weightInKg, activity, minsOfActivity=15){
-  return( (caloriesBurntByAtivity[activity] * minsOfActivity * weightInKg) / 1000000);
+  return( Math.round((caloriesBurntByAtivity[activity] * minsOfActivity * weightInKg) / 1000000) );
 };
 
 export function availableActivities(){
