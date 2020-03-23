@@ -162,7 +162,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             'username':'carter',
             'allergens': [ 'none_listed' ],
             'tags': [ 'none_listed' ],
-            #'type': [ 'none_listed' ],
+            'type': [ 'none_listed' ],
             'servings': 0,
             'yield': '0g'
         }     
@@ -175,10 +175,10 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         stars = match.group(8).strip()
         if stars == '':
             stars = 0
-        recipe_info['user_rating'] = int(stars)
+        recipe_info['user_rating'] = round(float(stars),1)
         recipe_info['allergens'] = [ a.strip() for a in match.group(9).strip().rstrip(",").split(',') ]    # create list of strings
-        recipe_info['tags'] = [ a.strip() for a in match.group(10).strip().rstrip(",").split(',') ]                
-        #recipe_info['type'] = match.group(11).strip()
+        recipe_info['tags'] = [ a.strip() for a in match.group(10).strip().rstrip(",").split(',') ]                        
+        recipe_info['type'] = [ a.strip() for a in match.group(11).strip().rstrip(",").split(',') ] 
         recipe_info['images'] = match.group(12).strip()
         recipe_info['lead_image'] = match.group(13).strip()
         recipe_info['username'] = match.group(14).strip()
@@ -192,7 +192,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         for index, line in enumerate(i_list):
             i_list[index] = ( re.sub('#.*', '', line) ).strip()
             
-        # shold check db to find subcomponents
+        # should check db to find subcomponents TODO - HIGH
         for index, line in enumerate(i_list):
             # split using tabs, remove white space, remove blanks
             line = line.split("\t")
@@ -207,6 +207,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             # default to ATOMIC until subcomponent found
             i_list[index].insert(ATOMIC_INDEX,1)                                   # indicates atmonic ingredient            
             
+            #print(f"[{SERVING_INDEX}]\nline:{line} <\ni_list:{i_list[index]}<")
             if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)                
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
 

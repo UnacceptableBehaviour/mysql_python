@@ -186,6 +186,7 @@ def create_entry_in_db(db, table, entry):
     print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
     print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
     print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
+    print(f"----- type:{entry['type']} \n-------------------------------------------- ")
     
     sql_string = f"INSERT INTO {table}"
     fields = "("
@@ -213,7 +214,7 @@ def create_entry_in_db(db, table, entry):
             print(f"{header} is a NUMBER in g")
             data = data + f"{entry[header].rstrip('g')}, "
         
-        elif header == 'allergens' or header == 'tags':
+        elif header == 'allergens' or header == 'tags' or header =='type':
             print(f"{header} is a LIST of tags / strings")
             tag_to_insert = create_sql_insert_tags_array_text(entry[header])
             data = data + tag_to_insert

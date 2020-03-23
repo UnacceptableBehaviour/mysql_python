@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS exploded (
   allergens       VARCHAR(150) ARRAY,
   tags            VARCHAR(150) ARRAY,
   user_tags       VARCHAR(150) ARRAY,
+  type            VARCHAR(150) ARRAY,
 
   lead_image VARCHAR(100) DEFAULT NULL,
   text_file VARCHAR(100) DEFAULT NULL,

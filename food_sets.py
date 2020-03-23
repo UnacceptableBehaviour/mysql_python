@@ -24,17 +24,39 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # Brief: should work with the ingredients in the current data set ~1400 ingredients
 # Basic guide: https://www.food.gov.uk/sites/default/files/media/document/top-allergy-types.pdf
 #
-# a call to get_allergens_from_ingredients(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
+# a call to get_allergens_for(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
 # should return ['dairy', 'eggs', 'fish', 'gluten']
 #
 # 'alcohol classification should be limited to rum', vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
 # - that's enough for scope of this exersize
 #
-#
 # # # #
 # the section following allergens is to deal with classifying for belief systems: IE no beef, no pork,
 # veggie, vegan, etc
-# Need to classify
+# and is aimed at recipes / components
+#
+# so similarly a call to 
+#   get_containsTAGS_for(['seared seabass','sauteed potatoes'])
+#   > fish, dairy
+#
+#   get_containsTAGS_for(['slow roast lamb','roast potatoes','caramelised carrots'])
+#   > lamb, dairy
+#
+#   get_containsTAGS_for(['water cress w/ sage','ewes milk curd','oats & sunflower seeds'])
+#   > veggie, dairy, sunflower seeds
+#
+#   get_containsTAGS_for(['watermelon gazpacho w/ prawns & mango salsa'])   < recipe in DB
+#   > prawns, chilli
+#
+#   get_containsTAGS_for(['couscous chermoula'])   < recipe in DB
+#   > veggie, nuts, gluten
+#
+#   get_containsTAGS_for(['ldl mild salsa dip'])   < shop bought ingredient - ots (Off The Shelf - need lookup)
+#   > ots
+#
+
+
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # DAIRY
@@ -711,14 +733,6 @@ def get_allergens_for(list_of_ingredients):
     return allergens_detected
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# SETS - CONTAINS FOOD TYPE - containsTAGS
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# def get_tags_from_ingredients_heading(igds):
-#     return 'vegan, veggie, cbs, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
-#                                                        
-# allegen sets
-# 'dairy', 'cheese,' 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # CHICKEN
@@ -1151,13 +1165,6 @@ def build_atomic_ingredients():
     
     
     
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# def get_tags_from_ingredients_heading(igds):
-#     return 'vegan, veggie, chicken, pork, beef, seafood, crustaceans, gluten_free, ns_pregnant'
-#                                                        
-# allegen sets
-# 'dairy', 'cheese,' 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'
-#
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 'CONTAINS' TAG SETS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

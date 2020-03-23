@@ -1,11 +1,8 @@
 #! /usr/bin/env python
 
-
-
-
-# refresh the asset server with any new data
-#import subprocess
-from random import randint  # TODO - remove
+# pre processing recipe diary to create structure data for asset pipeline
+# enables
+# a refresh the asset server with any new data, and a DB rebuild based on relevant adapter
 
 from pathlib import Path
 from shutil import copy2
@@ -16,10 +13,7 @@ import sys
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
 
-#from auto_tagging import get_allergens_from_ingredients, get_tags_from_ingredients, get_type_from_ingredients
-from auto_tagging import get_type_from_ingredients,parse_igdt_lines_into_igdt_list
 from food_sets import get_allergens_for,get_containsTAGS_for
-
 
 FILE_LOC = 0
 TMP_PATH = 1
@@ -37,7 +31,7 @@ def get_nutridoc_list_rtf():
     
     for file_loc in base_dir.rglob('*_NUTRITEST_recipes_*.rtf'):
         if 'y977' in file_loc.name: continue
-        # print(file_loc)
+        print(file_loc)
         # print(file_loc.name)
         # print(file_loc.parent)
         # print(file_loc.stem)
@@ -74,6 +68,27 @@ def get_costing_section_from_main_doc(text):
     return recipe_text
 
 
+def parse_igdt_lines_into_igdt_list(lines=''):
+    i_list = []
+        
+    lines = [ l.strip() for l in lines.splitlines() ]
+    lines = list(filter(None, lines))
+    
+    # remove qty & comment from each line    
+    for line in lines:
+        parts = [ item.strip() for item in line.split('\t') if (len(item) > 0) & ('#' not in item) & ('(' not in item) ] # remove comments
+        parts.pop(0)    # remove qty
+        try: 
+            i_list.append(parts.pop(0))
+        except IndexError:
+            pass
+
+    # remove duplicates from list
+    i_list = list(dict.fromkeys(i_list))
+    # remove empty strings    
+    i_list = list(filter(None, i_list))
+    
+    return i_list
 
     
 def get_images_from_lead_image(image):
@@ -91,7 +106,7 @@ def get_zero_pad_6dig_count():
     return f"{hrs:02}{mins:02}{secs:02}"
 
 
-TEMPLATE = Path('./scratch/date_time_recipe_name_template.txt')
+TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
 def produce_recipe_txts_from_costing_section(costing_section, fileset):
     
     target_file_name = ''
@@ -99,11 +114,11 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
     root_date = fileset[ROOT_DATE]
     
     # create regex
-    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
+    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
     
     # scan text for recipes    
     for match in PATTERN.finditer(costing_section):
-        name, serving_info, notes, ingredients, tot_yield, method, description, lead_image, username = match.groups()
+        name, serving_info, notes, ingredients, tot_yield, method, description, stars, type_tag, lead_image, username = match.groups()
         
         if 'calories' in name: continue        
         #print(f"name: {name},\n {serving_info},\n {ingredients},\n {tot_yield},\n {method}\n-\n")
@@ -133,10 +148,10 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
                     '__method__' : method.strip(),
                     '__notes__' : notes, #'add improvement comments',
                     '__description__' : description.strip(),
-                    '__stars__' : str(randint(1,5)),
+                    '__stars__' : str(stars).strip(),
                     '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
                     '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
-                    '__type__' : get_type_from_ingredients(ingredients),
+                    '__type__' : type_tag,
                     '__images__' : get_images_from_lead_image(lead_image),
                     '__lead_image__' : lead_image,
                     '__username__' : username}
@@ -177,7 +192,7 @@ def main():
 
 NUTRIDOC_LIST = [
 # 'y950',
- 'y951',
+# 'y951',
 # 'y952',
 # 'y953',
 # 'y954',
@@ -190,7 +205,7 @@ NUTRIDOC_LIST = [
 # 'y961',
 # 'y962',
 # 'y963',
- 'y964',
+# 'y964',
 # 'y965',
 # 'y966',
 # 'y967',
@@ -201,6 +216,7 @@ NUTRIDOC_LIST = [
 # 'y972',
 # 'y973',
 # 'y974',
+ 'y978',
 #'y979'
 ]
 
