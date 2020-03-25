@@ -191,8 +191,8 @@ def main():
 
 
 NUTRIDOC_LIST = [
-# 'y950',
-# 'y951',
+ 'y950',
+ 'y951',
 # 'y952',
 # 'y953',
 # 'y954',
@@ -216,7 +216,7 @@ NUTRIDOC_LIST = [
 # 'y972',
 # 'y973',
 # 'y974',
- 'y978',
+ 'y978',    # once over check all entries present in originator asset
 #'y979'
 ]
 
