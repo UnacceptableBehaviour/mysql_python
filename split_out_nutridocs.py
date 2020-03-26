@@ -108,6 +108,7 @@ def get_zero_pad_6dig_count():
 
 TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
 def produce_recipe_txts_from_costing_section(costing_section, fileset):
+    recipes_processed = 0
     
     target_file_name = ''
     target_path = fileset[TMP_PATH]
@@ -175,6 +176,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
         # write the recipe to folder
         with place_txt_file.open('w') as f:
             f.write(rcp)
+            recipes_processed += 1
         
         #if image exist copy it over
         if lead_image != '':
@@ -184,6 +186,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
         # recipe_file = target_path.joinpath(f"{root_date}_{incrementing_time}_{name})
         
         # write to target_path
+    return recipes_processed    
 
 
 def main():
@@ -191,17 +194,17 @@ def main():
 
 
 NUTRIDOC_LIST = [
- 'y950',
- 'y951',
-# 'y952',
-# 'y953',
-# 'y954',
-# 'y955',
-# 'y956',
-# 'y957',
-# 'y958',
-# 'y959',
-# 'y960',
+# 'y950',       # ~15   - xmas type recipes
+# 'y951',       # 60-70 - bit scrambled 50% done - needs template adding + image name
+# 'y952',       # ~12   - bread, and other 
+# 'y953',       # ~7    - move, fairly low quality, some product
+# 'y954',       # ~35   - start propper - better bread 
+# 'y955',       # ~30   - some good lo cal rcps    
+# 'y956',       # ~40   - brisket, burgers, broths
+# 'y957',       # ~25   - super healthy, meatbaslls, pastas, bread, beetroot burger
+# 'y958',       # ~20   - sushi, snack, grains, tortilla, fish
+# 'y959',       # ~10   - fish, comfort, snacks, seasoning
+# 'y960',       # ~20   - pies, salads, grains, seafood, icecream
 # 'y961',
 # 'y962',
 # 'y963',
@@ -270,8 +273,8 @@ if __name__ == '__main__':
         costing_section = get_costing_section_from_main_doc(nutridoc_text)
         #print(costing_section)
         
-        produce_recipe_txts_from_costing_section(costing_section, fileset)
+        no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
         
-        print(fileset[FILE_LOC])
+        print(fileset[FILE_LOC], f"\nGENERATED: {no_processed} recipes")
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
         
