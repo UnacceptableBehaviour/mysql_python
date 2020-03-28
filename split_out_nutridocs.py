@@ -205,8 +205,8 @@ NUTRIDOC_LIST = [
 # 'y958',       # ~20   - sushi, snack, grains, tortilla, fish
 # 'y959',       # ~10   - fish, comfort, snacks, seasoning
 # 'y960',       # ~20   - pies, salads, grains, seafood, icecream
-# 'y961',
-# 'y962',
+# 'y961',       
+# 'y962',       #       - started 50% done - needs template adding + image name - sushi, french sticks, brisket, broths
 # 'y963',
 # 'y964',
 # 'y965',
