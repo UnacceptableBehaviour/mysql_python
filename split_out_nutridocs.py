@@ -216,7 +216,7 @@ NUTRIDOC_LIST = [
 # 'y969',
 # 'y970',
 # 'y971',
-# 'y972',
+# 'y972',       # ~13   - lazy days
 # 'y973',
 # 'y974',
  'y978',    # once over check all entries present in originator asset
