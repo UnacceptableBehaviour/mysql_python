@@ -194,6 +194,7 @@ def main():
 
 
 NUTRIDOC_LIST = [
+# 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
 # 'y950',       # ~15   - xmas type recipes
 # 'y951',       # 60-70 - bit scrambled 50% done - needs template adding + image name
 # 'y952',       # ~12   - bread, and other 
@@ -208,7 +209,7 @@ NUTRIDOC_LIST = [
 # 'y961',       
 # 'y962',       #       - started 50% done - needs template adding + image name - sushi, french sticks, brisket, broths
 # 'y963',       # ~12   - empty copy - image ~16 cous cous, tortilla, salmon
-# 'y964',       # 
+# 'y964',       #       - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
 # 'y965',
 # 'y966',
 # 'y967',
@@ -219,7 +220,7 @@ NUTRIDOC_LIST = [
 # 'y972',       # ~13   - lazy days
 # 'y973',
 # 'y974',
- 'y978',    # once over check all entries present in originator asset
+ 'y978',        # ~54/? - once over check all entries present in originator asset
 #'y979'
 ]
 
