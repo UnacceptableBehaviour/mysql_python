@@ -105,10 +105,11 @@ def get_zero_pad_6dig_count():
     hrs = int(recipe_count / 3600 % 24)
     return f"{hrs:02}{mins:02}{secs:02}"
 
-
+OVER_WRITE_FILES = True
 TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
-def produce_recipe_txts_from_costing_section(costing_section, fileset):
+def produce_recipe_txts_from_costing_section(costing_section, fileset, overwrite=False):
     recipes_processed = 0
+    missing_images = []
     
     target_file_name = ''
     target_path = fileset[TMP_PATH]
@@ -173,20 +174,25 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset):
         print(place_img_file)
         print(rcp)
         
-        # write the recipe to folder
-        with place_txt_file.open('w') as f:
-            f.write(rcp)
-            recipes_processed += 1
+        recipes_processed += 1
+        if overwrite == True:
+            # write the recipe to folder
+            with place_txt_file.open('w') as f:            
+                f.write(rcp)
+        
         
         #if image exist copy it over
         if lead_image != '':
-            copy2(source_img_file, place_img_file)            
+            if overwrite == True:
+                copy2(source_img_file, place_img_file)
+        else:
+            missing_images.append(name)
         
         # get the date_time_from lead image
         # recipe_file = target_path.joinpath(f"{root_date}_{incrementing_time}_{name})
         
         # write to target_path
-    return recipes_processed    
+    return (recipes_processed, missing_images)
 
 
 def main():
@@ -220,7 +226,11 @@ NUTRIDOC_LIST = [
 # 'y972',       # ~13   - lazy days
 # 'y973',
 # 'y974',
- 'y978',        # ~54/? - once over check all entries present in originator asset
+# 'y975',
+# 'y976',
+# 'y977',
+ 'y978',        # ~54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
+                #     missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
 #'y979'
 ]
 
@@ -234,8 +244,8 @@ if __name__ == '__main__':
     
     #sys.exit()
     
-    # 'recipe_name' : recipe_text
-    processed_recipes = {}
+    # 'nutridoc' : (recipes process, [list missing images])
+    processed_nutridocs = {}
     
     # Create directories from nutridocd
     files_to_process = get_nutridoc_list_rtf()
@@ -274,8 +284,16 @@ if __name__ == '__main__':
         costing_section = get_costing_section_from_main_doc(nutridoc_text)
         #print(costing_section)
         
-        no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
+        no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset, OVER_WRITE_FILES)
+        #no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
+        processed_nutridocs[fileset[FILE_LOC].name] = no_processed
         
-        print(fileset[FILE_LOC], f"\nGENERATED: {no_processed} recipes")
+        print(fileset[FILE_LOC], f"\nGENERATED: {no_processed[0]} recipes", f"\nMISSING IMAGES: {len(no_processed[1])}\n{no_processed[1]}")
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
-        
+    
+    # report
+    print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+    for name, image_info in processed_nutridocs.items():
+        print(f"NUTRIDOC: {name}\nRECIPES: {image_info[0]}\nMISSING IMAGES:{len(no_processed[1])}\n{no_processed[1]}\n")
+
+    
