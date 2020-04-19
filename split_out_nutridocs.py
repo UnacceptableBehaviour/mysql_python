@@ -30,7 +30,6 @@ def get_nutridoc_list_rtf():
     from_to = []
     
     for file_loc in base_dir.rglob('*_NUTRITEST_recipes_*.rtf'):
-        if 'y977' in file_loc.name: continue
         print(file_loc)
         # print(file_loc.name)
         # print(file_loc.parent)
@@ -227,9 +226,9 @@ NUTRIDOC_LIST = [
 # 'y973',
 # 'y974',
 # 'y975',
-# 'y976',
-# 'y977',
-# 'y978',        # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
+#'y976',
+'y977',        # 
+#'y978',        # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
                  #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
 # 'y979',
 # 'y420',       # 0328-10
@@ -242,10 +241,27 @@ NUTRIDOC_LIST = [
 ]
 
 
+empty_recipe = '''
+------------------ for the recipe_name (1)
+180m		coffee												# notes, comments
+													Total (0g)
+description:
+stars: 1
+type: supplement, snack, breakfast, brunch, salad, soup, component, amuse, side, starter, fish, lightcourse,
+	main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+lead_image: _li_
+username: carter snapdragonpics
 
+
+'''
 
 
 if __name__ == '__main__':
+    create_templates_from_image_names = False
+
+    if '-ct' in sys.argv:
+        create_templates_from_image_names = True
+    
     #main()
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
@@ -278,32 +294,50 @@ if __name__ == '__main__':
     # NEW_FILE_PATH = 2
     # take contents out of each file and create text docs
     for fileset in files_to_process:
-        filename = str(fileset[0].name)
+        filename = str(fileset[0].name)        
         m = re.match(r'^(y\d\d\d)', filename)
         
+        nutridoc_dir = fileset[1].parent
+        print(m.group(1))
         if m.group(1) in NUTRIDOC_LIST:
-            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *")            
+            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *\nIN:{nutridoc_dir}")            
         else:
             print(f"SKIPPING: {str(fileset[FILE_LOC])}")
             continue
         
-        #convert file from RTF to txt
-        nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
-        #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
-        
-        costing_section = get_costing_section_from_main_doc(nutridoc_text)
-        #print(costing_section)
-        
-        no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset, OVER_WRITE_FILES)
-        #no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
-        processed_nutridocs[fileset[FILE_LOC].name] = no_processed
-        
-        print(fileset[FILE_LOC], f"\nGENERATED: {no_processed[0]} recipes", f"\nMISSING IMAGES: {len(no_processed[1])}\n{no_processed[1]}")
-        print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
+        print(f"create_templates_from_image_names: {create_templates_from_image_names} - {filename}")
+
+        if create_templates_from_image_names:
+            templates_from_images = ''
+            for file_loc in nutridoc_dir.glob('*.jpg'):                
+                m = re.match('\d{8}_\d{6}_(.*?)\.jpg', file_loc.name)
+                if m:
+                    #print(m.group(1))
+                    template_img = empty_recipe.replace('recipe_name', m.group(1))
+                    template_img = template_img.replace('_li_', file_loc.name)
+                    templates_from_images += template_img
+                    print(template_img)    
+        else:        
+            #convert file from RTF to txt
+            nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
+            #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
+            
+            costing_section = get_costing_section_from_main_doc(nutridoc_text)
+            #print(costing_section)
+            
+            no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset, OVER_WRITE_FILES)
+            #no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
+            processed_nutridocs[fileset[FILE_LOC].name] = no_processed
+            
+            # list images w recipe name
+            print(fileset[FILE_LOC], f"\nGENERATED: {no_processed[0]} recipes", f"\nMISSING IMAGES: {len(no_processed[1])}\n{no_processed[1]}")
+            print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
     
     # report
     print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
     for name, image_info in processed_nutridocs.items():
         print(f"NUTRIDOC: {name}\nRECIPES: {image_info[0]}\nMISSING IMAGES:{len(no_processed[1])}\n{no_processed[1]}\n")
 
+    print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
+    pprint(NUTRIDOC_LIST)
     
