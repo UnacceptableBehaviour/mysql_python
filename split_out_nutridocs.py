@@ -227,9 +227,10 @@ NUTRIDOC_LIST = [
 # 'y974',
 # 'y975',
 #'y976',
-'y977',        # 
-#'y978',        # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
-                 #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
+'y977',       # 52/1 - sushi, moussaka, tag n cheese, salads, comfort
+              # methods & recipes TODO
+# 'y978',       # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
+                #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
 # 'y979',
 # 'y420',       # 0328-10
 # 'y421',       # 0411-24 *
