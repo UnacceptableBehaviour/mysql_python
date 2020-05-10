@@ -229,12 +229,15 @@ NUTRIDOC_LIST = [
 # 'y976',      # 
 # 'y977',       # 52/1 - sushi, moussaka, tag n cheese, salads, comfort
               # methods & recipes TODO
-# 'y978',       # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
+#'y978',       # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
                 #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
-# 'y979',       # 0314-27 - 43: images processed - templates in place - REQ: fill in ~ 50% complete
-# 'y420',       # 0328-10 - 21: images processed - templates in place - REQ: fill in
-# 'y421',       # 0411-24 - 56: images processed - templates in place - REQ: fill in
-# 'y422',       # 0425-08
+# 'y979',       # 0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
+# 'y420',       # 0328-10 - 21/0: images processed - templates in place - REQ: fill in
+# 'y421',       # 0411-24 - 56/0: images processed - templates in place - REQ: fill in
+'y422',       # 0425-08 - 31/31: images processed - add image name to templates - REQ: recipes mostly complete
+get this scripty to check nutridoc_text for already present templates and skip them /
+add relevant image to existing template? just skip format now
+
 # 'y423',       # 0509-22
 # 'y424',       # 0523-05
 # 'y425',       # 0606-19
