@@ -105,9 +105,12 @@ def get_zero_pad_6dig_count():
     return f"{hrs:02}{mins:02}{secs:02}"
 
 OVER_WRITE_FILES = True
+DUMBY_RUN = False
+RNI_RECIPES = 0
+RNI_IMAGES = 1
 TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
 def produce_recipe_txts_from_costing_section(costing_section, fileset, overwrite=False):
-    recipes_processed = 0
+    recipes_processed = []
     missing_images = []
     
     target_file_name = ''
@@ -115,11 +118,13 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, overwrite
     root_date = fileset[ROOT_DATE]
     
     # create regex
-    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
+    PATTERN  = re.compile(r"--- for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^thoughts:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
     
     # scan text for recipes    
     for match in PATTERN.finditer(costing_section):
-        name, serving_info, notes, ingredients, tot_yield, method, description, stars, type_tag, lead_image, username = match.groups()
+        name, serving_info, notes, ingredients, tot_yield, method, description, thoughts, stars, type_tag, lead_image, username = match.groups()
+
+        recipes_processed.append(name)      # a dict would make search faster no? but for these numbes meh
         
         if 'calories' in name: continue        
         #print(f"name: {name},\n {serving_info},\n {ingredients},\n {tot_yield},\n {method}\n-\n")
@@ -149,6 +154,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, overwrite
                     '__method__' : method.strip(),
                     '__notes__' : notes, #'add improvement comments',
                     '__description__' : description.strip(),
+                    '__thoughts__' : thoughts.strip(),
                     '__stars__' : str(stars).strip(),
                     '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
                     '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
@@ -172,8 +178,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, overwrite
         print(source_img_file)
         print(place_img_file)
         print(rcp)
+                
         
-        recipes_processed += 1
         if overwrite == True:
             # write the recipe to folder
             with place_txt_file.open('w') as f:            
@@ -235,8 +241,8 @@ NUTRIDOC_LIST = [
 # 'y420',       # 0328-10 - 21/0: images processed - templates in place - REQ: fill in
 # 'y421',       # 0411-24 - 56/0: images processed - templates in place - REQ: fill in
 'y422',       # 0425-08 - 31/31: images processed - add image name to templates - REQ: recipes mostly complete
-get this scripty to check nutridoc_text for already present templates and skip them /
-add relevant image to existing template? just skip format now
+# get this scripty to check nutridoc_text for already present templates and skip them /
+# add relevant image to existing template? just skip format now
 
 # 'y423',       # 0509-22
 # 'y424',       # 0523-05
@@ -312,36 +318,51 @@ if __name__ == '__main__':
         
         print(f"create_templates_from_image_names: {create_templates_from_image_names} - {filename}")
 
+        #convert file from RTF to txt
+        nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
+        #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
+        
+        costing_section = get_costing_section_from_main_doc(nutridoc_text)
+        #print(costing_section)
+        
+        recipes_and_missing_imgs = None
         if create_templates_from_image_names:
+            recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, DUMBY_RUN)
+        else:
+            recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, OVER_WRITE_FILES)
+
+        print("recipes_and_missing_imgs[RNI_RECIPES] -S")
+        pprint(recipes_and_missing_imgs[RNI_RECIPES])
+        print("recipes_and_missing_imgs[RNI_RECIPES] -E")
+
+        processed_nutridocs[fileset[FILE_LOC].name] = recipes_and_missing_imgs
+
+        if create_templates_from_image_names:            
             templates_from_images = ''
-            for file_loc in nutridoc_dir.glob('*.jpg'):                
+            
+            for file_loc in nutridoc_dir.glob('*.jpg'):
+                print(f"Find image:{file_loc.name}")
                 m = re.match('\d{8}_\d{6}_(.*?)\.jpg', file_loc.name)
+                # create templates not already present in the nutridoc
                 if m:
-                    #print(m.group(1))
+                    print(m.group(1), (m.group(1) not in recipes_and_missing_imgs[RNI_RECIPES]), 'if TRUE print template from image')
+                      
+                if m and (m.group(1) not in recipes_and_missing_imgs[RNI_RECIPES]):
+                #if m:                     
                     template_img = empty_recipe.replace('recipe_name', m.group(1))
                     template_img = template_img.replace('_li_', file_loc.name)
                     templates_from_images += template_img
                     print(template_img)    
-        else:        
-            #convert file from RTF to txt
-            nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
-            #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
+
             
-            costing_section = get_costing_section_from_main_doc(nutridoc_text)
-            #print(costing_section)
-            
-            no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset, OVER_WRITE_FILES)
-            #no_processed = produce_recipe_txts_from_costing_section(costing_section, fileset)
-            processed_nutridocs[fileset[FILE_LOC].name] = no_processed
-            
-            # list images w recipe name
-            print(fileset[FILE_LOC], f"\nGENERATED: {no_processed[0]} recipes", f"\nMISSING IMAGES: {len(no_processed[1])}\n{no_processed[1]}")
-            print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
+        # list images w recipe name
+        print(fileset[FILE_LOC], f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes", f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[1])}\n{recipes_and_missing_imgs[1]}")
+        print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
     
     # report
     print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
     for name, image_info in processed_nutridocs.items():
-        print(f"NUTRIDOC: {name}\nRECIPES: {image_info[0]}\nMISSING IMAGES:{len(no_processed[1])}\n{no_processed[1]}\n")
+        print(f"NUTRIDOC: {name}\nRECIPES: {image_info[0]}\nMISSING IMAGES:{len(recipes_and_missing_imgs[1])}\n{recipes_and_missing_imgs[1]}\n")
 
     print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
     pprint(NUTRIDOC_LIST)

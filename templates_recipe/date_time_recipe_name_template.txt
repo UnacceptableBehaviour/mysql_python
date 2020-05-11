@@ -4,6 +4,7 @@ __ingredients__
 method: __method__
 notes: __notes__
 description: __description__
+thoughts: __thoughts__
 stars: __stars__
 allergens: __allergens__
 tags: __tags__
