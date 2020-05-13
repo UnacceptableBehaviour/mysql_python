@@ -1230,18 +1230,18 @@ def get_containsTAGS_for(list_of_ingredients):
                 #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
                 #print(f"checking SET:{containsTAG} for {i}")
                 if i in inverse_containsTAGS_LUT[containsTAG]:
-                    print(f"\tSET:{containsTAG} - {i} NOT PRESENT")
+                    # DBG_LEV_4 print(f"\tSET:{containsTAG} - {i} NOT PRESENT") 
                     remove_tags.append(containsTAG)
         
         # at on of this containsTAGS_detected may look like ['veggie','vegan','veggie','veggie','vegan']
         # flatten it to ['veggie','vegan']
         # if a single occurance of a non veggie or non vegan item occured remove the veggie or vegan tag
         containsTAGS_detected = set(containsTAGS_detected)
-        print(f"containsTAGS_detected:{containsTAGS_detected} - - - - S")
-        print(f"remove_tags: {remove_tags}")        
+        # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - S")
+        # DBG_LEV_4 print(f"remove_tags: {remove_tags}")        
         remove_tags = set(remove_tags)
         containsTAGS_detected = containsTAGS_detected - remove_tags
-        print(f"containsTAGS_detected:{containsTAGS_detected} - - - - E")
+        # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - E")
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
