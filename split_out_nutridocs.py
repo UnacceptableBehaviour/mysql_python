@@ -275,7 +275,7 @@ empty_recipe = '''
 description:
 thoughts:
 stars: 1
-type: supplement, snack, breakfast, brunch, salad, soup, component, amuse, side, starter, fish, lightcourse,
+type: sauce, supplement, beverage, snack, breakfast, brunch, salad, soup, component, amuse, side, starter, fish, lightcourse,
 	main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
 username: carter snapdragonpics
