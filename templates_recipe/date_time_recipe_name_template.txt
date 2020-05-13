@@ -2,9 +2,8 @@
 __ingredients__
 													Total (__total_yield__)
 method: __method__
-notes: __notes__
 description: __description__
-thoughts: __thoughts__
+notes: __notes__
 stars: __stars__
 allergens: __allergens__
 tags: __tags__

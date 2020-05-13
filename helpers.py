@@ -155,9 +155,9 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             'lead_image':'slms.jpg',
             'ingredients':"Pure green",
             'images':[ 'image_list.jpg' ],
-            'method':'use your instinct, be creative',
-            'notes':"it'll turn out better next time if you do this",
+            'method':'use your instinct, be creative',            
             'description':'invent_me',
+            'notes':"it'll turn out better next time if you do this",
             'user_rating':0,
             'username':'carter',
             'allergens': [ 'none_listed' ],
@@ -188,10 +188,16 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         # the return group is split mid line - this is used to fix that
         i_list = (''.join( match.group(3).strip() ) ).split("\n")
         
+        
         # remove comments (after #) from ingredients in recipe: 10g allspice     # woa that's gonna be strong!
         for index, line in enumerate(i_list):
             i_list[index] = ( re.sub('#.*', '', line) ).strip()
-            
+
+        # print(">>>DEBUG<<<-S")
+        # print(f"recipe_info['ri_name']:{recipe_info['ri_name']}< recipe_info['servings']:{recipe_info['servings']}<")
+        # pprint(i_list)
+        # print(">>>DEBUG<<<-E")
+        
         # should check db to find subcomponents TODO - HIGH
         for index, line in enumerate(i_list):
             # split using tabs, remove white space, remove blanks
@@ -207,7 +213,8 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             # default to ATOMIC until subcomponent found
             i_list[index].insert(ATOMIC_INDEX,1)                                   # indicates atmonic ingredient            
             
-            #print(f"[{SERVING_INDEX}]\nline:{line} <\ni_list:{i_list[index]}<")
+            #print(f"[{SERVING_INDEX}]\nline:{line} <\ni_list:{i_list[index]}<\nindex:{index}")
+            #pprint(i_list)
             if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)                
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
 

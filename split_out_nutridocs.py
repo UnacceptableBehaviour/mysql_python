@@ -122,11 +122,11 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
     
     
     # create regex
-    PATTERN  = re.compile(r"------------------ for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^thoughts:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
+    PATTERN  = re.compile(r"------------------ for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^notes:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
     
     # scan text for recipes    
     for match in PATTERN.finditer(costing_section):
-        name, serving_info, notes, ingredients, tot_yield, method, description, thoughts, stars, type_tag, lead_image, username = match.groups()
+        name, serving_info, notes_after_serve, ingredients, tot_yield, method, description, notes, stars, type_tag, lead_image, username = match.groups()
         original_text = match.group(0)
 
         if 'calories' in name: continue
@@ -165,10 +165,9 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                     '__serving_info__' : serving_info,
                     '__ingredients__' : ingredients.strip(),
                     '__total_yield__' : tot_yield,
-                    '__method__' : method.strip(),
-                    '__notes__' : notes, #'add improvement comments',
+                    '__method__' : method.strip(),                    
                     '__description__' : description.strip(),
-                    '__thoughts__' : thoughts.strip(),
+                    '__notes__' : str(notes).strip() + ('\n' + str(notes_after_serve)).strip(),  # if notes_after_serve existd put it on the next line!
                     '__stars__' : str(stars).strip(),
                     '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
                     '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
@@ -254,10 +253,10 @@ NUTRIDOC_LIST = [
               # methods & recipes TODO
 #'y978',       # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
                 #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
-# 'y979',       # 0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
-# 'y420',       # 0328-10 - 21/0: images processed - templates in place - REQ: fill in
-# 'y421',       # 0411-24 - 56/0: images processed - templates in place - REQ: fill in
-'y422',       # 0425-08 - 31/31: images processed - add image name to templates - REQ: recipes mostly complete
+ 'y979',       # 0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
+ # 'y420',       # 0328-10 - 21/0: images processed - templates in place - REQ: fill in
+ # 'y421',       # 0411-24 - 56/0: images processed - templates in place - REQ: fill in
+ # 'y422',       # 0425-08 - 31/31: images processed - add image name to templates - REQ: recipes mostly complete
 # get this scripty to check nutridoc_text for already present templates and skip them /
 # add relevant image to existing template? just skip format now
 
@@ -273,7 +272,7 @@ empty_recipe = '''
 180m		coffee												# notes, comments
 													Total (0g)
 description:
-thoughts:
+notes:
 stars: 1
 type: sauce, supplement, beverage, snack, breakfast, brunch, salad, soup, component, amuse, side, starter, fish, lightcourse,
 	main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
