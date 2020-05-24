@@ -128,8 +128,8 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
     
     # try 'allergens & tags below recipe' match first since 'recipe' will match both
     # should match template: date_time_recipe_name_template.txt
-    #                                   1      2     3                4                5          6                7          8              9         10        11         12               13           14
-    match = re.search( r'^-+- for the (.*) \((\w+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)notes:(.*?)description:(.*?)stars:(.*?)allergens:(.*?)tags:(.*?)type:(.*?)images:(.*?)lead_image:(.*?)username:(.*?)^.*?__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
+    #                                   1      2     3                4                5               6           7          8              9         10        11         12               13           14
+    match = re.search( r'^-+- for the (.*) \((\w+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)description:(.*?)notes:(.*?)stars:(.*?)allergens:(.*?)tags:(.*?)type:(.*?)images:(.*?)lead_image:(.*?)username:(.*?)^.*?__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
 
     #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
@@ -156,8 +156,8 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             'ingredients':"Pure green",
             'images':[ 'image_list.jpg' ],
             'method':'use your instinct, be creative',            
-            'description':'invent_me',
             'notes':"it'll turn out better next time if you do this",
+            'description':'invent_me',            
             'user_rating':0,
             'username':'carter',
             'allergens': [ 'none_listed' ],
@@ -169,9 +169,9 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         recipe_info['ri_name'] = match.group(1).strip()
         recipe_info['servings'] = match.group(2).strip()
         recipe_info['yield'] = match.group(4).strip()
-        recipe_info['method'] = match.group(5).strip()
-        recipe_info['notes'] = match.group(6).strip()        
-        recipe_info['description'] = match.group(7).strip()
+        recipe_info['method'] = match.group(5).strip()        
+        recipe_info['description'] = match.group(6).strip()
+        recipe_info['notes'] = match.group(7).strip()        
         stars = match.group(8).strip()
         if stars == '':
             stars = 0

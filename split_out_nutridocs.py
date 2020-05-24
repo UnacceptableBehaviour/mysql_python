@@ -247,20 +247,15 @@ NUTRIDOC_LIST = [
 # 'y972',       # ~13   - lazy days
 # 'y973',
 # 'y974',
-# 'y975',
-# 'y976',      # 
-# 'y977',       # 52/1 - sushi, moussaka, tag n cheese, salads, comfort
-              # methods & recipes TODO
-#'y978',       # DONE 54/5 - sushi, croquettes, wraps, fish, veg, stirfry etc
-                #      missing ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
- 'y979',       # 0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
- # 'y420',       # 0328-10 - 21/0: images processed - templates in place - REQ: fill in
- # 'y421',       # 0411-24 - 56/0: images processed - templates in place - REQ: fill in
- # 'y422',       # 0425-08 - 31/31: images processed - add image name to templates - REQ: recipes mostly complete
-# get this scripty to check nutridoc_text for already present templates and skip them /
-# add relevant image to existing template? just skip format now
-
-# 'y423',       # 0509-22
+ 'y975',        # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+# 'y976',       # SUSHI      0201-14 - images need sorting, tagging & processing, standard sushi templates bringing in 
+# 'y977',       # SUSHI      0215-28 - 54/1: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
+# 'y978',       # DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
+# 'y979',       #       0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
+# 'y420',       #       0328-10 - 21/0: images processed - templates in place - REQ: fill in
+# 'y421',       #       0411-24 - 56/0: images processed - templates in place - REQ: fill in
+# 'y422',       # DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
+# 'y423',       # DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
 # 'y424',       # 0523-05
 # 'y425',       # 0606-19
 # 'y440',       # 0601-15
