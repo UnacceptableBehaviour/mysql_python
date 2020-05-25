@@ -223,9 +223,9 @@ def main():
 NUTRIDOC_LIST = [
 # 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
 # 'y950',       # ~15   - xmas type recipes - A LOT of product - leave for now.
- 'y951',       # 60-70 - bit scrambled 50% done - needs template adding + image name
-# 'y952',       # ~12   - bread, and other 
-# 'y953',       # ~7    - move, fairly low quality, some product
+# 'y951',       # DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
+ 'y952',       # ~12   - bread, and other - sourdough boule
+ 'y953',       # ~7    - move, fairly low quality, some product
 # 'y954',       # ~35   - start propper - better bread 
 # 'y955',       # ~30   - some good lo cal rcps    
 # 'y956',       # ~40   - brisket, burgers, broths
@@ -247,7 +247,7 @@ NUTRIDOC_LIST = [
 # 'y972',       # ~13   - lazy days
 # 'y973',
 # 'y974',
- 'y975',        # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+# 'y975',        # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
 # 'y976',       # SUSHI      0201-14 - images need sorting, tagging & processing, standard sushi templates bringing in 
 # 'y977',       # SUSHI      0215-28 - 54/1: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
 # 'y978',       # DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
