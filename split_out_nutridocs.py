@@ -224,9 +224,9 @@ NUTRIDOC_LIST = [
 # 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
 # 'y950',       # ~15   - xmas type recipes - A LOT of product - leave for now.
 # 'y951',       # DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
- 'y952',       # ~12   - bread, and other - sourdough boule
- 'y953',       # ~7    - move, fairly low quality, some product
-# 'y954',       # ~35   - start propper - better bread 
+# 'y952',       # DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
+#  #'y953',     # DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
+'y954',         # TODO > 0214-28 42/3 >> MISSING IMAGES: 41  - start propper - better bread 
 # 'y955',       # ~30   - some good lo cal rcps    
 # 'y956',       # ~40   - brisket, burgers, broths
 # 'y957',       # ~25   - super healthy, meatbaslls, pastas, bread, beetroot burger
