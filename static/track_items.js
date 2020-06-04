@@ -324,7 +324,7 @@ function getServingWeight(qty, ingredient, modifier='medium'){
     modifier='medium';
   };
   
-  // quit dirty bounds check
+  // quick dirty bounds check
   if (modifier === 'xs')
     { modifier = 'small'; };
     
@@ -435,6 +435,9 @@ function splitLineIntoQtyAndIngredient(newItem){
     ingredient = breakDown.join(' ');
     console.log(`ingredient > ${ingredient} <`);
   }
+  
+  // case: no units no qty - apple, prune yogurt - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  if (qty==='99999') qty='1';
     
   
   // have no units - look item up and calculate/guess weight
