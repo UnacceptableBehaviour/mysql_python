@@ -226,7 +226,7 @@ NUTRIDOC_LIST = [
 # 'y951',       # DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
 # 'y952',       # DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
 #  #'y953',     # DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
-'y954',         # TODO > 0214-28 42/3 >> MISSING IMAGES: 41  - start propper - better bread 
+#'y954',         # TODO > 0214-28 42/3 >> MISSING IMAGES: 41  - start propper - better bread 
 # 'y955',       # ~30   - some good lo cal rcps    
 # 'y956',       # ~40   - brisket, burgers, broths
 # 'y957',       # ~25   - super healthy, meatbaslls, pastas, bread, beetroot burger
@@ -256,7 +256,7 @@ NUTRIDOC_LIST = [
 # 'y421',       #       0411-24 - 56/0: images processed - templates in place - REQ: fill in
 # 'y422',       # DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
 # 'y423',       # DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
-# 'y424',       # 0523-05
+# 'y424',       # DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
 # 'y425',       # 0606-19
 # 'y440',       # 0601-15
 ]
