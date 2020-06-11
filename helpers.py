@@ -128,8 +128,8 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
     
     # try 'allergens & tags below recipe' match first since 'recipe' will match both
     # should match template: date_time_recipe_name_template.txt
-    #                                   1      2     3                4                5               6           7          8              9         10        11         12               13           14
-    match = re.search( r'^-+- for the (.*) \((\w+)\)(.*)^\s+Total \((.*?)\).*?method:(.*?)description:(.*?)notes:(.*?)stars:(.*?)allergens:(.*?)tags:(.*?)type:(.*?)images:(.*?)lead_image:(.*?)username:(.*?)^.*?__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
+    #                                   1      2               3                4                5               6           7          8              9         10        11         12               13           14
+    match = re.search( r'^-+- for the (.*) \((\w+)\)[\s\w]*?$(.*)^\s+Total \((.*?)\).*?method:(.*?)description:(.*?)notes:(.*?)stars:(.*?)allergens:(.*?)tags:(.*?)type:(.*?)images:(.*?)lead_image:(.*?)username:(.*?)^.*?__end_recipe__', recipe_text, re.MULTILINE | re.DOTALL )
 
     #match = re.search( r'^-+- for the (.*) \((\d+)\)(.*)^\s+Total \((.*?)\)', recipe_text, re.MULTILINE | re.DOTALL )
     if (match):
