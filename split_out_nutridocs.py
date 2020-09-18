@@ -227,15 +227,15 @@ NUTRIDOC_LIST = [
 # 'y952',       #* DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
 #  #'y953',     #* DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
 # 'y954',       #* DONE 0214-28 48/13 - stews, tortilla, salads, roasts, snacks      MISSING IMAGES: 10 ['dashi stock', 'lemon dashi dip', 'mixed low cal snack lunch 20190214', 'chicken stock', 'aubergine and chicken liver pate', 'compare aubergine with brussels pate', 'cup of tea', 'home made chicken gravy', 'pea and spring onion gravy', 'mums coconut custard']
-# 'y955',       #* DONE 0301-14 33/15 - coucous madness DOTT! some good lo cal rcps  MISSING IMAGES: 4 ['sweet melon dressing', 'tomato red onion and lettuce w sweet melon', 'beetroot and tomato salad', 'mixed veg sunflower seed couscous']
- 'y956',       # ~40   - brisket, burgers, broths, croquettes, frying absorbtion experiments
-# 'y957',       # ~25   - super healthy, meatbaslls, pastas, bread, beetroot burger
-# 'y958',       # ~20   - sushi, snack, grains, tortilla, fish
-# 'y959',       # ~10   - fish, comfort, snacks, seasoning
-# 'y960',       # ~20   - pies, salads, grains, seafood, icecream
+# 'y955',       #* DONE 0301-14 33/15 - couscous madness DOTT! some good lo cal rcps  MISSING IMAGES: 4 ['sweet melon dressing', 'tomato red onion and lettuce w sweet melon', 'beetroot and tomato salad', 'mixed veg sunflower seed couscous']
+# 'y956',       #  DONE 0315-28 ~48/10 - brisket, burgers, broths, croquettes, frying absorbtion experiments
+# 'y957',       #  DONE 0329-11  32   - super healthy, meatballs, pastas, bread, beetroot burger
+# 'y958',       #  DONE 0412-25 34/6 - sushi, snack, grains, tortilla, fish
+# 'y959',       #  DONE 0429-09 16/22 - IPtodo - fish, comfort, snacks, seasoning, desert
+ 'y960',       # 0510-23 ~20   - pies, salads, grains, seafood, icecream
 # 'y961',       
 # 'y962',       #       - started 50% done - needs template adding + image name - sushi, french sticks, brisket, broths
-# 'y963',       # ~12   - empty copy - image ~16 cous cous, tortilla, salmon
+# 'y963',       # SLMS shortlist ~12   - SUSHI empty copy - image ~16 cous cous, tortilla, salmon
 # 'y964',       #       - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
 # 'y965',
 # 'y966',
@@ -258,9 +258,11 @@ NUTRIDOC_LIST = [
 # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
 # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
- 'y426',       #      0620-04 - 75% done
+# 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
 # 'y427',       #      0705-18 -
 # 'y428',       #      0719-01 -
+# 'y429',       #      0815-28 -
+#  'y430',       #      0829-11 - 
 # 'y440',       # 0601-15
 # * next to done means superfluous image files removed
 ]
@@ -273,8 +275,9 @@ empty_recipe = '''
 description:
 notes:
 stars: 1
-type: sauce, supplement, beverage, snack, breakfast, brunch, salad, soup, component, amuse, side, starter, fish, lightcourse,
-	main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+type: dough, bread, sandwich, sauce, supplement, beverage, snack, breakfast, brunch, salad,
+ soup, component, amuse, side, starter, sushi, fish, lightcourse, main, crepe, dessert, p4, cheese,
+ comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
 username: carter snapdragonpics
 
