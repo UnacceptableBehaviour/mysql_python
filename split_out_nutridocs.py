@@ -143,7 +143,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             # ONLY APPEND IF lead_image is blank - may not match title - OR leave in as reminder
             if lead_image == '':
                 missing_images.append(name)        
-                
+                            
         if lead_image == '' and lead_image_from_title != None:
             lead_image = lead_image_from_title
             # fill in the lead image in the original template
@@ -151,7 +151,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             #original_text = re.sub('lead_image:\s*?$', replacement, original_text, re.M | re.S)  # << NO WORK?? works in pythex?            
             original_text = re.sub('lead_image:', replacement, original_text, re.M | re.S)
             #print(f"\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n{lead_image}\n{replacement}\n{original_text}\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|")
-                                    
+              
         
         username = str(username).strip()        
         
@@ -221,6 +221,7 @@ def main():
 
 
 NUTRIDOC_LIST = [
+                # 2019 * * *
 # 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
 # 'y950',       # ~15   - xmas type recipes - A LOT of product - leave for now.
 # 'y951',       #* DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
@@ -230,24 +231,25 @@ NUTRIDOC_LIST = [
 # 'y955',       #* DONE 0301-14 33/15 - couscous madness DOTT! some good lo cal rcps  MISSING IMAGES: 4 ['sweet melon dressing', 'tomato red onion and lettuce w sweet melon', 'beetroot and tomato salad', 'mixed veg sunflower seed couscous']
 # 'y956',       #  DONE 0315-28 ~48/10 - brisket, burgers, broths, croquettes, frying absorbtion experiments
 # 'y957',       #  DONE 0329-11  32   - super healthy, meatballs, pastas, bread, beetroot burger
-# 'y958',       #  DONE 0412-25 34/6 - sushi, snack, grains, tortilla, fish
+# 'y958',       #  DONE 0412-25 34/6  - sushi, snack, grains, tortilla, fish
 # 'y959',       #  DONE 0429-09 16/22 - IPtodo - fish, comfort, snacks, seasoning, desert
- 'y960',       # 0510-23 ~20   - pies, salads, grains, seafood, icecream
-# 'y961',       
-# 'y962',       #       - started 50% done - needs template adding + image name - sushi, french sticks, brisket, broths
-# 'y963',       # SLMS shortlist ~12   - SUSHI empty copy - image ~16 cous cous, tortilla, salmon
-# 'y964',       #       - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-# 'y965',
-# 'y966',
-# 'y967',
-# 'y968',
-# 'y969',
-# 'y970',
-# 'y971',
-# 'y972',       # ~13   - lazy days
-# 'y973',
-# 'y974',
-# 'y975',        # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+# 'y960',       #  DONE 0510-23 28/5  - pies, salads, grains, seafood, dessert
+# 'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
+# 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
+# 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
+ 'y964',       #       - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
+# 'y965',       #
+# 'y966',       #
+# 'y967',       #
+# 'y968',       #
+# 'y969',       #
+# 'y970',       #
+# 'y971',       #
+# 'y972',       ## ~13   - lazy days
+# 'y973',       #
+                # 2020 * * *
+# 'y974',       #
+# 'y975',       # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
 # 'y976',       # SUSHI      0201-14 - images need sorting, tagging & processing, standard sushi templates bringing in 
 # 'y977',       # SUSHI      0215-28 - 54/1: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
 # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
@@ -284,9 +286,26 @@ username: carter snapdragonpics
 
 '''
 
+empty_lower_template = '''
+description:
+notes:
+stars: 1
+type: dough, bread, sandwich, sauce, supplement, beverage, snack, breakfast, brunch, salad,
+ soup, component, amuse, side, starter, sushi, fish, lightcourse, main, crepe, dessert, p4, cheese,
+ comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+lead_image: _li_
+username: carter snapdragonpics
+
+
+
+-'''
 
 if __name__ == '__main__':
+    split_recipes_from_diary_entry = False
     create_templates_from_image_names = False
+
+    if '-sp' in sys.argv:
+        split_recipes_from_diary_entry = True
 
     if '-ct' in sys.argv:
         create_templates_from_image_names = True
@@ -341,8 +360,37 @@ if __name__ == '__main__':
         #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
         
         costing_section = get_costing_section_from_main_doc(nutridoc_text)
-        #print(costing_section)
+        print(costing_section)
         
+        print("\n**\n**\nIf reading this re-run with option -sp: './split_out_nutridocs.py -sp' \nand shift-G search for '- UUU -' to find the beginning of the separated recipes\n**\n**\n")
+        
+        if split_recipes_from_diary_entry == True:
+            DIARY_RCP_ENTRY = re.compile(r"(----------------- for the.*?^-)", re.M | re.S)
+            diary_text = ""
+            recipes = "-"
+            print(" - MMM -")
+            for match in DIARY_RCP_ENTRY.finditer(costing_section):            
+                extract = match.group(1)            
+                if 'calories' in extract:
+                    diary_text = diary_text + extract 
+                else:
+                    extract += '~'      # w/o this it matches the start of the recipe!
+                    #print("\n - o -")
+                    #print(extract)
+                    #print(re.sub('\s-~',empty_lower_template, extract))
+                    new_template = re.sub('\s-~',empty_lower_template, extract)
+                    #print(new_template)
+                    recipes = recipes + new_template
+                    #print("- - - recipes - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
+                    #print(recipes)
+                print("\n - ^ -")
+            
+            print(" - UUU -")
+            print(recipes)
+            print(diary_text)
+            print("Diary & recipe components separated & description:, notes: etc added to recipes")
+            sys.exit(0)
+            
         # get list of available recipe images format: date_time_recipe.jpg - EG: 20200428_181655_fried chicken coating pancakes.jpg
         available_recipe_images = {}
         for image_file in nutridoc_dir.glob('*.jpg'):            
