@@ -143,15 +143,18 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             # ONLY APPEND IF lead_image is blank - may not match title - OR leave in as reminder
             if lead_image == '':
                 missing_images.append(name)        
-                            
-        if lead_image == '' and lead_image_from_title != None:
-            lead_image = lead_image_from_title
-            # fill in the lead image in the original template
-            replacement = f"lead_image: {lead_image} "
-            #original_text = re.sub('lead_image:\s*?$', replacement, original_text, re.M | re.S)  # << NO WORK?? works in pythex?            
-            original_text = re.sub('lead_image:', replacement, original_text, re.M | re.S)
+        
+        if (lead_image == '' or lead_image == '_li_') and lead_image_from_title != None:            
+            
+            replacement = f"lead_image: {lead_image_from_title} "
+            
+            if lead_image == '_li_':
+                original_text = re.sub('lead_image: _li_', replacement, original_text, re.M | re.S)
+            else:
+                original_text = re.sub('lead_image:', replacement, original_text, re.M | re.S)
+            
             #print(f"\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n{lead_image}\n{replacement}\n{original_text}\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|")
-              
+
         
         username = str(username).strip()        
         
@@ -237,12 +240,12 @@ NUTRIDOC_LIST = [
 # 'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
- 'y964',       #       - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-# 'y965',       #
-# 'y966',       #
-# 'y967',       #
-# 'y968',       #
-# 'y969',       #
+# 'y964',       #  43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
+# 'y965',       #  34/3
+# 'y966',       #  49/1
+ 'y967',       #  29/5
+# 'y968',       #  48/2
+# 'y969',       # split diary from rcp
 # 'y970',       #
 # 'y971',       #
 # 'y972',       ## ~13   - lazy days
@@ -264,8 +267,10 @@ NUTRIDOC_LIST = [
 # 'y427',       #      0705-18 -
 # 'y428',       #      0719-01 -
 # 'y429',       #      0815-28 -
-#  'y430',       #      0829-11 - 
-# 'y440',       # 0601-15
+# 'y430',       #      0829-11 -
+# 'y431',       #      0912-25 -
+# 'y432',       #      0929-09 - 
+# 'y440',       #  0601-15
 # * next to done means superfluous image files removed
 ]
 
