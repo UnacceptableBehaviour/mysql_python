@@ -141,7 +141,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             lead_image_from_title = available_recipe_images.pop(name)   # remove from available images
         except KeyError:
             # ONLY APPEND IF lead_image is blank - may not match title - OR leave in as reminder
-            if lead_image == '':
+            if lead_image == '' or lead_image == '_li_':
                 missing_images.append(name)        
         
         if (lead_image == '' or lead_image == '_li_') and lead_image_from_title != None:            
