@@ -107,12 +107,24 @@ def get_zero_pad_6dig_count():
 OVER_WRITE_FILES = True
 DUMBY_RUN = False
 TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
+RECIPES_PROCESSED = 0
+MISSING_IMAGES = 1
+INGREDIENTS_TOTAL_0G = 2
+RECIPES_WITH_NON_ZERO_TOTALS = 3
+AVAILABLE_RECIPE_IMAGES = 4
 def produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, overwrite=False):
     recipes_processed = []
     missing_images = []
-    
-    target_file_name = ''
-    target_path = fileset[TMP_PATH]
+    recipes_w_total_0g = []
+    recipes_with_non_zero_totals = []
+
+    # print('> - - - - - S \ ')
+    # pprint(fileset)
+    # #tmp_path = file_loc.parent.joinpath(file_loc.stem).joinpath('_i_w_r_auto_tmp')
+    # print(fileset[TMP_PATH].parent.joinpath('_i_w_r_auto_tot0g'))
+    # print('> - - - - - E / ')
+
+    target_file_name = ''    
     root_date = fileset[ROOT_DATE]
         
     # remove diary entries
@@ -130,6 +142,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         original_text = match.group(0)
 
         if 'calories' in name: continue
+        
+        target_path = fileset[TMP_PATH]         # reset target path in case changed to _i_w_r_auto_tot0g below
         
         recipes_processed.append(name)          # a dict would make search faster no? but for these numbes meh
         
@@ -187,6 +201,13 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             #print(f"INSERTING: {marker} - {type(insertion_dict[marker])} - {insertion_dict[marker]}")
             rcp = rcp.replace(marker, insertion_dict[marker])
         
+        if 'Total (0g)' in rcp:
+            recipes_w_total_0g.append(name)
+            target_path = fileset[TMP_PATH].parent.joinpath('_i_w_r_auto_tot0g')
+            target_path.mkdir(parents=True, exist_ok=True)
+        else:
+            recipes_with_non_zero_totals.append(name)
+        
         place_txt_file = target_path.joinpath(target_file_name)
         place_img_file = target_path.joinpath(lead_image)
         source_img_file = target_path.parent.joinpath(lead_image)
@@ -200,7 +221,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                 f.write(rcp)        
         
         #if image exist copy it over
-        if lead_image != '':
+        if lead_image != '' and lead_image != '_li_':
             if overwrite == True:
                 copy2(source_img_file, place_img_file)
     
@@ -216,7 +237,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
             
         
-    return (recipes_processed, missing_images)
+    return [recipes_processed, missing_images, recipes_w_total_0g, recipes_with_non_zero_totals, available_recipe_images]
 
 
 def main():
@@ -240,25 +261,25 @@ NUTRIDOC_LIST = [
 # 'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
-# 'y964',       #  43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-# 'y965',       #  34/3
-# 'y966',       #  49/1
- 'y967',       #  29/5
+# 'y964',       #  DONE 43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
+# 'y965',       #  40/19  - burgers, pasta, fish, lamb, salads 
+# 'y966',       #  49/1 - fish, salads, carbless veggie - TODO roast beef
+# 'y967',       #  29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
 # 'y968',       #  48/2
-# 'y969',       # split diary from rcp
-# 'y970',       #
-# 'y971',       #
-# 'y972',       ## ~13   - lazy days
-# 'y973',       #
-                # 2020 * * *
-# 'y974',       #
-# 'y975',       # 50%        0118-31 - 33/16: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
-# 'y976',       # SUSHI      0201-14 - images need sorting, tagging & processing, standard sushi templates bringing in 
-# 'y977',       # SUSHI      0215-28 - 54/1: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
-# 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
-# 'y979',       #       0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
-# 'y420',       #       0328-10 - 21/0: images processed - templates in place - REQ: fill in
-# 'y421',       #       0411-24 - 56/0: images processed - templates in place - REQ: fill in
+ 'y969',       #  18/30 - 2 month stretch / messy split diary from rcp
+# # 'y970',       #  1109-22 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
+# # 'y971',       # 1123-06 23/4 - broths, fish, bakewell tart & fudge, veg bake
+#  'y972',       # 1207-20 15/10 - 
+# # 'y973',       # 1221-03 26/15 - xmas, beef, brioche, broths, fennel pate, french stick
+#                 # 2020 * * *
+#  'y974',       # 0104-17 13/15 - 
+#  'y975',       # DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+# # 'y976',       # 0201-14 38/50- standard sushi templates bringing in 
+#  'y977',       #  SUSHI TODO  0215-28 - 9/48: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
+# # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
+#  'y979',       #       0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
+# 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
+#  'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
 # 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
 # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
@@ -308,12 +329,16 @@ username: carter snapdragonpics
 if __name__ == '__main__':
     split_recipes_from_diary_entry = False
     create_templates_from_image_names = False
+    verbose_mode = False
 
     if '-sp' in sys.argv:
         split_recipes_from_diary_entry = True
 
     if '-ct' in sys.argv:
         create_templates_from_image_names = True
+
+    if '-v' in sys.argv:
+        verbose_mode = True
     
     #main()
     # with PyCallGraph(output=graphviz, config=config):
@@ -428,18 +453,69 @@ if __name__ == '__main__':
         print(f"REPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
         print(fileset[FILE_LOC].name, f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes",
               f"\nTEMPLATES FROM IMAGES: {len(available_recipe_images)}",
-              f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[1])}\n{recipes_and_missing_imgs[1]}")
+              f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[MISSING_IMAGES])}\n{recipes_and_missing_imgs[MISSING_IMAGES]}")
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
     
     # report
+    missing_images_across_all_docs = {}
     print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
     for name, image_info in processed_nutridocs.items():
-        print(f"NUTRIDOC: {name}\nRECIPES: {image_info[0]}\nMISSING IMAGES:{len(recipes_and_missing_imgs[1])}\n{recipes_and_missing_imgs[1]}\n")
-        for i in recipes_and_missing_imgs[1]:
+        # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
+        
+                
+        print(fileset[FILE_LOC].name, f" -: {len(image_info[RECIPES_PROCESSED])} recipes")
+        
+        print(f"COMPLETE:       {len(image_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
+        if verbose_mode: print(image_info[RECIPES_WITH_NON_ZERO_TOTALS])
+        
+        print(f"TOTAL 0g:       {len(image_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")        
+        if verbose_mode: print(image_info[INGREDIENTS_TOTAL_0G])
+        
+        print(f"TMPLT FRM IMG:  {len(image_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")        
+        if verbose_mode: print(image_info[AVAILABLE_RECIPE_IMAGES])
+        
+        print(f"MISSING IMAGES: {len(image_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
+        if verbose_mode: print(image_info[MISSING_IMAGES])
+        
+        print("\n\n")
+        for i in image_info[MISSING_IMAGES]:
             print(i)
+        missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+        
+    print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+    doc_name = 'y425_NUTRITEST_recipes_20200606-0919.rtf'
+    column_headers = ['RECIPES','COMPLETE','TOTAL 0g','TMP FROM IMG','MISSING IMG']
+    header = 'DOC_NAME'.ljust(len(doc_name)+3) + '  '.join(column_headers)
+    print(header)
+    for name, image_info in processed_nutridocs.items():
+        # stats = dict(zip(column_headers, immage_info_list))
+        stats = {
+            'RECIPES': image_info[RECIPES_PROCESSED],
+            'COMPLETE': image_info[RECIPES_WITH_NON_ZERO_TOTALS], 
+            'TOTAL 0g': image_info[INGREDIENTS_TOTAL_0G],
+            'TMP FROM IMG': image_info[AVAILABLE_RECIPE_IMAGES],
+            'MISSING IMG': image_info[MISSING_IMAGES]
+        }
+        row = name.ljust(len(doc_name))
+        for col, data in stats.items():
+            row += str(len(data)).center(len(col)+2)
+        
+        print(row)
+        missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+        
     print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
     pprint(NUTRIDOC_LIST)
+    pprint(missing_images_across_all_docs)
+
+# 
+# RECIPES_PROCESSED = 0
+# MISSING_IMAGES = 1
+# INGREDIENTS_TOTAL_0G = 2
+# RECIPES_WITH_NON_ZERO_TOTALS = 3
+# AVAILABLE_RECIPE_IMAGES = 4
     
+    #pprint(recipes_and_missing_imgs)
+    #pprint(processed_nutridocs)
     
     
     
