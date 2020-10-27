@@ -172,7 +172,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         
         username = str(username).strip()        
         
-        target_file_name = lead_image.replace('.jpg', '.txt')
+        target_file_name = lead_image.lower().replace('.jpg', '.txt')
         
         # if no lead_image to base filename on - use root_date
         if target_file_name == '':
@@ -262,35 +262,36 @@ NUTRIDOC_LIST = [
 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
 # 'y964',       #  DONE 43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-# 'y965',       #  40/19  - burgers, pasta, fish, lamb, salads 
-# 'y966',       #  49/1 - fish, salads, carbless veggie - TODO roast beef
-# 'y967',       #  29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
-# 'y968',       #  48/2
- 'y969',       #  18/30 - 2 month stretch / messy split diary from rcp
-# # 'y970',       #  1109-22 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
-# # 'y971',       # 1123-06 23/4 - broths, fish, bakewell tart & fudge, veg bake
-#  'y972',       # 1207-20 15/10 - 
-# # 'y973',       # 1221-03 26/15 - xmas, beef, brioche, broths, fennel pate, french stick
-#                 # 2020 * * *
-#  'y974',       # 0104-17 13/15 - 
-#  'y975',       # DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
-# # 'y976',       # 0201-14 38/50- standard sushi templates bringing in 
-#  'y977',       #  SUSHI TODO  0215-28 - 9/48: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
-# # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
-#  'y979',       #       0314-27 - 43/4: images processed - templates in place - REQ: fill in ~ 50% complete
+# 'y965',       #  DONE 39/19  - burgers, pasta, fish, lamb, salads 
+# 'y966',       #  DONE 61/19 - fish, salads, carbless, veggie, sandwiches,
+# 'y967',       #  DONE 29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
+#'y968',       #  48/2
+# 'y969',       #  DONE 23/27 - 2 month stretch / messy split diary from rcp
+# 'y970',       #  DONE 1109-22 - 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
+# 'y971',       #  DONE 1123-06 24/2 - broths, fish, bakewell tart & fudge, veg bake
+# 'y972',       #  DONE 1207-20 19/4 - 
+# 'y973',       #  DONE 1221-03 28/11 - xmas, beef, brioche, broths, fennel pate, french stick - TODO: beef forerib, lamb chops, oils
+#               #* 2020 * * *
+# 'y974',       #  DONE 0104-17 - 18/1  crispy prawns, stir fry, arancini, moussakas, roast potatoes & salads
+# 'y975',       #  DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+# 'y976',       #  SUSHI TODO DONE 0201-14 42/45- standard sushi templates bringing in 
+# 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
+# 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
+# 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
 # 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
-#  'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
+# 'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
 # 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
 # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
 # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
 # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-# 'y427',       #      0705-18 -
-# 'y428',       #      0719-01 -
-# 'y429',       #      0815-28 -
-# 'y430',       #      0829-11 -
-# 'y431',       #      0912-25 -
-# 'y432',       #      0929-09 - 
+# 'y427',       #       0705-18 - 29/2:
+# 'y428',       #       0719-01 - 15/0:
+# 'y429',       #       0815-28 - 50/4:
+# 'y430',       #       0829-11 - 10/1:
+# 'y431',       #       0912-25 - 4 /2:
+# 'y432',       #       0929-09 - 13/0:
+# 'y433',       #       1010-23 - 12/2:
 # 'y440',       #  0601-15
 # * next to done means superfluous image files removed
 ]
