@@ -261,13 +261,13 @@ NUTRIDOC_LIST = [
 # 'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
-# 'y964',       #  DONE 43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-# 'y965',       #  DONE 39/19  - burgers, pasta, fish, lamb, salads 
-# 'y966',       #  DONE 61/19 - fish, salads, carbless, veggie, sandwiches,
-# 'y967',       #  DONE 29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
-#'y968',       #  48/2
-# 'y969',       #  DONE 23/27 - 2 month stretch / messy split diary from rcp
-# 'y970',       #  DONE 1109-22 - 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
+# 'y964',       #  DONE         43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
+# 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads 
+# 'y966',       #  DONE         61/19 - fish, salads, carbless, veggie, sandwiches,
+# 'y967',       #  DONE         29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
+# 'y968',       #  DONE 0830-12 72/17 - lo-cal, pastry, creme pat, roasts, salads
+# 'y969',       #  DONE         23/27 - 2 month stretch / messy split diary from rcp
+# 'y970',       #  DONE 1109-22 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
 # 'y971',       #  DONE 1123-06 24/2 - broths, fish, bakewell tart & fudge, veg bake
 # 'y972',       #  DONE 1207-20 19/4 - 
 # 'y973',       #  DONE 1221-03 28/11 - xmas, beef, brioche, broths, fennel pate, french stick - TODO: beef forerib, lamb chops, oils
@@ -285,13 +285,14 @@ NUTRIDOC_LIST = [
 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
 # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
 # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-# 'y427',       #       0705-18 - 29/2:
-# 'y428',       #       0719-01 - 15/0:
-# 'y429',       #       0815-28 - 50/4:
-# 'y430',       #       0829-11 - 10/1:
-# 'y431',       #       0912-25 - 4 /2:
-# 'y432',       #       0929-09 - 13/0:
-# 'y433',       #       1010-23 - 12/2:
+'y427',       #       0705-18 - 29/2:
+'y428',       #       0719-01 - 15/0:
+'y429',       #       0815-28 - 50/4:
+'y430',       #       0829-11 - 10/1:
+'y431',       #       0912-25 - 4 /2:
+'y432',       #       0929-09 - 13/0:
+'y433',       #       1010-23 - 12/2:
+'y434',       #       1024-06 - 00/0:
 # 'y440',       #  0601-15
 # * next to done means superfluous image files removed
 ]
