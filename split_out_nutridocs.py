@@ -285,14 +285,18 @@ NUTRIDOC_LIST = [
 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
 # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
 # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-'y427',       #       0705-18 - 29/2:
-'y428',       #       0719-01 - 15/0:
-'y429',       #       0815-28 - 50/4:
-'y430',       #       0829-11 - 10/1:
-'y431',       #       0912-25 - 4 /2:
-'y432',       #       0929-09 - 13/0:
-'y433',       #       1010-23 - 12/2:
-'y434',       #       1024-06 - 00/0:
+# 'y427',       #       0705-18 - 29/2:
+# 'y428',       #       0719-01 - 15/0:
+# 'y429',       #       0815-28 - 50/4:
+# 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
+# 'y431',       #       0912-25 - 4 /2:
+# 'y432',       #       0929-09 - 13/0:
+# 'y433',       #       1010-23 - 12/2:
+# 'y434',       #       1024-06 - 00/0:
+# 'y435',       #       0912-25 - 4 /2:
+# 'y436',       #       0929-09 - 13/0:
+# 'y437',       #       1010-23 - 12/2:
+# 'y438',       #       1024-06 - 00/0:
 # 'y440',       #  0601-15
 # * next to done means superfluous image files removed
 ]
