@@ -290,7 +290,7 @@ NUTRIDOC_LIST = [
 # 'y429',       #       0815-28 - 50/4:
 # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
 # 'y431',       #       0912-25 - 4 /2:
- 'y432',       #       0929-09 - 13/0:
+# 'y432',       #  DONE 0929-09 - 15/42: loads of material!
 # 'y433',       #       1010-23 - 12/2:
 # 'y434',       #       1024-06 - 00/0:
 # 'y435',       #       0912-25 - 4 /2:
