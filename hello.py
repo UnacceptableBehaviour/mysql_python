@@ -38,8 +38,10 @@ from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_u
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-# giza a look
+# giza a look - debug
 from pprint import pprint
+import random
+# debug - delete
 
 import urllib.parse
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
@@ -65,16 +67,23 @@ db = scoped_session(sessionmaker(bind=engine))
 def db_hello_world():
     # execute this query
     # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
-    db_lines = db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
+    all_recipes = db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
     
     formatted_text = "<br>"
+
+    # debug - delete
+    firstN = 20
+    db_lines = []
+    for i in range(firstN):
+        q_index = random.randint(0,len(all_recipes)-1)
+        db_lines.append(all_recipes.pop(q_index))
     
     for line in db_lines:
         pprint(line)
         #print(f" | {round(line.yield, 0)} | {round(line.servings, 0)} | {line.ri_name} | {line.lead_image} | <br>")
         #formatted_text = formatted_text + f" | {int(line.yield)} | {int(line.servings)} | {line.ri_name} | {line.lead_image} | <br>"
     
-    print(f"\n\nProcess Query\n{formatted_text}\n")
+    print(f"\n\nProcess Query - rendering {len(db_lines)} recipes. . \n{formatted_text}\n")
     
     #return render_template('data_return.html', lines=db_lines)
     return render_template('show_all_recipe_images.html', recipes=db_lines)

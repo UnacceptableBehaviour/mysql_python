@@ -371,7 +371,7 @@ def build_fish_set():
 molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
                   'oyster','scallop','octopus','squid','cuttlefish'}
 
-molluscs_derived_no_recipe =  {'oyster sauce'}
+molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels'}
 
 # different names same thing
 molluscs_alt = [
