@@ -89,7 +89,8 @@ function renderRecipeCard(rcpInfo){
   //</div>
   
   // TODO - serve from environment  
-  ASSET_ROOT = 'http://192.168.1.13:8000/'
+  //ASSET_ROOT = 'http://192.168.1.13:8000/'
+  ASSET_ROOT = 'http://127.0.0.1:8000/'   // otherwise https fails - & no images
   assets_url = `${ASSET_ROOT}static/recipe/`; // local dev
   
   //ASSET_ROOT = ''
