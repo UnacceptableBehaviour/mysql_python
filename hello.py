@@ -304,16 +304,24 @@ def db_gallery():
     # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
     
     # do this in pages when larger db - use JS to reload
-    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
+    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()    
     
-    recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
-
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    pprint(recipes)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-          
-    #return render_template('data_return.html', lines=db_lines)
+    # debug - delete
+    firstN = 20
+    rcp_ids_20_off = []
+    for i in range(firstN):
+        q_index = random.randint(0,len(ri_ids)-1)
+        rcp_ids_20_off.append(ri_ids.pop(q_index))
+    
+    #recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)  # show WHOLE DB!!! :/
+    recipes = get_gallery_info_for_display_as_list_of_dicts(rcp_ids_20_off)  # show 20 random! :)
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
+    # pprint(recipes)
+    # pprint(rcp_ids_20_off)
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+              
     return render_template('gallery.html', recipes=recipes)
+    
 
 
 @app.route('/settings', methods=["GET", "POST"])

@@ -27,7 +27,6 @@ if ((formPCWater.value === "") && (dtk['dtk_pc_h2o'] !== 0)) {
 }
 
 
-
 function recordWeighInDetails (){
   
   if ( (formWeight.value === "")|| (formPCFat.value === "")|| (formPCWater.value === "") ) {

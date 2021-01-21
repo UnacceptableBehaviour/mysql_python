@@ -16,7 +16,8 @@ from pathlib import Path
 
 from pprint import pprint # giza a look
 
-# serve files from http://192.168.1.13:8000/static/sql_recipe_data.csv
+# serve files from http://192.168.1.13:8000/static/sql_recipe_data.csv   < ASSET SERVER
+# use http://127.0.0.1:8000 so SSL on main site doesn't block retrieval
 # $ cd /a_syllabus/lang/python/repos/assest_server 
 # $ http-server -p 8000 --cors 
 import urllib.request
@@ -36,7 +37,7 @@ INGREDIENT_INDEX = 3
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_csv_from_server_as_disctionary(force_reload=False):
-    url = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'       
+    url = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'       
     print("----- get_csv_from_server_as_disctionary -----------------------------------")    
     
     url = urllib.parse.quote(url, safe='/:')  # replace spaces if there are any - urlencode
@@ -257,13 +258,13 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
     recipe_text = 'FILE ACCESS ERROR: NO FILE or NO DATA IN FILE'
     
     print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
-    base_url = 'http://192.168.1.13:8000/static/recipe/'
+    base_url = 'http://127.0.0.1:8000/static/recipe/'
     url = f"{base_url}{recipe_text_filename}"
     print(url)
 
-    # IN  http://192.168.1.13:8000/static/recipe/20190228_163410_monkfish and red pepper skewers.txt
+    # IN  http://127.0.0.1:8000/static/recipe/20190228_163410_monkfish and red pepper skewers.txt
     # url = url.replace(" ", "%20")          # WORKS 
-    # OUT http://192.168.1.13:8000/static/recipe/20190228_163410_monkfish%20and%20red%20pepper%20skewers.txt
+    # OUT http://127.0.0.1:8000/static/recipe/20190228_163410_monkfish%20and%20red%20pepper%20skewers.txt
 
     # get recipe text from assest server
     url = urllib.parse.quote(url, safe='/:')  # WORKS - likely more robust
@@ -718,11 +719,11 @@ def get_nutirents_for_redipe_id(db, ri_id):
     
 if __name__ == '__main__':
     # print("-----  get CSV ------------------------------------S")
-    # fetch_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'
+    # fetch_file = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'
     # get_csv_from_server_as_disctionary(fetch_file)
     # print("-----  get CSV ------------------------------------E")
 
     recipe_text = '20190103_170558_chicken beetroot w broccoli and greens.txt'
     #recipe_text = '20190109_143622_crabcakes.txt'
-    #urllib.request = 'http://192.168.1.13:8000/static/recipe/20190109_143622_crabcakes.txt'
+    #urllib.request = 'http://127.0.0.1:8000/static/recipe/20190109_143622_crabcakes.txt'
     get_recipe_ingredients_and_yields_from_file_test(recipe_text,'chicken beetroot w broccoli and greens')

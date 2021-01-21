@@ -73,7 +73,7 @@ function searchForRecipe (){
 
 function renderRecipeCard(rcpInfo){
   //<div class="card">
-  //    <img class="card-img-top" src="http://192.168.1.13:8000/static/recipe/{{recipe_info['lead_image']}}"></img>
+  //    <img class="card-img-top" src="http://127.0.0.1:8000/static/recipe/{{recipe_info['lead_image']}}"></img>
   //    <div class="card-body">
   //        <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
   //        <p class="card-text">{{ recipe_info['description'] }}</p>
