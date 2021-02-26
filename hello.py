@@ -648,7 +648,7 @@ if __name__ == '__main__':
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain("./scratch/server.crt", "./scratch/server.key")    
     # TODO sort DNS > dtk.health so certifates match
-    # change back
+    # ssh push test
     #serving.run_simple("0.0.0.0", 50015, app, ssl_context=context)
     
     # setting up SSL for image capture:
