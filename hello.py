@@ -642,12 +642,14 @@ if __name__ == '__main__':
     # reserved port numbers
     # https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
     #app.run(host='0.0.0.0', port=50015)
-    #app.run(host='192.168.1.13', port=50015 )
+    app.run(host='192.168.1.13', port=50015 )
     #app.run(host='192.168.1.13', port=50015, ssl_context='adhoc' )
     #app.run(host='192.168.1.13', port=50015, ssl_context=('server.crt', 'server.key') )
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain("./scratch/server.crt", "./scratch/server.key")    
-    serving.run_simple("0.0.0.0", 50015, app, ssl_context=context)
+    # TODO sort DNS > dtk.health so certifates match
+    # change back
+    #serving.run_simple("0.0.0.0", 50015, app, ssl_context=context)
     
     # setting up SSL for image capture:
     # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
