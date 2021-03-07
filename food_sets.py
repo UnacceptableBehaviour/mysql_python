@@ -186,7 +186,7 @@ def build_peanuts_set():
 nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
               'pecans','pistachios','walnuts'}
 
-nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava','cantuccini'}
+nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava','cantuccini','almond oil'}
 
 def build_nuts_set():
     nuts = {'nuts'}
