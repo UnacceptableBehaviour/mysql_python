@@ -4,13 +4,13 @@
 import re
 import sys
 import json
-from pprint import pprint 
-from config_files import get_file_for_data_set            
+from pprint import pprint
+from config_files import get_file_for_data_set
 
 class Nutrients:
     NUTRI_KEY = 0
     NUTRI_VALUE = 1
-    
+
     match_lookup = {                    # translate from human readable text to dict
         'energy':'n_En',
         'fat':'n_Fa',
@@ -24,11 +24,11 @@ class Nutrients:
         'starch':'n_St',
         'protein':'n_Pr',
         'salt':'n_Sa',
-        'alcohol':'n_Al'    
+        'alcohol':'n_Al'
     }
-    
+
     log_nutridata_key_errors = []
-    
+
     def __init__(self, ingredient='name_of_ingredient', nutridict={}): # nutridict={}):
         self._nutridict = {                  # self.nutridict - instance var
             'name': ingredient,
@@ -37,7 +37,7 @@ class Nutrients:
             'serving_size': 0.0,
             'yield': '0g',
             'units': 'g',
-            'density': 1, 
+            'density': 1,
             'n_En':0.0,   # energy
             'n_Fa':0.0,   # fat
             'n_Fs':0.0,   # fat-saturates
@@ -51,18 +51,19 @@ class Nutrients:
             'n_Pr':0.0,   # protein
             'n_Sa':0.0,   # salt
             'n_Al':0.0    # alcohol
-        }.update(nutridict)  #(nutridict - passed in)
-       
+        } #.update(nutridict) < tacking this on the end reults in None being assigned to self._nutridict
+        self._nutridict.update(nutridict)  #(nutridict - passed in)
+
 
     @property
-    def nutridict(self):        
+    def nutridict(self):
         return self._nutridict
- 
+
     @nutridict.setter                           #
     def nutridict(self, **kwargs):              # https://pythontips.com/2013/08/04/args-and-kwargs-in-python-explained/
         self._nutridict.update(kwargs)
 
-    
+
     @classmethod
     def process_text_to_nutrients_dict(cls, text_data, nutri_dict):
         if type(nutri_dict).__name__ != 'dict':
@@ -72,7 +73,7 @@ class Nutrients:
         normalise = 1.0         # leave non DTK alone
 
         # scan for nutrients
-        nut2ObjLUT = Nutrients.match_lookup                
+        nut2ObjLUT = Nutrients.match_lookup
 
         # match groups
         # 1 ingredient name
@@ -82,17 +83,17 @@ class Nutrients:
         for m in re.finditer(r'^-+ for the nutrition information(.*?)\((.*?)\)$(.*?)Total \((.*?)\)', text_data, re.MULTILINE | re.DOTALL ):
             nutridict_for_pass = {}
             name = m.group(1).strip()
-            
+
             if (name == ''): continue             # skip blank templates
-                                    
+
             nutridict_for_pass['name'] = name
-            
+
             if ('ml' in m.group(4)):
                 nutridict_for_pass['yield'] = float(m.group(4).replace('ml', ''))
                 nutridict_for_pass['units'] = 'ml'
             else:
                 nutridict_for_pass['yield'] = float(m.group(4).replace('g', ''))
-            
+
             if (m.group(2) == 'per 100g'):                      # 100g per serving
                 nutridict_for_pass['serving_size'] = 100.0
             elif ('ndb_no=' in m.group(2) ):                    # cross reference in place of per 100g
@@ -105,16 +106,16 @@ class Nutrients:
                     normalise = 1.0
                 else:
                     normalise = 100.0 / nutridict_for_pass['serving_size']
-            
+
             #print(f"\n\n** {name} - {m.group(2)} \n {m.group(3)} \n {m.group(4)} \n--")
-            
+
             lines = [ line.strip() for line in m.group(3).split("\n")] # remove leading/training space
-            
+
             lines = list( filter(None, lines) )                 # remove blanks & empty elements
-            
+
             for line in lines:
                 #print(f"L:{len(line)} - [{line}]");
-                pair = [ item.strip() for item in line.split() ]    # split line by white space, strip excess space off                
+                pair = [ item.strip() for item in line.split() ]    # split line by white space, strip excess space off
                 nutrient = pair[Nutrients.NUTRI_KEY]
                 quantity = pair[Nutrients.NUTRI_VALUE]
                 #pprint(pair)
@@ -137,8 +138,8 @@ class Nutrients:
                             quantity = float(quantity) / 1000000.0
                         elif ('g' in quantity): quantity = quantity.replace('g','')
                         #nutridict_for_pass[ nut2ObjLUT[nutrient] ] = float(quantity) * normalise
-                    
-            # TODO 
+
+            # TODO
             # insert = Nutrients(name, nutridict_for_pass)
             # nutri_dict[name] = insert.nutridict
             # print('- - - - - * - - - - - * - - - - - * - - - - - * - - - - - * - - - - - * - - - - - * ')
@@ -149,10 +150,10 @@ class Nutrients:
 
             nutri_dict[name] = nutridict_for_pass  # WORKS
 
-        print("SCANNING. . . complete")        
-        
+        print("SCANNING. . . complete")
+
         return nutri_dict
-        
+
 
 class NutriDictError(Exception):
     '''TODO Move this and other error classes to separate file: exceptions.py'''
@@ -169,7 +170,7 @@ class DemoMultipleCatch(NutriDictError):
 class ResourceLocked(NutriDictError):
     '''No other threads yet so should not happen!'''
     pass
-    
+
 
 # Singleton interface for the NutrientsDB
 class NutrientsDB:
@@ -187,7 +188,7 @@ class NutrientsDB:
         '''Return handle to Nutrients Databas - simple file'''
         if NutrientsDB.__instance == None:
             NutrientsDB()
-            
+
         return NutrientsDB.__instance
 
     @classmethod
@@ -198,7 +199,7 @@ class NutrientsDB:
         else:
             NutrientsDB.__seek_misses.append(ingredient)
             return None
-    
+
     @classmethod
     def set(cls, ingredient, nutridict={}):
         '''Shallow write to DB - locally stored'''
@@ -207,14 +208,14 @@ class NutrientsDB:
 
     @classmethod
     def commit(cls):
-        '''Write the local version back to DB'''        
+        '''Write the local version back to DB'''
         # NutrientsDB.__file_lock.acquire()     # lock resource
         if NutrientsDB.__file_lock == False:
             NutrientsDB.__file_lock = True
             try:
                 with open('ingredient_db.json', 'w') as f:
                     f.write(json.dumps(ingredient_db))
-                
+
             except (NotImplementedError, DemoMultipleCatch) as e:
                 print("WARNING FAILED to commit DB to disk")
                 print(f"\n***\n{e} \n<")
@@ -225,8 +226,8 @@ class NutrientsDB:
                 NutrientsDB.__file_lock = False
         else:
             raise ResourceLocked("Something unexpected going on squire.")
-            
-        
+
+
     # load DB if not loaded
     def __init__(self):
         if NutrientsDB.__instance != None:
@@ -240,33 +241,33 @@ class NutrientsDB:
             if (NutrientsDB.__len__() > 0):
                 NutrientsDB.__nutrients_loaded = True
                 print(f"SUCCESS: Loaded {NutrientsDB.__len__()} ingredients.")
-                      
-    
-    @classmethod                    
+
+
+    @classmethod
     def loadNutrientsFromTextFile(cls, nutri_file, nutri_dict):
         '''Load nutrient information from text file and load it into Dict'''
         try:
             with open(nutri_file, 'r') as f:
                 nutrition_items_text = f.read()
                 Nutrients.process_text_to_nutrients_dict(nutrition_items_text, nutri_dict)
-            
+
         except (FileNotFoundError, NotImplementedError) as e:
             print("WARNING Exception raised: loadNutrientsFromTextFile")
             print(f"nutri_file: {nutri_file}")
             print("nutri_dict:")
             pprint(nutri_dict)
-            print(f"\n***\n{e} \n<")          
+            print(f"\n***\n{e} \n<")
 
-    
+
     @classmethod
     def __len__(cls):
-        return len(NutrientsDB.__nutrients_db.keys()) 
+        return len(NutrientsDB.__nutrients_db.keys())
 
     @classmethod
     def __iter__(cls):
         NutrientsDB.__iterator = iter(NutrientsDB.__nutrients_db)
         return NutrientsDB.__iterator
-    
+
     @classmethod
     def __next__(cls):
         return NutrientsDB.__iterator.next()
@@ -285,33 +286,33 @@ if __name__ == '__main__':
     ingredient_db = NutrientsDB.getInstance()
     ingredient_db2 = NutrientsDB.getInstance()      # should be the same DB
     #ingredient_db3 = NutrientsDB()                 # Exception: Access NutrientsDB via getInstance class method
-    
+
     print("= = SHOW GLOBAL VARLIST")
     pprint(globals())
     print("<\n\n")
-    
+
     print("= = SHOW protagonists")
     print("--> ingredient_db")
     print(type(ingredient_db))
     print(len(ingredient_db))
     print(id(ingredient_db))
-    
+
     print("\n--> ingredient_db2")
     print(type(ingredient_db2))
     print(len(ingredient_db2))
     print(id(ingredient_db2))
-    
+
     # print("\n--> ingredient_db3")
     # print(type(ingredient_db3))
     # print(len(ingredient_db3))
     # print(id(ingredient_db3))
-    # 
+    #
     pprint( ingredient_db.get('flour') )
     pprint( ingredient_db.get('coffee') )
     pprint( ingredient_db.get('pork chop') )
     pprint( ingredient_db.get('spinach tortilla') )
     print(f"Seek Misses:\n{NutrientsDB.list_seek_misses()}")
-    
+
     t_dict = {}
     i_db = NutrientsDB.getInstance()
     i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), t_dict)
@@ -321,7 +322,7 @@ if __name__ == '__main__':
     for igdt in iter(i_db):
         print(igdt)
 
-        
+
 
 
 
