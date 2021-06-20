@@ -278,30 +278,34 @@ NUTRIDOC_LIST = [
 # 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
 # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
 # 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
-# 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
-# 'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
-# 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
-# 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
-# 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
-# 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
-# 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-# 'y427',       #       0705-18 - 29/2:
-# 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
-# 'y429',       #       0815-28 - 50/4:
-# 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
-# 'y431',       #       0912-25 - 4 /2:
-# 'y432',       #  DONE 0929-09 - 15/42: loads of material!
-# 'y433',       #       1010-23 - 12/2:
-# 'y434',       #       1024-06 - 00/0:
-# 'y435',       #       1107-20 -
-# 'y436',       #       1121-04 -
-# 'y437',       #       1205-18 - 00/28
-# 'y438',       #       1024-06 - 00/0:
-# 'y440',       #  0601-15
-# 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
-# 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
-# 'y443',       #  DONE 0410-23 - 
-'y444'
+# #  'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
+# #  'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
+# # # 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
+# # # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
+# # # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
+# # # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
+# # # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
+# #  'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
+# # # 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
+# #                #       0801-14 - no nutridoc!?
+# #  'y429',       #       0815-28 - 50/4:
+# # # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
+# # # 'y431',       #       0912-25 - 4 /2:
+# # # 'y432',       #  DONE 0929-09 - 15/42: loads of material!
+# #  'y433',       #       1010-23 - 12/2:
+# #  'y434',       #       1024-06 - 00/0:
+# #  'y435',       #       1107-20 -
+# #  'y436',       #       1121-04 -
+# #  'y437',       #       1205-18 - 00/28
+# #  'y438',       #       1024-06 - 00/0:
+# # # 'y439',       #     0116-0212 - 00/0:
+# # # 'y440',       #  0601-15
+# # # 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
+# # # 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
+# # # 'y443',       #  DONE 0410-23 -
+# #  'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
+# #  'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
+  'y446',
 # * next to done means superfluous image files removed
 ]
 
@@ -469,6 +473,8 @@ if __name__ == '__main__':
     # report
     missing_images_across_all_docs = {}
     print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+    pprint(processed_nutridocs)
+    print('^^processed_nutridocs^^')
     for name, image_info in processed_nutridocs.items():
         # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
 
@@ -487,7 +493,7 @@ if __name__ == '__main__':
         print(f"MISSING IMAGES: {len(image_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
         if verbose_mode: print(image_info[MISSING_IMAGES])
 
-        print("\n\n")
+        print("\nMissing image recipe names:\n")
         for i in image_info[MISSING_IMAGES]:
             print(i)
         missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
