@@ -278,36 +278,50 @@ NUTRIDOC_LIST = [
 # 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
 # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
 # 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
-# #  'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
-# #  'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
-# # # 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
-# # # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
-# # # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
-# # # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
-# # # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-# #  'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
-# # # 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
-# #                #       0801-14 - no nutridoc!?
-# #  'y429',       #       0815-28 - 50/4:
-# # # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
-# # # 'y431',       #       0912-25 - 4 /2:
-# # # 'y432',       #  DONE 0929-09 - 15/42: loads of material!
-# #  'y433',       #       1010-23 - 12/2:
-# #  'y434',       #       1024-06 - 00/0:
-# #  'y435',       #       1107-20 -
-# #  'y436',       #       1121-04 -
-# #  'y437',       #       1205-18 - 00/28
-# #  'y438',       #       1024-06 - 00/0:
-# # # 'y439',       #     0116-0212 - 00/0:
-# # # 'y440',       #  0601-15
-# # # 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
-# # # 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
-# # # 'y443',       #  DONE 0410-23 -
-# #  'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
-# #  'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
-  'y446',
+ 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
+ 'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
+# 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
+# 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
+# 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
+# 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
+# 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
+ 'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
+# 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
+               #       0801-14 - no nutridoc!?
+ 'y429',       #       0815-28 - 50/4:
+# 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
+# 'y431',       #       0912-25 - 4 /2:
+# 'y432',       #  DONE 0929-09 - 15/42: loads of material!
+ 'y433',       #       1010-23 - 12/2:
+ 'y434',       #       1024-06 - 00/0:
+ 'y435',       #       1107-20 -
+ 'y436',       #       1121-04 -
+ 'y437',       #       1205-18 - 00/28
+ 'y438',       #       1024-06 - 00/0:
+# 'y439',       #     0116-0212 - 00/0:
+# 'y440',       #  0601-15
+# 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
+# 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
+# 'y443',       #  DONE 0410-23 -
+ 'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
+ 'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
+  # 'y446',
 # * next to done means superfluous image files removed
 ]
+
+# DOC_NAME                                   RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
+# y437_NUTRITEST_recipes_20201205-18.rtf      28       0         28          0             0
+# y436_NUTRITEST_recipes_20201121-04.rtf      0        0         0           0             0
+# y445_NUTRITEST_recipes_20210508-21.rtf      53       8         45          0             5
+# y435_NUTRITEST_recipes_20201107-20.rtf      0        0         0           0             0
+# y420_NUTRITEST_recipes_20200328-10.rtf      25       0         25          1             0
+# y438_NUTRITEST_recipes_20201219-0115.rtf    2        2         0           0             2
+# y433_NUTRITEST_recipes_20201010-23.rtf      50       12        38          0             1
+# y444_NUTRITEST_recipes_20210424-07.rtf      60       24        36          1             12
+# y429_NUTRITEST_recipes_20200815-28.rtf      54       50        4           1             47
+# y421_NUTRITEST_recipes_20200411-24.rtf      52       2         50          3             0
+# y427_NUTRITEST_recipes_20200705-18.rtf      32       30        2           3             29
+# y434_NUTRITEST_recipes_20201024-06.rtf      37       36        1           1             36
 
 
 empty_recipe = '''
