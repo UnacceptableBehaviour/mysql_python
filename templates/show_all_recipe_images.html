@@ -5,17 +5,16 @@
 
 {% block content %}
 
-<div class="container"> 
+<div class="container">
     {% for recipe in recipes %}
-    
+
     <p>{{ recipe['ri_id'] }} - {{ recipe['ri_name'] }} - {{ recipe['lead_image'] }}</p>
     <div class="gallery_image">
-        
-        <image src="http://127.0.0.1:8000/static/recipe/{{ recipe['lead_image'] }}">
+
+        <image src="http://127.0.0.1:8000/static/recipe/{{ recipe['lead_image'] }}" width='100%'>
     </div>
     <br>
     {% endfor %}
 </div>
 
 {% endblock %}
-
