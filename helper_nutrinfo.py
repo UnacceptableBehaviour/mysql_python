@@ -80,13 +80,22 @@ class Nutrients:
         # 2 servings / source < assumes nutirnt data is per 100g
         # 3 nutrients
         # 4 yield (weight of ingredient providing calories)
-        for m in re.finditer(r'^-+ for the nutrition information(.*?)\((.*?)\)$(.*?)Total \((.*?)\)', text_data, re.MULTILINE | re.DOTALL ):
+        # 5 ingredietslist for ots
+        # 6 igdt_type: atomic / ots / derived / dtk
+        #   atomic  - irreducible ingredient
+        #   derived - ingredient made by combining or processing other ingredients that results in changing their nutritional profile
+        #   ots     - off the shelf - derived by others & purchased - nutrition info on label of from DB
+        #   dtk     - daily tracker submission
+        #
+        for m in re.finditer(r'^-+ for the nutrition information(.*?)\((.*?)\)$(.*?)Total \((.*?)\).*?^ingredients:(.*?)^igdt_type:(.*?)$', text_data, re.MULTILINE | re.DOTALL ):
             nutridict_for_pass = {}
             name = m.group(1).strip()
 
             if (name == ''): continue             # skip blank templates
 
             nutridict_for_pass['name'] = name
+            nutridict_for_pass['ots_ingredients'] = m.group(5).strip()
+            nutridict_for_pass['igdt_type'] = m.group(6).strip()
 
             if ('ml' in m.group(4)):
                 nutridict_for_pass['yield'] = float(m.group(4).replace('ml', ''))

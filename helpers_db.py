@@ -330,8 +330,8 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
 
     # query db - the index from fields is used to retrive and alocate data to correct dictionary entry - -
     if fields == None:
-        fields = ['id','ri_id','ri_name','yield','units','servings','density','serving_size',
-                  'atomic','ingredients','allergens','tags','user_tags','lead_image','text_file',
+        fields = ['id','ri_id','ri_name','description','method','notes','yield','units','servings','density','serving_size',
+                  'atomic','ingredients','allergens','type','tags','user_tags','lead_image','text_file',
                   'n_En','n_Fa','n_Fs','n_Fm','n_Fp','n_Fo3','n_Ca','n_Su','n_Fb','n_St','n_Pr','n_Sa','n_Al']
 
     qry_string = ', '.join(fields)

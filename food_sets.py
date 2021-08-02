@@ -27,7 +27,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # a call to get_allergens_for(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
 # should return ['dairy', 'eggs', 'fish', 'gluten']
 #
-# 'alcohol classification should be limited to rum', vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
+# alcohol classification should be limited to rum, vodka, gin, whisky, red wine, white wine, champagne, cava, scrumpy
 # - that's enough for scope of this exersize
 #
 # # # #
@@ -79,8 +79,8 @@ dairy_alt = [
     {'st agur','st agur cheese','saint agur blue cheese'},
     {'feta','feta cheese','greek feta'},
     {'philadelphia','philadelphia soft cheese','cream cheese','soft cheese','soft white cheese'},
-    {'brie','somerset brie'},  
-]  
+    {'brie','somerset brie'},
+]
 
 # have to give cheese a super set of its own!
 # notes on categories here: https://recipes.howstuffworks.com/food-facts/different-types-of-cheese.htm
@@ -115,7 +115,7 @@ dairy_subsets = {
     'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
     'butter' : {'salted butter','cornish butter','ghee','clarified butter'},
     'cheese' : cheese,
-    'casein' : {'milk protein','whey protein'},    
+    'casein' : {'milk protein','whey protein'},
     'ice cream' : {'gelato','ice milk','whippy san','frozen custard','frozen yoghurt'},
 }
 
@@ -123,18 +123,18 @@ dairy_subsets = {
 
 def build_dairy_set():
     dairy = {'dairy'}
-    
+
     for key, val in dairy_subsets.items():
         union = val | {key}     # include the categegory generalisation
         dairy = dairy | union
-        
+
     for val in dairy_alt:
         dairy = dairy | val       # include different names for each dairy
-    
+
     dairy = dairy | dairy_derived_no_recipe
-    
+
     dairy = dairy | dairy_basic
-    
+
     return dairy
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -154,11 +154,11 @@ def build_eggs_set():
 
     for val in eggs_alt:
         eggs = eggs | val
-        
+
     eggs = eggs | eggs_derived_no_recipe
-    
+
     eggs = eggs | eggs_basic
-    
+
     return eggs
 
 
@@ -172,11 +172,11 @@ peanuts_derived_no_recipe =  {'peanut butter'}
 
 def build_peanuts_set():
     peanuts = {'peanuts'}
-        
+
     peanuts = peanuts | peanuts_derived_no_recipe
-    
+
     peanuts = peanuts | peanuts_basic
-    
+
     return peanuts
 
 
@@ -190,11 +190,11 @@ nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','h
 
 def build_nuts_set():
     nuts = {'nuts'}
-    
+
     nuts = nuts | nuts_derived_no_recipe
-    
+
     nuts = nuts | nuts_basic
-    
+
     return nuts
 
 
@@ -216,18 +216,18 @@ seeds_lupin_basic = {'lupin','lupin seeds','lupin flour'}
 
 def build_seeds_lupin_set():
     seeds_lupin = {'seeds_lupin'}
-    
+
     # for key, val in seeds_lupin_subsets.items():
     #     union = val | {key}     # include the categegory generalisation
     #     seeds_lupin = seeds_lupin | union
-    #     
+    #
     # for val in seeds_lupin_alt:
     #     seeds_lupin = seeds_lupin | val       # include different names for each
-    # 
+    #
     # seeds_lupin = seeds_lupin | seeds_lupin_derived_no_recipe
-    
+
     seeds_lupin = seeds_lupin | seeds_lupin_basic
-    
+
     return seeds_lupin
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -250,18 +250,18 @@ seeds_sesame_alt = [
 
 def build_seeds_sesame_set():
     seeds_sesame = {'seeds_sesame'}
-    
+
     # for key, val in seeds_sesame_subsets.items():
     #     union = val | {key}     # include the categegory generalisation
     #     seeds_sesame = seeds_sesame | union
-        
+
     for val in seeds_sesame_alt:
         seeds_sesame = seeds_sesame | val       # include different names for each seeds_sesame
-    
+
     seeds_sesame = seeds_sesame | seeds_sesame_derived_no_recipe
-    
+
     seeds_sesame = seeds_sesame | seeds_sesame_basic
-    
+
     return seeds_sesame
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -283,18 +283,18 @@ seeds_mustard_alt = [
 #seeds_mustard_subsets = {}
 def build_seeds_mustard_set():
     seeds_mustard = {'seeds_mustard'}
-    
+
     # for key, val in seeds_mustard_subsets.items():
     #     union = val | {key}     # include the categegory generalisation
     #     seeds_mustard = seeds_mustard | union
-        
+
     for val in seeds_mustard_alt:
         seeds_mustard = seeds_mustard | val       # include different names for each seeds_mustard
-    
+
     seeds_mustard = seeds_mustard | seeds_mustard_derived_no_recipe
-    
+
     seeds_mustard = seeds_mustard | seeds_mustard_basic
-    
+
     return seeds_mustard
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -338,11 +338,11 @@ fish_subsets = {
     'bass' : {'bass','striped bass'},
     'eel' : {'eel','conger eel'},
     'flounder' : {'plaice','gulf flounder','summer flounder','winer flounder','european flounder','which flounder','halibut','olive flounder'},
-    'salmon' : {'sockeye salmon','alaskan salmon','chinook salmon','pink salmon','coho salmon'},    
+    'salmon' : {'sockeye salmon','alaskan salmon','chinook salmon','pink salmon','coho salmon'},
     'sanddab' : {'pacific sanddab'},   # there are a lot of these
     'shad' : {'alewife','american shad'},
     'snapper' : {'red snapper','northern red snapper','rockfish','rock cod','pacific snapper'}, # suspect grouping but hey, lets get it working!
-    'trout' : {'trout','rainbow trout'},    
+    'trout' : {'trout','rainbow trout'},
     'tuna' : {'albacore tuna','bigeye tuna','bluefin tuna','dogtooth tuna','skipjack tuna','yellowfin tuna'},
     'roe' : {'caviar','sturgeon roe','ikura','salmon roe','kazunoko','herring roe','lumpfish roe','masago','capelin roe','shad roe','tobiko','flying-fish roe'}
 }
@@ -350,18 +350,18 @@ fish_subsets = {
 
 def build_fish_set():
     fish = {'fish'}
-    
+
     for key, val in fish_subsets.items():
         union = val | {key}     # include the categegory generalisation
         fish = fish | union
-        
+
     for val in fish_alt:
         fish = fish | val       # include different names for each fish
-    
+
     fish = fish | fish_derived_no_recipe
-    
+
     fish = fish | fish_basic
-    
+
     return fish
 
 
@@ -395,18 +395,18 @@ molluscs_subsets = {
 
 def build_molluscs_set():
     molluscs = {'molluscs'}
-    
+
     for key, val in molluscs_subsets.items():
         union = val | {key}     # include the categegory generalisation
         molluscs = molluscs | union
-        
+
     for val in molluscs_alt:
         molluscs = molluscs | val       # include different names for each molluscs
-    
+
     molluscs = molluscs | molluscs_derived_no_recipe
-    
+
     molluscs = molluscs | molluscs_basic
-    
+
     return molluscs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -437,18 +437,18 @@ crustaceans_subsets = {
 }
 def build_crustaceans_set():
     crustaceans = {'crustaceans'}
-    
+
     for key, val in crustaceans_subsets.items():
         union = val | {key}     # include the categegory generalisation
         crustaceans = crustaceans | union
-        
+
     for val in crustaceans_alt:
         crustaceans = crustaceans | val       # include different names for each
-    
+
     crustaceans = crustaceans | crustaceans_derived_no_recipe
-    
+
     crustaceans = crustaceans | crustaceans_basic
-    
+
     return crustaceans
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -479,18 +479,18 @@ alcohol_subsets = {
 
 def build_alcohol_set():
     alcohol = {'alcohol'}
-    
+
     for key, val in alcohol_subsets.items():
         union = val | {key}     # include the categegory generalisation
         alcohol = alcohol | union
-        
+
     for val in alcohol_alt:
-        alcohol = alcohol | val       # include different names for each 
-    
+        alcohol = alcohol | val       # include different names for each
+
     alcohol = alcohol | alcohol_derived_no_recipe
-    
+
     alcohol = alcohol | alcohol_basic
-    
+
     return alcohol
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -506,11 +506,11 @@ celery_derived_no_recipe =  {'chicken stock','lamb stock', 'beef stock', 'fish s
 
 def build_celery_set():
     celery = {'celery'}
-        
+
     celery = celery | celery_derived_no_recipe
-    
+
     celery = celery | celery_basic
-    
+
     return celery
 
 
@@ -551,18 +551,18 @@ gluten_subsets = {
 }
 def build_gluten_set():
     gluten = {'gluten'}
-    
+
     for key, val in gluten_subsets.items():
         union = val | {key}     # include the categegory generalisation
         gluten = gluten | union
-        
+
     for val in gluten_alt:
         gluten = gluten | val       # include different names for each gluten
-    
+
     gluten = gluten | gluten_derived_no_recipe
-    
+
     gluten = gluten | gluten_basic
-    
+
     return gluten
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -586,31 +586,31 @@ soya_alt = [
     {'yellow miso','shinshu miso'},
     {'red miso','aka miso'},
     {'teriyaki','teriyaki sauce','teriyake','teriyake sauce'},
-    
+
 ]
 
 # subsets - common name with various types
 soya_subsets = {
     'tofu' : {'silken tofu','extra soft tofu','soft tofu','medium tofu','firm tofu','extra firm tofu','super firm tofu',
               'noodling','tofu noodles','tofu sponge','egg tofu','pressed tofu','fermented tofu','tofu skin','tofu sticks',
-              'fried tofu','tofu pockets','tofu puffs'},    
+              'fried tofu','tofu pockets','tofu puffs'},
     'miso' : {'red miso','yellow miso','white miso','awase miso','barley miso',}
 }
 
 def build_soya_set():
     soya = {'soya'}
-    
+
     for key, val in soya_subsets.items():
         union = val | {key}     # include the categegory generalisation
         soya = soya | union
-        
+
     for val in soya_alt:
         soya = soya | val       # include different names for each soya
-    
+
     soya = soya | soya_derived_no_recipe
-    
+
     soya = soya | soya_basic
-    
+
     return soya
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -623,11 +623,11 @@ sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites'}
 
 def build_sulphur_dioxide_set():
     sulphur_dioxide = {'sulphur_dioxide'}
-        
+
     #sulphur_dioxide = sulphur_dioxide | sulphur_dioxide_derived_no_recipe
-    
+
     sulphur_dioxide = sulphur_dioxide | sulphur_dioxide_basic
-    
+
     return sulphur_dioxide
 
 
@@ -652,26 +652,26 @@ plain text list here
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # HEADINGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_allergens_headings():    
+def get_allergens_headings():
     return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
 
 # ingredeints for each component already recursed and stored in exploded
 # add_subcomponents_ingredients
 def does_component_contain_allergen(component, allergen):
-    allergen_present = False    
-    
-    if allergen in get_allergens_headings():    
+    allergen_present = False
+
+    if allergen in get_allergens_headings():
         allergen_set = allergenLUT[allergen]
     else:
         raise(UnkownAllergenType(f"ERROR: unknown allergen: {allergen} <"))
-    
+
     ingredients_of_component = get_ingredients_as_text_list(component)
-    
+
     if ingredients_of_component == None:     # its an ATOMIC ingredient
         return component in allergen_set
-    
+
     else:
-        for i in ingredients_of_component:            
+        for i in ingredients_of_component:
             if i in allergen_set:
                 return True
 
@@ -682,7 +682,7 @@ allergenLUT = {
     'dairy' : build_dairy_set(),
     'eggs' : build_eggs_set(),
     'peanuts' : build_peanuts_set(),
-    'nuts' : build_nuts_set(),               
+    'nuts' : build_nuts_set(),
     'seeds_lupin' : build_seeds_lupin_set(),
     'seeds_sesame' : build_seeds_sesame_set(),
     'seeds_mustard' : build_seeds_mustard_set(),
@@ -693,19 +693,19 @@ allergenLUT = {
     'celery' : build_celery_set(),
     'gluten' : build_gluten_set(),
     'soya' : build_soya_set(),
-    'sulphur_dioxide' : build_sulphur_dioxide_set()    
+    'sulphur_dioxide' : build_sulphur_dioxide_set()
 }
 
 def get_allergens_for(list_of_ingredients):
     allergens_detected = []
-    
+
     if list_of_ingredients.__class__ == str:
-        list_of_ingredients = [list_of_ingredients]    
-    
+        list_of_ingredients = [list_of_ingredients]
+
     if list_of_ingredients.__class__ == list:
         # build complete list - from local DB
         # will not follow URL to inet for ingredients of off the shelf items
-        
+
         add_ingredients = []
         for i in list_of_ingredients:
             add_me = get_ingredients_as_text_list(i)
@@ -715,21 +715,21 @@ def get_allergens_for(list_of_ingredients):
                 #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
                 #print(f"NF:{i}<")
                 pass # TODO - log
-                    
-        
+
+
         # flatten so there's only one of each
         list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
-        
+
         for i in list_of_ingredients:
             for allergen in allergenLUT:
                 if i in allergenLUT[allergen]:
                     allergens_detected.append(allergen)
-                    
+
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
-    
+
     allergens_detected = list(set(allergens_detected))
-    
+
     return allergens_detected
 
 
@@ -763,18 +763,18 @@ chicken_alt = [
 
 def build_chicken_set():
     chicken = {'chicken'}
-    
+
     # for key, val in chicken_subsets.items():
     #     union = val | {key}     # include the categegory generalisation
     #     chicken = chicken | union
-        
+
     for val in chicken_alt:
         chicken = chicken | val       # include different names for each
-    
+
     chicken = chicken | chicken_derived_no_recipe
-    
+
     chicken = chicken | chicken_basic
-    
+
     return chicken
 
 
@@ -813,18 +813,18 @@ pork_subsets = {
 }
 def build_pork_set():
     pork = {'pork'}
-    
+
     for key, val in pork_subsets.items():
         union = val | {key}     # include the categegory generalisation
         pork = pork | union
-        
+
     for val in pork_alt:
         pork = pork | val       # include different names for each
-    
+
     pork = pork | pork_derived_no_recipe
-    
+
     pork = pork | pork_basic
-    
+
     return pork
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -855,22 +855,22 @@ beef_subsets = {
 }
 def build_beef_set():
     beef = {'beef'}
-    
+
     for key, val in beef_subsets.items():
         union = val | {key}     # include the categegory generalisation
         beef = beef | union
-        
+
     for val in beef_alt:
         beef = beef | val       # include different names for each beef
-    
+
     beef = beef | beef_derived_no_recipe
-    
+
     beef = beef | beef_basic
-    
+
     return beef
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# LAMB 
+# LAMB
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 lamb_basic = {'lamb','hogget','mutton','roast lamb shoulder','lamb shoulder','lamb leg','lamb shank','lamb leg kabob',
               'lamb leg kabab','roast leg lamb lean','lamb chop lean','lamb chops lean','lamb chop wfat','lamb chops wfat',
@@ -893,18 +893,18 @@ lamb_subsets = {
 }
 def build_lamb_set():
     lamb = {'lamb'}
-    
+
     for key, val in lamb_subsets.items():
         union = val | {key}     # include the categegory generalisation
         lamb = lamb | union
-        
+
     for val in lamb_alt:
         lamb = lamb | val       # include different names for each lamb
-    
+
     lamb = lamb | lamb_derived_no_recipe
-    
+
     lamb = lamb | lamb_basic
-    
+
     return lamb
 
 
@@ -929,18 +929,18 @@ duck_derived_no_recipe =  {'peking duck','crispy duck','aunt bessies duck fat ro
 # }
 def build_duck_set():
     duck = {'duck'}
-    
+
     # for key, val in duck_subsets.items():
     #     union = val | {key}     # include the categegory generalisation
     #     duck = duck | union
-        
+
     for val in duck_alt:
         duck = duck | val       # include different names for each duck
-    
+
     duck = duck | duck_derived_no_recipe
-    
+
     duck = duck | duck_basic
-    
+
     return duck
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -984,22 +984,22 @@ game_subsets = {
                 'turkey stock','turkey gravy','home made turkey gravy','roast turkey','fried turkey breast',
                 'fried turkey thigh','fried turkey wing','fried turkey quarter','turkey mince','minced turkey',
                 'turkey skin','turkey burger'}
-    
+
 }
 def build_game_set():
     game = {'game'}
-    
+
     for key, val in game_subsets.items():
         union = val | {key}     # include the categegory generalisation
         game = game | union
-        
+
     for val in game_alt:
         game = game | val       # include different names for each game
-    
+
     game = game | game_derived_no_recipe
-    
+
     game = game | game_basic
-    
+
     return game
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1025,13 +1025,13 @@ other_edible_animal_subsets = {
 
 def build_other_edible_animal_set():
     other_edible_animal = {'other_edible_animal'}
-    
+
     for key, val in other_edible_animal_subsets.items():
         union = val | {key}     # include the categegory generalisation
         other_edible_animal = other_edible_animal | union
-    
+
     other_edible_animal = other_edible_animal | other_edible_animal_basic
-    
+
     return other_edible_animal
 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1041,16 +1041,16 @@ def build_other_edible_animal_set():
 # #           minimise tuna (mercury)# quite a few soft cheeses are fine! Source NHS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # allergen_basic = {'',''}
-# 
+#
 # # usually product of some type katsuobushi or fish sauce for example
 # allergen_derived_no_recipe =  {'',''}
-# 
+#
 # # different names same thing
 # allergen_alt = [
 #     {'name1','name2'},
 #     {'another1', 'another2'},
 # ]
-# 
+#
 # # subsets - common name with various types
 # allergen_subsets = {
 #     'cod' : { 'pacific cod', 'atlantic cod' },
@@ -1058,18 +1058,18 @@ def build_other_edible_animal_set():
 # }
 # def build_allergen_set():
 #     allergen = {'allergen'}
-#     
+#
 #     for key, val in allergen_subsets.items():
 #         union = val | {key}     # include the categegory generalisation
 #         allergen = allergen | union
-#         
+#
 #     for val in allergen_alt:
 #         allergen = allergen | val       # include different names for each allergen
-#     
+#
 #     allergen = allergen | allergen_derived_no_recipe
-#     
+#
 #     allergen = allergen | allergen_basic
-#     
+#
 #     return allergen
 
 
@@ -1083,16 +1083,16 @@ def build_other_edible_animal_set():
 # # HEADING
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # allergen_basic = {'',''}
-# 
+#
 # # usually product of some type katsuobushi or fish sauce for example
 # allergen_derived_no_recipe =  {'',''}
-# 
+#
 # # different names same thing
 # allergen_alt = [
 #     {'name1','name2'},
 #     {'another1', 'another2'},
 # ]
-# 
+#
 # # subsets - common name with various types
 # allergen_subsets = {
 #     'cod' : { 'pacific cod', 'atlantic cod' },
@@ -1100,18 +1100,18 @@ def build_other_edible_animal_set():
 # }
 # def build_allergen_set():
 #     allergen = {'allergen'}
-#     
+#
 #     for key, val in allergen_subsets.items():
 #         union = val | {key}     # include the categegory generalisation
 #         allergen = allergen | union
-#         
+#
 #     for val in allergen_alt:
 #         allergen = allergen | val       # include different names for each allergen
-#     
+#
 #     allergen = allergen | allergen_derived_no_recipe
-#     
+#
 #     allergen = allergen | allergen_basic
-#     
+#
 #     return allergen
 
 
@@ -1123,7 +1123,7 @@ def build_other_edible_animal_set():
 # not striclty true but from a vegan perspective ok
 #seafood = fish | molluscs | crustaceans
 
-# NOT veggie 
+# NOT veggie
 def build_not_veggie_set():
     not_veggie = build_chicken_set() |               \
                  build_pork_set() |                  \
@@ -1133,8 +1133,8 @@ def build_not_veggie_set():
                  build_lamb_set() |                  \
                  build_fish_set() |                  \
                  build_game_set() |                  \
-                 build_other_edible_animal_set()     
-    
+                 build_other_edible_animal_set()
+
     return not_veggie
 
 # NOT vegan
@@ -1148,7 +1148,7 @@ def build_not_vegan_set():
 
 def build_atomic_ingredients():
     atomic_ingredients = set()
-    
+
     nutrients = Path('../assest_server/scratch/nutrinfo.txt')
     content = ''
     with nutrients.open('r') as f:
@@ -1158,13 +1158,13 @@ def build_atomic_ingredients():
     for m in re.finditer( r'--- for the nutrition information(.*?)\(.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
         ingredient = m.group(1).strip()
         igdt_type =  m.group(2).strip()
-        if igdt_type == 'atomic':       # ott = off the shelf, derived = in house recipe, atomic = basic ingredient
+        if igdt_type == 'atomic':       # ots = off the shelf, derived = in house recipe, atomic = basic ingredient
             atomic_ingredients = atomic_ingredients | {ingredient}
-    
+
     return atomic_ingredients
-    
-    
-    
+
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 'CONTAINS' TAG SETS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1191,14 +1191,14 @@ inverse_containsTAGS_LUT = {
 def get_containsTAGS_for(list_of_ingredients):
     containsTAGS_detected = []
     atomic_igdts = build_atomic_ingredients()
-    
+
     if list_of_ingredients.__class__ == str:
-        list_of_ingredients = [list_of_ingredients]    
-    
+        list_of_ingredients = [list_of_ingredients]
+
     if list_of_ingredients.__class__ == list:
         # build complete list - from local DB
         # will not follow URL to inet for ingredients of off the shelf items
-        
+
         add_ingredients = []
         for i in list_of_ingredients:
             add_me = get_ingredients_as_text_list(i)
@@ -1208,11 +1208,11 @@ def get_containsTAGS_for(list_of_ingredients):
                 #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
                 #print(f"NF:{i}<")
                 pass # TODO - log
-                    
-        
+
+
         # flatten so there's only one of each
         list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
-        
+
         # TRUE LOOKUP
         for i in list_of_ingredients:
             for containsTAG in containsTAGS_LUT:
@@ -1222,33 +1222,33 @@ def get_containsTAGS_for(list_of_ingredients):
         # INVERSE LOOKUP - build_atomic_ingredients
         remove_tags = []
         for i in list_of_ingredients:
-            
+
             for containsTAG in inverse_containsTAGS_LUT:
-                if (get_ingredients_as_text_list(i) != None) or (i in atomic_igdts) :         # it has to be in the data base to work! 
+                if (get_ingredients_as_text_list(i) != None) or (i in atomic_igdts) :         # it has to be in the data base to work!
                     containsTAGS_detected.append(containsTAG)
-            
+
                 #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
                 #print(f"checking SET:{containsTAG} for {i}")
                 if i in inverse_containsTAGS_LUT[containsTAG]:
-                    # DBG_LEV_4 print(f"\tSET:{containsTAG} - {i} NOT PRESENT") 
+                    # DBG_LEV_4 print(f"\tSET:{containsTAG} - {i} NOT PRESENT")
                     remove_tags.append(containsTAG)
-        
+
         # at on of this containsTAGS_detected may look like ['veggie','vegan','veggie','veggie','vegan']
         # flatten it to ['veggie','vegan']
         # if a single occurance of a non veggie or non vegan item occured remove the veggie or vegan tag
         containsTAGS_detected = set(containsTAGS_detected)
         # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - S")
-        # DBG_LEV_4 print(f"remove_tags: {remove_tags}")        
+        # DBG_LEV_4 print(f"remove_tags: {remove_tags}")
         remove_tags = set(remove_tags)
         containsTAGS_detected = containsTAGS_detected - remove_tags
         # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - E")
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
-    
-    
+
+
     containsTAGS_detected = list(set(containsTAGS_detected))    # remove duplicates
-    
+
     return containsTAGS_detected
 
 
@@ -1257,50 +1257,50 @@ def main():
     pass
 
 if __name__ == '__main__':
-    
+
     # fish = ''
     # for m in re.finditer(r'^(.*?)$', conv_list, re.MULTILINE | re.DOTALL):
-    #     fish += f"'{m.group(1).lower()}',"         
+    #     fish += f"'{m.group(1).lower()}',"
     #     print(f"'{m.group(1).lower()}'")
-    #     
+    #
     # print(fish)
     # sys.exit()
 
     # fish_basic, fish_alt (list of sets), fish_subsets (dict of sets)
     # fish = {'fish'}
     # print(len(fish), fish)
-    # 
+    #
     # for key, val in fish_subsets.items():
     #     print(key, val)
     #     union = val | {key}     # include the categegory generalisation
     #     fish = fish | union
     #     print(union)
     #     print()
-    #     
-    # print(len(fish), fish)    
-    # 
+    #
+    # print(len(fish), fish)
+    #
     # for val in fish_alt:
     #     print(val)
     #     fish = fish | val       # include different names for each fish
     #     print()
-    #     
+    #
     # print(len(fish), fish)
-    # 
+    #
     # fish = fish | fish_basic
-    # 
+    #
     # print(len(fish), fish)
-    
+
     #print(build_fish_set())
-    
+
     #print(cheese_subsets)
-    
+
     # cheese = {'cheese'}
     # #[cheese | cheese_set for cheese_set in cheese_subsets ]
     # for cheese_cat, cheese_set in cheese_subsets.items():
     #     cheese = cheese | {cheese_cat} | cheese_set
-    # 
+    #
     # print(cheese) # all the cheese
-    
+
     nutrients = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
     content = ''
     with nutrients.open('r') as f:
@@ -1311,21 +1311,21 @@ if __name__ == '__main__':
         ingredient = m.group(1)
         if re.search("lamb", ingredient):
             print(ingredient.strip())
-            
-    #print('NON VEGAN')        
+
+    #print('NON VEGAN')
     #print(build_not_vegan_set())
-    
-    # print(get_ingredients_as_text_list('beef & jalapeno burger')) 
-    #         
+
+    # print(get_ingredients_as_text_list('beef & jalapeno burger'))
+    #
     print(get_ingredients_as_text_list('tiger baguette round'))
     print("\n\n - - - - ATOMIC - - - - \n\n")
     print(build_atomic_ingredients())
-    # 
+    #
     # print(get_ingredients_as_text_list('tomatoes'))
-    # 
+    #
     # print(get_containsTAGS_for('hatchet salad'))
     # print(get_allergens_for('hatchet salad'))
-    # 
+    #
     # containsTAGS_detected = []
     # containsTAGS_detected = set(containsTAGS_detected) | {'blarny'}
     # print(containsTAGS_detected)
@@ -1339,22 +1339,22 @@ if __name__ == '__main__':
 
     # print('- - -')
     # print(build_not_vegan_set())
-    
+
 # ELEMENTS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # # HEADING
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # allergen_basic = {'',''}
-# 
+#
 # # usually product of some type katsuobushi or fish sauce for example
 # allergen_derived_no_recipe =  {'',''}
-# 
+#
 # # different names same thing
 # allergen_alt = [
 #     {'name1','name2'},
 #     {'another1', 'another2'},
 # ]
-# 
+#
 # # subsets - common name with various types
 # allergen_subsets = {
 #     'cod' : { 'pacific cod', 'atlantic cod' },
@@ -1362,16 +1362,16 @@ if __name__ == '__main__':
 # }
 # def build_allergen_set():
 #     allergen = {'allergen'}
-#     
+#
 #     for key, val in allergen_subsets.items():
 #         union = val | {key}     # include the categegory generalisation
 #         allergen = allergen | union
-#         
+#
 #     for val in allergen_alt:
 #         allergen = allergen | val       # include different names for each allergen
-#     
+#
 #     allergen = allergen | allergen_derived_no_recipe
-#     
+#
 #     allergen = allergen | allergen_basic
-#     
+#
 #     return allergen
