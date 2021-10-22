@@ -119,12 +119,12 @@ print("----- populate_asset_server.rb ----------------------------------------- 
 
 # insert array of arrays
 def create_sql_insert_ingredients_array_text(ingredients):
-    # '{    {"0", "250", "(0)", "cheese"},          # 0 - atomic
-    #       {"0", "110", "(0)", "rice"},
-    #       {"1", "110", "(0)", "turkey mix"},      # 1 - sc - subcomponent
-    #       {"0", "20", "(0)", "pepper"},
-    #       {"0", "20", "(0)", "salt"},
-    #       {"0", "55", "(1)", "eggs"}
+    # '{    {"1", "250", "(0)", "cheese"},          # 1 - atomic
+    #       {"1", "110", "(0)", "rice"},
+    #       {"0", "110", "(0)", "turkey mix"},      # 0 - sc - subcomponent- derived
+    #       {"1", "20", "(0)", "pepper"},
+    #       {"1", "20", "(0)", "salt"},
+    #       {"1", "55", "(1)", "eggs"}
     #   }'
 
     sql_insert = "'{"

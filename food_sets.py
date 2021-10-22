@@ -35,7 +35,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # veggie, vegan, etc
 # and is aimed at recipes / components
 #
-# so similarly a call to 
+# so similarly a call to
 #   get_containsTAGS_for(['seared seabass','sauteed potatoes'])
 #   > fish, dairy
 #
@@ -73,7 +73,7 @@ dairy_alt = [
     {'custard', 'creme anglaise'},
     {'creme patissiere', 'creme patissier'},
     {'whippy-san','whippy san'},
-    {'parmesan','parmigiano-reggiano'},
+    {'parmesan','parmigiano-reggiano','parmesan cheese'},
     {'mature cheddar','mature cheddar cheese'},
     {'roquefort','roquetfort'},   # 2nd is misspelling
     {'st agur','st agur cheese','saint agur blue cheese'},
@@ -89,7 +89,7 @@ cheese_subsets = {
     'cream cheese' : {'philadelphia','roule','garlic roule','garlic & herb roule','boursin'},
     'pasta filata' : {'mozzarella','burrata','provolone','queso oaxaca','scamorza affumicata','caciocavallo','cheddar mozzarella 50/50 mix','chefs larder grated mozzarella and cheddar','chedoza','grated mozzarella and cheddar'},
     'soft-ripened cheese' : {'brie','camembert','cambozola','goats cheese','chavroux goats cheese'},       # bloomy rind
-    'semi-soft cheese' : {'havarti','muenster','jarlsberg','chaumes','red leicester'},
+    'semi-soft cheese' : {'havarti','muenster','munster','jarlsberg','chaumes','red leicester'},
     'washed-rind cheese' : {'limburger','taleggio','epoisses','alsatian munster'},
     'blue cheese' : {'roquefort','stilton','gorgonzola','sweet gorgonzola','danish blue', 'st agur'},
     'semi-hard cheese' : {'cheddar','gouda','mature gouda','edam','monterey jack','emmental','swiss','gruyere','extra mature cheddar',
@@ -655,7 +655,7 @@ plain text list here
 def get_allergens_headings():
     return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
 
-# ingredeints for each component already recursed and stored in exploded
+# ingredients for each component already recursed and stored in exploded
 # add_subcomponents_ingredients
 def does_component_contain_allergen(component, allergen):
     allergen_present = False
@@ -1163,6 +1163,8 @@ def build_atomic_ingredients():
 
     return atomic_ingredients
 
+def build_igdt_type_dict():
+    pass
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1307,17 +1309,52 @@ if __name__ == '__main__':
         #content = f.readlines()
         content = f.read()
 
+    search_term = 'lamb'
     for m in re.finditer( r'--- for the nutrition information(.*?)\(', content, re.MULTILINE | re.DOTALL ):
         ingredient = m.group(1)
-        if re.search("lamb", ingredient):
+        if re.search(search_term, ingredient):
             print(ingredient.strip())
 
-    #print('NON VEGAN')
-    #print(build_not_vegan_set())
+    print(f"\n ^ ingredients w/ {search_term} \n")
 
-    # print(get_ingredients_as_text_list('beef & jalapeno burger'))
+    # print('NON VEGAN')
+    # print(build_not_vegan_set())
+
+    print('\ncauliflower california')
+    print(get_ingredients_as_text_list('cauliflower california'))
+
+    print('\ncardamom donuts w lamb & harissa broth')
+    print(get_ingredients_as_text_list('cardamom donuts w lamb & harissa broth'))
+
     #
+    print('\ntiger baguette round')
     print(get_ingredients_as_text_list('tiger baguette round'))
+
+
+    print("\nget_ingredients_as_text_list('pork fennel & orange kofte')")
+    print(get_ingredients_as_text_list('pork fennel & orange kofte'))
+
+    print("\nget_ingredients_as_text_list('plain turkey & chicken kofte mix')")
+    print(get_ingredients_as_text_list('plain turkey & chicken kofte mix'))
+
+    print("\ndoes_component_contain_allergen('pork fennel & orange kofte', 'dairy')")
+    print(does_component_contain_allergen('pork fennel & orange kofte', 'dairy'))
+
+    print("\ndoes_component_contain_allergen('pork fennel & orange kofte', 'soya')")
+    print(does_component_contain_allergen('pork fennel & orange kofte', 'soya'))
+
+    print("\ndoes_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')")
+    print(does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya'))
+
+
+    print("\nget_allergens_for(get_ingredients_as_text_list('pork fennel & orange kofte'))")
+    print(get_allergens_for(get_ingredients_as_text_list('pork fennel & orange kofte')))
+
+    print("\nget_allergens_for(get_ingredients_as_text_list('plain turkey & chicken kofte mix'))")
+    print(get_allergens_for(get_ingredients_as_text_list('plain turkey & chicken kofte mix')))
+
+    # TODO does_component_contain_allergen NOT recursive
+
     print("\n\n - - - - ATOMIC - - - - \n\n")
     print(build_atomic_ingredients())
     #

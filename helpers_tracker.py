@@ -42,14 +42,14 @@ def get_interface_file():
 def create_DTK_textcomponent(dtk, dtk_mode=True):
     dtk_text = ''
     recipe = dtk['dtk_rcp']
-        
+
     print("------------------+------------------+------------------+------------------+------------------")
     print(f"mode: {dtk_mode} - {recipe['nutrinfo']['servings']} <")
     pprint(recipe['nutrinfo'])
     print("------------------+------------------+------------------+------------------+------------------")
-    
+
     # ------------------ for the 2019 calories month 10 day 01 (1) - 103.6kg,	fat_pc - 36.9,	H2O_pc - 45.9
-    # 180m	coffee												# 0815 
+    # 180m	coffee												# 0815
     # 250m	water								# swim @ 1055 - 1km 75m 668cal - included the rides on each end
     # 180m	coffee												# 1734
     # 70g		smoked mackerel
@@ -60,9 +60,9 @@ def create_DTK_textcomponent(dtk, dtk_mode=True):
         headline = f"------------------ for the {recipe['ri_name']} (1) - {dtk['dtk_weight']}kg,	fat_pc - {dtk['dtk_pc_fat']},	H2O_pc - {dtk['dtk_pc_h2o']}"
     else:
         headline = f"------------------ for the {recipe['ri_name']} ({recipe['nutrinfo']['servings']})"
-    
+
     dtk_text += headline + "\n"
-    
+
     for line in recipe['ingredients']:
         time = helpers_db.time24h_from_nix_time(line[helpers_db.TRACK_NIX_TIME])
         qty  = line[helpers_db.QTY_IN_G_INDEX]
@@ -72,9 +72,9 @@ def create_DTK_textcomponent(dtk, dtk_mode=True):
         else:
             human_line = f"{qty}\t{ingredient}\n"
         dtk_text += human_line
-        
-    dtk_text += f"													Total ({recipe['nutrinfo']['yield']})\n\n"    
-        
+
+    dtk_text += f"													Total ({recipe['nutrinfo']['yield']})\n\n"
+
     return dtk_text
 
 
@@ -84,7 +84,7 @@ def create_DTK_textcomponent(dtk, dtk_mode=True):
 # INGREDIENT_INDEX = 3
 # TRACK_NIX_TIME = 4
 
-# take recipe / component convert 
+# take recipe / component convert
 def create_text_component(recipe):
     # ------------------ for the double tomato cracker (1)
     # 6g		rosemary cracker
@@ -113,16 +113,16 @@ def create_human_readable_DTK_spec(dtk):
 
     test_text_3 = '''
 ------------------ for the 2019 calories month 10 day 02 (1) - 103.6kg,	fat_pc - 36.9,	H2O_pc - 45.9
-180m	coffee												# 0815 
+180m	coffee												# 0815
 20g		spinach and cheddar cheese tortilla
 250m	water								# swim @ 1055 - 1km 75m 668cal - included the rides on each end
 80m		coffee												# 1210
 330g	post swim breakfast 20190901
-180m	coffee												# 1230 
+180m	coffee												# 1230
 384g	lamb teriyaki skewers and lambs lettuce
 40g		lamb and aubergine teriyaki skewers					# helped mum with lamb on one of hers - aubergine went down well
 180m	coffee												# 1630
-10g		plain chocolate 
+10g		plain chocolate
 180m	coffee												# 1734
 200m	vodka												# 2136
 500m 	omega cider											# 2200
@@ -154,29 +154,29 @@ def create_human_readable_DTK_spec(dtk):
     return test_text_1 + test_text_2 + test_text_3 + test_text_4
 
 # awaiting implementation
-# 
+#
 def post_DTK_info_for_processing(dtk):
     # create DTK
-    dtk_spec = create_human_readable_DTK_spec(dtk)    
-    
+    dtk_spec = create_human_readable_DTK_spec(dtk)
+
     # file it - post_interface_file() get the name of filee from
     # a shared config file - a json file
     with open(post_interface_file(), 'w') as i_face_out:
         i_face_out.write(dtk_spec)
         i_face_out.close()
 
-        
+
 def get_DTK_info_from_processing(dtk):
     # just loaf info for dtk
     search_name = dtk['dtk_rcp']['ri_name']
-    
+
     dtk_nut_dict = {}
-    
+
     # load nutrinfo
     i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), dtk_nut_dict)
-    
+
     return dtk_nut_dict[search_name]
-                
+
     # return {'density': 1,
     #         'n_Al': 0,
     #         'n_Ca': 0,
@@ -217,38 +217,38 @@ def get_DTK_info_from_processing(dtk):
 
 def process_new_dtk_from_user(dtk_data):
     uuid = dtk_data['dtk_user_info']['UUID']
-    
+
     # update DB
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
-    
+
     # export DTK for PROCESSING
     # as nutridoc entry
     post_DTK_info_for_processing(dtk_data)
-    
+
     # fire up ccm_nutridoc_web.rb PROCESS DTK data
     arg1 = f"{dtk_data['dtk_weight']}"
     arg2 = f"file={post_interface_file()}"
     data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
-    
+
     # import RESULT: just get nutrinfo for daily tracker for now.
     # will expect a fully processed DTK including subcomponents
     # TODO
     nutridata = get_DTK_info_from_processing(dtk_data)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-    
+
     # TODO - 1st
     # Make robust - if a single item is NO NUTIRIENT DATA
     # nothing is returned because DTK in for day FAILS
     # Highlight missing items, but total the known ones
-    
-    
-    # merge nutrinfo into DTK and send it back!        
+
+
+    # merge nutrinfo into DTK and send it back!
     dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
     dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
     #pprint(dtk_data)
     store_daily_tracker_to_DB(dtk_data)   # ram & disc
     #helpers_db.commit_DTK_DB()            # disc
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")  
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
     return(dtk_data)
 
@@ -265,11 +265,11 @@ def archive_dtk(dtk):
     # make sure they're in the same 24hr period
     dtk_timestamp_rolled_over(serv_dtk) # insert 'dt_rollover' if not present - TODO REMOVE
     dtk_timestamp_rolled_over(dtk)
-    
+
 
     # if 'dt_last_update' not in dtk['dtk_rcp']: dtk['dtk_rcp']['dt_last_update'] = 0
     # if 'dt_last_update' not in serv_dtk['dtk_rcp']: serv_dtk['dtk_rcp']['dt_last_update'] = 0
-    
+
     # check we're in the same day - otherwise not relevant
     if serv_dtk['dtk_rcp']['dt_rollover'] == dtk['dtk_rcp']['dt_rollover']:
         archive_dtk = dtk if (dtk['dtk_rcp']['dt_last_update'] > serv_dtk['dtk_rcp']['dt_last_update']) else serv_dtk
@@ -280,33 +280,33 @@ def archive_dtk(dtk):
         print("Archiving DEV directly")
 
     archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}.json"
-    
+
     arch_target = Path(get_file_for_data_set("archive_path")).joinpath(archfile_name)
-    
+
     with open(arch_target, 'w') as f:
         f.write(json.dumps(archive_dtk))
-        #f.close()        
-    
+        #f.close()
+
     store_daily_tracker_to_DB(archive_dtk)
-    
+
     print(f"SRV:{serv_dtk['dtk_user_info']['name']} - {serv_dtk['dtk_user_info']['UUID']} - {serv_dtk['dtk_rcp']['dt_last_update']}")
     print(f"DEV:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']} - {dtk['dtk_rcp']['dt_last_update']}")
     print(f"ARC:{archive_dtk['dtk_user_info']['name']} - {archive_dtk['dtk_user_info']['UUID']} - {archive_dtk['dtk_rcp']['dt_last_update']}")
     pprint(archive_dtk)
-    print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")    
-                
+    print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")
 
 
 
-def dtk_timestamp_rolled_over(dtk):    
+
+def dtk_timestamp_rolled_over(dtk):
     print("dtk_timestamp_rolled_over?")
-    
+
     # this is only necessary for earlier version - TODO REMOVE
     if 'dt_rollover' not in dtk['dtk_rcp']:
         dtk['dtk_rcp']['dt_rollover'] = roll_over_from_nix_time(dtk['dtk_rcp']['dt_date'])
-        print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")        
+        print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")
         return True         # start a fresh dtk
-    
+
     dro = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
     dts = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
     dlu = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
@@ -316,7 +316,7 @@ def dtk_timestamp_rolled_over(dtk):
     print(f"RollOver check: RO: {dro} < NOW: {hr_now}  -  CREATED: {dts}  -  Last Update: {dlu} <")
     # nix time
     print(f"RollOver check: RO: {dtk['dtk_rcp']['dt_rollover']} < NOW: {nix_now}  -  CREATED: {dtk['dtk_rcp']['dt_date']}  -  Last Update: {dtk['dtk_rcp']['dt_last_update']} <")
-        
+
     #if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
     if nix_now > dtk['dtk_rcp']['dt_rollover']:
         print("dtk_timestamp_rolled_over? True")
@@ -329,11 +329,11 @@ def dtk_timestamp_rolled_over(dtk):
 
 
 
-# testing         
+# testing
 if __name__ == '__main__':
     pprint(get_daily_tracker_from_DB())
 
 
-    
-    
-    
+
+
+

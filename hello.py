@@ -191,11 +191,6 @@ def query_status_w_js():
 
 @app.route('/weigh_in')
 def weigh_in():
-    # <!--TODO - change all files to this format _t for the 'super' tmeplate file-->
-    #                                <!--and _page for the content-->
-    # <!--TODO - recipe_t.html recipe_page.html--> DONE
-    # <!--TODO - serach for {% extends 'nav_buttons   < assess list-->
-
     dtk = get_daily_tracker_from_DB() # TODO uuid/session
     uuid = dtk['dtk_user_info']['UUID']
 
