@@ -1,21 +1,21 @@
 {% block content %}
 <div class="container-fluid padding">
-	<div class="row padding">   
-        
+	<div class="row padding">
+
 		<!-- if re-writing in JS . . ?
         rename so there is a root variable tha allows multiple recipe
-        de-reference into the leaf? 
+        de-reference into the leaf?
         -->
-        <script>      
-          var recipes = {{ recipes|tojson }};                       // convert info using tojson filter		  
-          console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check      
+        <script>
+          var recipes = {{ recipes|tojson }};                       // convert info using tojson filter
+          console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check
         </script>
 
-		
+
         <!--<div class="col-md-12">-->
 		<div>
             <div class="card">
-                <img class="card-img-top" src="http://127.0.0.1:8000/static/recipe/{{recipes[0]['lead_image']}}"></img>
+                <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipes[0]['lead_image']}}"></img>
                 <div class="card-body">
                     <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
                     <p class="card-text">{{ recipes[0]['description'] }}</p>
@@ -23,8 +23,8 @@
                         <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
                     </h4>
 					<h5>(makes {{recipes[0]['nutrinfo']['yield']|int}}g / {{recipes[0]['nutrinfo']['servings']|int}} servings)</h6></h5>
-                    
-					<!--headline ingredients--> 
+
+					<!--headline ingredients-->
 					<table class="card-text" width='100%'>
 						{% for ingd_line in recipes[0]['ingredients'] %}
 						<tr>  <!--ingredient row items-->
@@ -33,15 +33,15 @@
 								  <td></td>
 							  {% else %}
 								  <td>{{ingd_line[2]}}</td>
-							  {% endif %}                          
+							  {% endif %}
 							<td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-							  {% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+							  {% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->
 								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
 							  {% else %}
 								<td></td>
 							  {% endif %}
 							<!--extra small button - relies on additional styling recipe.css-->
-							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->							  
+							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
 						</tr>
 						{% endfor %}
 					</table>
@@ -50,7 +50,7 @@
                     <h5 class="card-title">ingredients</h5>
 					{% endif %}
 					<table class="card-text" width='100%'>
-						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}	<!-- ingredients for each component -->				  
+						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}	<!-- ingredients for each component -->
 						  <tr><td colspan="4"><h6><b>{{cmp_name}}</b> (makes {{cmp_rcp['nutrinfo']['yield']|int}}g / {{cmp_rcp['nutrinfo']['servings']|int}} servings)</h6></td></tr>
 							  {% for ingd_line in cmp_rcp['ingredients'] %}
 								  <tr>  <!--ingredient row items-->
@@ -59,15 +59,15 @@
 											<td></td>
 										{% else %}
 											<td>{{ingd_line[2]}}</td>
-										{% endif %}                          
+										{% endif %}
 									  <td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-										{% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->										  
+										{% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->
 										  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
 										{% else %}
 										  <td></td>
-										{% endif %} 
+										{% endif %}
 								  </tr>
-							  {% endfor %}						
+							  {% endfor %}
 						  <tr><td><br></td></tr>
 						{% endfor %}
 					</table>
@@ -75,7 +75,7 @@
             </div>
 
             {% include 'nutrient_traffic_lights.html' %}
-        </div>    
+        </div>
     </div>
 </div>
 

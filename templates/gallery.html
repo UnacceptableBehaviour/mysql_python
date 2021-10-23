@@ -14,7 +14,7 @@
 <div class="container-fluid padding">
     <div class="row padding">
         <!--  -->
-        <!-- <div class="card-columns"> -->        
+        <!-- <div class="card-columns"> -->
         <!-- <div class="card-deck"> -->
         <!-- <div class="card-group"> good way to compare recipes? -->
         <div class="card-columns">
@@ -23,7 +23,7 @@
                 <!-- <div class="col-md-12"> </div>-->
                     <!-- <div class="card" style="width:180px"> -->
                     <div class="card">
-                        <img class="card-img-top" src="http://127.0.0.1:8000/static/recipe/{{recipe_info['lead_image']}}"></img>
+                        <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipe_info['lead_image']}}"></img>
                         <div class="card-body">
                             <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
                             <p class="card-text">{{ recipe_info['description'] }}</p>
@@ -46,4 +46,3 @@
 </div>
 
 {% endblock %}
-

@@ -338,7 +338,7 @@ def main():
 
     # http-server -p 8000 --cors
     # url_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'
-    url_file = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'
+    url_file = 'https://asset.server:8080/static/sql_recipe_data.csv'
 
     sql_dict = get_csv_from_server_as_disctionary(url_file)
 

@@ -17,7 +17,7 @@
 // recipes including a tag: name
 //
 //cs50_recipes=# SELECT ri_id,ri_name, tags FROM exploded WHERE 'veggie' = ANY(tags);
-// ri_id |              ri_name              |                                   tags                                   
+// ri_id |              ri_name              |                                   tags
 //-------+-----------------------------------+--------------------------------------------------------------------------
 //   901 | spinach tortilla                  | {veggie,gluten_free,msg,ns_pregnant}
 //  2701 | mushroom risotto                  | {veggie,cbs,gluten_free}
@@ -38,20 +38,20 @@ searchFrom.addEventListener('keyup', function(event) {   // act on hit return ke
 
 
 function searchForRecipe (){
-  
+
   search = searchFrom.value;
-  
+
   if (search === "") search ='%'; // match anything - just use filters & tags - TODO randomise for roulette!
- 
+
   // post info to DB
   fetch( '/search', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
-    body: JSON.stringify( { 'user':userUUID, 'search':search } )      // Payload        
-  
-  }).then( function(response) {    
+    body: JSON.stringify( { 'user':userUUID, 'search':search } )      // Payload
+
+  }).then( function(response) {
     return response.json();
-  
+
   }).then( function(search_response) {
     console.log("AHEM:", search_response);
     console.log('----*----');
@@ -73,7 +73,7 @@ function searchForRecipe (){
 
 function renderRecipeCard(rcpInfo){
   //<div class="card">
-  //    <img class="card-img-top" src="http://127.0.0.1:8000/static/recipe/{{recipe_info['lead_image']}}"></img>
+  //    <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipe_info['lead_image']}}"></img>
   //    <div class="card-body">
   //        <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
   //        <p class="card-text">{{ recipe_info['description'] }}</p>
@@ -87,14 +87,14 @@ function renderRecipeCard(rcpInfo){
   //        <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
   //    </div>
   //</div>
-  
-  // TODO - serve from environment  
+
+  // TODO - serve from environment
   //ASSET_ROOT = 'http://192.168.1.13:8000/'
-  ASSET_ROOT = 'http://127.0.0.1:8000/'   // otherwise https fails - & no images
+  ASSET_ROOT = 'https://asset.server:8080/'   // otherwise https fails - & no images
   assets_url = `${ASSET_ROOT}static/recipe/`; // local dev
-  
+
   //ASSET_ROOT = ''
-  //assets_url = `${ASSET_ROOT}static/images/`; // heroku 
+  //assets_url = `${ASSET_ROOT}static/images/`; // heroku
 
   var html_stars = '';
   for ( var i = 0; i < 5; i++ ) {
@@ -104,15 +104,15 @@ function renderRecipeCard(rcpInfo){
       html_stars += '<i class="fa fa-star recip-star-down-rating"></i>';
     }
   }
-  
-  html_card = `<div class="card">    
+
+  html_card = `<div class="card">
         <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
         <div class="card-body">
             <h5 class="card-title">${rcpInfo['ri_name']}</h5>
             <p class="card-text">${rcpInfo['description']}</p>
             ${html_stars}
             <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
-        </div>    
+        </div>
   </div>`
 
   return html_card;
@@ -120,14 +120,14 @@ function renderRecipeCard(rcpInfo){
 
 function renderGalleryFromResult(recipeList){
   var htmlInnerGallery = ''
-  
+
   if (typeof(recipeList) === 'object') {
-    
-    for (var rcpNo = 0; rcpNo < recipeList.length; rcpNo++ ) {      
+
+    for (var rcpNo = 0; rcpNo < recipeList.length; rcpNo++ ) {
       htmlInnerGallery += renderRecipeCard(recipeList[rcpNo]);
     }
-    
-  } 
+
+  }
 
   var html_gallery = `<div class="row padding">
       <div class="card-columns">
