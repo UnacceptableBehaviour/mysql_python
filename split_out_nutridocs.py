@@ -248,7 +248,7 @@ NUTRIDOC_LIST = [
                 # 2019 * * *
 # 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
 # 'y950',       # ~15   - xmas type recipes - A LOT of product - leave for now.
- 'y951',       #* DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
+# 'y951',       #* DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
 # 'y952',       #* DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
 #  #'y953',     #* DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
 # 'y954',       #* DONE 0214-28 48/13 - stews, tortilla, salads, roasts, snacks      MISSING IMAGES: 10 ['dashi stock', 'lemon dashi dip', 'mixed low cal snack lunch 20190214', 'chicken stock', 'aubergine and chicken liver pate', 'compare aubergine with brussels pate', 'cup of tea', 'home made chicken gravy', 'pea and spring onion gravy', 'mums coconut custard']
@@ -304,14 +304,20 @@ NUTRIDOC_LIST = [
 # # 'y439',       #     0116-0212 - 00/0:
 # # 'y440',       #  0601-15
 # # 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
-# # 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
+'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
 # # 'y443',       #  DONE 0410-23 -
 #  'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
 #  'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
 #   # 'y446',
 #   # 'y447',
     # 'y448',       #  DONE 0703-23 - 41/30
-    'y449',       #  DONE 0703-23 - 41/30
+    'y449',
+    'y450',
+    'y451',
+    'y452',
+    'y453',
+
+    
 # * next to done means superfluous image files removed
 ]
 
@@ -566,7 +572,7 @@ if __name__ == '__main__':
         missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
 
     print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
-    doc_name = 'y425_NUTRITEST_recipes_20200606-0919.rtf'
+    doc_name = 'y452_NUTRITEST_recipes_20211206-0108_xmas.rtf'
     column_headers = ['RECIPES','COMPLETE','TOTAL 0g','TMP FROM IMG','MISSING IMG']
     header = 'DOC_NAME'.ljust(len(doc_name)+3) + '  '.join(column_headers)
     print(header)
