@@ -419,7 +419,7 @@ if __name__ == '__main__':
     create_empty_templates_from_image_names = False
     verbose_mode = False
 
-    if '-sp' in sys.argv:
+    if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
         split_recipes_from_diary_entry = True
 
     if '-ct' in sys.argv:
