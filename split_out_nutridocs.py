@@ -12,7 +12,6 @@ import sys
 
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
-
 from food_sets import get_allergens_for,get_containsTAGS_for
 
 FILE_LOC = 0
@@ -184,9 +183,9 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                     '__serving_info__' : serving_info,
                     '__ingredients__' : ingredients.strip(),
                     '__total_yield__' : tot_yield,
-                    '__method__' : method.strip(),
-                    '__description__' : description.strip(),
-                    '__notes__' : str(notes).strip() + ('\n' + str(notes_after_serve)).strip(),  # if notes_after_serve existd put it on the next line!
+                    '__method__' : method.strip().replace("'","''"),    # SQL escape for ' is '' 'x2 - - \
+                    '__description__' : description.strip(),                                              #
+                    '__notes__' : (str(notes).strip() + ('\n' + str(notes_after_serve)).strip()).replace("'","''"),  # if notes_after_serve existd put it on the next line!
                     '__stars__' : str(stars).strip(),
                     '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
                     '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
@@ -317,7 +316,7 @@ NUTRIDOC_LIST = [
     # 'y450',
     # 'y451',
     # 'y452',
-    # 'y453',
+    'y453',
     'y454',
 
     
@@ -533,7 +532,6 @@ if __name__ == '__main__':
             recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
         else:
             recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, OVER_WRITE_FILES)
-
 
         if create_empty_templates_from_image_names:
             templates_from_images = ''
