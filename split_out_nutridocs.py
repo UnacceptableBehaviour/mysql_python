@@ -166,7 +166,9 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                 original_text = re.sub('lead_image: _li_', replacement, original_text, re.M | re.S)
             else:
                 original_text = re.sub('lead_image:', replacement, original_text, re.M | re.S)
-
+            
+            lead_image = lead_image_from_title          # found image that matches title so use it!
+            
             #print(f"\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n{lead_image}\n{replacement}\n{original_text}\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|")
 
 
@@ -422,7 +424,7 @@ if __name__ == '__main__':
     if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
         split_recipes_from_diary_entry = True
 
-    if '-ct' in sys.argv:
+    if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
         create_empty_templates_from_image_names = True
 
     if '-v' in sys.argv:
@@ -478,7 +480,7 @@ if __name__ == '__main__':
         #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
 
         costing_section = get_costing_section_from_main_doc(nutridoc_text)
-        print(costing_section)
+        if verbose_mode: print(costing_section)
 
         print("\n**\n**\nIf reading this re-run with option -sp: './split_out_nutridocs.py -sp' \nand shift-G search for '- UUU -' to find the beginning of the separated recipes\n**\n**\n")
 
@@ -517,6 +519,14 @@ if __name__ == '__main__':
                 recipe_name = m.group(1)
                 available_recipe_images[recipe_name] = image_file.name
                 print(f"Rcp img:{recipe_name} = {available_recipe_images[recipe_name]}")
+        
+        # # # # # add opt -ili  insert lead image
+        #
+        # at this point have enough info to load rtf (fileset[FILE_LOC])
+        # scan for recipe templates key:recipe_name  image: available_recipe_images[recipe_name]
+        # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
+        #
+        # # # # #
 
         recipes_and_missing_imgs = None
         if create_empty_templates_from_image_names:
