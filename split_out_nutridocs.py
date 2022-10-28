@@ -13,11 +13,13 @@ import sys
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
 from food_sets import get_allergens_for,get_containsTAGS_for
+from helpers_db import nix_time_ms
 
 FILE_LOC = 0
 TMP_PATH = 1
 NEW_FILE_PATH = 2
 ROOT_DATE = 3
+TMP_PATH_INCOMPLETE = 4
 #
 def get_nutridoc_list_rtf():
     base_dir = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components')
@@ -35,14 +37,22 @@ def get_nutridoc_list_rtf():
         # print(file_loc.stem)
         new_file=f"{file_loc.stem}.txt"
         tmp_path = file_loc.parent.joinpath(file_loc.stem).joinpath('_i_w_r_auto_tmp')
+        tmp_path_incomplete = file_loc.parent.joinpath(file_loc.stem).joinpath('_i_w_r_auto_tot0g')
         new_file_path = tmp_path.joinpath(new_file)
         root_date = re.search(r'(\d{8})-', file_loc.stem).group(1)
         # print(new_file_path ) # target
         # print(tmp_path)
         # print(type(tmp_path))
-        from_to.append([file_loc, tmp_path, new_file_path, root_date])
+        from_to.append([file_loc, tmp_path, new_file_path, root_date, tmp_path_incomplete])
+        
+        #timestamp & relable last temp directories - avoid polution
+        nix_time = nix_time_ms()
+        if tmp_path.exists():
+            tmp_path.rename(tmp_path.parent.joinpath(f"_{nix_time}{tmp_path.stem}"))
+        if tmp_path_incomplete.exists():
+            tmp_path_incomplete.rename(tmp_path_incomplete.parent.joinpath(f"_{nix_time}{tmp_path_incomplete.stem}"))
         tmp_path.mkdir(parents=True, exist_ok=True)
-        #print(f"RootDate-{root_date}")
+        tmp_path_incomplete.mkdir(parents=True, exist_ok=True)
 
     return from_to
 
@@ -120,7 +130,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
     # print('> - - - - - S \ ')
     # pprint(fileset)
     # #tmp_path = file_loc.parent.joinpath(file_loc.stem).joinpath('_i_w_r_auto_tmp')
-    # print(fileset[TMP_PATH].parent.joinpath('_i_w_r_auto_tot0g'))
+    # print(fileset[TMP_PATH_INCOMPLETE])
     # print('> - - - - - E / ')
 
     target_file_name = ''
@@ -142,7 +152,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
         if 'calories' in name: continue
 
-        target_path = fileset[TMP_PATH]         # reset target path in case changed to _i_w_r_auto_tot0g below
+        target_path = fileset[TMP_PATH]         # reset target path in case changed to TMP_PATH_INCOMPLETE below
 
         recipes_processed.append(name)          # a dict would make search faster no? but for these numbers meh
 
@@ -204,8 +214,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
         if 'Total (0g)' in rcp:
             recipes_w_total_0g.append(name)
-            target_path = fileset[TMP_PATH].parent.joinpath('_i_w_r_auto_tot0g')
-            target_path.mkdir(parents=True, exist_ok=True)
+            target_path = fileset[TMP_PATH_INCOMPLETE]
         else:
             recipes_with_non_zero_totals.append(name)
 
@@ -227,11 +236,12 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                 copy2(source_img_file, place_img_file)
 
         if overwrite == True:
-            # show actions if live (IE NOT option -ct)
-            print(place_txt_file)
-            print(source_img_file)
-            print(place_img_file)
-            print(rcp)
+            if verbose_mode:
+                # show actions if live (IE NOT option -ct)
+                print(place_txt_file)
+                print(source_img_file)
+                print(place_img_file)
+                print(rcp)
         else:
             # print original with image inserted into lead_image: img.jpg   < where was blank
             print(original_text + '\n')
@@ -461,10 +471,10 @@ if __name__ == '__main__':
     # NEW_FILE_PATH = 2
     # take contents out of each file and create text docs
     for fileset in files_to_process:
-        filename = str(fileset[0].name)
+        filename = str(fileset[FILE_LOC].name)
         m = re.match(r'^(y\d\d\d)', filename)
 
-        nutridoc_dir = fileset[1].parent
+        nutridoc_dir = fileset[TMP_PATH].parent
         print(m.group(1))
         if m.group(1) in NUTRIDOC_LIST:
             print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *\nIN:{nutridoc_dir}")
@@ -526,7 +536,7 @@ if __name__ == '__main__':
         # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
         #
         # # # # #
-
+        
         recipes_and_missing_imgs = None
         if create_empty_templates_from_image_names:
             recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
