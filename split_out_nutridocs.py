@@ -145,7 +145,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
         target_path = fileset[TMP_PATH]         # reset target path in case changed to _i_w_r_auto_tot0g below
 
-        recipes_processed.append(name)          # a dict would make search faster no? but for these numbes meh
+        recipes_processed.append(name)          # a dict would make search faster no? but for these numbers meh
 
         lead_image = str(lead_image).strip()    # convert None to ''
 
@@ -304,18 +304,19 @@ NUTRIDOC_LIST = [
 # # 'y439',       #     0116-0212 - 00/0:
 # # 'y440',       #  0601-15
 # # 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
-'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
+#'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
 # # 'y443',       #  DONE 0410-23 -
 #  'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
 #  'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
 #   # 'y446',
 #   # 'y447',
     # 'y448',       #  DONE 0703-23 - 41/30
-    'y449',
-    'y450',
-    'y451',
-    'y452',
-    'y453',
+    # 'y449',
+    # 'y450',
+    # 'y451',
+    # 'y452',
+    # 'y453',
+    'y454',
 
     
 # * next to done means superfluous image files removed
@@ -415,14 +416,14 @@ username: carter snapdragonpics
 
 if __name__ == '__main__':
     split_recipes_from_diary_entry = False
-    create_templates_from_image_names = False
+    create_empty_templates_from_image_names = False
     verbose_mode = False
 
     if '-sp' in sys.argv:
         split_recipes_from_diary_entry = True
 
     if '-ct' in sys.argv:
-        create_templates_from_image_names = True
+        create_empty_templates_from_image_names = True
 
     if '-v' in sys.argv:
         verbose_mode = True
@@ -470,7 +471,7 @@ if __name__ == '__main__':
             print(f"SKIPPING: {str(fileset[FILE_LOC])}")
             continue
 
-        print(f"create_templates_from_image_names: {create_templates_from_image_names} - {filename}")
+        print(f"create_empty_templates_from_image_names: {create_empty_templates_from_image_names} - {filename}")
 
         # convert file from RTF to txt
         nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
@@ -518,13 +519,13 @@ if __name__ == '__main__':
                 print(f"Rcp img:{recipe_name} = {available_recipe_images[recipe_name]}")
 
         recipes_and_missing_imgs = None
-        if create_templates_from_image_names:
+        if create_empty_templates_from_image_names:
             recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
         else:
             recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, OVER_WRITE_FILES)
 
 
-        if create_templates_from_image_names:
+        if create_empty_templates_from_image_names:
             templates_from_images = ''
 
             for recipe_name, image_file in available_recipe_images.items():
