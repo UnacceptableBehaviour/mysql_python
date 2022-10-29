@@ -236,7 +236,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                 copy2(source_img_file, place_img_file)
 
         if overwrite == True:
-            if verbose_mode:
+            if opt_dict['verbose_mode']:
                 # show actions if live (IE NOT option -ct)
                 print(place_txt_file)
                 print(source_img_file)
@@ -430,22 +430,24 @@ username: carter snapdragonpics
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-create_empty_templates_from_image_names = False
-verbose_mode = False
-clean_old_files_NO_backup = False
-generate_output_in_tmp_folders = False
+opt_dict = {
+    'create_empty_templates_from_image_names': False,
+    'verbose_mode':  False,
+    'clean_old_files_NO_backup':  False,
+    'generate_output_in_tmp_folders':  False
+}
 
 if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
-    create_empty_templates_from_image_names = True
+    opt_dict['create_empty_templates_from_image_names'] = True
 
 if '-v' in sys.argv:
-    verbose_mode = True
+    opt_dict['verbose_mode'] = True
     
 if '-c' in sys.argv:                            # TODO - implement
-    clean_old_files_NO_backup = True
+    opt_dict['clean_old_files_NO_backup'] = True
 
 if '-go' in sys.argv:                           # TODO - implement
-    generate_output_in_tmp_folders = True
+    opt_dict['generate_output_in_tmp_folders'] = True
 
 
 # 'nutridoc' : (recipes process, [list missing images])
@@ -483,14 +485,14 @@ for fileset in files_to_process:
         print(f"SKIPPING: {str(fileset[FILE_LOC])}")
         continue
 
-    print(f"create_empty_templates_from_image_names: {create_empty_templates_from_image_names} - {filename}")
+    print(f"create_empty_templates_from_image_names: {opt_dict['create_empty_templates_from_image_names']} - {filename}")
 
     # convert file from RTF to txt
     nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
     #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
 
     costing_section = get_costing_section_from_main_doc(nutridoc_text)
-    if verbose_mode: print(costing_section)
+    if opt_dict['verbose_mode']: print(costing_section)
 
 
     # get list of available recipe images format: date_time_recipe.jpg - EG: 20200428_181655_fried chicken coating pancakes.jpg
@@ -511,12 +513,12 @@ for fileset in files_to_process:
     # # # # #
     
     recipes_and_missing_imgs = None
-    if create_empty_templates_from_image_names:
+    if opt_dict['create_empty_templates_from_image_names']:
         recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
     else:
         recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, OVER_WRITE_FILES)
 
-    if create_empty_templates_from_image_names:
+    if opt_dict['create_empty_templates_from_image_names']:
         templates_from_images = ''
 
         for recipe_name, image_file in available_recipe_images.items():
@@ -547,16 +549,16 @@ for name, image_info in processed_nutridocs.items():
     print(fileset[FILE_LOC].name, f" -: {len(image_info[RECIPES_PROCESSED])} recipes")
 
     print(f"COMPLETE:       {len(image_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
-    if verbose_mode: print(image_info[RECIPES_WITH_NON_ZERO_TOTALS])
+    if opt_dict['verbose_mode']: print(image_info[RECIPES_WITH_NON_ZERO_TOTALS])
 
     print(f"TOTAL 0g:       {len(image_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")
-    if verbose_mode: print(image_info[INGREDIENTS_TOTAL_0G])
+    if opt_dict['verbose_mode']: print(image_info[INGREDIENTS_TOTAL_0G])
 
     print(f"TMPLT FRM IMG:  {len(image_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")
-    if verbose_mode: print(image_info[AVAILABLE_RECIPE_IMAGES])
+    if opt_dict['verbose_mode']: print(image_info[AVAILABLE_RECIPE_IMAGES])
 
     print(f"MISSING IMAGES: {len(image_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
-    if verbose_mode: print(image_info[MISSING_IMAGES])
+    if opt_dict['verbose_mode']: print(image_info[MISSING_IMAGES])
 
     print("\nMissing image recipe names:\n")
     for i in image_info[MISSING_IMAGES]:
@@ -597,8 +599,7 @@ pprint(missing_images_across_all_docs)
 
 
 # TODO
-# add from opt_dict
-# pass to produce_recipe_txts_from_costing_section AND get_nutridoc_list_rtf
+# pass opt_dict to produce_recipe_txts_from_costing_section AND get_nutridoc_list_rtf
 # remove OVER_WRITE_FILES / DUMBY_RUN
 # verify report with no args
 # add progress dots in quiet mode
