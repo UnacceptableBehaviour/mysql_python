@@ -251,10 +251,6 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
     return [recipes_processed, missing_images, recipes_w_total_0g, recipes_with_non_zero_totals, available_recipe_images]
 
 
-def main():
-    pass
-
-
 NUTRIDOC_LIST = [
                 # 2019 * * *
 # 'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
@@ -326,7 +322,7 @@ NUTRIDOC_LIST = [
     # 'y450',
     # 'y451',
     # 'y452',
-    'y453',
+    #'y453',
     'y454',
 
     
@@ -425,204 +421,203 @@ username: carter snapdragonpics
 
 -'''
 
-if __name__ == '__main__':
-    split_recipes_from_diary_entry = False
-    create_empty_templates_from_image_names = False
-    verbose_mode = False
-    report_only = True
-    clean_old_files_NO_backup = False
-    generate_output_in_tmp_folders = False
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# start processing, generate above report & and assets fro downstream processing
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
-        split_recipes_from_diary_entry = True       # TODO remove
+split_recipes_from_diary_entry = False
+create_empty_templates_from_image_names = False
+verbose_mode = False
+clean_old_files_NO_backup = False
+generate_output_in_tmp_folders = False
 
-    if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
-        create_empty_templates_from_image_names = True
+if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
+    split_recipes_from_diary_entry = True       # TODO remove
 
-    if '-v' in sys.argv:
-        verbose_mode = True
-        
-    if '-c' in sys.argv:                            # TODO - implement
-        clean_old_files_NO_backup = True
+if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
+    create_empty_templates_from_image_names = True
 
-    if '-go' in sys.argv:                           # TODO - implement
-        generate_output_in_tmp_folders = True
+if '-v' in sys.argv:
+    verbose_mode = True
+    
+if '-c' in sys.argv:                            # TODO - implement
+    clean_old_files_NO_backup = True
 
-    #main()
-    # with PyCallGraph(output=graphviz, config=config):
-    #     main()
-
-    #parse_igdt_lines_into_igdt_list()
-
-    #sys.exit()
-
-    # 'nutridoc' : (recipes process, [list missing images])
-    processed_nutridocs = {}
-
-    # Create directories from nutridocd
-    files_to_process = get_nutridoc_list_rtf()
-
-    for f in files_to_process:
-        check = 'NOT PRESENT'
-        filename = str(f[0].name)
-        m = re.match(r'^(y\d\d\d)', filename)
-        print(f"M: {m.group(1)} {m.group(1) in NUTRIDOC_LIST}<")
-        for nutridoc_no in NUTRIDOC_LIST:
-            if nutridoc_no in filename:
-                check = 'PRESENT'
-        #pprint(f)
-        print(filename, check)
-
-    #sys.exit()
-
-    # FILE_LOC = 0
-    # TMP_PATH = 1
-    # NEW_FILE_PATH = 2
-    # take contents out of each file and create text docs
-    for fileset in files_to_process:
-        filename = str(fileset[FILE_LOC].name)
-        m = re.match(r'^(y\d\d\d)', filename)
-
-        nutridoc_dir = fileset[TMP_PATH].parent
-        print(m.group(1))
-        if m.group(1) in NUTRIDOC_LIST:
-            print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *\nIN:{nutridoc_dir}")
-        else:
-            print(f"SKIPPING: {str(fileset[FILE_LOC])}")
-            continue
-
-        print(f"create_empty_templates_from_image_names: {create_empty_templates_from_image_names} - {filename}")
-
-        # convert file from RTF to txt
-        nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
-        #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
-
-        costing_section = get_costing_section_from_main_doc(nutridoc_text)
-        if verbose_mode: print(costing_section)
-
-        print("\n**\n**\nIf reading this re-run with option -sp: './split_out_nutridocs.py -sp' \nand shift-G search for '- UUU -' to find the beginning of the separated recipes\n**\n**\n")
-
-        if split_recipes_from_diary_entry == True:
-            DIARY_RCP_ENTRY = re.compile(r"(----------------- for the.*?^-)", re.M | re.S)
-            diary_text = ""
-            recipes = "-"
-            print(" - MMM -")
-            for match in DIARY_RCP_ENTRY.finditer(costing_section):
-                extract = match.group(1)
-                if 'calories' in extract:
-                    diary_text = diary_text + extract
-                else:
-                    extract += '~'      # w/o this it matches the start of the recipe!
-                    #print("\n - o -")
-                    #print(extract)
-                    #print(re.sub('\s-~',empty_lower_template, extract))
-                    new_template = re.sub('\s-~',empty_lower_template, extract)
-                    #print(new_template)
-                    recipes = recipes + new_template
-                    #print("- - - recipes - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
-                    #print(recipes)
-                print("\n - ^ -")
-
-            print(" - UUU -")
-            print(recipes)
-            print(diary_text)
-            print("Diary & recipe components separated & description:, notes: etc added to recipes")
-            sys.exit(0)
-
-        # get list of available recipe images format: date_time_recipe.jpg - EG: 20200428_181655_fried chicken coating pancakes.jpg
-        available_recipe_images = {}
-        for image_file in nutridoc_dir.glob('*.jpg'):
-            m = re.match('\d{8}_\d{6}_(.*?)\.jpg', image_file.name)
-            if m:
-                recipe_name = m.group(1)
-                available_recipe_images[recipe_name] = image_file.name
-                print(f"Rcp img:{recipe_name} = {available_recipe_images[recipe_name]}")
-        
-        # # # # # add opt -ili  insert lead image
-        #
-        # at this point have enough info to load rtf (fileset[FILE_LOC])
-        # scan for recipe templates key:recipe_name  image: available_recipe_images[recipe_name]
-        # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
-        #
-        # # # # #
-        
-        recipes_and_missing_imgs = None
-        if create_empty_templates_from_image_names:
-            recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
-        else:
-            recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, OVER_WRITE_FILES)
-
-        if create_empty_templates_from_image_names:
-            templates_from_images = ''
-
-            for recipe_name, image_file in available_recipe_images.items():
-                #print(recipe_name, image_file)
-                template_img = empty_recipe.replace('recipe_name', recipe_name)
-                template_img = template_img.replace('_li_', image_file)
-                templates_from_images += template_img
-                print(template_img)
+if '-go' in sys.argv:                           # TODO - implement
+    generate_output_in_tmp_folders = True
 
 
-        processed_nutridocs[fileset[FILE_LOC].name] = recipes_and_missing_imgs
+# 'nutridoc' : (recipes process, [list missing images])
+processed_nutridocs = {}
 
-        print(f"REPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
-        print(fileset[FILE_LOC].name, f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes",
-              f"\nTEMPLATES FROM IMAGES: {len(available_recipe_images)}",
-              f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[MISSING_IMAGES])}\n{recipes_and_missing_imgs[MISSING_IMAGES]}")
-        print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
+# Create directories from nutridocd
+files_to_process = get_nutridoc_list_rtf()
 
-    # report
-    missing_images_across_all_docs = {}
-    print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
-    pprint(processed_nutridocs)
-    print('^^processed_nutridocs^^')
-    for name, image_info in processed_nutridocs.items():
-        # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
+for f in files_to_process:
+    check = 'NOT PRESENT'
+    filename = str(f[0].name)
+    m = re.match(r'^(y\d\d\d)', filename)
+    print(f"M: {m.group(1)} {m.group(1) in NUTRIDOC_LIST}<")
+    for nutridoc_no in NUTRIDOC_LIST:
+        if nutridoc_no in filename:
+            check = 'PRESENT'
+    #pprint(f)
+    print(filename, check)
+
+#sys.exit()
+
+# FILE_LOC = 0
+# TMP_PATH = 1
+# NEW_FILE_PATH = 2
+# take contents out of each file and create text docs
+for fileset in files_to_process:
+    filename = str(fileset[FILE_LOC].name)
+    m = re.match(r'^(y\d\d\d)', filename)
+
+    nutridoc_dir = fileset[TMP_PATH].parent
+    print(m.group(1))
+    if m.group(1) in NUTRIDOC_LIST:
+        print(f"PROCESSING - - - - : {str(fileset[FILE_LOC])} * *\nIN:{nutridoc_dir}")
+    else:
+        print(f"SKIPPING: {str(fileset[FILE_LOC])}")
+        continue
+
+    print(f"create_empty_templates_from_image_names: {create_empty_templates_from_image_names} - {filename}")
+
+    # convert file from RTF to txt
+    nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
+    #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
+
+    costing_section = get_costing_section_from_main_doc(nutridoc_text)
+    if verbose_mode: print(costing_section)
+
+    print("\n**\n**\nIf reading this re-run with option -sp: './split_out_nutridocs.py -sp' \nand shift-G search for '- UUU -' to find the beginning of the separated recipes\n**\n**\n")
+
+    if split_recipes_from_diary_entry == True:
+        DIARY_RCP_ENTRY = re.compile(r"(----------------- for the.*?^-)", re.M | re.S)
+        diary_text = ""
+        recipes = "-"
+        print(" - MMM -")
+        for match in DIARY_RCP_ENTRY.finditer(costing_section):
+            extract = match.group(1)
+            if 'calories' in extract:
+                diary_text = diary_text + extract
+            else:
+                extract += '~'      # w/o this it matches the start of the recipe!
+                #print("\n - o -")
+                #print(extract)
+                #print(re.sub('\s-~',empty_lower_template, extract))
+                new_template = re.sub('\s-~',empty_lower_template, extract)
+                #print(new_template)
+                recipes = recipes + new_template
+                #print("- - - recipes - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
+                #print(recipes)
+            print("\n - ^ -")
+
+        print(" - UUU -")
+        print(recipes)
+        print(diary_text)
+        print("Diary & recipe components separated & description:, notes: etc added to recipes")
+        sys.exit(0)
+
+    # get list of available recipe images format: date_time_recipe.jpg - EG: 20200428_181655_fried chicken coating pancakes.jpg
+    available_recipe_images = {}
+    for image_file in nutridoc_dir.glob('*.jpg'):
+        m = re.match('\d{8}_\d{6}_(.*?)\.jpg', image_file.name)
+        if m:
+            recipe_name = m.group(1)
+            available_recipe_images[recipe_name] = image_file.name
+            print(f"Rcp img:{recipe_name} = {available_recipe_images[recipe_name]}")
+    
+    # # # # # add opt -ili  insert lead image
+    #
+    # at this point have enough info to load rtf (fileset[FILE_LOC])
+    # scan for recipe templates key:recipe_name  image: available_recipe_images[recipe_name]
+    # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
+    #
+    # # # # #
+    
+    recipes_and_missing_imgs = None
+    if create_empty_templates_from_image_names:
+        recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, DUMBY_RUN)
+    else:
+        recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, OVER_WRITE_FILES)
+
+    if create_empty_templates_from_image_names:
+        templates_from_images = ''
+
+        for recipe_name, image_file in available_recipe_images.items():
+            #print(recipe_name, image_file)
+            template_img = empty_recipe.replace('recipe_name', recipe_name)
+            template_img = template_img.replace('_li_', image_file)
+            templates_from_images += template_img
+            print(template_img)
 
 
-        print(fileset[FILE_LOC].name, f" -: {len(image_info[RECIPES_PROCESSED])} recipes")
+    processed_nutridocs[fileset[FILE_LOC].name] = recipes_and_missing_imgs
 
-        print(f"COMPLETE:       {len(image_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
-        if verbose_mode: print(image_info[RECIPES_WITH_NON_ZERO_TOTALS])
+    print(f"REPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
+    print(fileset[FILE_LOC].name, f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes",
+          f"\nTEMPLATES FROM IMAGES: {len(available_recipe_images)}",
+          f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[MISSING_IMAGES])}\n{recipes_and_missing_imgs[MISSING_IMAGES]}")
+    print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n\n\n\n")
 
-        print(f"TOTAL 0g:       {len(image_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")
-        if verbose_mode: print(image_info[INGREDIENTS_TOTAL_0G])
+# report
+missing_images_across_all_docs = {}
+print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+pprint(processed_nutridocs)
+print('^^processed_nutridocs^^')
+for name, image_info in processed_nutridocs.items():
+    # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
 
-        print(f"TMPLT FRM IMG:  {len(image_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")
-        if verbose_mode: print(image_info[AVAILABLE_RECIPE_IMAGES])
 
-        print(f"MISSING IMAGES: {len(image_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
-        if verbose_mode: print(image_info[MISSING_IMAGES])
+    print(fileset[FILE_LOC].name, f" -: {len(image_info[RECIPES_PROCESSED])} recipes")
 
-        print("\nMissing image recipe names:\n")
-        for i in image_info[MISSING_IMAGES]:
-            print(i)
-        missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+    print(f"COMPLETE:       {len(image_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
+    if verbose_mode: print(image_info[RECIPES_WITH_NON_ZERO_TOTALS])
 
-    print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
-    doc_name = 'y452_NUTRITEST_recipes_20211206-0108_xmas.rtf'
-    column_headers = ['RECIPES','COMPLETE','TOTAL 0g','TMP FROM IMG','MISSING IMG']
-    header = 'DOC_NAME'.ljust(len(doc_name)+3) + '  '.join(column_headers)
-    print(header)
-    for name, image_info in processed_nutridocs.items():
-        # stats = dict(zip(column_headers, immage_info_list))
-        stats = {
-            'RECIPES': image_info[RECIPES_PROCESSED],
-            'COMPLETE': image_info[RECIPES_WITH_NON_ZERO_TOTALS],
-            'TOTAL 0g': image_info[INGREDIENTS_TOTAL_0G],
-            'TMP FROM IMG': image_info[AVAILABLE_RECIPE_IMAGES],
-            'MISSING IMG': image_info[MISSING_IMAGES]
-        }
-        row = name.ljust(len(doc_name))
-        for col, data in stats.items():
-            row += str(len(data)).center(len(col)+2)
+    print(f"TOTAL 0g:       {len(image_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")
+    if verbose_mode: print(image_info[INGREDIENTS_TOTAL_0G])
 
-        print(row)
-        missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+    print(f"TMPLT FRM IMG:  {len(image_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")
+    if verbose_mode: print(image_info[AVAILABLE_RECIPE_IMAGES])
 
-    print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
-    pprint(NUTRIDOC_LIST)
-    pprint(missing_images_across_all_docs)
+    print(f"MISSING IMAGES: {len(image_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
+    if verbose_mode: print(image_info[MISSING_IMAGES])
+
+    print("\nMissing image recipe names:\n")
+    for i in image_info[MISSING_IMAGES]:
+        print(i)
+    missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+
+print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+doc_name = 'y452_NUTRITEST_recipes_20211206-0108_xmas.rtf'
+column_headers = ['RECIPES','COMPLETE','TOTAL 0g','TMP FROM IMG','MISSING IMG']
+header = 'DOC_NAME'.ljust(len(doc_name)+3) + '  '.join(column_headers)
+print(header)
+for name, image_info in processed_nutridocs.items():
+    # stats = dict(zip(column_headers, immage_info_list))
+    stats = {
+        'RECIPES': image_info[RECIPES_PROCESSED],
+        'COMPLETE': image_info[RECIPES_WITH_NON_ZERO_TOTALS],
+        'TOTAL 0g': image_info[INGREDIENTS_TOTAL_0G],
+        'TMP FROM IMG': image_info[AVAILABLE_RECIPE_IMAGES],
+        'MISSING IMG': image_info[MISSING_IMAGES]
+    }
+    row = name.ljust(len(doc_name))
+    for col, data in stats.items():
+        row += str(len(data)).center(len(col)+2)
+
+    print(row)
+    missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
+
+print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
+pprint(NUTRIDOC_LIST)
+pprint(missing_images_across_all_docs)
 
 #
 # RECIPES_PROCESSED = 0
@@ -631,5 +626,13 @@ if __name__ == '__main__':
 # RECIPES_WITH_NON_ZERO_TOTALS = 3
 # AVAILABLE_RECIPE_IMAGES = 4
 
-    #pprint(recipes_and_missing_imgs)
-    #pprint(processed_nutridocs)
+
+# TODO
+# add from opt_dict
+# pass to produce_recipe_txts_from_costing_section AND get_nutridoc_list_rtf
+# remove OVER_WRITE_FILES / DUMBY_RUN
+# verify report with no args
+# add progress dots in quiet mode
+# add -go option
+# add -c lean option
+
