@@ -1,0 +1,171 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fswiss\fcharset0 Helvetica-Bold;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red251\green0\blue184;\red80\green114\blue2;
+}
+{\*\expandedcolortbl;;\csgray\c0;\cssrgb\c100000\c0\c77003;\cssrgb\c38303\c51231\c0;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23960\viewh11360\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f0\fs34 \cf0 atomic - notes
+\fs28 \
+\
+atomic - boolean in SQL table - change to 		atomic  TINYINT DEFAULT -1,\
+\
+SQL tables\
+- - - - - db_table_atomic_ingredients_table_def.sql - mysql_python/static		2	atomic_ingredients	0 entries\
+\
+- - - - - db_table_recipe_exploded_table_def.sql - mysql_python/static		2	exploded		
+\f1\fs22 \cf2 \CocoaLigature0 1260 entries
+\f0\fs28 \cf0 \CocoaLigature1 \
+\
+- - - - - db_table_recipe_table_def.sql - mysql_python/static			1	recipes			
+\f1\fs22 \cf2 \CocoaLigature0 1260 entries
+\f0\fs28 \cf0 \CocoaLigature1 \
+\
+\
+igdt_type: unchecked / derived / atomic / ots / dtk\
+			-1	 		0		1	 2	  3\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f2\b \cf0 - - - - - food_sets.py - mysql_python/ 		14
+\f0\b0 \
+	from \cf3 helpers_db\cf0  import get_ingredients_as_text_list\
+	\
+	def \cf3 build_atomic_ingredients\cf0 ():	creates list from nutrients = Path('../\cf3 assest_server\cf0 /scratch/\cf3 nutrinfo.txt\cf0 ')\
+	\
+	def \cf3 build_groupNameX_set\cf0 (): groupNameX = peanuts, pork, chicken etc \cf3 allergens\cf0  & \cf3 belief systems\cf0 \
+\
+	def \cf3 get_allergens_headings\cf0 (): return class names, \cf3 dairy eggs etc\
+\
+	\cf0 def \cf3 get_ingredients_as_text_list('pork fennel & orange kofte')\cf0 :\
+		
+\f1\fs22 \cf2 \CocoaLigature0 ['plain turkey & chicken kofte mix', 'seared pork shoulder', 'fennel bulb', . . . 'orange zest', 'hoisin sauce']\
+		NOT recursive
+\f0\fs28 \cf0 \CocoaLigature1 \
+\
+	TODO does_component_contain_allergen NOT recursive\
+\
+	def \cf3 get_allergens_for\cf0 (\cf4 get_ingredients_as_text_list\cf0 ('pork fennel & orange kofte'))	IS RECURSIVE
+\f1\fs22 \cf2 \CocoaLigature0 \
+	['eggs', 'gluten', 'soya']\
+\
+	
+\f0\fs28 \cf0 \CocoaLigature1 def \cf3 get_allergens_for\cf0 (\cf4 get_ingredients_as_text_list\cf0 ('plain turkey & chicken kofte mix'))
+\f1\fs22 \cf2 \CocoaLigature0 \
+	['eggs', 'gluten', 'soya']
+\f0\fs28 \cf0 \CocoaLigature1 \
+\
+\
+
+\f2\b - - - - - process_nutridocs.py \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 	from \cf3 food_sets\cf0  import get_allergens_for,get_containsTAGS_for\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f2\b \cf0 - - - - - populate_asset_server.rb - ruby/scripts/		0
+\f0\b0 	\
+	copies files to asset server\
+\
+
+\f2\b - - - - - populate_db.py - mysql_python/	3
+\f0\b0 \
+	recipe_table_templates = ['db_table_recipe_table_def
+\f2\b .sql
+\f0\b0 ','db_table_recipe_exploded_table_def
+\f2\b .sql
+\f0\b0 ','db_table_atomic_ingredients_table_def
+\f2\b .sql
+\f0\b0 ']\
+	url_file = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'\
+	columns in csv file - (created by \cf3 populate_asset_server.rb\cf0 )\
+	ri_id,
+\f2\b lead_image
+\f0\b0 ,ri_name,
+\f2\b text_file
+\f0\b0 ,n_En,
+\f2\b n_Fa
+\f0\b0 ,n_Fs,
+\f2\b n_Fm
+\f0\b0 ,n_Fp,
+\f2\b n_Fo3
+\f0\b0 ,n_Ca,
+\f2\b n_Su
+\f0\b0 ,n_Fb,
+\f2\b n_St
+\f0\b0 ,n_Pr,
+\f2\b n_Sa,
+\f0\b0 n_Al,
+\f2\b serving_size\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 	upto 1260\
+	\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f2\b \cf0 - - - - - helper_nutrinfo.py - mysql_python/	2
+\f0\b0 \
+\
+
+\f2\b - - - - - helpers.py - mysql_python/			14
+\f0\b0 \
+def get_ingredients_as_text_list(ingredient)	# include from helpers_db\
+	Query DB=exploded search exact match in ri_name\
+\
+def add_ingredient_w_timestamp()\
+\
+def return_recipe_dictionary():\
+	sets atomic to 1 by default\
+\
+\
+
+\f2\b - - - - - helpers_db.py - mysql_python/		15
+\f0\b0 \
+\
+
+\f2\b - - - - - helpers_tracker.py - mysql_python/	1
+\f0\b0 \
+\
+== CLIENT SIDE\
+
+\f2\b - - - - - track_items.js - mysql_python/static			15
+\f0\b0 \
+const ATOMIC_INDEX = 0;\
+const ATOMIC = 1;\
+\
+
+\f2\b - - - - - recipe_page.html - mysql_python/templates		2
+\f0\b0 \
+\
+\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\fs32 \cf0 ACTIONS
+\fs28 \
+Where is atomic set? It isn't\
+\
+Populate DB - includes from? globs directory build all\
+	add exclude to just build 448\
+\
+populate_asset_server.rb\
+	speed up by simply checking for presence of size adjusted image & text file - CHECK FILENAME\
+	DONT open to check size\
+\
+Apostrophe issue 
+\f1\fs22 \cf2 \CocoaLigature0 ./populate_db.py
+\f0\fs28 \cf0 \CocoaLigature1 :\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7950\tx9125\tx10236\tx11361\tx12473\tx13661\tx14763\tx15904\tx17028\tx18155\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 "I reckon anything 
+\fs28 you'd
+\fs22  do with venison or duck would work,"
+\f0\fs28 \cf0 \CocoaLigature1 \
+\
+}

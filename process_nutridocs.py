@@ -584,7 +584,7 @@ for name, image_info in processed_nutridocs.items():
     print(row)
     missing_images_across_all_docs[name] = image_info[MISSING_IMAGES]
 
-print("\n\nIf building NUTRIDOC from image set build text templates for each image using './split_out_nutridocs.py -ct' ")
+print("\n\nIf building NUTRIDOC from image set build text templates for each image using './process_nutridocs.py -ct' ")
 pprint(NUTRIDOC_LIST)
 pprint(missing_images_across_all_docs)
 

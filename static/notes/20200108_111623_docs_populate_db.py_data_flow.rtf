@@ -1,15 +1,15 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf840
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;\f2\fnil\fcharset0 Menlo-Regular;
-\f3\fnil\fcharset0 Menlo-Bold;}
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;\f2\fnil\fcharset0 Menlo-Regular;
+\f3\fswiss\fcharset0 Helvetica-Bold;\f4\fnil\fcharset0 Menlo-Bold;}
 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red63\green110\blue116;
-\red201\green199\blue209;\red0\green0\blue0;\red255\green255\blue255;\red251\green0\blue9;\red101\green164\blue37;
-\red191\green28\blue4;\red200\green20\blue201;\red16\green132\blue255;\red0\green0\blue0;\red191\green28\blue4;
-\red251\green0\blue7;\red136\green162\blue5;\red251\green0\blue7;}
+\red201\green199\blue209;\red0\green0\blue0;\red255\green255\blue255;\red251\green0\blue9;\red101\green165\blue37;
+\red191\green28\blue4;\red200\green20\blue201;\red16\green132\blue255;\red0\green0\blue0;\red251\green0\blue7;
+\red136\green162\blue5;\red251\green0\blue7;}
 {\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;\csgenericrgb\c100000\c100000\c100000;\csgenericrgb\c24700\c43100\c45600;
 \cssrgb\c82743\c82147\c85273;\csgray\c0;\csgray\c100000;\cssrgb\c100000\c0\c1224;\cssrgb\c46510\c69109\c19169;
-\cssrgb\c80182\c18758\c0;\cssrgb\c83396\c23075\c82664;\cssrgb\c0\c60446\c100000;\cssrgb\c0\c0\c0;\cssrgb\c80182\c18758\c0;
-\cssrgb\c100000\c1836\c0;\cssrgb\c59964\c68375\c0;\cssrgb\c100000\c612\c0;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww24500\viewh17160\viewkind0
+\cssrgb\c80182\c18758\c0;\cssrgb\c83396\c23075\c82664;\cssrgb\c0\c60446\c100000;\cssrgb\c0\c0\c0;\cssrgb\c100000\c1836\c0;
+\cssrgb\c59964\c68375\c0;\cssrgb\c100000\c612\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww19620\viewh14280\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
 \f0\fs34 \cf0 REBUILD DB STEPS\
@@ -61,9 +61,10 @@
 \
 \
 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
-\b Steps to do complete rebuild (process assets > server > DB > heroku local > heroku live > DB live):
-\b0 \
+\f3\b \cf0 Steps to do complete rebuild (process assets > server > DB > heroku local > heroku live > DB live):
+\f0\b0 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf5 (also deploys spec set for event)\cf0 \
 set menu/nutrinfo numbers in menu_assembly.rb (no need to run it)\
@@ -90,7 +91,7 @@ make sure each recipe has image info \
 
 \f2\fs22 \cf6 \cb7 \CocoaLigature0 							# nutridocs in components dir\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab720\pardirnatural\partightenfactor0
-\cf6 ------------------ for the roast lamb wrap kebab (1)\
+------------------ for the roast lamb wrap kebab (1)\
 16g		mayo\
 58g	(1)	tortilla wrap\
 5g		coriander\
@@ -115,7 +116,7 @@ create recipe image pairs in component subdirectories\
 this will create tags & allergens and build from template
 \f2\fs22 \cf6 \cb7 \CocoaLigature0 \
 							# comment nutridocs to be rebuilt\
-$ split_out_nutridocs.py		# from repo my_sql dir
+$ process_nutridocs.py		# from repo my_sql dir
 \f0\fs34 \cf0 \cb1 \CocoaLigature1 \
 \
 move assets to asset server, accessible from all local web dev\
@@ -131,6 +132,7 @@ create local postgresql DB (drops current tables)\
 
 \f2\fs22 \cf8 \cb7 \CocoaLigature0 								# shut all connections to DB\
 								# fire up asset_server\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf6 $ populate_db.py					# runs populate_asset_server.rb if force_complete_rebuild = True
 \f0\fs34 \cf0 \cb1 \CocoaLigature1 \
 \
@@ -148,16 +150,16 @@ $ git commit -m\'92updating images & DB\'92				# commit\
 $ git push heroku master							# push images\
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx9061\tx10216\tx11389\tx12542\tx13610\tx14727\tx15851\tx17002\tx18132\tx19381\tx19500\tx19994\tx20640\pardirnatural\partightenfactor0
-\cf6 \cb7 $ heroku pg:push \cf10 cs50_recipes\cf6  \cf11 postgresql-concentric-77912\cf6  --app \cf12 stark-scrubland-88399		\cf13 # \cf14 \cb7 local_db_name \cf11 \cb7 heroku_pgDB\cf12  app_name\cf6 \
+$ heroku pg:push \cf10 cs50_recipes\cf6  \cf11 postgresql-concentric-77912\cf6  --app \cf12 stark-scrubland-88399		\cf13 # \cf10 local_db_name \cf11 heroku_pgDB\cf12  app_name\cf6 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf6 \cb7 $ heroku pg:reset								# then confirm\
+$ heroku pg:reset								# then confirm\
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
 \f0\fs34 \cf0 \cb1 \CocoaLigature1 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
-\cf15 copy images & spec text to my_sql (local)\
+\cf14 copy images & spec text to my_sql (local)\
 add it to DB heroku local\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf0 \
@@ -165,26 +167,27 @@ add it to DB heroku local\
 \
 \
 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
-\b Starts from bottom working to final step populate_db.py 
-\b0 \
+\f3\b \cf0 Starts from bottom working to final step populate_db.py 
+\f0\b0 \
 INPUTS											Script						OUTPUTS\
 													(and function)\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\fs24 \cf4 \cb3 													
-\f3\b \cf16 $ populate_db.py\
+\f4\b \cf15 $ populate_db.py\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf16 													create DB using table specs\
+\f2\b0 \cf15 													create DB using table specs\
 													populate with data from CSV file
-\f3\b \
+\f4\b \
 							
-\f2\b0 \cf4 						\cf17 (All connections to DB SB closed!)\
+\f2\b0 \cf4 						\cf16 (All connections to DB SB closed!)\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f3\b \cf16 							
-\f2\b0 \cf4 						\cf17 (Asset server should be live!)\cf4 \
+\f4\b \cf15 							
+\f2\b0 \cf4 						\cf16 (Asset server should be live!)\cf4 \
 table_sepcs:\
 /mysql_python/static/db_table_recipe_exploded_table_def.sql\
 /mysql_python/static/db_table_recipe_table_def.sql\
@@ -218,10 +221,10 @@ LOCAL ASSET SERVER:\
 													* & in title cause issue\
 														suspected not reproduced\
 													
-\f3\b \cf16 $ populate_asset_server.rb\
+\f4\b \cf15 $ populate_asset_server.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf16 													take all recipe (image/text) pairs\
+\f2\b0 \cf15 													take all recipe (image/text) pairs\
 													from /_course_components/_i_w_r_auto_tmp\
 													combine with nutrition info into\
 													CSV file for further processing\cf4 \
@@ -234,7 +237,7 @@ dev											/_i_w_r_auto_tmp\
 product										/_i_w_r\
 \
 /assest_server/scratch/
-\f3\b \cf16 nutrinfo.txt	# nutrition info source
+\f4\b \cf15 nutrinfo.txt	# nutrition info source
 \f2\b0 \cf4 \
 COPY OF: /_courses_components/z_product_nutrition_info.txt\
 																			CSV file per line recipe: name, image nutrifo etc per line\
@@ -249,10 +252,10 @@ COPY OF: /_courses_components/z_product_nutrition_info.txt\
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f3\b \cf16 													$ split_out_nutridocs.py\
+\f4\b \cf15 													$ process_nutridocs.py\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf16 													Generates assests recipe.jpg .txt\
+\f2\b0 \cf15 													Generates assests recipe.jpg .txt\
 													from nutidocs, image, template.txt\
 													creates recipe (image/text) pairs\
 													in /_course_components/_i_w_r_auto_tmp\cf4 \
@@ -268,18 +271,18 @@ Plug data into: recipe_template.txt\
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f3\b \cf16 													$ cost_menu.rb		# runs menu_assembly.rb\
+\f4\b \cf15 													$ cost_menu.rb		# runs menu_assembly.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf16 													process components (nutridocs are components)\
+\f2\b0 \cf15 													process components (nutridocs are components)\
 													cost then and work out nutrition info\
 													\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f3\b \cf16 													$ sql_access.rb\
+\f4\b \cf15 													$ sql_access.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf16 													process missing ingredients list\
+\f2\b0 \cf15 													process missing ingredients list\
 													Search FDA DB or\
 													Scrape from URL provided\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
