@@ -429,15 +429,24 @@ if __name__ == '__main__':
     split_recipes_from_diary_entry = False
     create_empty_templates_from_image_names = False
     verbose_mode = False
+    report_only = True
+    clean_old_files_NO_backup = False
+    generate_output_in_tmp_folders = False
 
     if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
-        split_recipes_from_diary_entry = True
+        split_recipes_from_diary_entry = True       # TODO remove
 
     if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
         create_empty_templates_from_image_names = True
 
     if '-v' in sys.argv:
         verbose_mode = True
+        
+    if '-c' in sys.argv:                            # TODO - implement
+        clean_old_files_NO_backup = True
+
+    if '-go' in sys.argv:                           # TODO - implement
+        generate_output_in_tmp_folders = True
 
     #main()
     # with PyCallGraph(output=graphviz, config=config):
