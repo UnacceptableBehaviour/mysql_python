@@ -430,14 +430,10 @@ username: carter snapdragonpics
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-split_recipes_from_diary_entry = False
 create_empty_templates_from_image_names = False
 verbose_mode = False
 clean_old_files_NO_backup = False
 generate_output_in_tmp_folders = False
-
-if '-sp' in sys.argv:                           # DEPRECATED - used to split out diary entried in mixed mode nutridocs
-    split_recipes_from_diary_entry = True       # TODO remove
 
 if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
     create_empty_templates_from_image_names = True
@@ -496,34 +492,6 @@ for fileset in files_to_process:
     costing_section = get_costing_section_from_main_doc(nutridoc_text)
     if verbose_mode: print(costing_section)
 
-    print("\n**\n**\nIf reading this re-run with option -sp: './split_out_nutridocs.py -sp' \nand shift-G search for '- UUU -' to find the beginning of the separated recipes\n**\n**\n")
-
-    if split_recipes_from_diary_entry == True:
-        DIARY_RCP_ENTRY = re.compile(r"(----------------- for the.*?^-)", re.M | re.S)
-        diary_text = ""
-        recipes = "-"
-        print(" - MMM -")
-        for match in DIARY_RCP_ENTRY.finditer(costing_section):
-            extract = match.group(1)
-            if 'calories' in extract:
-                diary_text = diary_text + extract
-            else:
-                extract += '~'      # w/o this it matches the start of the recipe!
-                #print("\n - o -")
-                #print(extract)
-                #print(re.sub('\s-~',empty_lower_template, extract))
-                new_template = re.sub('\s-~',empty_lower_template, extract)
-                #print(new_template)
-                recipes = recipes + new_template
-                #print("- - - recipes - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
-                #print(recipes)
-            print("\n - ^ -")
-
-        print(" - UUU -")
-        print(recipes)
-        print(diary_text)
-        print("Diary & recipe components separated & description:, notes: etc added to recipes")
-        sys.exit(0)
 
     # get list of available recipe images format: date_time_recipe.jpg - EG: 20200428_181655_fried chicken coating pancakes.jpg
     available_recipe_images = {}
@@ -636,4 +604,3 @@ pprint(missing_images_across_all_docs)
 # add progress dots in quiet mode
 # add -go option
 # add -c lean option
-# remove -sp CHECK back compat against y950-y970 - run REPORT 
