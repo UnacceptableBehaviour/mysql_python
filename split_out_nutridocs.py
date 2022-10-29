@@ -398,9 +398,10 @@ empty_recipe = '''
 description:
 notes:
 stars: 1
-type: dough, bread, sandwich, sauce, supplement, beverage, snack, breakfast, brunch, salad,
- soup, component, amuse, side, starter, sushi, fish, lightcourse, main, crepe, dessert, p4, cheese,
- comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
+pizza, sauce, supplement, beverage, snack, breakfast, brunch, homegrown, salad, soup,
+preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
+dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
 username: carter snapdragonpics
 
@@ -411,9 +412,10 @@ empty_lower_template = '''
 description:
 notes:
 stars: 1
-type: dough, bread, sandwich, sauce, supplement, beverage, snack, breakfast, brunch, salad,
- soup, component, amuse, side, starter, sushi, fish, lightcourse, main, crepe, dessert, p4, cheese,
- comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
+pizza, sauce, supplement, beverage, snack, breakfast, brunch, homegrown, salad, soup,
+preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
+dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
 username: carter snapdragonpics
 
@@ -428,7 +430,6 @@ username: carter snapdragonpics
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 split_recipes_from_diary_entry = False
 create_empty_templates_from_image_names = False
 verbose_mode = False
@@ -635,4 +636,4 @@ pprint(missing_images_across_all_docs)
 # add progress dots in quiet mode
 # add -go option
 # add -c lean option
-
+# remove -sp CHECK back compat against y950-y970 - run REPORT 
