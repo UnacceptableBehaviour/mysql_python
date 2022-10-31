@@ -120,8 +120,6 @@ def get_zero_pad_6dig_count():
     hrs = int(recipe_count / 3600 % 24)
     return f"{hrs:02}{mins:02}{secs:02}"
 
-OVER_WRITE_FILES = True
-DUMBY_RUN = False
 TEMPLATE = Path('./templates_recipe/date_time_recipe_name_template.txt')
 RECIPES_PROCESSED = 0
 MISSING_IMAGES = 1
