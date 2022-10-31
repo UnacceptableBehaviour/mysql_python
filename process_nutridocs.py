@@ -439,7 +439,8 @@ opt_dict = {
     'create_empty_templates_from_image_names': False,
     'verbose_mode':  False,
     'clean_old_files_NO_backup':  False,
-    'generate_output_in_tmp_folders':  False
+    'generate_output_in_tmp_folders':  False,
+    'help': False
 }
 
 if '-ct' in sys.argv:                           # for recipes that have an image but for which there is no recipe template
@@ -454,6 +455,8 @@ if '-c' in sys.argv:                            # TODO - implement
 if '-go' in sys.argv:
     opt_dict['generate_output_in_tmp_folders'] = True
 
+if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
+    opt_dict['help'] = True
 
 # 'nutridoc' : (recipes process, [list missing images])
 processed_nutridocs = {}
@@ -592,5 +595,23 @@ pprint(missing_images_across_all_docs)
 # AVAILABLE_RECIPE_IMAGES = 4
 
 
+
+help = '''
+Options Information
+No arguments:            Report status of files selected in NUTRIDOC_LIST
+
+-ct                      Create empty Templates from image names
+                         for recipes that have an image but for which there is no recipe template
+
+-v                       Verbose mode 
+    
+-c                       Clean old files NO backup - removes asset backup directory after completion
+                         NOT IMPLEMENTED
+
+-go                      Generate Output in tmp folders - for populate_db.py
+
+'''
+opt_setting = [ v for k, v in opt_dict.items() if v]
+if not opt_setting: print(help)
 # TODO
 # add -c(lean) option
