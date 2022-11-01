@@ -357,7 +357,8 @@ NUTRIDOC_LIST = [
 # y443_NUTRITEST_recipes_20210410-23.rtf           63       43        20          1             5      
 # y444_NUTRITEST_recipes_20210424-07.rtf           60       25        35          1             12     
 # y445_NUTRITEST_recipes_20210508-21.rtf           52       8         44          1             5      
-# y446_NUTRITEST_recipes_20210522-0618.rtf         77       20        57          0             3      
+# y446_NUTRITEST_recipes_20210522-0618.rtf         77       20        57          0             3
+# DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y447_NUTRITEST_recipes_20210619-02.rtf           42       40        2           1             41     
 # y448_NUTRITEST_recipes_20210703-23.rtf           73       43        30          0             1      
 # y449_NUTRITEST_recipes_20210724-0820.rtf         77       53        24          0             7      
@@ -365,7 +366,7 @@ NUTRIDOC_LIST = [
 # y451_NUTRITEST_recipes_20211016-1205.rtf         9        8         1           0             9      
 # y452_NUTRITEST_recipes_20211206-0108_xmas.rtf    6        1         5           0             6      
 # y453_NUTRITEST_recipes_20220219-0930.rtf         99       67        32          8             11     
-# y454_NUTRITEST_recipes_20221001-13.rtf           33       30        3           16            3
+# y454_NUTRITEST_recipes_20221001-31.rtf           40       38        2           17            1
 #
 # y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
 # y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
@@ -385,7 +386,8 @@ NUTRIDOC_LIST = [
 # y966_NUTRITEST_recipes_20190802-15.rtf           80       61        19          3             5      
 # y967_NUTRITEST_recipes_20190816-29.rtf           40       32        8           4             2      
 # y968_NUTRITEST_recipes_20190830-12.rtf           89       72        17          5             4      
-# y969_NUTRITEST_recipes_20190913-1108.rtf         50       23        27          1             1      
+# y969_NUTRITEST_recipes_20190913-1108.rtf         50       23        27          1             1
+# DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y970_NUTRITEST_recipes_20191109-22.rtf           30       29        1           1             0      
 # y971_NUTRITEST_recipes_20191123-06.rtf           26       24        2           1             3      
 # y972_NUTRITEST_recipes_20191207-20.rtf           23       19        4           1             0      
