@@ -153,7 +153,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
     for match in PATTERN.finditer(costing_section):
         name, serving_info, notes_after_serve, ingredients, tot_yield, method, description, notes, stars, type_tag, lead_image, username = match.groups()
         original_text = match.group(0)        
-        if 'calories' in name: continue
+        if 'calories' in name: continue         # diary entry
+        if 'recipe_name' in name: continue      # blank template
 
         target_path = fileset[TMP_PATH]         # reset target path in case changed to TMP_PATH_INCOMPLETE below
 
