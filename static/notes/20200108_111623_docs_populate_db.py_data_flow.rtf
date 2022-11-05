@@ -212,15 +212,14 @@ LOCAL ASSET SERVER:\
 \
 																			set of recipe images\
 \cf17 																			\cf16 set of recipe json/images > recipe_dtk_multi.js\cf4 \
-\
-													WORKING WITH LOCAL FILESYSTEM\
-													(NO URLS)\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf15 \
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf4 \
+													WORKING WITH LOCAL FILESYSTEM (NO URLS)\
 													ISSUES:\
-													* blank ri_name in csv\
-														miss match image title\
-														file title vs recipe title\
-													* & in title cause issue\
-														suspected not reproduced\
+													\cf16 Uses images to drive CSV population SB: use _i_w_r_auto_tmp/*.txt\cf4 \
 													
 \f4\b \cf15 $ populate_asset_server.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
@@ -230,18 +229,12 @@ LOCAL ASSET SERVER:\
 													combine with nutrition info into\
 													CSV file for further processing\cf4 \
 DATE_TIME_recipe.txt\
-(inc sub components)\
-\
 DATE_TIME_recipe.jpg\
-/_courses_components/*_NUTRITEST_recipes_*/_images_w_recipe\
-dev											/_i_w_r_auto_tmp\
-product										/_i_w_r\
+in components/yXXX_component/_i_w_r_auto_tmp\
 \
-/assest_server/scratch/
-\f4\b \cf15 nutrinfo.txt	# nutrition info source
-\f2\b0 \cf4 \
-COPY OF: /_courses_components/z_product_nutrition_info.txt\
-																			CSV file per line recipe: name, image nutrifo etc per line\
+/_courses_components/z_product_nutrition_info.txt\
+nutrition_db = load_nutrition_data\
+																			CSV file per line recipe: name, image nutrifo etc\
 																			/assest_server/static/sql_recipe_data.csv\
 \
 																			LOCAL ASSET SERVER: my_sql\
