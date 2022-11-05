@@ -256,36 +256,36 @@ NUTRIDOC_LIST = [
                 # 2019 * * *
                 #'nutridoc_no' # ~#recipes/#missing_images - recipe types list rough idea of content
                 # #'y950',       # ~15   - xmas type recipes - A LOT of product - leave for now.
-                'y951',       #* DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
-                'y952',       #* DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
-                'y953',       #* DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
-                'y954',       #* DONE 0214-28 48/13 - stews, tortilla, salads, roasts, snacks      MISSING IMAGES: 10 ['dashi stock', 'lemon dashi dip', 'mixed low cal snack lunch 20190214', 'chicken stock', 'aubergine and chicken liver pate', 'compare aubergine with brussels pate', 'cup of tea', 'home made chicken gravy', 'pea and spring onion gravy', 'mums coconut custard']
-                'y955',       #* DONE 0301-14 33/15 - couscous madness DOTT! some good lo cal rcps  MISSING IMAGES: 4 ['sweet melon dressing', 'tomato red onion and lettuce w sweet melon', 'beetroot and tomato salad', 'mixed veg sunflower seed couscous']
-                'y956',       #  DONE 0315-28 ~48/10 - brisket, burgers, broths, croquettes, frying absorbtion experiments
-                'y957',       #  DONE 0329-11  32   - super healthy, meatballs, pastas, bread, beetroot burger
-                'y958',       #  DONE 0412-25 34/6  - sushi, snack, grains, tortilla, fish
-                'y959',       #  DONE 0429-09 16/22 - IPtodo - fish, comfort, snacks, seasoning, desert
-                'y960',       #  DONE 0510-23 28/5  - pies, salads, grains, seafood, dessert
-                'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
-                'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
-                'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
-                'y964',       #  DONE         43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-                'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
-                'y966',       #  DONE         61/19 - fish, salads, carbless, veggie, sandwiches,
-                'y967',       #  DONE         29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
-                'y968',       #  DONE 0830-12 72/17 - lo-cal, pastry, creme pat, roasts, salads
-                'y969',       #  DONE         23/27 - 2 month stretch / messy split diary from rcp
-                'y970',       #  DONE 1109-22 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
-                'y971',       #  DONE 1123-06 24/2 - broths, fish, bakewell tart & fudge, veg bake
-                'y972',       #  DONE 1207-20 19/4 -
-                'y973',       #  DONE 1221-03 28/11 - xmas, beef, brioche, broths, fennel pate, french stick - TODO: beef forerib, lamb chops, oils
-                              #  * * * 2020 * * *
-                'y974',       #  DONE 0104-17 - 18/1  crispy prawns, stir fry, arancini, moussakas, roast potatoes & salads
-                'y975',       #  DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
-                'y976',       #  SUSHI TODO DONE 0201-14 42/45- standard sushi templates bringing in
-                'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
-                'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
-                'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
+                # 'y951',       #* DONE 0101-18 70/10 - lots of toast & lo-cal                       MISSING IMAGES: 10 ['wmgt', 'buttered wmgt', 'mixed vegetable risotto', 'ham snack', 'coffee', 'milled linseed ingredients', 'poached egg on tomato mgt', 'poached egg on tomato mmgt', 'left over fish broth', 'apple mirin']
+                # 'y952',       #* DONE 0119-31 17/10 - breads & broths                              MISSING IMAGES: 3 ['aubergine and leek w lemon grass soup', 'bun bo huey stock cube', 'pork and blue cheese kebab']  TODO sourdough ring loaf, sourdough boule, confit duck, a few images need tagging
+                # 'y953',       #* DONE 0201-14 0/0   - NO_RECIPES_FOR_DTK
+                # 'y954',       #* DONE 0214-28 48/13 - stews, tortilla, salads, roasts, snacks      MISSING IMAGES: 10 ['dashi stock', 'lemon dashi dip', 'mixed low cal snack lunch 20190214', 'chicken stock', 'aubergine and chicken liver pate', 'compare aubergine with brussels pate', 'cup of tea', 'home made chicken gravy', 'pea and spring onion gravy', 'mums coconut custard']
+                # 'y955',       #* DONE 0301-14 33/15 - couscous madness DOTT! some good lo cal rcps  MISSING IMAGES: 4 ['sweet melon dressing', 'tomato red onion and lettuce w sweet melon', 'beetroot and tomato salad', 'mixed veg sunflower seed couscous']
+                # 'y956',       #  DONE 0315-28 ~48/10 - brisket, burgers, broths, croquettes, frying absorbtion experiments
+                # 'y957',       #  DONE 0329-11  32   - super healthy, meatballs, pastas, bread, beetroot burger
+                # 'y958',       #  DONE 0412-25 34/6  - sushi, snack, grains, tortilla, fish
+                # 'y959',       #  DONE 0429-09 16/22 - IPtodo - fish, comfort, snacks, seasoning, desert
+                # 'y960',       #  DONE 0510-23 28/5  - pies, salads, grains, seafood, dessert
+                # 'y961',       #  DONE 0524-06 42/15 - brisket, salads, soups, sushi, breads x3, 15 extra LOW hanging fruit!
+                # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
+                # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
+                # 'y964',       #  DONE         43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
+                # 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
+                # 'y966',       #  DONE         61/19 - fish, salads, carbless, veggie, sandwiches,
+                # 'y967',       #  DONE         29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
+                # 'y968',       #  DONE 0830-12 72/17 - lo-cal, pastry, creme pat, roasts, salads
+                # 'y969',       #  DONE         23/27 - 2 month stretch / messy split diary from rcp
+                # 'y970',       #  DONE 1109-22 24/6 - bakes, veggie  mousaka, cauliflower cheese, meatballs, fish
+                # 'y971',       #  DONE 1123-06 24/2 - broths, fish, bakewell tart & fudge, veg bake
+                # 'y972',       #  DONE 1207-20 19/4 -
+                # 'y973',       #  DONE 1221-03 28/11 - xmas, beef, brioche, broths, fennel pate, french stick - TODO: beef forerib, lamb chops, oils
+                #               #  * * * 2020 * * *
+                # 'y974',       #  DONE 0104-17 - 18/1  crispy prawns, stir fry, arancini, moussakas, roast potatoes & salads
+                # 'y975',       #  DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
+                # 'y976',       #  SUSHI TODO DONE 0201-14 42/45- standard sushi templates bringing in
+                # 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
+                # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
+                # 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
                 # 
                 # #_doc_#         status dateRange - RCP/incomplete : type of content
                 # 
@@ -295,35 +295,35 @@ NUTRIDOC_LIST = [
                 # 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
                 # 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
                 # 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
-                'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-                'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
-                'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
-                              #       0801-14 - no nutridoc!?
-                'y429',       #       0815-28 - 50/4:
-                'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
-                'y431',       #       0912-25 - 4 /2:
-                'y432',       #  DONE 0929-09 - 15/42: loads of material!
-                'y433',       #       1010-23 - 12/2:
-                'y434',       #       1024-06 - 00/0:
-                'y435',       #       1107-20 -
-                'y436',       #       1121-04 -
-                'y437',       #       1205-18 - 00/28
-                'y438',       #       1024-06 - 00/0:
-                'y439',       #       0116-0212 - 00/0:
-                'y440',       #       0601-15
-                'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
-                'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
-                'y443',       #  DONE 0410-23 -
-                'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
-                'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
-                'y446',
-                'y447',
-                'y448',       #  DONE 0703-23 - 41/30
-                'y449',
-                'y450',
-                'y451',
-                'y452',
-                'y453',
+                # 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
+                # 'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
+                # 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
+                #               #       0801-14 - no nutridoc!?
+                # 'y429',       #       0815-28 - 50/4:
+                # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
+                # 'y431',       #       0912-25 - 4 /2:
+                # 'y432',       #  DONE 0929-09 - 15/42: loads of material!
+                # 'y433',       #       1010-23 - 12/2:
+                # 'y434',       #       1024-06 - 00/0:
+                # 'y435',       #       1107-20 -
+                # 'y436',       #       1121-04 -
+                # 'y437',       #       1205-18 - 00/28
+                # 'y438',       #       1024-06 - 00/0:
+                # 'y439',       #       0116-0212 - 00/0:
+                # 'y440',       #       0601-15
+                # 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
+                # 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
+                # 'y443',       #  DONE 0410-23 -
+                # 'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
+                # 'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
+                # 'y446',
+                # 'y447',
+                # 'y448',       #  DONE 0703-23 - 41/30
+                # 'y449',
+                # 'y450',
+                # 'y451',
+                # 'y452',
+                # 'y453',
                 'y454',
 
     
@@ -474,45 +474,6 @@ processed_nutridocs = {}
 files_to_process = []
 nutridocs_found = get_nutridoc_list_rtf()
 
-#pprint(sorted(nutridocs_found))
-#import os
-if opt_dict['clean_old_files_NO_backup'] == True:
-    print("\n\n\n* * REMOVING * * empty folders from _courses_components & _nix_time_i_w_r_auto_tmp/0g backups.\n") 
-    yn = input('Continue? y/(n)\n\n')
-    if yn.strip().lower() != 'y': sys.exit(0)
-    
-    for file_set in nutridocs_found:
-        base_dir = str(file_set[1].parent)
-        print('\n\n')
-        print(base_dir)
-        sub_dirs = [f for f in Path(base_dir).glob('*') if f.is_dir()]
-        for sub_d in sub_dirs:
-            no_of_files = [f for f in Path(sub_d).glob('*')]
-            #print(f"\t{len(no_of_files)} - {sub_d}")
-            if len(no_of_files) == 0:
-                print(f"\tREMOVING {sub_d}\n")
-                sub_d.rmdir()
-            else:
-                #print(f"\tdir: {sub_d}\n")
-                if re.search(r'(_\d*_i_w_r_auto_tot0g)', str(sub_d)):
-                    print(f"\t** REMOVING ** 0g ({len(no_of_files)} files): {sub_d}")
-                    #shutil.rmtree(sub_d)
-                if re.search(r'(_\d*_i_w_r_auto_tmp)', str(sub_d)):
-                    print(f"\t** REMOVING ** tmp ({len(no_of_files)} files): {sub_d}")
-                    #shutil.rmtree(sub_d)
-                # if '_i_w_r_auto_tmp' in str(sub_d):
-                #     newname = re.sub(r'_\d*_i_w_r_auto_tmp','_i_w_r_auto_tmp', str(sub_d))
-                #     print(f"\t{newname} <")
-                #     if not Path(newname).exists():
-                #         Path(sub_d).rename(newname)
-                # 
-                # if '_i_w_r_auto_tot0g' in str(sub_d):
-                #     newname = re.sub(r'_\d*_i_w_r_auto_tot0g','_i_w_r_auto_tot0g', str(sub_d))
-                #     print(f"\t{newname} <")
-                #     if not Path(newname).exists():
-                #         Path(sub_d).rename(newname)
-            
-sys.exit(0)
 
 print(f"\n\nProcessing: LIVE?:{opt_dict['generate_output_in_tmp_folders']} . . Use opt -go for LIVE run")
 for f in nutridocs_found:
@@ -633,13 +594,36 @@ pprint(NUTRIDOC_LIST)
 print('> Missing images across ALL docs - - - - - - - - - - - - - - - < < < < MISSING INGS * * *')
 pprint(missing_images_across_all_docs)
 
-#
-# RECIPES_PROCESSED = 0
-# MISSING_IMAGES = 1
-# INGREDIENTS_TOTAL_0G = 2
-# RECIPES_WITH_NON_ZERO_TOTALS = 3
-# AVAILABLE_RECIPE_IMAGES = 4
 
+nutridocs_found = get_nutridoc_list_rtf()
+if opt_dict['clean_old_files_NO_backup_inspect'] == True:
+    print("\n\n\n* * REMOVING * * empty folders from _courses_components & _nix_time_i_w_r_auto_tmp/0g backups.\n") 
+    yn = input('Continue? y/(n)\n\n')
+    if yn.strip().lower() != 'y': sys.exit(0)
+    
+    for file_set in nutridocs_found:
+        base_dir = str(file_set[1].parent)
+        #print('\n\n')
+        print(f"\n{base_dir}")
+        sub_dirs = [f for f in Path(base_dir).glob('*') if f.is_dir()]
+        for sub_d in sub_dirs:
+            no_of_files = [f for f in Path(sub_d).glob('*')]
+            #print(f"\t{len(no_of_files)} - {sub_d}")
+            if len(no_of_files) == 0:
+                print(f"\tREMOVING {sub_d}\n")
+                sub_d.rmdir()
+            else:
+                #print(f"\tdir: {sub_d}\n")
+                if re.search(r'(_\d*_i_w_r_auto_tot0g)', str(sub_d)):
+                    print(f"\t** REMOVING ** 0g ({len(no_of_files)} files): {sub_d}")
+                    if opt_dict['clean_old_files_NO_backup_HOT']: shutil.rmtree(sub_d)
+                    
+                if re.search(r'(_\d*_i_w_r_auto_tmp)', str(sub_d)):
+                    print(f"\t** REMOVING ** tmp ({len(no_of_files)} files): {sub_d}")
+                    if opt_dict['clean_old_files_NO_backup_HOT']: shutil.rmtree(sub_d)
+                    
+    if opt_dict['clean_old_files_NO_backup_HOT'] == False:
+        print("Use: \n\tprocess_nutridocs.py -clean \n\nto HOT DELETE directories & contents.")
 
 
 help = '''
