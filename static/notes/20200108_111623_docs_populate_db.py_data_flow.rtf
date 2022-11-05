@@ -4,13 +4,13 @@
 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red63\green110\blue116;
 \red201\green199\blue209;\red0\green0\blue0;\red255\green255\blue255;\red251\green0\blue9;\red101\green165\blue37;
 \red191\green28\blue4;\red200\green20\blue201;\red16\green132\blue255;\red0\green0\blue0;\red251\green0\blue7;
-\red136\green162\blue5;\red251\green0\blue7;\red251\green0\blue12;\red64\green163\blue3;\red64\green163\blue3;
-\red251\green0\blue14;\red251\green0\blue12;}
+\red136\green162\blue5;\red251\green0\blue7;\red115\green0\blue4;\red251\green0\blue12;\red64\green163\blue3;
+\red64\green163\blue3;\red251\green0\blue14;\red251\green0\blue12;}
 {\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;\csgenericrgb\c100000\c100000\c100000;\csgenericrgb\c24700\c43100\c45600;
 \cssrgb\c82743\c82147\c85273;\csgray\c0;\csgray\c100000;\cssrgb\c100000\c0\c1224;\cssrgb\c46510\c69109\c19169;
 \cssrgb\c80182\c18758\c0;\cssrgb\c83396\c23075\c82664;\cssrgb\c0\c60446\c100000;\cssrgb\c0\c0\c0;\cssrgb\c100000\c1836\c0;
-\cssrgb\c59964\c68375\c0;\cssrgb\c100000\c612\c0;\cssrgb\c100000\c0\c2983;\cssrgb\c30112\c68375\c0;\cssrgb\c30112\c68375\c0;
-\cssrgb\c100000\c0\c4473;\cssrgb\c100000\c0\c2983;}
+\cssrgb\c59964\c68375\c0;\cssrgb\c100000\c612\c0;\cssrgb\c53076\c0\c792;\cssrgb\c100000\c0\c2983;\cssrgb\c30112\c68375\c0;
+\cssrgb\c30112\c68375\c0;\cssrgb\c100000\c0\c4473;\cssrgb\c100000\c0\c2983;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww22520\viewh18640\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
@@ -210,7 +210,8 @@ LOCAL ASSET SERVER:\
 																			images\
 																			/repos/heroku_nubes/static/images\
 \
-																			set of recipe images \
+																			set of recipe images\
+\cf17 																			\cf16 set of recipe json/images > recipe_dtk_multi.js\cf4 \
 \
 													WORKING WITH LOCAL FILESYSTEM\
 													(NO URLS)\
@@ -265,13 +266,38 @@ COPY OF: /_courses_components/z_product_nutrition_info.txt\
 All diary recipes in\
 yXXX_NUTRITEST_recipes_20190719-01.rtf\
 \
-Plug data into: recipe_template.txt\
+\
 \
 																			STORE recipe pairs in\
 																			/_course_components/_i_w_r_auto_tmp\
 																			DATE_TIME_recipe.txt\
 																			DATE_TIME_recipe.jpg\
 																			z_product_nutrition_info.txt\
+\cf15 \
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\
+													
+\f4\b $ ./scratch/scan_for_each_data.py
+\f2\b0 \
+													Design: ./scratch/scan_for_each_data.jpg\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf4 All diary recipes in\
+yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf15 													Process all nutridoc files and extract lines\
+													220g	(2)	nectarines\
+													Produce JSON format - for JS / script integration\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf4 																			JSON format SML weights of singular of ingredient\
+																			
+\fs22 \cf6 \cb1 \CocoaLigature0 'nectarine': \{ 'small': 82.5, 'medium': 110.0, . . \
+
+\fs24 \cf4 \cb3 \CocoaLigature1 																			
+\fs22 \cf6 \cb1 \CocoaLigature0 'nori': \{ 'small': 1.5, 'medium': 2.0, 'large': 2.5, . . \
+
+\fs24 \cf4 \cb3 \CocoaLigature1 																			
+\fs22 \cf6 \cb1 \CocoaLigature0 'olive': \{ . . 'large': 3.8, 'density': 1.0 \},
+\fs24 \cf4 \cb3 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf15 \
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\cf4 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
@@ -282,9 +308,9 @@ Plug data into: recipe_template.txt\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf15 										Used to cost components for markets\
-										Produces ingredients list \cf17 NOT\cf15  ordered by weight (for Labelling)\
+										Produces ingredients list \cf18 NOT\cf15  ordered by weight (for Labelling)\
 										Produce {\field{\*\fldinst{HYPERLINK "https://www.gov.uk/guidance/food-labelling-giving-food-information-to-consumers"}}{\fldrslt QUID}} list % of product by weight mixing stage (for Labelling)\
-										\cf18 Produce 
+										\cf19 Produce 
 \f4\b nutrition information
 \f2\b0  (for Labelling)\cf15 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
@@ -298,9 +324,9 @@ Plug data into: recipe_template.txt\
 \f2\b0 \cf15 										(Banquest asset assembly: Table menu, shop list, todo etc)\
 										Selects components based on menu_type = MENU_LABELLING_NUTRITION\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
-\cf4 y997_costing_waypoint.rtf costing information recorded to date -\cf17  update w/ info \cf15 FRK_5-6\cf4  Incorporated into o/p > - - \\\cf15 \
+\cf4 y997_costing_waypoint.rtf costing information recorded to date -\cf18  update w/ info \cf15 FRK_5-6\cf4  Incorporated into o/p > - - \\\cf15 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
-\cf19 										produces costing section from each template compiled into >\cf4 	___LAB_NUT_COSTING.rtf\cf15 \
+\cf20 										produces costing section from each template compiled into >\cf4 	___LAB_NUT_COSTING.rtf\cf15 \
 											list of recipe texts from the nutridocs in templates\
 										FRK_1-2 ^\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
@@ -322,10 +348,10 @@ Plug data into: recipe_template.txt\
 \f2\b0 FRK_2-3 Dump i_db costing info & component numbers\cf4 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
-\cf15 										FRK_5-6 \cf19 info dump 			for paste into >	y997_costing_waypoint.rtf\cf15 \
+\cf15 										FRK_5-6 \cf20 info dump 			for paste into >	y997_costing_waypoint.rtf\cf15 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf15 										FRK_6-7 list of FLATTENED SUBCOMPONENTS 44 (missing DATA still to cost)\
-										FRK_7-8 \cf19 list of items requiring COSTING INFO - includes URL\cf15  easy to find info / \cf20 automatable\cf15 \
+										FRK_7-8 \cf20 list of items requiring COSTING INFO - includes URL\cf15  easy to find info / \cf21 automatable\cf15 \
 													compare ri_name to nutrition_db to\
 										FRK_8-9 looks same as FRK_6-7?\
 										FRK_9-10 support functions for 10-11\
@@ -337,14 +363,14 @@ Plug data into: recipe_template.txt\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf15 													process components (nutridocs are components) and work out nutrition info\
-													\cf19 add any 
+													\cf20 add any 
 \f4\b new
 \f2\b0  nutrinfo to\cf15 			>\cf4 	z_product_nutrition_info.txt\cf15 			
 \f4\b \
 
 \f2\b0 										FRK_10-11 NUTRITION, QUID, INGREDIENTS by component\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
-\cf17 												INGREDIENTS need to be ordered by QUID & sub ingredients included\cf15 \
+\cf18 												INGREDIENTS need to be ordered by QUID & sub ingredients included\cf15 \
 										FRK_10-11 DIARY NUTRITION / cals count by day\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 																			INGREDIENTS_DB = 'ruby/scripts...ingredients_db'\
@@ -372,7 +398,7 @@ Plug data into: recipe_template.txt\
 
 \f2\b0 \cf15 													process missing ingredients list\
 													Search FDA DB or\
-													Scrape from URL provided w \cf21 product_info.rb - failing\cf15 \
+													Scrape from URL provided w \cf22 product_info.rb - failing\cf15 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 All components\
 /_courses_components/\
