@@ -40,15 +40,15 @@ def build_file_LUT():
 
 
 errors = {
-    'txt_title_NO_match_rcp':[],
-    'derived_w_file_HAS_ndb_no':[],
-    'ndb_no_neg99':[],
-    'derived_SB_atomic':[],
+    'txt_title_NO_match_rcp':[],        #
+    'derived_w_file_HAS_ndb_no':[],     #
+    'ndb_no_neg99':[],                  #
+    'derived_HAS_http_SB_ots': [],      #
     'derived_HAS_atomic_alias':[],
-    'ots_ingredients_missing':[],
+    'ots_ingredients_missing':[],       #
     'unknown_alias':[],
-    #'':[],
 }
+aliases = {}
 def build_atomic_LUT():
     aliases = {}
     content = ''
@@ -71,7 +71,30 @@ def build_atomic_LUT():
         # (per 100g)                    # derived ingredient
         # (ndb_no=-99)
         # (ndb_no=sea bream fillets)    # alias to another entry - which could be any of the above
-        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):
+        if ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
+            alias = (re.search('\(ndb_no=(\d+)\)', ndb_no_url_alias).group(1))
+            # track multiples
+            if alias in aliases:
+                aliases[alias].append(component)
+            else:
+                aliases[alias] = [component]
+            if alias in component_file_LUT:
+                atomic_LUT[component]['alias'] = alias
+        
+        if ('http' in ndb_no_url_alias):
+            errors['derived_HAS_http_SB_ots'].append((component, igdt_type, ndb_no_url_alias))
+        
+        if (ndb_no_url_alias == 'ndb_no=-99'):
+            errors['ndb_no_neg99'].append((component, igdt_type))
+        
+        if (igdt_type == 'ots') and (ingredients == '__igdts__'):
+            errors['ots_ingredients_missing'].append((component, '__igdts__'))
+            
+        if (igdt_type == 'derived') and (component in component_file_LUT) and (re.search('\(ndb_no=\d+\)', ndb_no_url_alias)):
+            ndb_no = re.search('\(ndb_no=(\d+)\)', ndb_no_url_alias).group(1)
+            errors['derived_w_file_HAS_ndb_no'].append(component)
+            
+        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):          
             if ('http' not in ndb_no_url_alias) and not ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
                 alias = re.sub('ndb_no=', '', ndb_no_url_alias)
             print(component)
