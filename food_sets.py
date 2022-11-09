@@ -16,6 +16,29 @@ NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 component_file_LUT = {}
 COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
 
+def search(search_term):
+    print(f"\n==> Searching for {search_term} . .\n")
+    for i in atomic_LUT.keys():
+        if re.search(search_term, i):
+            print(f"{i.ljust(40)} - {atomic_LUT[i]['ndb_no_url_alias']}", end='\t')
+            alias = re.sub('ndb_no=', '', atomic_LUT[i]['ndb_no_url_alias'])
+            if i in component_file_LUT.keys():          print(f"rcoi:{component_file_LUT[i].name}")
+            elif alias in component_file_LUT.keys():    print(f"A:{alias} - {component_file_LUT[alias].name}")
+            else: print()
+    
+    print(f"\n ^ ingredients w/ {search_term} \n")
+
+
+def build_file_LUT():
+    file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
+    for f in file_list:
+        m = re.search(r'\d{8}_\d{6}_(.*?).txt', str(f))
+        if m:
+            #print(f"{m.group(1)} - {f.name}")
+            component_file_LUT[m.group(1)] = f
+            get_ingredients_from_component_file(m.group(1)) # cache file & log rcoi/ri_name mismatch
+
+
 errors = {
     'txt_title_NO_match_rcp':[],
     'derived_w_file_HAS_ndb_no':[],
@@ -26,33 +49,6 @@ errors = {
     'unknown_alias':[],
     #'':[],
 }
-
-def search(search_term):
-    for i in atomic_LUT.keys():
-        if re.search(search_term, i):
-            print(f"{i.ljust(40) - {atomic_LUT[i]['ndb_no_url_alias']}}")
-    
-    print(f"\n ^ ingredients w/ {search_term} \n")
-    # was . . .
-    # content = ''
-    # with NUTREINT_FILE_PATH.open('r') as f:
-    #     #content = f.readlines()
-    #     content = f.read()
-    # for m in re.finditer( r'--- for the nutrition information(.*?)\(', content, re.MULTILINE | re.DOTALL ):
-    #     ingredient = m.group(1)
-    #     if re.search(search_term, ingredient):
-    #         print(ingredient.strip())    
-    # print(f"\n ^ ingredients w/ {search_term} \n")
-
-def build_file_LUT():
-    file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
-    for f in file_list:
-        m = re.search(r'\d{8}_\d{6}_(.*?).txt', str(f))
-        if m:
-            #print(f"{m.group(1)} - {f.name}")
-            component_file_LUT[m.group(1)] = f
-
-
 def build_atomic_LUT():
     aliases = {}
     content = ''
@@ -120,11 +116,16 @@ def parse_igdt_lines_into_igdt_list(lines=''):
     return i_list
 
 
+CACHE_recipe_component_or_ingredient = {}
 def get_ingredients_from_component_file(recipe_component_or_ingredient):
     rcoi = recipe_component_or_ingredient
-
-    with component_file_LUT[rcoi].open('r') as f:
-        content = f.read()
+    
+    if rcoi in CACHE_recipe_component_or_ingredient:
+        content = CACHE_recipe_component_or_ingredient[rcoi]
+    else:
+        with component_file_LUT[rcoi].open('r') as f:
+            content = f.read()
+            CACHE_recipe_component_or_ingredient[rcoi] = content
     
     m = re.search(r'--- for the (.*?) \((.*?)\)(.*?)Total \((.*?)\).*?__end_recipe__', content, re.MULTILINE | re.DOTALL)
     
@@ -134,9 +135,11 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
         if rcoi == ri_name:
             return parse_igdt_lines_into_igdt_list(ingredients_lines)
         else:
-            return 'ERROR: template component name & filename mismatch'
+            errors['txt_title_NO_match_rcp'].append((rcoi, ri_name))
+            return f"txt_title_NO_match_rcp>{rcoi}|{ri_name}<alias"
     else:
         return 'ERROR: bad_template'
+
 
 # recursive compile ingredients including OTS if ingredients available    
 def get_ingredients_as_text_list(recipe_component_or_ingredient, d=0): # takes str:name
@@ -215,6 +218,28 @@ pprint(component_file_LUT[target])
 print(f"> - - - - {target} - - - - <")
 print(get_ingredients_as_text_list(target))
 
+show_txt_title_NO_match_rcp = False
+if show_txt_title_NO_match_rcp == True:
+    print(f"errors['txt_title_NO_match_rcp']: {len(errors['txt_title_NO_match_rcp'])}")
+    for rcoi, ri_name in errors['txt_title_NO_match_rcp']:
+        print(rcoi)
+        pprint(atomic_LUT[rcoi]) if rcoi in atomic_LUT else print(f"NO: {rcoi} in atomic_LUT")
+        print(ri_name)
+        pprint(atomic_LUT[ri_name]) if ri_name in atomic_LUT else print(f"NO: {ri_name} in atomic_LUT")
+        print('-')
+
+
+print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_ingredient)}")
+print("\nERRORS found")
+for e in errors.keys():
+    print(f"{e} ({len(errors[e])})")
+
+
+print('\nSearch?')
+while(True):
+    yn = input('Continue ingredient/(n)\n')
+    if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
+    search(yn)
 
 sys.exit(0)
 
