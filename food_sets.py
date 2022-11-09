@@ -6,7 +6,241 @@ import itertools
 from pprint import pprint
 from pathlib import Path
 
-from helpers_db import get_ingredients_as_text_list
+
+#from helpers_db import get_ingredients_as_text_list
+
+atomic_LUT = {}
+components_aliases_LUT = {} # need?
+NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+
+component_file_LUT = {}
+COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
+
+errors = {
+    'txt_title_NO_match_rcp':[],
+    'derived_w_file_HAS_ndb_no':[],
+    'ndb_no_neg99':[],
+    'derived_SB_atomic':[],
+    'derived_HAS_atomic_alias':[],
+    'ots_ingredients_missing':[],
+    'unknown_alias':[],
+    #'':[],
+}
+
+def search(search_term):
+    for i in atomic_LUT.keys():
+        if re.search(search_term, i):
+            print(f"{i.ljust(40) - {atomic_LUT[i]['ndb_no_url_alias']}}")
+    
+    print(f"\n ^ ingredients w/ {search_term} \n")
+    # was . . .
+    # content = ''
+    # with NUTREINT_FILE_PATH.open('r') as f:
+    #     #content = f.readlines()
+    #     content = f.read()
+    # for m in re.finditer( r'--- for the nutrition information(.*?)\(', content, re.MULTILINE | re.DOTALL ):
+    #     ingredient = m.group(1)
+    #     if re.search(search_term, ingredient):
+    #         print(ingredient.strip())    
+    # print(f"\n ^ ingredients w/ {search_term} \n")
+
+def build_file_LUT():
+    file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
+    for f in file_list:
+        m = re.search(r'\d{8}_\d{6}_(.*?).txt', str(f))
+        if m:
+            #print(f"{m.group(1)} - {f.name}")
+            component_file_LUT[m.group(1)] = f
+
+
+def build_atomic_LUT():
+    aliases = {}
+    content = ''
+    with NUTREINT_FILE_PATH.open('r') as f:
+        #content = f.readlines()
+        content = f.read()
+
+    for m in re.finditer( r'--- for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
+        component, ndb_no_url_alias, ingredients, igdt_type = m.group(1).strip(), m.group(2).strip(), m.group(3).strip(), m.group(4).strip()
+        if component == '': continue
+        # print(f"{component}", end=':')
+        # print(f"{component in atomic_LUT.keys()}", end=' ')
+        # pprint(atomic_LUT)
+        atomic_LUT[component] = {}        
+        atomic_LUT[component]['ingredients'] = ingredients
+        atomic_LUT[component]['igdt_type'] = igdt_type
+        atomic_LUT[component]['ndb_no_url_alias'] = ndb_no_url_alias
+        # (ndb_no=https://www.bla)      # online resource to ingredient
+        # (ndb_no=11367)                # info from FDA DB - \(ndb_no=\d+\)
+        # (per 100g)                    # derived ingredient
+        # (ndb_no=-99)
+        # (ndb_no=sea bream fillets)    # alias to another entry - which could be any of the above
+        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):
+            if ('http' not in ndb_no_url_alias) and not ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
+                alias = re.sub('ndb_no=', '', ndb_no_url_alias)
+            print(component)
+            if component in component_file_LUT: print(component_file_LUT[component])
+            elif alias in component_file_LUT: print(f"{alias} - {component_file_LUT[alias]}")            
+            else:
+                r = re.search('\(ndb_no=\d+\)', ndb_no_url_alias)
+                pprint(r)
+                print(f"no file - C:{component} - A:{alias} - {r}")
+            pprint(atomic_LUT[component])
+            print()
+        
+
+    return len(atomic_LUT)
+
+# keep it simple to start
+# remove QUID (34%) no's - these could be used to revese engineer a recipe in conjunction w/ nutrition info
+# downcase and remove whitespace and .
+def process_off_the_shelf_ingredients_list(i_list):    
+    # new_list = [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
+    # print(i_list)
+    # print(new_list)
+    return [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
+
+def parse_igdt_lines_into_igdt_list(lines=''):
+    i_list = []
+
+    lines = [ l.strip() for l in lines.splitlines() ]
+    lines = list(filter(None, lines))
+
+    # remove qty & comment from each line
+    for line in lines:
+        parts = [ item.strip() for item in line.split('\t') if (len(item) > 0) & ('#' not in item) & ('(' not in item) ] # remove comments
+        parts.pop(0)    # remove qty
+        try:
+            i_list.append(parts.pop(0))
+        except IndexError:
+            pass
+
+    i_list = list(dict.fromkeys(i_list))        # remove duplicates from list    
+    i_list = list(filter(None, i_list))         # remove empty strings
+    return i_list
+
+
+def get_ingredients_from_component_file(recipe_component_or_ingredient):
+    rcoi = recipe_component_or_ingredient
+
+    with component_file_LUT[rcoi].open('r') as f:
+        content = f.read()
+    
+    m = re.search(r'--- for the (.*?) \((.*?)\)(.*?)Total \((.*?)\).*?__end_recipe__', content, re.MULTILINE | re.DOTALL)
+    
+    if m:
+        ri_name, servings, ingredients_lines, total_yield = m.group(1), m.group(2), m.group(3), m.group(4)
+    
+        if rcoi == ri_name:
+            return parse_igdt_lines_into_igdt_list(ingredients_lines)
+        else:
+            return 'ERROR: template component name & filename mismatch'
+    else:
+        return 'ERROR: bad_template'
+
+# recursive compile ingredients including OTS if ingredients available    
+def get_ingredients_as_text_list(recipe_component_or_ingredient, d=0): # takes str:name
+    d += 1
+    rcoi = recipe_component_or_ingredient
+    i_list = [f"unknown_component:{rcoi}"]
+    
+    if rcoi in atomic_LUT:
+        igdt_type = atomic_LUT[rcoi]['igdt_type']
+        
+        if igdt_type == 'atomic':
+            i_list = [atomic_LUT[rcoi]['ingredients']] if atomic_LUT[rcoi]['ingredients'] != '__igdts__' else [rcoi]
+        
+        elif igdt_type == 'ots':
+            if atomic_LUT[rcoi]['ingredients'] == '__igdts__':
+                i_list = [f"ots_i_miss>{rcoi}<"]
+            else:
+                # TODO need an ingredients processing call - a lot of different formats
+                i_list = process_off_the_shelf_ingredients_list(atomic_LUT[rcoi]['ingredients'])
+        
+        elif igdt_type == 'derived':
+            if rcoi not in component_file_LUT:
+                print(atomic_LUT[rcoi])
+                alias = re.sub('ndb_no=', '', atomic_LUT[rcoi]['ndb_no_url_alias'])
+                if alias in component_file_LUT:
+                    print(f"{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
+                    s_list = get_ingredients_from_component_file(alias)
+                else:
+                    s_list = [f"alias_NF>{rcoi}|{alias}<"]            
+            else:
+                print(f"{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
+                s_list = get_ingredients_from_component_file(rcoi)
+            #print(f"{'    '*d}L:", end=' ')
+            print(s_list)
+            if s_list == 'ERROR: bad_template':
+                i_list = [f"bad_template_in_file>{rcoi}<"]
+            else:
+                i_list = []
+                for i in s_list:
+                    print_list = get_ingredients_as_text_list(i,d)
+                    i_list = i_list + print_list
+                    print(f"{'    '*d}{print_list}")
+            
+            # pass them one at a time to get_ingredients_as_text_list
+            #i_list = i_list + get_ingredients_as_text_list(rcoi) 
+        else:
+            i_list = [f"unknown_igdt_type>{rcoi}<"]
+    
+    return i_list
+
+
+
+build_file_LUT()
+
+#atomic_LUT['chicken']['ndb_no_url_alias'] = 'holy smoke batman'
+build_atomic_LUT()
+#pprint([(k, atomic_LUT[k]['ndb_no_url_alias']) for k in atomic_LUT.keys() if atomic_LUT[k]['igdt_type'] == 'atomic'])
+#pprint(atomic_LUT['chicken'])
+
+#pprint()
+
+target = 'guinea fowl tagine w couscous & salad'
+    # guinea fowl tagine (derived)
+    #     chermoula (derived)
+    # couscous chermoula (derived)
+    #     veg stock (ots)
+    # green leaf & orange beet (derived)
+    #     orange beetroot (derived)
+    #     lemon vinaigrette (derived)
+pprint(atomic_LUT[target])
+print('chicken - atomic_LUT')
+pprint(atomic_LUT['chicken'])
+print('chicken - component_file_LUT')
+pprint(component_file_LUT[target])
+
+print(f"> - - - - {target} - - - - <")
+print(get_ingredients_as_text_list(target))
+
+
+sys.exit(0)
+
+# def build_atomic_ingredients():
+#     atomic_ingredients = set()
+# 
+#     content = ''
+#     with NUTREINT_FILE_PATH.open('r') as f:
+#         #content = f.readlines()
+#         content = f.read()
+# 
+#     for m in re.finditer( r'--- for the nutrition information(.*?)\(.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
+#         ingredient = m.group(1).strip()
+#         igdt_type =  m.group(2).strip()
+#         if igdt_type == 'atomic':       # ots = off the shelf, derived = in house recipe, atomic = basic ingredient
+#             atomic_ingredients = atomic_ingredients | {ingredient}
+# 
+#     return atomic_ingredients
+
+
+def build_igdt_type_dict():
+    pass
+
+
+
+
 
 class FoodSetsError(Exception):
     '''TODO Move this and other error classes to separate file: exceptions.py'''
@@ -1146,26 +1380,6 @@ def build_not_vegan_set():
     return not_vegan
 
 
-def build_atomic_ingredients():
-    atomic_ingredients = set()
-
-    nutrients = Path('../assest_server/scratch/nutrinfo.txt')
-    content = ''
-    with nutrients.open('r') as f:
-        #content = f.readlines()
-        content = f.read()
-
-    for m in re.finditer( r'--- for the nutrition information(.*?)\(.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
-        ingredient = m.group(1).strip()
-        igdt_type =  m.group(2).strip()
-        if igdt_type == 'atomic':       # ots = off the shelf, derived = in house recipe, atomic = basic ingredient
-            atomic_ingredients = atomic_ingredients | {ingredient}
-
-    return atomic_ingredients
-
-def build_igdt_type_dict():
-    pass
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 'CONTAINS' TAG SETS
@@ -1192,7 +1406,6 @@ inverse_containsTAGS_LUT = {
 
 def get_containsTAGS_for(list_of_ingredients):
     containsTAGS_detected = []
-    atomic_igdts = build_atomic_ingredients()
 
     if list_of_ingredients.__class__ == str:
         list_of_ingredients = [list_of_ingredients]
@@ -1226,7 +1439,7 @@ def get_containsTAGS_for(list_of_ingredients):
         for i in list_of_ingredients:
 
             for containsTAG in inverse_containsTAGS_LUT:
-                if (get_ingredients_as_text_list(i) != None) or (i in atomic_igdts) :         # it has to be in the data base to work!
+                if (get_ingredients_as_text_list(i) != None) or (i in atomic_LUT.keys()) :         # it has to be in the data base to work!
                     containsTAGS_detected.append(containsTAG)
 
                 #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
@@ -1303,19 +1516,7 @@ if __name__ == '__main__':
     #
     # print(cheese) # all the cheese
 
-    nutrients = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
-    content = ''
-    with nutrients.open('r') as f:
-        #content = f.readlines()
-        content = f.read()
 
-    search_term = 'lamb'
-    for m in re.finditer( r'--- for the nutrition information(.*?)\(', content, re.MULTILINE | re.DOTALL ):
-        ingredient = m.group(1)
-        if re.search(search_term, ingredient):
-            print(ingredient.strip())
-
-    print(f"\n ^ ingredients w/ {search_term} \n")
 
     # print('NON VEGAN')
     # print(build_not_vegan_set())
