@@ -7,7 +7,7 @@ from pprint import pprint
 from pathlib import Path
 
 
-#from helpers_db import get_ingredients_as_text_list
+from helpers_db import get_ingredients_as_text_list as deprecated_get_ingredients_as_text_list
 
 atomic_LUT = {}
 components_aliases_LUT = {} # need?
@@ -130,11 +130,12 @@ def parse_igdt_lines_into_igdt_list(lines=''):
     i_list = []
 
     lines = [ l.strip() for l in lines.splitlines() ]
-    lines = list(filter(None, lines))
+    lines = list(filter(None, lines)) 
 
     # remove qty & comment from each line
     for line in lines:
-        parts = [ item.strip() for item in line.split('\t') if (len(item) > 0) & ('#' not in item) & ('(' not in item) ] # remove comments
+        parts = [ item.strip() for item in line.split('\t') if (len(item) > 0) & ('#' not in item) & ('(' not in item) & (item.strip() != '') ] # remove comments
+     
         parts.pop(0)    # remove qty
         try:
             i_list.append(parts.pop(0))
@@ -161,7 +162,7 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
     
     if m:
         ri_name, servings, ingredients_lines, total_yield = m.group(1), m.group(2), m.group(3), m.group(4)
-    
+ 
         if rcoi == ri_name:
             return parse_igdt_lines_into_igdt_list(ingredients_lines)
         else:
@@ -175,7 +176,7 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
 def get_ingredients_as_text_list(recipe_component_or_ingredient, d=0): # takes str:name
     d += 1
     rcoi = recipe_component_or_ingredient
-    i_list = [f"unknown_component:{rcoi}"]
+    i_list = [f"unknown_component>{rcoi}<"]
     
     if rcoi in atomic_LUT:
         igdt_type = atomic_LUT[rcoi]['igdt_type']
@@ -248,10 +249,7 @@ print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_i
 print("\nERRORS found")
 for e in errors.keys():
     print(f"{e} ({len(errors[e])})")
-
-print("\n - - - - - - - aliases - - - S\ ")
-pprint(aliases)
-print("\n - - - - - - - aliases - - - E/     ")
+    
 
 target = 'guinea fowl tagine w couscous & salad'
     # guinea fowl tagine (derived)
@@ -268,7 +266,25 @@ print('chicken - component_file_LUT')
 pprint(component_file_LUT[target])
 
 print(f"> - - - - {target} - - - - <")
-print(get_ingredients_as_text_list(target))
+print(f"\n\n{get_ingredients_as_text_list(target)}")
+
+target = 'hard goats cheese'
+print(f"> - - - - {target} - - - - <")
+print(f"\n\n{get_ingredients_as_text_list(target)}")
+
+target = 'bakewell fudge'
+print(f"> - - - - {target} - - - - <")
+print(f"\n\n{get_ingredients_as_text_list(target)}")
+
+target = 'tiger baguette round'
+print(f"> - - - - {target} - - - - <")
+print(f"\n\n{get_ingredients_as_text_list(target)}")
+
+target = 'beef & jalapeno burger'
+print(f"> - - - - {target} - - - - <")
+print(f"\n\n{get_ingredients_as_text_list(target)}")
+
+
 
 
 # print('\nSearch?')
@@ -276,6 +292,9 @@ print(get_ingredients_as_text_list(target))
 #     yn = input('Continue ingredient/(n)\n')
 #     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
 #     search(yn)
+
+print("\n\nCALL deprecated_get_ingredients_as_text_list({target})")
+pprint(deprecated_get_ingredients_as_text_list(target))
 
 print('\nDump error table? Enter one of the following error KEYS . .')
 while(True):
@@ -285,6 +304,8 @@ while(True):
     #pprint(errors[yn])
     pprint(errors)
     pprint(aliases)
+
+
 
 sys.exit(0) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
