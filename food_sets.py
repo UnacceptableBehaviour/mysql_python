@@ -46,11 +46,12 @@ errors = {
     'derived_HAS_http_SB_ots': [],      #
     'derived_HAS_atomic_alias':[],
     'ots_ingredients_missing':[],       #
+    'ots_NO_url':[],                    #
     'unknown_alias':[],
 }
 aliases = {}
 def build_atomic_LUT():
-    aliases = {}
+
     content = ''
     with NUTREINT_FILE_PATH.open('r') as f:
         #content = f.readlines()
@@ -71,30 +72,36 @@ def build_atomic_LUT():
         # (per 100g)                    # derived ingredient
         # (ndb_no=-99)
         # (ndb_no=sea bream fillets)    # alias to another entry - which could be any of the above
-        if ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
-            alias = (re.search('\(ndb_no=(\d+)\)', ndb_no_url_alias).group(1))
-            # track multiples
-            if alias in aliases:
-                aliases[alias].append(component)
-            else:
-                aliases[alias] = [component]
-            if alias in component_file_LUT:
-                atomic_LUT[component]['alias'] = alias
         
-        if ('http' in ndb_no_url_alias):
+        if (igdt_type == 'derived') and ('http' in ndb_no_url_alias):
             errors['derived_HAS_http_SB_ots'].append((component, igdt_type, ndb_no_url_alias))
         
         if (ndb_no_url_alias == 'ndb_no=-99'):
             errors['ndb_no_neg99'].append((component, igdt_type))
         
         if (igdt_type == 'ots') and (ingredients == '__igdts__'):
-            errors['ots_ingredients_missing'].append((component, '__igdts__'))
+            errors['ots_ingredients_missing'].append((igdt_type, component, ndb_no_url_alias))
+
+        if (igdt_type == 'ots') and not (re.search('http', ndb_no_url_alias)):
+            errors['ots_NO_url'].append((igdt_type, component, ndb_no_url_alias))
             
         if (igdt_type == 'derived') and (component in component_file_LUT) and (re.search('\(ndb_no=\d+\)', ndb_no_url_alias)):
             ndb_no = re.search('\(ndb_no=(\d+)\)', ndb_no_url_alias).group(1)
             errors['derived_w_file_HAS_ndb_no'].append(component)
-            
-        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):          
+
+        #track aliases
+        if (ndb_no_url_alias != 'per 100g'):
+            alias = re.sub('ndb_no=', '', ndb_no_url_alias)
+            entry = (alias in component_file_LUT, ndb_no_url_alias)
+
+            if component in aliases:
+                aliases[component].append(entry)
+            else:
+                aliases[component] = [entry]
+
+                
+        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):
+            # look for alias
             if ('http' not in ndb_no_url_alias) and not ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
                 alias = re.sub('ndb_no=', '', ndb_no_url_alias)
             print(component)
@@ -224,22 +231,7 @@ build_atomic_LUT()
 
 #pprint()
 
-target = 'guinea fowl tagine w couscous & salad'
-    # guinea fowl tagine (derived)
-    #     chermoula (derived)
-    # couscous chermoula (derived)
-    #     veg stock (ots)
-    # green leaf & orange beet (derived)
-    #     orange beetroot (derived)
-    #     lemon vinaigrette (derived)
-pprint(atomic_LUT[target])
-print('chicken - atomic_LUT')
-pprint(atomic_LUT['chicken'])
-print('chicken - component_file_LUT')
-pprint(component_file_LUT[target])
 
-print(f"> - - - - {target} - - - - <")
-print(get_ingredients_as_text_list(target))
 
 show_txt_title_NO_match_rcp = False
 if show_txt_title_NO_match_rcp == True:
@@ -257,14 +249,56 @@ print("\nERRORS found")
 for e in errors.keys():
     print(f"{e} ({len(errors[e])})")
 
+print("\n - - - - - - - aliases - - - S\ ")
+pprint(aliases)
+print("\n - - - - - - - aliases - - - E/     ")
 
-print('\nSearch?')
+target = 'guinea fowl tagine w couscous & salad'
+    # guinea fowl tagine (derived)
+    #     chermoula (derived)
+    # couscous chermoula (derived)
+    #     veg stock (ots)
+    # green leaf & orange beet (derived)
+    #     orange beetroot (derived)
+    #     lemon vinaigrette (derived)
+pprint(atomic_LUT[target])
+print('chicken - atomic_LUT')
+pprint(atomic_LUT['chicken'])
+print('chicken - component_file_LUT')
+pprint(component_file_LUT[target])
+
+print(f"> - - - - {target} - - - - <")
+print(get_ingredients_as_text_list(target))
+
+
+# print('\nSearch?')
+# while(True):
+#     yn = input('Continue ingredient/(n)\n')
+#     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
+#     search(yn)
+
+print('\nDump error table? Enter one of the following error KEYS . .')
 while(True):
-    yn = input('Continue ingredient/(n)\n')
+    [ print(e) for e in errors.keys() ]
+    yn = input('Error type/(n)\n')
     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
-    search(yn)
+    #pprint(errors[yn])
+    pprint(errors)
+    pprint(aliases)
 
-sys.exit(0)
+sys.exit(0) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 
 # def build_atomic_ingredients():
 #     atomic_ingredients = set()
