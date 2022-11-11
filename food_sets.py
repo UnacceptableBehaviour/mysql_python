@@ -5,12 +5,14 @@ import sys
 import itertools
 from pprint import pprint
 from pathlib import Path
+from collections import Counter
 
+# TODO remove
+#from helpers_db import get_ingredients_as_text_list as deprecated_get_ingredients_as_text_list
 
-from helpers_db import get_ingredients_as_text_list as deprecated_get_ingredients_as_text_list
+aliases = {}
 
 atomic_LUT = {}
-components_aliases_LUT = {} # need?
 NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 
 component_file_LUT = {}
@@ -40,16 +42,17 @@ def build_file_LUT():
 
 
 errors = {
-    'txt_title_NO_match_rcp':[],        #
+    'txt_title_NO_match_rcp':[],        # = collected by code (if hash # next to error type)
     'derived_w_file_HAS_ndb_no':[],     #
     'ndb_no_neg99':[],                  #
     'derived_HAS_http_SB_ots': [],      #
     'derived_HAS_atomic_alias':[],
     'ots_ingredients_missing':[],       #
     'ots_NO_url':[],                    #
-    'unknown_alias':[],
+    'unknown_alias':[],                 #
+    'dead_ends_in_this_pass': []
 }
-aliases = {}
+
 def build_atomic_LUT():
 
     content = ''
@@ -92,7 +95,10 @@ def build_atomic_LUT():
         #track aliases
         if (ndb_no_url_alias != 'per 100g'):
             alias = re.sub('ndb_no=', '', ndb_no_url_alias)
-            entry = (alias in component_file_LUT, ndb_no_url_alias)
+            alias_found = alias in component_file_LUT
+            entry = (alias_found, ndb_no_url_alias)
+            
+            if not alias_found: errors['unknown_alias'].append((component, alias))
 
             if component in aliases:
                 aliases[component].append(entry)
@@ -120,6 +126,7 @@ def build_atomic_LUT():
 # keep it simple to start
 # remove QUID (34%) no's - these could be used to revese engineer a recipe in conjunction w/ nutrition info
 # downcase and remove whitespace and .
+# TODO - need a lot more data to REFINE
 def process_off_the_shelf_ingredients_list(i_list):    
     # new_list = [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
     # print(i_list)
@@ -171,11 +178,21 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
     else:
         return 'ERROR: bad_template'
 
+# TODO REMOVE
+def remove_error(possible_err_string):
+    #'unknown_component>alias_NF>coriander sauce|per 100g'
+    # 'ots_i_miss>sherry vinegar'
+    e_list = possible_err_string.split('>')
+    if len(e_list) > 1:
+        return e_list.pop()
+    return possible_err_string
+
+
 
 # recursive compile ingredients including OTS if ingredients available    
-def get_ingredients_as_text_list(recipe_component_or_ingredient, d=0): # takes str:name
+def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes str:name
     d += 1
-    rcoi = recipe_component_or_ingredient
+    rcoi = remove_error(recipe_component_or_ingredient)
     i_list = [f"unknown_component>{rcoi}<"]
     
     if rcoi in atomic_LUT:
@@ -193,121 +210,63 @@ def get_ingredients_as_text_list(recipe_component_or_ingredient, d=0): # takes s
         
         elif igdt_type == 'derived':
             if rcoi not in component_file_LUT:
-                print(atomic_LUT[rcoi])
                 alias = re.sub('ndb_no=', '', atomic_LUT[rcoi]['ndb_no_url_alias'])
                 if alias in component_file_LUT:
-                    print(f"{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
+                    print(f"\n{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
                     s_list = get_ingredients_from_component_file(alias)
                 else:
                     s_list = [f"alias_NF>{rcoi}|{alias}<"]            
             else:
-                print(f"{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
+                print(f"\n{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
                 s_list = get_ingredients_from_component_file(rcoi)
-            #print(f"{'    '*d}L:", end=' ')
-            print(s_list)
+
+            print(f"{'    '*(d-1)}{s_list}")
+            #print('-*-')
+            
             if s_list == 'ERROR: bad_template':
                 i_list = [f"bad_template_in_file>{rcoi}<"]
             else:
                 i_list = []
                 for i in s_list:
-                    print_list = get_ingredients_as_text_list(i,d)
-                    i_list = i_list + print_list
-                    print(f"{'    '*d}{print_list}")
+                    sub_list = get_ingredients_as_text_list_R(i,d)
+                    i_list = i_list + sub_list
+                    #print(f"{'    '*d}{sub_list}")
             
-            # pass them one at a time to get_ingredients_as_text_list
-            #i_list = i_list + get_ingredients_as_text_list(rcoi) 
+            # pass them one at a time to get_ingredients_as_text_list_R
+            #i_list = i_list + get_ingredients_as_text_list_R(rcoi) 
         else:
             i_list = [f"unknown_igdt_type>{rcoi}<"]
     
-    return i_list
-
-
-
-build_file_LUT()
-
-#atomic_LUT['chicken']['ndb_no_url_alias'] = 'holy smoke batman'
-build_atomic_LUT()
-#pprint([(k, atomic_LUT[k]['ndb_no_url_alias']) for k in atomic_LUT.keys() if atomic_LUT[k]['igdt_type'] == 'atomic'])
-#pprint(atomic_LUT['chicken'])
-
-#pprint()
-
-
-
-show_txt_title_NO_match_rcp = False
-if show_txt_title_NO_match_rcp == True:
-    print(f"errors['txt_title_NO_match_rcp']: {len(errors['txt_title_NO_match_rcp'])}")
-    for rcoi, ri_name in errors['txt_title_NO_match_rcp']:
-        print(rcoi)
-        pprint(atomic_LUT[rcoi]) if rcoi in atomic_LUT else print(f"NO: {rcoi} in atomic_LUT")
-        print(ri_name)
-        pprint(atomic_LUT[ri_name]) if ri_name in atomic_LUT else print(f"NO: {ri_name} in atomic_LUT")
-        print('-')
-
-
-print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_ingredient)}")
-print("\nERRORS found")
-for e in errors.keys():
-    print(f"{e} ({len(errors[e])})")
+    i_list = sorted(list(set(i_list)))
+    errors['dead_ends_in_this_pass'] += scan_for_error_items(i_list) 
     
+    return sorted(list(set(i_list)))# remove duplicates    
 
-target = 'guinea fowl tagine w couscous & salad'
-    # guinea fowl tagine (derived)
-    #     chermoula (derived)
-    # couscous chermoula (derived)
-    #     veg stock (ots)
-    # green leaf & orange beet (derived)
-    #     orange beetroot (derived)
-    #     lemon vinaigrette (derived)
-pprint(atomic_LUT[target])
-print('chicken - atomic_LUT')
-pprint(atomic_LUT['chicken'])
-print('chicken - component_file_LUT')
-pprint(component_file_LUT[target])
 
-print(f"> - - - - {target} - - - - <")
-print(f"\n\n{get_ingredients_as_text_list(target)}")
+def scan_for_error_items(i_list, return_all_ingredients=False):
+    e_list = []
+    for i in i_list:
+        m = re.match('(.*?)>(.*?)<',i)
+        if m:
+            err, item = m.group(1), m.group(2)
+            e_list.append((err, item))
+        elif return_all_ingredients:
+            e_list.append(('no_error', i))
 
-target = 'hard goats cheese'
-print(f"> - - - - {target} - - - - <")
-print(f"\n\n{get_ingredients_as_text_list(target)}")
-
-target = 'bakewell fudge'
-print(f"> - - - - {target} - - - - <")
-print(f"\n\n{get_ingredients_as_text_list(target)}")
-
-target = 'tiger baguette round'
-print(f"> - - - - {target} - - - - <")
-print(f"\n\n{get_ingredients_as_text_list(target)}")
-
-target = 'beef & jalapeno burger'
-print(f"> - - - - {target} - - - - <")
-print(f"\n\n{get_ingredients_as_text_list(target)}")
+    return e_list
 
 
 
-
-# print('\nSearch?')
-# while(True):
-#     yn = input('Continue ingredient/(n)\n')
-#     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
-#     search(yn)
-
-print("\n\nCALL deprecated_get_ingredients_as_text_list({target})")
-pprint(deprecated_get_ingredients_as_text_list(target))
-
-print('\nDump error table? Enter one of the following error KEYS . .')
-while(True):
-    [ print(e) for e in errors.keys() ]
-    yn = input('Error type/(n)\n')
-    if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
-    #pprint(errors[yn])
-    pprint(errors)
-    pprint(aliases)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# build LUT's CACHE recipes
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+build_file_LUT()
+build_atomic_LUT()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-sys.exit(0) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#sys.exit(0) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -318,29 +277,6 @@ sys.exit(0) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-# def build_atomic_ingredients():
-#     atomic_ingredients = set()
-# 
-#     content = ''
-#     with NUTREINT_FILE_PATH.open('r') as f:
-#         #content = f.readlines()
-#         content = f.read()
-# 
-#     for m in re.finditer( r'--- for the nutrition information(.*?)\(.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
-#         ingredient = m.group(1).strip()
-#         igdt_type =  m.group(2).strip()
-#         if igdt_type == 'atomic':       # ots = off the shelf, derived = in house recipe, atomic = basic ingredient
-#             atomic_ingredients = atomic_ingredients | {ingredient}
-# 
-#     return atomic_ingredients
-
-
-def build_igdt_type_dict():
-    pass
-
 
 
 
@@ -1002,7 +938,12 @@ def does_component_contain_allergen(component, allergen):
     else:
         raise(UnkownAllergenType(f"ERROR: unknown allergen: {allergen} <"))
 
-    ingredients_of_component = get_ingredients_as_text_list(component)
+    ingredients_of_component = get_ingredients_as_text_list_R(component)
+        
+    # filter err out of err>name<   - REMOVE w/ ATOMIC implementation? Its passive only
+        # scan_for_error_items returns a list of tuples (err, ingredient)
+        # only errors unless return_all_ingredients=True
+    ingredients_of_component = [i for e, i in scan_for_error_items(ingredients_of_component, return_all_ingredients=True) ]
 
     if ingredients_of_component == None:     # its an ATOMIC ingredient
         return component in allergen_set
@@ -1024,6 +965,7 @@ allergenLUT = {
     'seeds_sesame' : build_seeds_sesame_set(),
     'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
+    'shellfish' : build_molluscs_set() | build_crustaceans_set(),
     'molluscs' : build_molluscs_set(),
     'crustaceans' : build_crustaceans_set(),
     'alcohol' : build_alcohol_set(),
@@ -1033,6 +975,7 @@ allergenLUT = {
     'sulphur_dioxide' : build_sulphur_dioxide_set()
 }
 
+    
 def get_allergens_for(list_of_ingredients):
     allergens_detected = []
 
@@ -1040,22 +983,20 @@ def get_allergens_for(list_of_ingredients):
         list_of_ingredients = [list_of_ingredients]
 
     if list_of_ingredients.__class__ == list:
-        # build complete list - from local DB
+        # build complete list - from local assets
         # will not follow URL to inet for ingredients of off the shelf items
 
         add_ingredients = []
         for i in list_of_ingredients:
-            add_me = get_ingredients_as_text_list(i)
-            if add_me:
-                add_ingredients = add_ingredients + add_me
-            else:   # ingredient not in DB
-                #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
-                #print(f"NF:{i}<")
-                pass # TODO - log
-
+            add_ingredients += get_ingredients_as_text_list_R(i)
 
         # flatten so there's only one of each
         list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
+
+        # filter err out of err>name<   - REMOVE w/ ATOMIC implementation? Its passive only
+            # scan_for_error_items returns a list of tuples (err, ingredient)
+            # only errors unless return_all_ingredients=True
+        list_of_ingredients = [i for e, i in scan_for_error_items(list_of_ingredients, return_all_ingredients=True) ]
 
         for i in list_of_ingredients:
             for allergen in allergenLUT:
@@ -1519,7 +1460,7 @@ def get_containsTAGS_for(list_of_ingredients):
 
         add_ingredients = []
         for i in list_of_ingredients:
-            add_me = get_ingredients_as_text_list(i)
+            add_me = get_ingredients_as_text_list_R(i)
             if add_me:
                 add_ingredients = add_ingredients + add_me
             else:   # ingredient not in DB
@@ -1542,7 +1483,7 @@ def get_containsTAGS_for(list_of_ingredients):
         for i in list_of_ingredients:
 
             for containsTAG in inverse_containsTAGS_LUT:
-                if (get_ingredients_as_text_list(i) != None) or (i in atomic_LUT.keys()) :         # it has to be in the data base to work!
+                if (get_ingredients_as_text_list_R(i) != None) or (i in atomic_LUT.keys()) :         # it has to be in the data base to work!
                     containsTAGS_detected.append(containsTAG)
 
                 #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
@@ -1620,66 +1561,151 @@ if __name__ == '__main__':
     # print(cheese) # all the cheese
 
 
+    show_txt_title_NO_match_rcp = False
+    if show_txt_title_NO_match_rcp == True:
+        print(f"errors['txt_title_NO_match_rcp']: {len(errors['txt_title_NO_match_rcp'])}")
+        for rcoi, ri_name in errors['txt_title_NO_match_rcp']:
+            print(rcoi)
+            pprint(atomic_LUT[rcoi]) if rcoi in atomic_LUT else print(f"NO: {rcoi} in atomic_LUT")
+            print(ri_name)
+            pprint(atomic_LUT[ri_name]) if ri_name in atomic_LUT else print(f"NO: {ri_name} in atomic_LUT")
+            print('-')
+    
+    
+    print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_ingredient)}")
+    print("\nERRORS found")
+    for e in errors.keys():
+        print(f"{e} ({len(errors[e])})")
+        
+    
+    target = 'guinea fowl tagine w couscous & salad'
+        # guinea fowl tagine (derived)
+        #     chermoula (derived)
+        # couscous chermoula (derived)
+        #     veg stock (ots)
+        # green leaf & orange beet (derived)
+        #     orange beetroot (derived)
+        #     lemon vinaigrette (derived)
+    pprint(atomic_LUT[target])
+    print('chicken - atomic_LUT')
+    pprint(atomic_LUT['chicken'])
+    print('chicken - component_file_LUT')
+    pprint(component_file_LUT[target])
+    
+    print(f"\n\n> - - - - {target} - - - - <")
+    i_list = get_ingredients_as_text_list_R(target)
+    e_list = scan_for_error_items(i_list)
+    print(f"\n{i_list}")
+    print('problems:')
+    print(f"{e_list}")
+    print('\nCall DEP')
+    #print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
+    # 
+    # target = 'hard goats cheese'
+    # print(f"\n\n> - - - - {target} - - - - <")
+    # print(f"{get_ingredients_as_text_list_R(target)}")
+    # print('\nCall DEP')
+    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
+    # 
+    # target = 'bakewell fudge'
+    # print(f"\n\n> - - - - {target} - - - - <")
+    # print(f"{get_ingredients_as_text_list_R(target)}")
+    # print('\nCall DEP')
+    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
+    # 
+    # target = 'tiger baguette round'
+    # print(f"\n\n> - - - - {target} - - - - <")
+    # print(f"{get_ingredients_as_text_list_R(target)}")
+    # print('\nCall DEP')
+    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
+    # 
+    # target = 'beef & jalapeno burger'
+    # print(f"\n\n> - - - - {target} - - - - <")
+    # print(f"{get_ingredients_as_text_list_R(target)}")
+    # print('\nCall DEP')
+    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
+    
 
     # print('NON VEGAN')
     # print(build_not_vegan_set())
+    def dbg_i_list_as_text_from_component_name(c):
+        print(f"\n|\n|\n \_  I_LIST_as_text_FROM_component_NAME:{c}")
+        print(f"\nLIST({c}){get_ingredients_as_text_list_R(c)}")
 
-    print('\ncauliflower california')
-    print(get_ingredients_as_text_list('cauliflower california'))
+    def dbg_does_component_contain_allergen(c, a):
+        print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
+    
+    def dbg_get_allergens_for_component_recursive(c):
+        print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
+        print(f"\nALLERGENS:{get_allergens_for(get_ingredients_as_text_list_R(c))}")
+    
+    def dbg_unroll_all_seperately(c):
+        for a in get_allergens_headings():
+            print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
+        print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
+        print(get_allergens_for(get_ingredients_as_text_list_R(c)))
+        
+    
+    
+    # dbg_i_list_as_text_from_component_name('cauliflower california')
+    # dbg_i_list_as_text_from_component_name('cardamom donuts w lamb & harissa broth')
+    # dbg_i_list_as_text_from_component_name('tiger baguette round')
+    # dbg_i_list_as_text_from_component_name('plain turkey & chicken kofte mix')
+    # print()
+    
+    dbg_i_list_as_text_from_component_name('pork fennel & orange kofte')    
+    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'dairy')
+    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'soya')
+    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'gluten')
+    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'eggs')
+    dbg_does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')
+    dbg_get_allergens_for_component_recursive('pork fennel & orange kofte')    
+    print()
 
-    print('\ncardamom donuts w lamb & harissa broth')
-    print(get_ingredients_as_text_list('cardamom donuts w lamb & harissa broth'))
+    print(f"\n\n> - - - - ALLERGENS - - - - <")
+    dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad')
+    dbg_get_allergens_for_component_recursive('patty pan & parsnip')
+    dbg_get_allergens_for_component_recursive('leeks w honey & ginger')
+    dbg_get_allergens_for_component_recursive('red onion dressing')
+    dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad')    
+    dbg_get_allergens_for_component_recursive('chicken & beansprout broth')
+    dbg_get_allergens_for_component_recursive('prawn chicken courgette broth')
+    dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth')
+    #dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato')   
 
-    #
-    print('\ntiger baguette round')
-    print(get_ingredients_as_text_list('tiger baguette round'))
+    print('> = = = = DIG - - - S')
+    dbg_unroll_all_seperately('leeks w honey & ginger')
+    print('> = = = = DIG - - - E')
+
+    #print("\n\n - - - - ATOMIC - - - - \n\n")
+    #print(sorted(atomic_LUT.keys()))
+    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# check errors & investigate 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+    # print('\nSearch?')
+    # while(True):
+    #     yn = input('Continue ingredient/(n)\n')
+    #     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
+    #     search(yn)
+    
+    print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
+    pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
+    #pprint(dict(Counter(errors['dead_ends_in_this_pass']).most_common()))
+    #pprint(sorted(dict(Counter(errors['dead_ends_in_this_pass']))))
+    print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
+    
+    # print('\nDump error table? Enter one of the following error KEYS . .')
+    # while(True):
+    #     [ print(e) for e in errors.keys() ]
+    #     yn = input('Error type/(n)\n')
+    #     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
+    #     #pprint(errors[yn])
+    #     pprint(errors)
+    #     pprint(aliases)    
 
 
-    print("\nget_ingredients_as_text_list('pork fennel & orange kofte')")
-    print(get_ingredients_as_text_list('pork fennel & orange kofte'))
 
-    print("\nget_ingredients_as_text_list('plain turkey & chicken kofte mix')")
-    print(get_ingredients_as_text_list('plain turkey & chicken kofte mix'))
-
-    print("\ndoes_component_contain_allergen('pork fennel & orange kofte', 'dairy')")
-    print(does_component_contain_allergen('pork fennel & orange kofte', 'dairy'))
-
-    print("\ndoes_component_contain_allergen('pork fennel & orange kofte', 'soya')")
-    print(does_component_contain_allergen('pork fennel & orange kofte', 'soya'))
-
-    print("\ndoes_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')")
-    print(does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya'))
-
-
-    print("\nget_allergens_for(get_ingredients_as_text_list('pork fennel & orange kofte'))")
-    print(get_allergens_for(get_ingredients_as_text_list('pork fennel & orange kofte')))
-
-    print("\nget_allergens_for(get_ingredients_as_text_list('plain turkey & chicken kofte mix'))")
-    print(get_allergens_for(get_ingredients_as_text_list('plain turkey & chicken kofte mix')))
-
-    # TODO does_component_contain_allergen NOT recursive
-
-    print("\n\n - - - - ATOMIC - - - - \n\n")
-    print(build_atomic_ingredients())
-    #
-    # print(get_ingredients_as_text_list('tomatoes'))
-    #
-    # print(get_containsTAGS_for('hatchet salad'))
-    # print(get_allergens_for('hatchet salad'))
-    #
-    # containsTAGS_detected = []
-    # containsTAGS_detected = set(containsTAGS_detected) | {'blarny'}
-    # print(containsTAGS_detected)
-    # containsTAGS_detected = set(containsTAGS_detected) | {'double blarny'}
-    # print(containsTAGS_detected)
-    # # for tag in containsTAGS_detected:       < SORRY NO CAN DO - RuntimeError: Set changed size during iteration
-    # #     print(f"DISCARDING: {tag}")
-    # #     containsTAGS_detected.discard(tag)
-    # # containsTAGS_detected = set(containsTAGS_detected)  - {'blarny'}
-    # print(containsTAGS_detected)
-
-    # print('- - -')
-    # print(build_not_vegan_set())
 
 # ELEMENTS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
