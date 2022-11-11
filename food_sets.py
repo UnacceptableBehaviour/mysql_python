@@ -644,7 +644,7 @@ def build_fish_set():
 molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
                   'oyster','scallop','octopus','squid','cuttlefish'}
 
-molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels'}
+molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels', 'wood smoked mussels', 'wood smoked mussels (mollusc)'}
 
 # different names same thing
 molluscs_alt = [
@@ -685,16 +685,16 @@ def build_molluscs_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SHELLFISH - CRUSTACEANS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-crustaceans_basic = {'crustaceans','langoustine','crab','crayfish','prawns','shrimp','langostino','lobster'}
+crustaceans_basic = {'crustaceans','langoustine','crab','crayfish','prawn','prawns','shrimp','shrimps','langostino','lobster'}
 
 # usually product of some type katsuobushi or fish sauce for example
-crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shrimp paste'}
+crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shrimp paste', 'dried shrimp'}
 
 # different names same thing
 crustaceans_alt = [
     {'langostino', 'squat lobster'},
     {'norway lobster', 'dublin bay prawn', 'langoustine','langostine'},
-    {'prawns','shrimp'},
+    {'prawn','prawns','shrimp','shrimps'},
     {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
      'cangrejo de rio'},
     {'cangrejo', 'crab', 'crab meat', 'crab claws', 'white crab meat', 'brown crab meat'}
@@ -841,7 +841,7 @@ def build_gluten_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOYA
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-soya_basic = {'soy','soya','edamame','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
+soya_basic = {'soy','soya','edamame','soybeans','soy bean','soyabeans','soya bean','soy bean','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
               'teriyaki','tempeh','textured soy protein','tsp','textured vegetable protein','tvp','soy flour',
               'soybean oil','soy lecithin','natto','kinako'}
 
@@ -926,7 +926,8 @@ plain text list here
 # HEADINGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 def get_allergens_headings():
-    return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
+    #return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
+    return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
 
 # ingredients for each component already recursed and stored in exploded
 # add_subcomponents_ingredients
@@ -945,13 +946,16 @@ def does_component_contain_allergen(component, allergen):
         # only errors unless return_all_ingredients=True
     ingredients_of_component = [i for e, i in scan_for_error_items(ingredients_of_component, return_all_ingredients=True) ]
 
-    if ingredients_of_component == None:     # its an ATOMIC ingredient
-        return component in allergen_set
-
-    else:
-        for i in ingredients_of_component:
-            if i in allergen_set:
-                return True
+    if allergen == 'molluscs':
+        pprint(allergen_set)
+    
+    for i in ingredients_of_component:
+        if allergen == 'molluscs':
+            print(f"{i}")
+        if i in allergen_set:
+            return (allergen, i, component)
+    
+    return allergen_present
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ALLERGEN SETS
@@ -965,7 +969,7 @@ allergenLUT = {
     'seeds_sesame' : build_seeds_sesame_set(),
     'seeds_mustard' : build_seeds_mustard_set(),
     'fish' : build_fish_set(),
-    'shellfish' : build_molluscs_set() | build_crustaceans_set(),
+    #'shellfish' : build_molluscs_set() | build_crustaceans_set(),     superfluous result: ['soya', 'crustaceans', 'fish', 'celery', 'shellfish', 'dairy']
     'molluscs' : build_molluscs_set(),
     'crustaceans' : build_crustaceans_set(),
     'alcohol' : build_alcohol_set(),
@@ -976,7 +980,7 @@ allergenLUT = {
 }
 
     
-def get_allergens_for(list_of_ingredients):
+def get_allergens_for(list_of_ingredients, show_provenance=False):
     allergens_detected = []
 
     if list_of_ingredients.__class__ == str:
@@ -1001,12 +1005,16 @@ def get_allergens_for(list_of_ingredients):
         for i in list_of_ingredients:
             for allergen in allergenLUT:
                 if i in allergenLUT[allergen]:
-                    allergens_detected.append(allergen)
+                    allergens_detected.append((allergen, i))
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
 
-    allergens_detected = list(set(allergens_detected))
+    if show_provenance:
+        print("ALLERGEN show_provenance:")
+        pprint(allergens_detected)
+        
+    allergens_detected = list(set([ a for a,i in allergens_detected]))
 
     return allergens_detected
 
@@ -1635,15 +1643,15 @@ if __name__ == '__main__':
     def dbg_does_component_contain_allergen(c, a):
         print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
     
-    def dbg_get_allergens_for_component_recursive(c):
+    def dbg_get_allergens_for_component_recursive(c,sp=False):
         print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
-        print(f"\nALLERGENS:{get_allergens_for(get_ingredients_as_text_list_R(c))}")
+        print(f"\nALLERGENS:{get_allergens_for(get_ingredients_as_text_list_R(c), sp)}")
     
-    def dbg_unroll_all_seperately(c):
+    def dbg_unroll_all_seperately(c,sp=False):
         for a in get_allergens_headings():
             print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
         print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
-        print(get_allergens_for(get_ingredients_as_text_list_R(c)))
+        print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
         
     
     
@@ -1663,19 +1671,23 @@ if __name__ == '__main__':
     print()
 
     print(f"\n\n> - - - - ALLERGENS - - - - <")
-    dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad')
-    dbg_get_allergens_for_component_recursive('patty pan & parsnip')
-    dbg_get_allergens_for_component_recursive('leeks w honey & ginger')
-    dbg_get_allergens_for_component_recursive('red onion dressing')
-    dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad')    
-    dbg_get_allergens_for_component_recursive('chicken & beansprout broth')
-    dbg_get_allergens_for_component_recursive('prawn chicken courgette broth')
-    dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth')
-    #dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato')   
+    sp = True # SHOW provenance of allergen
+    dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad', sp)
+    dbg_get_allergens_for_component_recursive('patty pan & parsnip', sp)
+    dbg_get_allergens_for_component_recursive('leeks w honey & ginger', sp)
+    dbg_get_allergens_for_component_recursive('red onion dressing', sp)
+    dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad', sp)    
+    dbg_get_allergens_for_component_recursive('chicken & beansprout broth', sp)
+    dbg_get_allergens_for_component_recursive('prawn chicken courgette broth', sp)
+    dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth', sp)
+    dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato', sp)   
 
     print('> = = = = DIG - - - S')
-    dbg_unroll_all_seperately('leeks w honey & ginger')
+    #dbg_unroll_all_seperately('leeks w honey & ginger', sp)
+    dbg_unroll_all_seperately('smoked mussel salad w baked mash potato', sp)
+    dbg_does_component_contain_allergen('smoked mussel salad w baked mash potato', 'molluscs')
     print('> = = = = DIG - - - E')
+    
 
     #print("\n\n - - - - ATOMIC - - - - \n\n")
     #print(sorted(atomic_LUT.keys()))
@@ -1692,7 +1704,7 @@ if __name__ == '__main__':
     print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
     pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
     #pprint(dict(Counter(errors['dead_ends_in_this_pass']).most_common()))
-    #pprint(sorted(dict(Counter(errors['dead_ends_in_this_pass']))))
+    #pprint(sorted(dict(Counter(errors['dead_ends_in_this_pass']))))    
     print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
     
     # print('\nDump error table? Enter one of the following error KEYS . .')
