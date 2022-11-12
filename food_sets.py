@@ -50,7 +50,8 @@ errors = {
     'ots_ingredients_missing':[],       #
     'ots_NO_url':[],                    #
     'unknown_alias':[],                 #
-    'dead_ends_in_this_pass': []
+    'dead_ends_in_this_pass': [],
+    'items_not_triggering_TAGS' :[]
 }
 
 def build_atomic_LUT():
@@ -338,7 +339,7 @@ dairy_basic = {'milk','cows milk','goats milk','sheeps milk','fermented milk','y
                'casein','custard','ice cream','milk powder'}
 
 # usually product of some type katsuobushi or fish sauce for example
-dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade'}
+dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade', 'parmesan crisps'}
 
 # different names same thing
 dairy_alt = [
@@ -641,10 +642,11 @@ def build_fish_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SHELLFISH - MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-molluscs_basic = {'abalone','escargot','squid','hereford snail','mussel','limpits','winkles','whelks','clams','mussels',
+molluscs_basic = {'abalone','escargot','squid','snail','snails','hereford snails','mussel','limpits','winkles','whelks','clams','mussels',
                   'oyster','scallop','octopus','squid','cuttlefish'}
 
-molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels', 'wood smoked mussels', 'wood smoked mussels (mollusc)'}
+molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels', 'wood smoked mussels', 'wood smoked mussels (mollusc)',
+                               'cooked squid'}
 
 # different names same thing
 molluscs_alt = [
@@ -694,7 +696,8 @@ crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shr
 crustaceans_alt = [
     {'langostino', 'squat lobster'},
     {'norway lobster', 'dublin bay prawn', 'langoustine','langostine'},
-    {'prawn','prawns','shrimp','shrimps'},
+    {'prawn','prawns','shrimp','shrimps','large head on shell on prawns', 'large head on shell on prawn',
+     'hoso prawn','hoso prawns','so prawn','so prawns','shell on jumbo king prawn', 'shell on jumbo king prawns'},
     {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
      'cangrejo de rio'},
     {'cangrejo', 'crab', 'crab meat', 'crab claws', 'white crab meat', 'brown crab meat'}
@@ -799,7 +802,10 @@ gluten_basic = {'gluten','wheat','wheat germ','rye','barley','bulgur','couscous'
 
 # usually product of some type katsuobushi or fish sauce for example
 gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread','lamb samosa','veg samosa',
-                             'samosa'}
+                             'samosa','pie','pies','malted wheat flakes','wheat starch'}
+
+# TODO remove this once parser improved!
+gluten_parse_catch = {'wheat flour (wheat flour'}
 
 # different names same thing
 gluten_alt = [
@@ -817,10 +823,11 @@ gluten_subsets = {
     'pasta' : {'orzo','spaghetti','macaroni','tagliatele','linguini','fusili','lasagna','rigatoni','farfale','ravioli',
                'fettuccini','penne'}, # a a million other types!
     'bread' : {'sliced bread','sourdough','brown bread','tiger loaf','french stick','giraffe bread','baguette','burger bun',
-               'brioche','demi brioche','baton','biscuit','bagel','cornbread','rye bread','milk bread','galic pizza',
+               'brioche','demi brioche','baton','biscuit','bagel','cornbread','rye bread','milk bread','pizza','garlic pizza',
                'garlic bread','turkish bread','ciabata','bun','focaccia','mgt','multi grain','seeded batch','thick sliced bread',
                'thick sliced seeded bread','sandwich loaf','white bread','olive bread','poppy seed roll','bap', 'crumpet',
-               'seeded baguette','seeded baguette round','baguette round','sourdough round','wholemeal tortilla wrap'},
+               'seeded baguette','seeded baguette round','baguette round','sourdough round','wholemeal tortilla wrap','seeded panini',
+               'panini', 'seeded folded flatbreads aldi', 'sff'},
 }
 def build_gluten_set():
     gluten = {'gluten'}
@@ -835,6 +842,8 @@ def build_gluten_set():
     gluten = gluten | gluten_derived_no_recipe
 
     gluten = gluten | gluten_basic
+    
+    gluten = gluten | gluten_parse_catch
 
     return gluten
 
@@ -941,7 +950,7 @@ def does_component_contain_allergen(component, allergen):
 
     ingredients_of_component = get_ingredients_as_text_list_R(component)
         
-    # filter err out of err>name<   - REMOVE w/ ATOMIC implementation? Its passive only
+    # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
         # scan_for_error_items returns a list of tuples (err, ingredient)
         # only errors unless return_all_ingredients=True
     ingredients_of_component = [i for e, i in scan_for_error_items(ingredients_of_component, return_all_ingredients=True) ]
@@ -997,7 +1006,7 @@ def get_allergens_for(list_of_ingredients, show_provenance=False):
         # flatten so there's only one of each
         list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
 
-        # filter err out of err>name<   - REMOVE w/ ATOMIC implementation? Its passive only
+        # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
             # scan_for_error_items returns a list of tuples (err, ingredient)
             # only errors unless return_all_ingredients=True
         list_of_ingredients = [i for e, i in scan_for_error_items(list_of_ingredients, return_all_ingredients=True) ]
@@ -1307,6 +1316,7 @@ other_edible_animal_subsets = {
                   'kangaroo shoulder','kangaroo ribs','kangaroo neck','kangaroo flank','kangaroo leg','kangaroo mince',
                   'kangaroo saddle','kangaroo loin','kangaroo striploin','kangaroo diced','kangaroo mince',
                   'minced kangaroo'},
+    'insects' : { 'mealworm','mealworms','cricket','crickets' },
 }
 
 def build_other_edible_animal_set():
@@ -1442,22 +1452,28 @@ containsTAGS_LUT = {
     'pork' : build_pork_set(),
     'beef' : build_beef_set(),
     'shellfish' : build_molluscs_set() | build_crustaceans_set(),
+    #'molluscs' : build_molluscs_set(),
     #'crustaceans' : build_crustaceans_set(),
     'lamb' : build_lamb_set(),
     'fish' : build_fish_set(),
     'game' : build_game_set(),
+    #'insects' : TODO break out from other
     'other' : build_other_edible_animal_set(),
     # 'set_name' : build_XXX_set(),
 }
 inverse_containsTAGS_LUT = {
-    #'gluten_free' : build_gluten_set(),     # if its not in this set its gluten free!
-    # 'ns_pregnant' : build_XXX_set(),
+    'gluten_free' : build_gluten_set(),     # if its not in this set its gluten free!
+    #'ns_pregnant' : build_XXX_set(),
     'veggie' : build_not_veggie_set(),    # if its not in this set its veggie!
     'vegan' : build_not_vegan_set(),      # if its not in this set its vegan!
 }
+# do we need the veggie / vegan sets?
+veggie_mutex_set = set(['chicken','pork','beef','shellfish','molluscs','crustaceans','lamb','fish','game','insects','other'])
+vegan_mutex_set = set(['chicken','pork','beef','shellfish','molluscs','crustaceans','lamb','fish','game','insects','other','eggs','dairy'])
 
-def get_containsTAGS_for(list_of_ingredients):
-    containsTAGS_detected = []
+    
+def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
+    TAGS_detected = []
 
     if list_of_ingredients.__class__ == str:
         list_of_ingredients = [list_of_ingredients]
@@ -1466,57 +1482,65 @@ def get_containsTAGS_for(list_of_ingredients):
         # build complete list - from local DB
         # will not follow URL to inet for ingredients of off the shelf items
 
-        add_ingredients = []
+        exploded_list = []
         for i in list_of_ingredients:
-            add_me = get_ingredients_as_text_list_R(i)
-            if add_me:
-                add_ingredients = add_ingredients + add_me
-            else:   # ingredient not in DB
-                #print(f"INGREDIENT NOT FOUND IN DATABASE: {i} << WARNING * *")
-                #print(f"NF:{i}<")
-                pass # TODO - log
+            exploded_list += get_ingredients_as_text_list_R(i)
 
+        # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
+            # scan_for_error_items returns a list of tuples (err, ingredient)
+            # only errors unless return_all_ingredients=True
+        exploded_list = [i for e, i in scan_for_error_items(exploded_list, return_all_ingredients=True) ]
 
         # flatten so there's only one of each
-        list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
+        list_of_ingredients = list(set(exploded_list))
 
         # TRUE LOOKUP
         for i in list_of_ingredients:
-            for containsTAG in containsTAGS_LUT:
-                if i in containsTAGS_LUT[containsTAG]:
-                    containsTAGS_detected.append(containsTAG)
+            for tag in containsTAGS_LUT:
+                if i in containsTAGS_LUT[tag]:
+                    TAGS_detected.append((tag, i))
 
         # INVERSE LOOKUP - build_atomic_ingredients
-        remove_tags = []
+        # I think we only need this loop to get provenance info!
+        if show_provenance:
+            for i in list_of_ingredients:
+                for tag in inverse_containsTAGS_LUT:
+                    if i not in inverse_containsTAGS_LUT[tag]:
+                        TAGS_detected.append((tag, i))
+
+        gf_flag = True
         for i in list_of_ingredients:
-
-            for containsTAG in inverse_containsTAGS_LUT:
-                if (get_ingredients_as_text_list_R(i) != None) or (i in atomic_LUT.keys()) :         # it has to be in the data base to work!
-                    containsTAGS_detected.append(containsTAG)
-
-                #print(f"containsTAGS_detected:{containsTAGS_detected} - - - -")
-                #print(f"checking SET:{containsTAG} for {i}")
-                if i in inverse_containsTAGS_LUT[containsTAG]:
-                    # DBG_LEV_4 print(f"\tSET:{containsTAG} - {i} NOT PRESENT")
-                    remove_tags.append(containsTAG)
-
-        # at on of this containsTAGS_detected may look like ['veggie','vegan','veggie','veggie','vegan']
-        # flatten it to ['veggie','vegan']
-        # if a single occurance of a non veggie or non vegan item occured remove the veggie or vegan tag
-        containsTAGS_detected = set(containsTAGS_detected)
-        # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - S")
-        # DBG_LEV_4 print(f"remove_tags: {remove_tags}")
-        remove_tags = set(remove_tags)
-        containsTAGS_detected = containsTAGS_detected - remove_tags
-        # DBG_LEV_4 print(f"containsTAGS_detected:{containsTAGS_detected} - - - - E")
+            if i in inverse_containsTAGS_LUT['gluten_free']:
+                gf_flag = False     # gluten found!!! brrr
+            
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
 
+    if show_provenance:
+        pprint(TAGS_detected)
+        #pprint([ (t,i) for t,i in TAGS_detected if t == 'gluten_free'])
 
-    containsTAGS_detected = list(set(containsTAGS_detected))    # remove duplicates
+    TAGS_detected = set([ t for t,i in TAGS_detected])
 
-    return containsTAGS_detected
+    meaty_goodness = TAGS_detected - set(['veggie', 'gluten_free', 'vegan'])
+
+    if meaty_goodness & vegan_mutex_set:
+        TAGS_detected = TAGS_detected - set(['vegan'])
+    else:
+        TAGS_detected = TAGS_detected or set(['vegan'])
+
+    if meaty_goodness & veggie_mutex_set:
+        TAGS_detected = TAGS_detected - set(['veggie'])
+    else:
+        TAGS_detected = TAGS_detected or set(['veggie'])
+    
+    if gf_flag:
+        TAGS_detected = TAGS_detected or set(['gluten_free'])
+    else:
+        TAGS_detected = TAGS_detected - set(['gluten_free'])
+
+    return list(TAGS_detected)
 
 
 
@@ -1653,44 +1677,59 @@ if __name__ == '__main__':
         print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
         print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
         
+        
     
-    
-    # dbg_i_list_as_text_from_component_name('cauliflower california')
-    # dbg_i_list_as_text_from_component_name('cardamom donuts w lamb & harissa broth')
-    # dbg_i_list_as_text_from_component_name('tiger baguette round')
-    # dbg_i_list_as_text_from_component_name('plain turkey & chicken kofte mix')
+    # # dbg_i_list_as_text_from_component_name('cauliflower california')
+    # # dbg_i_list_as_text_from_component_name('cardamom donuts w lamb & harissa broth')
+    # # dbg_i_list_as_text_from_component_name('tiger baguette round')
+    # # dbg_i_list_as_text_from_component_name('plain turkey & chicken kofte mix')
+    # # print()
+    # 
+    # dbg_i_list_as_text_from_component_name('pork fennel & orange kofte')    
+    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'dairy')
+    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'soya')
+    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'gluten')
+    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'eggs')
+    # dbg_does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')
+    # dbg_get_allergens_for_component_recursive('pork fennel & orange kofte')    
     # print()
-    
-    dbg_i_list_as_text_from_component_name('pork fennel & orange kofte')    
-    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'dairy')
-    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'soya')
-    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'gluten')
-    dbg_does_component_contain_allergen('pork fennel & orange kofte', 'eggs')
-    dbg_does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')
-    dbg_get_allergens_for_component_recursive('pork fennel & orange kofte')    
-    print()
-
-    print(f"\n\n> - - - - ALLERGENS - - - - <")
-    sp = True # SHOW provenance of allergen
-    dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad', sp)
-    dbg_get_allergens_for_component_recursive('patty pan & parsnip', sp)
-    dbg_get_allergens_for_component_recursive('leeks w honey & ginger', sp)
-    dbg_get_allergens_for_component_recursive('red onion dressing', sp)
-    dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad', sp)    
-    dbg_get_allergens_for_component_recursive('chicken & beansprout broth', sp)
-    dbg_get_allergens_for_component_recursive('prawn chicken courgette broth', sp)
-    dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth', sp)
-    dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato', sp)   
+    # 
+    # print(f"\n\n> - - - - ALLERGENS - - - - <")
+    # sp = True # SHOW provenance of allergen
+    # dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad', sp)
+    # dbg_get_allergens_for_component_recursive('patty pan & parsnip', sp)
+    # dbg_get_allergens_for_component_recursive('leeks w honey & ginger', sp)
+    # dbg_get_allergens_for_component_recursive('red onion dressing', sp)
+    # dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad', sp)    
+    # dbg_get_allergens_for_component_recursive('chicken & beansprout broth', sp)
+    # dbg_get_allergens_for_component_recursive('prawn chicken courgette broth', sp)
+    # dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth', sp)
+    # dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato', sp)   
 
     print('> = = = = DIG - - - S')
-    #dbg_unroll_all_seperately('leeks w honey & ginger', sp)
-    dbg_unroll_all_seperately('smoked mussel salad w baked mash potato', sp)
-    dbg_does_component_contain_allergen('smoked mussel salad w baked mash potato', 'molluscs')
+    # dbg_unroll_all_seperately('leeks w honey & ginger', sp)
+    # dbg_unroll_all_seperately('smoked mussel salad w baked mash potato', sp)
+    # dbg_does_component_contain_allergen('smoked mussel salad w baked mash potato', 'molluscs')
     print('> = = = = DIG - - - E')
-    
 
-    #print("\n\n - - - - ATOMIC - - - - \n\n")
-    #print(sorted(atomic_LUT.keys()))
+    def tag_test(c, sp):
+        dbg_i_list_as_text_from_component_name(c)
+        print(f"\n\nTAGS:{get_containsTAGS_for(c, sp)}")
+
+    sp=True
+    tag_test('lamb kofte',sp)
+    # dbg_get_allergens_for_component_recursive
+    tag_test('lamb kofte v2',sp)
+    # dbg_get_allergens_for_component_recursive
+    tag_test('kofte & couscous salad sandwich',sp)
+    # dbg_get_allergens_for_component_recursive
+    tag_test('s&p prawns w squid',sp)
+    # dbg_get_allergens_for_component_recursive
+    tag_test('mini turkey ball kebab',sp)
+    # dbg_get_allergens_for_component_recursive
+    tag_test('prawn sauce w blue cheese & garlic',sp)
+    dbg_get_allergens_for_component_recursive('prawn sauce w blue cheese & garlic',sp)
+    
     
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
@@ -1715,7 +1754,6 @@ if __name__ == '__main__':
     #     #pprint(errors[yn])
     #     pprint(errors)
     #     pprint(aliases)    
-
 
 
 
