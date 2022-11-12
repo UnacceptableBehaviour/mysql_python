@@ -1171,10 +1171,10 @@ lamb_basic = {'lamb','hogget','mutton','roast lamb shoulder','lamb shoulder','la
               'lamb leg kabab','roast leg lamb lean','lamb chop lean','lamb chops lean','lamb chop wfat','lamb chops wfat',
               'barnsley chop','lamb chop rounds','diced lamb','lambs liver','lamb neck','rack of lamb','lamb cutlets',
               'leg of lamb','roast lamb','roast leg of lamb','lamb rump','lamb breast','lamb belly','lamb flank',
-              'lamb chuck','lamb loin','saddle of lamb'}
+              'lamb chuck','lamb loin','saddle of lamb','lamb leg steaks','lamb leg steak'}
 
 # usually product of some type katsuobushi or fish sauce for example
-lamb_derived_no_recipe =  {'lamb samosa','lamb kofte','donner kebab','lamb bao bun'}
+lamb_derived_no_recipe =  {'lamb samosa','lamb kofte','donner kebab','lamb bao bun','seared lamb'}
 
 # different names same thing
 lamb_alt = [
@@ -1507,7 +1507,17 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
                 for tag in inverse_containsTAGS_LUT:
                     if i not in inverse_containsTAGS_LUT[tag]:
                         TAGS_detected.append((tag, i))
-
+        
+        vv_flag = True
+        for i in list_of_ingredients:
+            if i in inverse_containsTAGS_LUT['vegan']:
+                vv_flag = False
+                
+        v_flag = True
+        for i in list_of_ingredients:
+            if i in inverse_containsTAGS_LUT['veggie']:
+                v_flag = False
+                
         gf_flag = True
         for i in list_of_ingredients:
             if i in inverse_containsTAGS_LUT['gluten_free']:
@@ -1523,18 +1533,28 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
 
     TAGS_detected = set([ t for t,i in TAGS_detected])
 
-    meaty_goodness = TAGS_detected - set(['veggie', 'gluten_free', 'vegan'])
+    # meaty_goodness = TAGS_detected - set(['veggie', 'gluten_free', 'vegan'])
+    # 
+    # if meaty_goodness & vegan_mutex_set:
+    #     TAGS_detected = TAGS_detected - set(['vegan'])
+    # else:
+    #     TAGS_detected = TAGS_detected or set(['vegan'])
+    # 
+    # if meaty_goodness & veggie_mutex_set:
+    #     TAGS_detected = TAGS_detected - set(['veggie'])
+    # else:
+    #     TAGS_detected = TAGS_detected or set(['veggie'])
 
-    if meaty_goodness & vegan_mutex_set:
-        TAGS_detected = TAGS_detected - set(['vegan'])
-    else:
+    if vv_flag:
         TAGS_detected = TAGS_detected or set(['vegan'])
-
-    if meaty_goodness & veggie_mutex_set:
-        TAGS_detected = TAGS_detected - set(['veggie'])
     else:
+        TAGS_detected = TAGS_detected - set(['vegan'])
+
+    if v_flag:
         TAGS_detected = TAGS_detected or set(['veggie'])
-    
+    else:
+        TAGS_detected = TAGS_detected - set(['veggie'])
+        
     if gf_flag:
         TAGS_detected = TAGS_detected or set(['gluten_free'])
     else:
@@ -1710,6 +1730,7 @@ if __name__ == '__main__':
     # dbg_unroll_all_seperately('leeks w honey & ginger', sp)
     # dbg_unroll_all_seperately('smoked mussel salad w baked mash potato', sp)
     # dbg_does_component_contain_allergen('smoked mussel salad w baked mash potato', 'molluscs')
+    
     print('> = = = = DIG - - - E')
 
     def tag_test(c, sp):
@@ -1729,8 +1750,8 @@ if __name__ == '__main__':
     # dbg_get_allergens_for_component_recursive
     tag_test('prawn sauce w blue cheese & garlic',sp)
     dbg_get_allergens_for_component_recursive('prawn sauce w blue cheese & garlic',sp)
-    
-    
+    dbg_get_allergens_for_component_recursive('lamb humous & kimchi mini wrap',sp)    
+    tag_test('lamb humous & kimchi mini wrap',sp)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
