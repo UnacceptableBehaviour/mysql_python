@@ -154,7 +154,7 @@ def build_atomic_LUT():
 # Wow, the first example I dug up has a variety of inconsistencies! Ingredients for a pie!
 #
 QUID_PC = re.compile('\((\d+%)\)')
-#CONTAINS = re.compile('contains:*\s*\b')
+#CONTAINS = re.compile('contains:*\s*\b') # doesn't like word boundary for some reason!
 CONTAINS = re.compile('contains:*\s*')
 FLV_EN = re.compile('flavour enhancer:')
 regex_noise = [QUID_PC, CONTAINS, FLV_EN]
