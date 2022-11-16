@@ -128,6 +128,113 @@ def build_atomic_LUT():
 # remove QUID (34%) no's - these could be used to revese engineer a recipe in conjunction w/ nutrition info
 # downcase and remove whitespace and .
 # TODO - need a lot more data to REFINE
+# Scan for allergens in brackets: like wood smoked mussels (mollusc)
+# scan for ingredients in BRACKETS - allergens often inside
+# Preservative (Sodium Metabisulphite)
+# This: Acidity Regulators (Acetic Acid, Citric Acid), splits to
+# 'Acidity Regulators (Acetic Acid' and
+# 'Citric Acid'
+# discard first element or retain as a classifier: Preservative, Acidity Regulators
+# { classifier: [i_list] } < this structure will recurse retaining classifier (dict) ingredient (string, list member)
+# EGs
+# Beef (29%), Water, Wheat Flour (contains: Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamine),
+# Margarine (contains: Palm & Rapeseed Fats & Oils, Water, Salt), Modified Maize Starch, Beef Flavour Powder, Salt,
+# Flavour Enhancer: Monosodium Glutamate, Onion Powder, Caramelised Sugar Powder, Pepper, Barley Malt Extract, Butter (contains: Milk),
+# Wheat Protein, Beef from EU approved suppliers (UK & abroad)
+# 
+# [ beef, water,
+#       {'wheat flour': [wheat flour, calcium carbonate, iron, niacin, thiamine]},
+#       {'margarine': [palm & rapeseed fats & oils, water, salt]},
+#   modified maize starch, beef flavour powder, salt,
+#       {'flavour enhancer': [monosodium glutamate] },
+#   onion powder, caramelised sugar powder, pepper, barley malt extract,
+#       {'butter': [milk]},
+#   wheat protein, beef from eu approved suppliers (uk & abroad) ]
+#
+# Wow, the first example I dug up has a variety of inconsistencies! Ingredients for a pie!
+#
+QUID_PC = re.compile('\((\d+%)\)')
+#CONTAINS = re.compile('contains:*\s*\b')
+CONTAINS = re.compile('contains:*\s*')
+FLV_EN = re.compile('flavour enhancer:')
+regex_noise = [QUID_PC, CONTAINS, FLV_EN]
+
+# def filter_noise_list(i_list):
+#     r_list = []
+#     
+#     for i in i_list:
+#         i = i.lower()
+#         for r in regex_noise:
+#             i = re.sub(r,'',i).strip()
+#         
+#         r_list.append(i)
+#     
+#     return(r_list)
+
+
+def filter_noise(i):    
+    print(f"rgx-i:{i}")
+    i = i.lower()
+    for r in regex_noise:
+        i = re.sub(r,'',i).strip()
+    
+    print(f"rgx-o:{i}")
+    return(i)
+
+
+def dict_from_list(i_list):
+    print(f"d2i: {i_list}")
+    ret_dict = {}
+    m = re.search(r'(.*?)\((.*?)\)',i_list)
+    
+    if m:
+        ret_dict[m.group(1).strip()] = [ i.strip() for i in m.group(2).split(',') ]
+        
+    return(ret_dict)
+
+def process_i_string(i_list):
+    p_list = []
+    b=0
+    sub_list = ''
+    
+    for i in i_list.split(','):
+        #i = i.strip().lower()
+        i = filter_noise(i)
+        m = re.search(r'(.*?)\((.*?)\)',i)
+        if m:      # opening & closing brackets in item
+            p_list.append(i)
+            print(f"aw(:{i}")
+            continue
+        if ('(' in i) and (b==0):    # open bracket
+            print(f"s=i:{i}")
+            sub_list = i
+            b = 1
+        elif (b==1) and (')' not in i):
+            sub_list = f"{sub_list},{i}"    # put comma back
+            print(f"s+=i:{sub_list} - {i}")
+        elif (')' in i) and (b==1):
+            sub_list = f"{sub_list},{i}"
+            b=0
+            print(f"s2d:{sub_list}")
+            p_list.append(dict_from_list(sub_list))
+        else:
+            print(f"an(:{i}")
+            p_list.append(i)
+
+    return(p_list)
+
+t1 = 'Beef (29%), Water, Wheat Flour (contains: Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamine), Margarine (contains: Palm & Rapeseed Fats & Oils, Water, Salt), Modified Maize Starch, Beef Flavour Powder, Salt, Flavour Enhancer: Monosodium Glutamate, Onion Powder, Caramelised Sugar Powder, Pepper, Barley Malt Extract, Butter (contains: Milk), Wheat Protein, Beef from EU approved suppliers (UK & abroad)'
+print(f"{t1}\n\n")
+pprint(t1.split(','))
+print('')
+
+i_list_with_dict = process_i_string(t1)
+pprint(i_list_with_dict)
+print('\n-\n')
+
+
+sys.exit(0)
+    
 def process_off_the_shelf_ingredients_list(i_list):    
     # new_list = [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
     # print(i_list)
@@ -797,7 +904,7 @@ def build_celery_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # GLUTEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-gluten_basic = {'gluten','wheat','wheat germ','rye','barley','bulgur','couscous','farina','graham flour',
+gluten_basic = {'gluten','wheat','wheat protein','wheat germ','rye','barley','bulgur','couscous','farina','graham flour',
                 'kamut','khorasan wheat','semolina','spelt','triticale','oats','oat bran','flour' }
 
 # usually product of some type katsuobushi or fish sauce for example
