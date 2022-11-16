@@ -1512,17 +1512,19 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
         for i in list_of_ingredients:
             if i in inverse_containsTAGS_LUT['vegan']:
                 vv_flag = False
+                break   # no need to check any more!
                 
         v_flag = True
         for i in list_of_ingredients:
             if i in inverse_containsTAGS_LUT['veggie']:
                 v_flag = False
-                
+                break   # no need to check any more!
+            
         gf_flag = True
         for i in list_of_ingredients:
             if i in inverse_containsTAGS_LUT['gluten_free']:
                 gf_flag = False     # gluten found!!! brrr
-            
+                break   # no need to check any more!            
 
     else:
         raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
