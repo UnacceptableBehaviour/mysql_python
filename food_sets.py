@@ -191,26 +191,11 @@ def build_atomic_LUT():
 # Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract.
 
 
-QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  QUID_PC = re.compile('\((\d+%)\)')
-PUREE = re.compile('purée')
-CONTAINS = re.compile('contains:*\s*')      # contains: allergen
-
-IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([;\]\}\)])", re.MULTILINE | re.DOTALL )    # ingredient classifier: ingredient name
-
-regex_noise = [QUID_PC, CONTAINS, PUREE]
 
 
-def filter_noise_list(i_list):
-    r_list = []
-    
-    for i in i_list:
-        i = i.lower()
-        for r in regex_noise:
-            i = re.sub(r,'',i).strip()
-        
-        r_list.append(i)
-    
-    return(r_list)
+
+
+
 
 # # store these?
 # acidity regulator: ascorbic acid;
@@ -218,42 +203,78 @@ def filter_noise_list(i_list):
 # colour: beetroot red;
 # acid: citric acid;
 # stabiliser: guar gum;
-def remove_igdt_classifiers(i_list):
-    # for m in re.finditer(IC_IGDT, i_list):
-    #     print(f"\ng0 - {m.group(0)}")
-    #     print(f"g1 - {m.group(1)}")
-    #     print(f"g2 - {m.group(2)}")
-    #     print(f"g3 - {m.group(3)}")    
-    i_list = re.sub(IC_IGDT, r"\2\3", i_list)    # \3 preserves brakets ), }, ], & semi colon ;
-    # print(f"\n{i_list}\n")
-    i_list = re.sub(';', ',', i_list)            # replace semicolon w/ a comma
-    return(i_list)
 
+# ingredient classifier: ingredient name
+IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([;\]\}\)])", re.MULTILINE | re.DOTALL )
+
+def remove_igdt_classifiers(i_string):
+    classifiers = {}
+    for m in re.finditer(IC_IGDT, i_string):
+        print(f"\ng0 - {m.group(0)}")
+        print(f"g1 - {m.group(1)}")
+        print(f"g2 - {m.group(2)}")
+        print(f"g3 - {m.group(3)}")
+        if m.group(1) in classifiers: classifiers[m.group(1)].append(m.group(2))
+        else: classifiers[m.group(1)] = [m.group(2)]
+    
+    i_string = re.sub(IC_IGDT, r"\2\3", i_string)    # \3 preserves brakets ), }, ], & semi colon ;
+    # print(f"\n{i_string}\n")
+    i_string = re.sub(';', ',', i_string)            # replace semicolon w/ a comma
+    return((i_string, classifiers))
+
+ALLERGENS = re.compile('\((contains)*:*\s*([\w ]+)\)')
+# assumes lower case
+def screen_for_allergens(i_string):
+    allergens = []
+    for m in re.finditer(ALLERGENS, i_string):
+        allergens.append(m.group(2))        
+    return(list(set(allergens)))  
+
+
+QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  QUID_PC = re.compile('\((\d+%)\)')
+PUREE = re.compile('purée')
+CONTAINS = re.compile('contains:*\s*')      # contains: allergen
+regex_noise = [QUID_PC, CONTAINS, PUREE]
 
 def filter_noise(i_string):    
     print(f"\nrgx-i:{i_string}")
-    i_string = i_string.lower()
     for r in regex_noise:
         i_string = re.sub(r,'',i_string).strip()
     
     print(f"\nrgx-o:{i_string}")
     return(i_string)
 
+def flatten_tree(i_tree, with_super_ingredient=False):
+    flat = []
+    for leaf in i_tree:
+        if isinstance(leaf, dict):      # branch
+            for key in leaf.keys():     # should only be one!
+                flat = flat + flatten_tree(leaf[key])
+                if with_super_ingredient: flat = flat + [key]
+        else:
+            flat.append(leaf)
+    return flat
 
-def process_ots_ingredient_string(ingredient_string):
-    # filter_noise(bpork)
-    # remove_igdt_classifiers(bpork)
+
+def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
+    composite_data = {}
+    composite_data['orig_i_string'] = ingredient_string
+    # ORDER DEPENDANT - STRING PROCESSING
+    i_string = ingredient_string.lower()    # removed from each function do ONCE!
+    composite_data['allergens'] = screen_for_allergens(i_string)     # testing
+    i_string = filter_noise(i_string)
+    i_string, composite_data['classifiers'] = remove_igdt_classifiers(i_string)
 
     ret_list = []
-    i_string = ingredient_string
     c_pos = -1
 
     def split_out_sublists_in_brackets(b=-1):
         nonlocal c_pos
         nonlocal i_string
         nonlocal ret_list
+        
         # scan by character
-        b += 1          # bracket count () atrt at 0
+        b += 1          # bracket count () start at 0
         i = ''          # ingredient
         key_igdt = ''   # ingredient with sub ingredients
         sub_dict = {}
@@ -292,18 +313,20 @@ def process_ots_ingredient_string(ingredient_string):
         
         return(ret_list)
     
-    return split_out_sublists_in_brackets()
+    composite_data['i_tree'] = split_out_sublists_in_brackets()
+    composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
+    return composite_data
             
 
 
 
 search_tag = 0
-def dbg_process_ots_list(tx):
+def dbg_process_ots_ingredient_string(tx):
     global search_tag
     search_tag += 1
-    i_list_with_dict = process_ots_ingredient_string(tx)
+    composite = process_ots_ingredient_string(tx)
     print('\n')
-    pprint(i_list_with_dict)
+    pprint(composite)
     print(f"\n>-{search_tag}\n")
     print(tx)
     # print('\n')
@@ -312,16 +335,16 @@ def dbg_process_ots_list(tx):
 
 
 # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
-dbg_process_ots_list("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
+dbg_process_ots_ingredient_string("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
 # https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
-dbg_process_ots_list("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
+dbg_process_ots_ingredient_string("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
 # https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
-dbg_process_ots_list("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
+dbg_process_ots_ingredient_string("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
 #  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
 bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
-dbg_process_ots_list(bpork)
+dbg_process_ots_ingredient_string(bpork)
 # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
-dbg_process_ots_list("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
+dbg_process_ots_ingredient_string("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
 
 sys.exit(0)
     
@@ -612,7 +635,7 @@ def build_dairy_set():
 # EGGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
-              'egg solids','egg white','egg yolk'}
+              'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk'}
 
 # usually product of some type katsuobushi or fish sauce for example
 eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
@@ -1047,7 +1070,8 @@ def build_gluten_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOYA
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-soya_basic = {'soy','soya','edamame','soybeans','soy bean','soyabeans','soya bean','soy bean','soy sauce','tofu','soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu',
+soya_basic = {'soy','soya','edamame','soybeans','soy bean','soyabeans','soya bean','soy bean','soy sauce','tofu',
+              'soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu','fermented soya bean',
               'teriyaki','tempeh','textured soy protein','tsp','textured vegetable protein','tvp','soy flour',
               'soybean oil','soy lecithin','natto','kinako'}
 
