@@ -258,6 +258,7 @@ def flatten_tree(i_tree, with_super_ingredient=False):
 
 def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
     composite_data = {}
+    composite_data['ri_name'] = ingredient_name
     composite_data['orig_i_string'] = ingredient_string
     # ORDER DEPENDANT - STRING PROCESSING
     i_string = ingredient_string.lower()    # removed from each function do ONCE!
@@ -317,37 +318,7 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
     composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
     return composite_data
             
-
-
-
-search_tag = 0
-def dbg_process_ots_ingredient_string(tx):
-    global search_tag
-    search_tag += 1
-    composite = process_ots_ingredient_string(tx)
-    print('\n')
-    pprint(composite)
-    print(f"\n>-{search_tag}\n")
-    print(tx)
-    # print('\n')
-    # pprint(t1.split(','))
-    print('\n')
-
-
-# https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
-dbg_process_ots_ingredient_string("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
-# https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
-dbg_process_ots_ingredient_string("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
-# https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
-dbg_process_ots_ingredient_string("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
-#  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
-bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
-dbg_process_ots_ingredient_string(bpork)
-# https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
-dbg_process_ots_ingredient_string("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
-
-sys.exit(0)
-    
+# TODO - DEPRECATED - REMOVE    
 def process_off_the_shelf_ingredients_list(i_list):    
     # new_list = [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
     # print(i_list)
@@ -1975,6 +1946,36 @@ if __name__ == '__main__':
     dbg_get_allergens_for_component_recursive('prawn sauce w blue cheese & garlic',sp)
     dbg_get_allergens_for_component_recursive('lamb humous & kimchi mini wrap',sp)    
     tag_test('lamb humous & kimchi mini wrap',sp)
+    
+    
+    # OTS ingredient list processing tests
+    # search_tag = 0
+    # def dbg_process_ots_ingredient_string(tx):
+    #     global search_tag
+    #     search_tag += 1
+    #     composite = process_ots_ingredient_string(tx)
+    #     print('\n')
+    #     pprint(composite)
+    #     print(f"\n>-{search_tag}\n")
+    #     print(tx)
+    #     # print('\n')
+    #     # pprint(t1.split(','))
+    #     print('\n')
+    # 
+    # 
+    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
+    # dbg_process_ots_ingredient_string("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
+    # # https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
+    # dbg_process_ots_ingredient_string("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
+    # # https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
+    # dbg_process_ots_ingredient_string("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
+    # #  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
+    # bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
+    # dbg_process_ots_ingredient_string(bpork)
+    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
+    # dbg_process_ots_ingredient_string("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
+    # 
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
