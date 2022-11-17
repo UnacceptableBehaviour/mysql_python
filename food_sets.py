@@ -318,12 +318,6 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
     composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
     return composite_data
             
-# TODO - DEPRECATED - REMOVE    
-def process_off_the_shelf_ingredients_list(i_list):    
-    # new_list = [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
-    # print(i_list)
-    # print(new_list)
-    return [ re.sub('\(\d+%\)', '', i).lower().strip(' .') for i in i_list.split(',') ]
 
 def parse_igdt_lines_into_igdt_list(lines=''):
     i_list = []
@@ -398,7 +392,8 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
                 i_list = [f"ots_i_miss>{rcoi}<"]
             else:
                 # TODO need an ingredients processing call - a lot of different formats
-                i_list = process_off_the_shelf_ingredients_list(atomic_LUT[rcoi]['ingredients'])
+                composite = process_ots_ingredient_string(atomic_LUT[rcoi]['ingredients'], rcoi)
+                i_list = composite['i_list_flat']
         
         elif igdt_type == 'derived':
             if rcoi not in component_file_LUT:
