@@ -239,144 +239,70 @@ def filter_noise(i_string):
     print(f"\nrgx-o:{i_string}")
     return(i_string)
 
-ret_list = []
-c_pos = 0
-i_string=''
-def proc_i_list(ingredient_string):
-    global c_pos
-    global i_string
-    global ret_list
+
+def process_ots_ingredient_string(ingredient_string):
+    # filter_noise(bpork)
+    # remove_igdt_classifiers(bpork)
+
+    ret_list = []
     i_string = ingredient_string
     c_pos = -1
-    return split_out_sublists_in_brackets()
 
-
-def split_out_sublists_in_brackets(b=-1):
-    global c_pos
-    global i_string
-    global ret_list
-    # scan by character
-    b += 1          # bracket count () atrt at 0
-    i = ''          # ingredient
-    key_igdt = ''   # ingredient with sub ingredients
-    sub_dict = {}
-    sub_i_list = []
-    print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
-    while (c_pos < len(i_string)-1):
-        c_pos += 1
-        c = i_string[c_pos]
-        print(c, end='.')
-        if (c==',') and not b:               # no bracket in ingredient - store it
-            if i: ret_list.append(i.strip())
-            if sub_dict: ret_list.append(sub_dict)
-            # if dict store it
-            print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-            i = ''
-            sub_dict = {}
-            continue
-        if (c==',') and b:                  # inside brackets store ingredients in sublist
-            if i: sub_i_list.append(i.strip())
-            if sub_dict: sub_i_list.append(sub_dict)
-            i = ''
-            sub_dict = {}            
-            print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-            continue
-        if (c=='('):
-            key_igdt = i.strip()
-            sub_dict[key_igdt] = split_out_sublists_in_brackets(b)
-            i = ''
-            print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-            continue
-        if (c==')'):    # bracket end to construct dict with result
-            sub_i_list.append(i.strip())
-            print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-            return(sub_i_list)
-
-        i += c        
+    def split_out_sublists_in_brackets(b=-1):
+        nonlocal c_pos
+        nonlocal i_string
+        nonlocal ret_list
+        # scan by character
+        b += 1          # bracket count () atrt at 0
+        i = ''          # ingredient
+        key_igdt = ''   # ingredient with sub ingredients
+        sub_dict = {}
+        sub_i_list = []
+        print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
+        while (c_pos < len(i_string)-1):
+            c_pos += 1
+            c = i_string[c_pos]
+            print(c, end='.')
+            if (c==',') and not b:               # no bracket in ingredient - store it
+                if i: ret_list.append(i.strip())
+                if sub_dict: ret_list.append(sub_dict)
+                print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                i = ''
+                sub_dict = {}
+                continue
+            if (c==',') and b:                  # inside brackets store ingredients in sublist
+                if i: sub_i_list.append(i.strip())
+                if sub_dict: sub_i_list.append(sub_dict)
+                i = ''
+                sub_dict = {}            
+                print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                continue
+            if (c=='('):
+                key_igdt = i.strip()
+                sub_dict[key_igdt] = split_out_sublists_in_brackets(b)
+                i = ''
+                print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                continue
+            if (c==')'):    # bracket end to construct dict with result
+                sub_i_list.append(i.strip())
+                print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                return(sub_i_list)
     
-    return(ret_list)
-            
-            
-
-
-
-bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
-#bpork = "British Pork Belly (80%), Soy Beans (Soya), Fermented Cabbage (Cone Cabbage, Chillies, Sugar, Water, Salt), Savory Soy (15%) (Water, Sugar, Fish Sauce (Water,  Salt, Anchovy, Spirit Vinegar))."
-bpork = filter_noise(bpork)
-print(bpork)
-bpork = remove_igdt_classifiers(bpork)
-print('\n>-B\n')
-print(bpork)
-print('\n>-C\n')
-proc_i_list(bpork)
-print("\nresult\n")
-pprint(ret_list)
-
-# c_pos = 0
-# while (c_pos < len(bpork)):
-#     print(bpork[c_pos], end='_')
-#     c_pos += 1
-
-print(f"not -1:{not -1}")
-
-sys.exit(0)
-
-
-def dict_from_list(i_list):
-    print(f"d2i: {i_list}")
-    ret_dict = {}
-    m = re.search(r'(.*?)\((.*?)\)',i_list)
-    
-    if m:
-        ret_dict[m.group(1).strip()] = [ i.strip() for i in m.group(2).split(',') ]
+            i += c        
         
-    return(ret_dict)
-
-def process_i_string(i_list):
-    p_list = []
-    b=0
-    sub_list = ''
+        return(ret_list)
     
-    for i in i_list.split(','):
-        #i = i.strip().lower()
-        i = filter_noise(i)
-        m = re.search(r'(.*?)\((.*?)\)',i)
-        if m:      # opening & closing brackets in item
-            p_list.append(i)
-            print(f"aw(:{i}")
-            continue
-        if ('(' in i) and (b==0):    # open bracket
-            print(f"s=i:{i}")
-            sub_list = i
-            b = 1
-        elif (b==1) and (')' not in i):
-            sub_list = f"{sub_list},{i}"    # put comma back
-            print(f"s+=i:{sub_list} - {i}")
-        elif (')' in i) and (b==1):
-            sub_list = f"{sub_list},{i}"
-            b=0
-            print(f"s2d:{sub_list}")
-            p_list.append(dict_from_list(sub_list))
-        else:
-            print(f"an(:{i}")
-            p_list.append(i)
+    return split_out_sublists_in_brackets()
+            
 
-    return(p_list)
-
-def clean_and_process_i_string(i_list):
-    re.sub(QUID_PC,'',i_list).strip()
-
-
-
-def process_i_string(i_list):
-    return(i_list)
 
 
 search_tag = 0
 def dbg_process_ots_list(tx):
     global search_tag
     search_tag += 1
-    i_list_with_dict = process_i_string(tx)
+    i_list_with_dict = process_ots_ingredient_string(tx)
+    print('\n')
     pprint(i_list_with_dict)
     print(f"\n>-{search_tag}\n")
     print(tx)
@@ -384,14 +310,6 @@ def dbg_process_ots_list(tx):
     # pprint(t1.split(','))
     print('\n')
 
-t1 = 'Beef (29%), Water, Wheat Flour (contains: Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamine), Margarine (contains: Palm & Rapeseed Fats & Oils, Water, Salt), Modified Maize Starch, Beef Flavour Powder, Salt, Flavour Enhancer: Monosodium Glutamate, Onion Powder, Caramelised Sugar Powder, Pepper, Barley Malt Extract, Butter (contains: Milk), Wheat Protein, Beef from EU approved suppliers (UK & abroad)'
-print(f"{t1}\n\n")
-pprint(t1.split(','))
-print('')
-
-i_list_with_dict = process_i_string(t1)
-pprint(i_list_with_dict)
-print('\n-\n')
 
 # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
 dbg_process_ots_list("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
