@@ -153,33 +153,173 @@ def build_atomic_LUT():
 #
 # Wow, the first example I dug up has a variety of inconsistencies! Ingredients for a pie!
 #
-QUID_PC = re.compile('\((\d+%)\)')
-#CONTAINS = re.compile('contains:*\s*\b') # doesn't like word boundary for some reason!
-CONTAINS = re.compile('contains:*\s*')
-FLV_EN = re.compile('flavour enhancer:')
-regex_noise = [QUID_PC, CONTAINS, FLV_EN]
+# British Pork Belly (80%),
+# Char Sui Style Glaze (15%)
+#     (Water,
+#      Sugar,
+#      Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar),
+#      Fermented Soya Bean (Soy Beans (Soya), Water, Salt),
+#      Onions,
+#      Garlic Purée,
+#      Ginger Purée,
+#      Red Wine Vinegar,
+#      Cornflour,
+#      Red Chilli Purée ,
+#      Caramelised Sugar Syrup,
+#      Concentrated Plum Juice,
+#      Star Anise,
+#      Cinnamon,
+#      Fennel Seed,
+#      Black Pepper,
+#      Clove),
+# Brown Sugar,
+# Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder,
+#                    Acidity Regulator: Ascorbic Acid;
+#                    Anti-caking Agent: Silicon Dioxide),
+# Cornflour,
+# Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar),
+# Garlic Powder,
+# Caramelised Sugar,
+# Colour: Beetroot Red;
+# Onion Powder,
+# Yeast Extract,
+# Smoked Salt,
+# Black Pepper,
+# Acid: Citric Acid;
+# Ginger, Salt, Chilli Powder,
+# Stabiliser: Guar Gum;
+# Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract.
 
-# def filter_noise_list(i_list):
-#     r_list = []
-#     
-#     for i in i_list:
-#         i = i.lower()
-#         for r in regex_noise:
-#             i = re.sub(r,'',i).strip()
-#         
-#         r_list.append(i)
-#     
-#     return(r_list)
+
+QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  QUID_PC = re.compile('\((\d+%)\)')
+PUREE = re.compile('purée')
+CONTAINS = re.compile('contains:*\s*')      # contains: allergen
+
+IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([;\]\}\)])", re.MULTILINE | re.DOTALL )    # ingredient classifier: ingredient name
+
+regex_noise = [QUID_PC, CONTAINS, PUREE]
 
 
-def filter_noise(i):    
-    print(f"rgx-i:{i}")
-    i = i.lower()
-    for r in regex_noise:
-        i = re.sub(r,'',i).strip()
+def filter_noise_list(i_list):
+    r_list = []
     
-    print(f"rgx-o:{i}")
-    return(i)
+    for i in i_list:
+        i = i.lower()
+        for r in regex_noise:
+            i = re.sub(r,'',i).strip()
+        
+        r_list.append(i)
+    
+    return(r_list)
+
+# # store these?
+# acidity regulator: ascorbic acid;
+# anti-caking agent: silicon dioxide)
+# colour: beetroot red;
+# acid: citric acid;
+# stabiliser: guar gum;
+def remove_igdt_classifiers(i_list):
+    # for m in re.finditer(IC_IGDT, i_list):
+    #     print(f"\ng0 - {m.group(0)}")
+    #     print(f"g1 - {m.group(1)}")
+    #     print(f"g2 - {m.group(2)}")
+    #     print(f"g3 - {m.group(3)}")    
+    i_list = re.sub(IC_IGDT, r"\2\3", i_list)    # \3 preserves brakets ), }, ], & semi colon ;
+    # print(f"\n{i_list}\n")
+    i_list = re.sub(';', ',', i_list)            # replace semicolon w/ a comma
+    return(i_list)
+
+
+def filter_noise(i_string):    
+    print(f"\nrgx-i:{i_string}")
+    i_string = i_string.lower()
+    for r in regex_noise:
+        i_string = re.sub(r,'',i_string).strip()
+    
+    print(f"\nrgx-o:{i_string}")
+    return(i_string)
+
+ret_list = []
+c_pos = 0
+i_string=''
+def proc_i_list(ingredient_string):
+    global c_pos
+    global i_string
+    global ret_list
+    i_string = ingredient_string
+    c_pos = -1
+    return split_out_sublists_in_brackets()
+
+
+def split_out_sublists_in_brackets(b=-1):
+    global c_pos
+    global i_string
+    global ret_list
+    # scan by character
+    b += 1          # bracket count () atrt at 0
+    i = ''          # ingredient
+    key_igdt = ''   # ingredient with sub ingredients
+    sub_dict = {}
+    sub_i_list = []
+    print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
+    while (c_pos < len(i_string)-1):
+        c_pos += 1
+        c = i_string[c_pos]
+        print(c, end='.')
+        if (c==',') and not b:               # no bracket in ingredient - store it
+            if i: ret_list.append(i.strip())
+            if sub_dict: ret_list.append(sub_dict)
+            # if dict store it
+            print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+            i = ''
+            sub_dict = {}
+            continue
+        if (c==',') and b:                  # inside brackets store ingredients in sublist
+            if i: sub_i_list.append(i.strip())
+            if sub_dict: sub_i_list.append(sub_dict)
+            i = ''
+            sub_dict = {}            
+            print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+            continue
+        if (c=='('):
+            key_igdt = i.strip()
+            sub_dict[key_igdt] = split_out_sublists_in_brackets(b)
+            i = ''
+            print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+            continue
+        if (c==')'):    # bracket end to construct dict with result
+            sub_i_list.append(i.strip())
+            print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+            return(sub_i_list)
+
+        i += c        
+    
+    return(ret_list)
+            
+            
+
+
+
+bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
+#bpork = "British Pork Belly (80%), Soy Beans (Soya), Fermented Cabbage (Cone Cabbage, Chillies, Sugar, Water, Salt), Savory Soy (15%) (Water, Sugar, Fish Sauce (Water,  Salt, Anchovy, Spirit Vinegar))."
+bpork = filter_noise(bpork)
+print(bpork)
+bpork = remove_igdt_classifiers(bpork)
+print('\n>-B\n')
+print(bpork)
+print('\n>-C\n')
+proc_i_list(bpork)
+print("\nresult\n")
+pprint(ret_list)
+
+# c_pos = 0
+# while (c_pos < len(bpork)):
+#     print(bpork[c_pos], end='_')
+#     c_pos += 1
+
+print(f"not -1:{not -1}")
+
+sys.exit(0)
 
 
 def dict_from_list(i_list):
@@ -223,6 +363,27 @@ def process_i_string(i_list):
 
     return(p_list)
 
+def clean_and_process_i_string(i_list):
+    re.sub(QUID_PC,'',i_list).strip()
+
+
+
+def process_i_string(i_list):
+    return(i_list)
+
+
+search_tag = 0
+def dbg_process_ots_list(tx):
+    global search_tag
+    search_tag += 1
+    i_list_with_dict = process_i_string(tx)
+    pprint(i_list_with_dict)
+    print(f"\n>-{search_tag}\n")
+    print(tx)
+    # print('\n')
+    # pprint(t1.split(','))
+    print('\n')
+
 t1 = 'Beef (29%), Water, Wheat Flour (contains: Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamine), Margarine (contains: Palm & Rapeseed Fats & Oils, Water, Salt), Modified Maize Starch, Beef Flavour Powder, Salt, Flavour Enhancer: Monosodium Glutamate, Onion Powder, Caramelised Sugar Powder, Pepper, Barley Malt Extract, Butter (contains: Milk), Wheat Protein, Beef from EU approved suppliers (UK & abroad)'
 print(f"{t1}\n\n")
 pprint(t1.split(','))
@@ -232,6 +393,17 @@ i_list_with_dict = process_i_string(t1)
 pprint(i_list_with_dict)
 print('\n-\n')
 
+# https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
+dbg_process_ots_list("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
+# https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
+dbg_process_ots_list("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
+# https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
+dbg_process_ots_list("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
+#  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
+bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
+dbg_process_ots_list(bpork)
+# https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
+dbg_process_ots_list("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
 
 sys.exit(0)
     
@@ -1183,7 +1355,7 @@ def build_chicken_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PORK
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pork_basic = {'pork','carvery pork','pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
+pork_basic = {'pork','carvery pork','pork belly','british pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
               'pork ribs','pork_alt loin','pork_alt chop','pork tenderloin','pork shoulder chop','pork shoulder','pork leg',
               'pigs cheeks','pig cheeks','pigs cheeks oyesters','osso buco','pigs hock','spare ribs','rack of ribs','bacon',
               'cured pork','pork sausage','ham','gelatine sheets'
