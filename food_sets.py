@@ -134,70 +134,10 @@ def build_atomic_LUT():
 # This: Acidity Regulators (Acetic Acid, Citric Acid), splits to
 # 'Acidity Regulators (Acetic Acid' and
 # 'Citric Acid'
-# discard first element or retain as a classifier: Preservative, Acidity Regulators
-# { classifier: [i_list] } < this structure will recurse retaining classifier (dict) ingredient (string, list member)
-# EGs
-# Beef (29%), Water, Wheat Flour (contains: Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamine),
-# Margarine (contains: Palm & Rapeseed Fats & Oils, Water, Salt), Modified Maize Starch, Beef Flavour Powder, Salt,
-# Flavour Enhancer: Monosodium Glutamate, Onion Powder, Caramelised Sugar Powder, Pepper, Barley Malt Extract, Butter (contains: Milk),
-# Wheat Protein, Beef from EU approved suppliers (UK & abroad)
-# 
-# [ beef, water,
-#       {'wheat flour': [wheat flour, calcium carbonate, iron, niacin, thiamine]},
-#       {'margarine': [palm & rapeseed fats & oils, water, salt]},
-#   modified maize starch, beef flavour powder, salt,
-#       {'flavour enhancer': [monosodium glutamate] },
-#   onion powder, caramelised sugar powder, pepper, barley malt extract,
-#       {'butter': [milk]},
-#   wheat protein, beef from eu approved suppliers (uk & abroad) ]
-#
-# Wow, the first example I dug up has a variety of inconsistencies! Ingredients for a pie!
-#
-# British Pork Belly (80%),
-# Char Sui Style Glaze (15%)
-#     (Water,
-#      Sugar,
-#      Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar),
-#      Fermented Soya Bean (Soy Beans (Soya), Water, Salt),
-#      Onions,
-#      Garlic Purée,
-#      Ginger Purée,
-#      Red Wine Vinegar,
-#      Cornflour,
-#      Red Chilli Purée ,
-#      Caramelised Sugar Syrup,
-#      Concentrated Plum Juice,
-#      Star Anise,
-#      Cinnamon,
-#      Fennel Seed,
-#      Black Pepper,
-#      Clove),
-# Brown Sugar,
-# Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder,
-#                    Acidity Regulator: Ascorbic Acid;
-#                    Anti-caking Agent: Silicon Dioxide),
-# Cornflour,
-# Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar),
-# Garlic Powder,
-# Caramelised Sugar,
-# Colour: Beetroot Red;
-# Onion Powder,
-# Yeast Extract,
-# Smoked Salt,
-# Black Pepper,
-# Acid: Citric Acid;
-# Ginger, Salt, Chilli Powder,
-# Stabiliser: Guar Gum;
-# Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract.
 
 
 
-
-
-
-
-
-# # store these?
+# # store these in composite
 # acidity regulator: ascorbic acid;
 # anti-caking agent: silicon dioxide)
 # colour: beetroot red;
@@ -205,7 +145,7 @@ def build_atomic_LUT():
 # stabiliser: guar gum;
 
 # ingredient classifier: ingredient name
-IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([;\]\}\)])", re.MULTILINE | re.DOTALL )
+IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([,;\]\}\)])", re.MULTILINE | re.DOTALL )
 
 def remove_igdt_classifiers(i_string):
     classifiers = {}
@@ -257,6 +197,7 @@ def flatten_tree(i_tree, with_super_ingredient=False):
 
 
 def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
+    print(f"[process_ots_ingredient_string] for ({ingredient_name})")
     composite_data = {}
     composite_data['ri_name'] = ingredient_name
     composite_data['orig_i_string'] = ingredient_string
@@ -280,7 +221,7 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
         key_igdt = ''   # ingredient with sub ingredients
         sub_dict = {}
         sub_i_list = []
-        print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
+        #print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
         while (c_pos < len(i_string)-1):
             c_pos += 1
             c = i_string[c_pos]
@@ -288,7 +229,7 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
             if (c==',') and not b:               # no bracket in ingredient - store it
                 if i: ret_list.append(i.strip())
                 if sub_dict: ret_list.append(sub_dict)
-                print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                #print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
                 i = ''
                 sub_dict = {}
                 continue
@@ -297,17 +238,17 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
                 if sub_dict: sub_i_list.append(sub_dict)
                 i = ''
                 sub_dict = {}            
-                print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                #print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
                 continue
             if (c=='('):
                 key_igdt = i.strip()
                 sub_dict[key_igdt] = split_out_sublists_in_brackets(b)
                 i = ''
-                print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                #print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
                 continue
             if (c==')'):    # bracket end to construct dict with result
                 sub_i_list.append(i.strip())
-                print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
+                #print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
                 return(sub_i_list)
     
             i += c        
@@ -316,6 +257,15 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
     
     composite_data['i_tree'] = split_out_sublists_in_brackets()
     composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
+    print('\n|A|')
+    print(composite_data['allergens'])
+    print(get_allergens_for(composite_data['allergens']))       
+    print(get_allergens_for(composite_data['i_list_flat']))
+    composite_data['allergens'] += get_allergens_for(composite_data['allergens'])   # filter latin & other names
+    composite_data['allergens'] += get_allergens_for(composite_data['i_list_flat']) 
+    print('|')
+    pprint(composite_data)
+    print('|')
     return composite_data
             
 
@@ -391,7 +341,8 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
             if atomic_LUT[rcoi]['ingredients'] == '__igdts__':
                 i_list = [f"ots_i_miss>{rcoi}<"]
             else:
-                # TODO need an ingredients processing call - a lot of different formats
+                # TODO test on more formats - mostly sbs at the mo!
+                # TODO pass allergen info from OTS composite['allergens']
                 composite = process_ots_ingredient_string(atomic_LUT[rcoi]['ingredients'], rcoi)
                 i_list = composite['i_list_flat']
         
@@ -419,8 +370,6 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
                     i_list = i_list + sub_list
                     #print(f"{'    '*d}{sub_list}")
             
-            # pass them one at a time to get_ingredients_as_text_list_R
-            #i_list = i_list + get_ingredients_as_text_list_R(rcoi) 
         else:
             i_list = [f"unknown_igdt_type>{rcoi}<"]
     
@@ -428,6 +377,14 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
     errors['dead_ends_in_this_pass'] += scan_for_error_items(i_list) 
     
     return sorted(list(set(i_list)))# remove duplicates    
+
+def get_exploded_ingredients_as_list_from_list(i_list):
+    exploded_list = []
+    for i in i_list:
+        exploded_list += get_ingredients_as_text_list_R(i)
+    
+    return(sorted(list(set(exploded_list))))
+    
 
 
 def scan_for_error_items(i_list, return_all_ingredients=False):
@@ -601,7 +558,8 @@ def build_dairy_set():
 # EGGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
-              'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk'}
+              'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk',
+              'dried free range egg white'}
 
 # usually product of some type katsuobushi or fish sauce for example
 eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
@@ -768,6 +726,10 @@ fish_basic = {'anchovies','barracuda','basa','bass','black cod','blowfish','blue
               'smelt','snakehead','snapper','sole','sprat','sturgeon','surimi','swordfish','tilapia','tilefish',
               'trout','tuna','turbot','wahoo','whitefish','whiting','witch','whitebait'}
 
+fish_latin = {'theragra chalcogramma','alaska pollock',
+              'merluccius merluccius','european hake','cornish salmon','herring hake'}
+
+
 fish_derived_no_recipe = {'katsuobushi','dashi','fish stock cube','fish sauce','cured salmon','smoked salmon','worcestershire sauce'}
 
 # exceptions, sub sets & alternate names
@@ -821,6 +783,8 @@ def build_fish_set():
     fish = fish | fish_derived_no_recipe
 
     fish = fish | fish_basic
+    
+    fish = fish | fish_latin
 
     return fish
 
@@ -1085,7 +1049,7 @@ def build_soya_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SULPHUR_DIOXIDE
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites'}
+sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites', 'sodium metabisulphite'}
 
 # usually product of some type katsuobushi or fish sauce for example
 #sulphur_dioxide_derived_no_recipe =  {'',''}
@@ -1886,7 +1850,9 @@ if __name__ == '__main__':
         print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
         print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
         
-        
+    def tag_test(c, sp):
+        dbg_i_list_as_text_from_component_name(c)
+        print(f"\n\nTAGS:{get_containsTAGS_for(c, sp)}")        
     
     # # dbg_i_list_as_text_from_component_name('cauliflower california')
     # # dbg_i_list_as_text_from_component_name('cardamom donuts w lamb & harissa broth')
@@ -1922,9 +1888,7 @@ if __name__ == '__main__':
     
     print('> = = = = DIG - - - E')
 
-    def tag_test(c, sp):
-        dbg_i_list_as_text_from_component_name(c)
-        print(f"\n\nTAGS:{get_containsTAGS_for(c, sp)}")
+
 
     sp=True
     tag_test('lamb kofte',sp)
@@ -1974,17 +1938,52 @@ if __name__ == '__main__':
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-    # print('\nSearch?')
-    # while(True):
-    #     yn = input('Continue ingredient/(n)\n')
-    #     if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
-    #     search(yn)
+    def error_table(e):
+        print(f"\n\n# # # # # # # # # # # errors['{e}'] # # # # # # # # # # # S")    
+        pprint(Counter(errors[e]).most_common())
+        print(f"# # # # # # # # # # # errors['{e}'] # # # # # # # # # # # E\n\n")
     
-    print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
-    pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
-    #pprint(dict(Counter(errors['dead_ends_in_this_pass']).most_common()))
-    #pprint(sorted(dict(Counter(errors['dead_ends_in_this_pass']))))    
-    print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
+    # for e in errors.keys():
+    #     error_table(e)
+    
+    error_keys = [
+                  'txt_title_NO_match_rcp',
+                  'derived_w_file_HAS_ndb_no',
+                  'ndb_no_neg99',
+                  'derived_HAS_http_SB_ots',
+                  'derived_HAS_atomic_alias',
+                  'ots_ingredients_missing',
+                  'ots_NO_url',
+                  'unknown_alias',                  
+                  'items_not_triggering_TAGS',
+                  'dead_ends_in_this_pass',
+                  ]
+
+    for e in error_keys:
+        error_table(e)
+
+
+    print('\nSearch?')
+    while(True):
+        yn = input('Continue ingredient/(n)\n')
+        if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
+        search(yn)
+    
+    # beef & humous mini wrap:
+    # exploded: baby spinach, beef, bell pepper, black pepper, bramley apples, butter, carrots, chillies, cone cabbage,
+    #           coriander, coriander leaf, coriander seeds, cornflour, cumin seeds, fennel seeds, garlic, garlic puree,
+    #           ginger, ground black pepper, honey, lemon juice, lemon zest, mustard flour, olive oil,
+    #           
+    #           ots_i_miss>cannellini beans<,
+    #           ots_i_miss>mini wrap<,
+    #           ots_i_miss>rapeseed oil<,              
+    #           ots_i_miss>sriracha chilli sauce<,
+    #           ots_i_miss>white wine vinegar<,
+    #           
+    #           paprika, rapeseed oil, red onion, rioja red wine, salt, savoy cabbage, sherry vinegar, sodium nitrite,
+    #           spring onions, sugar, tomato, triphosphates, water
+
+
     
     # print('\nDump error table? Enter one of the following error KEYS . .')
     # while(True):
