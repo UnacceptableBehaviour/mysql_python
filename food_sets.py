@@ -18,15 +18,28 @@ NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 component_file_LUT = {}
 COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
 
+
+# Item: large dried chillies
+# {'alias': 'dried chillies',
+#  'alias_file': ('y445', '20210511_123843_dried chillies.txt'),
+#  'alias_nutrients': True,
+#  'igdt_type': 'derived',
+#  'ingredients': '__igdts__',
+#  'ndb_no': '',
+#  'ndb_no_url_alias': 'ndb_no=dried chillies',
+#  'txtfile': '',
+#  'url': ''}
+
+# enter prawn to get all components with prawn in the name!
 def search(search_term):
     print(f"\n==> Searching for {search_term} . .\n")
     for i in atomic_LUT.keys():
         if re.search(search_term, i):
-            print(f"{i.ljust(40)} - {atomic_LUT[i]['ndb_no_url_alias']}", end='\t')
-            alias = re.sub('ndb_no=', '', atomic_LUT[i]['ndb_no_url_alias'])
-            if i in component_file_LUT.keys():          print(f"rcoi:{component_file_LUT[i].name}")
-            elif alias in component_file_LUT.keys():    print(f"A:{alias} - {component_file_LUT[alias].name}")
-            else: print()
+            print(f"\n{atomic_LUT[i]['igdt_type'].ljust(8)} {atomic_LUT[i]['ndb_no'].center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
+            if atomic_LUT[i]['alias']: print(f"\tA: {atomic_LUT[i]['alias'].ljust(40)} - Nutrinfo:{atomic_LUT[i]['alias_nutrients']} - F:{atomic_LUT[i]['alias_file']} <")
+            if atomic_LUT[i]['url']: print(f"\tU: {atomic_LUT[i]['url'].ljust(40)}")
+            if atomic_LUT[i]['ingredients']!='__igdts__': print(f"\tIL:{atomic_LUT[i]['ingredients']}")
+            #pprint(atomic_LUT[i])
     
     print(f"\n ^ ingredients w/ {search_term} \n")
 
@@ -54,12 +67,20 @@ errors = {
     'items_not_triggering_TAGS' :[]
 }
 
-def build_atomic_LUT():
+def build_atomic_LUT(verbose=False):
 
     content = ''
     with NUTREINT_FILE_PATH.open('r') as f:
         #content = f.readlines()
         content = f.read()
+
+    # FIRST PASS to get all component names
+    for m in re.finditer( r'--- for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
+        component, ndb_no_url_alias, ingredients, igdt_type = m.group(1).strip(), m.group(2).strip(), m.group(3).strip(), m.group(4).strip()
+        if component == '': continue
+        atomic_LUT[component] = {}   
+
+    print(f"atomic_LUT FOUND ({len(atomic_LUT)})")
 
     for m in re.finditer( r'--- for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
         component, ndb_no_url_alias, ingredients, igdt_type = m.group(1).strip(), m.group(2).strip(), m.group(3).strip(), m.group(4).strip()
@@ -67,7 +88,6 @@ def build_atomic_LUT():
         # print(f"{component}", end=':')
         # print(f"{component in atomic_LUT.keys()}", end=' ')
         # pprint(atomic_LUT)
-        atomic_LUT[component] = {}        
         atomic_LUT[component]['ingredients'] = ingredients
         atomic_LUT[component]['igdt_type'] = igdt_type
         atomic_LUT[component]['ndb_no_url_alias'] = ndb_no_url_alias
@@ -76,9 +96,66 @@ def build_atomic_LUT():
         # (per 100g)                    # derived ingredient
         # (ndb_no=-99)
         # (ndb_no=sea bream fillets)    # alias to another entry - which could be any of the above
+
+        # find
+        # ots w/o __igdts__ NO   URL  - list and add URL
+        # ots w/o __igdts__ with URL  - pass to scrape tool       << add helper to retrieve
+
+        txtfile = ''
+        txtfile_short = ''
+        alias = ''
+        url = ''
+        ndb_no = ''
+        alias_file = ''
+        alias_nutrients = False
         
-        if (igdt_type == 'derived') and ('http' in ndb_no_url_alias):
-            errors['derived_HAS_http_SB_ots'].append((component, igdt_type, ndb_no_url_alias))
+        if (ndb_no_url_alias != 'per 100g'):
+            if ndb_no_url_alias == 'ndb_no=-99':
+                ndb_no = -99
+            else:                
+                m1 = re.search(r'ndb_no=\b(\d{5})\b', ndb_no_url_alias)
+                m2 = re.search(r'ndb_no=(http.*?$)', ndb_no_url_alias)
+                m3 = re.search(r'ndb_no=([\w &]+?$)', ndb_no_url_alias)
+
+                if m1:   ndb_no = m1.group(1)
+                elif m2: url    = m2.group(1)
+                elif m3: alias  = m3.group(1)
+
+
+            alias_file_found = alias in component_file_LUT
+            if alias_file_found:                
+                m = re.search(r'(y\d{3})_NUTRITEST', str(component_file_LUT[alias]))
+                alias_file = (m.group(1), component_file_LUT[alias].name)
+            
+            
+            alias_nutrients_found = alias in atomic_LUT
+            if alias_nutrients_found:
+                alias_nutrients = True
+            else:
+                errors['unknown_alias'].append((component, alias))
+
+            if component in aliases:
+                aliases[component].append((component, alias))
+            else:
+                aliases[component] = [(component, alias)]        
+
+        if component in component_file_LUT:
+            txtfile = component_file_LUT[component]
+            m = re.search(r'(y\d{3})_NUTRITEST', str(txtfile))
+            txtfile_short = (m.group(1), txtfile.name)    
+                
+        
+        atomic_LUT[component]['txtfile']         = txtfile
+        atomic_LUT[component]['txtfile_short']   = txtfile_short
+        atomic_LUT[component]['alias']           = alias
+        atomic_LUT[component]['url']             = url
+        atomic_LUT[component]['ndb_no']          = ndb_no
+        atomic_LUT[component]['alias_file']      = alias_file
+        atomic_LUT[component]['alias_nutrients'] = alias_nutrients
+
+        
+        if (igdt_type == 'derived') and url:
+            errors['derived_HAS_http_SB_ots'].append((component, igdt_type, url))
         
         if (ndb_no_url_alias == 'ndb_no=-99'):
             errors['ndb_no_neg99'].append((component, igdt_type))
@@ -86,41 +163,17 @@ def build_atomic_LUT():
         if (igdt_type == 'ots') and (ingredients == '__igdts__'):
             errors['ots_ingredients_missing'].append((igdt_type, component, ndb_no_url_alias))
 
-        if (igdt_type == 'ots') and not (re.search('http', ndb_no_url_alias)):
+        if (igdt_type == 'ots') and not url:
             errors['ots_NO_url'].append((igdt_type, component, ndb_no_url_alias))
             
-        if (igdt_type == 'derived') and (component in component_file_LUT) and (re.search('\(ndb_no=\d+\)', ndb_no_url_alias)):
-            ndb_no = re.search('\(ndb_no=(\d+)\)', ndb_no_url_alias).group(1)
-            errors['derived_w_file_HAS_ndb_no'].append(component)
+        if (igdt_type == 'derived') and txtfile and ndb_no:
+            errors['derived_w_file_HAS_ndb_no'].append((component, Path(txtfile).name, ndb_no))
 
-        #track aliases
-        if (ndb_no_url_alias != 'per 100g'):
-            alias = re.sub('ndb_no=', '', ndb_no_url_alias)
-            alias_found = alias in component_file_LUT
-            entry = (alias_found, ndb_no_url_alias)
             
-            if not alias_found: errors['unknown_alias'].append((component, alias))
+        if verbose and (ndb_no_url_alias != 'per 100g'):
+            print(f"\nItem: {component}")
+            pprint(atomic_LUT[component])            
 
-            if component in aliases:
-                aliases[component].append(entry)
-            else:
-                aliases[component] = [entry]
-
-                
-        if (igdt_type == 'derived') and (ndb_no_url_alias != 'per 100g'):
-            # look for alias
-            if ('http' not in ndb_no_url_alias) and not ( re.search('\(ndb_no=\d+\)', ndb_no_url_alias) ):
-                alias = re.sub('ndb_no=', '', ndb_no_url_alias)
-            print(component)
-            if component in component_file_LUT: print(component_file_LUT[component])
-            elif alias in component_file_LUT: print(f"{alias} - {component_file_LUT[alias]}")            
-            else:
-                r = re.search('\(ndb_no=\d+\)', ndb_no_url_alias)
-                pprint(r)
-                print(f"no file - C:{component} - A:{alias} - {r}")
-            pprint(atomic_LUT[component])
-            print()
-        
 
     return len(atomic_LUT)
 
@@ -154,8 +207,8 @@ def remove_igdt_classifiers(i_string):
         print(f"g1 - {m.group(1)}")
         print(f"g2 - {m.group(2)}")
         print(f"g3 - {m.group(3)}")
-        if m.group(1) in classifiers: classifiers[m.group(1)].append(m.group(2))
-        else: classifiers[m.group(1)] = [m.group(2)]
+        if m.group(1) in classifiers: classifiers[m.group(1)].append(m.group(2).strip())
+        else: classifiers[m.group(1)] = [m.group(2).strip()]
     
     i_string = re.sub(IC_IGDT, r"\2\3", i_string)    # \3 preserves brakets ), }, ], & semi colon ;
     # print(f"\n{i_string}\n")
@@ -404,8 +457,12 @@ def scan_for_error_items(i_list, return_all_ingredients=False):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # build LUT's CACHE recipes
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+print('>--A build_file_LUT')
 build_file_LUT()
-build_atomic_LUT()
+
+print('>--B build_atomic_LUT')
+build_atomic_LUT() # pass True for debug o/p
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -1049,7 +1106,7 @@ def build_soya_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SULPHUR_DIOXIDE
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites', 'sodium metabisulphite'}
+sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites', 'sodium metabisulphite', 'triphosphates'}
 
 # usually product of some type katsuobushi or fish sauce for example
 #sulphur_dioxide_derived_no_recipe =  {'',''}
@@ -1722,50 +1779,7 @@ def main():
 
 if __name__ == '__main__':
 
-    # fish = ''
-    # for m in re.finditer(r'^(.*?)$', conv_list, re.MULTILINE | re.DOTALL):
-    #     fish += f"'{m.group(1).lower()}',"
-    #     print(f"'{m.group(1).lower()}'")
-    #
-    # print(fish)
-    # sys.exit()
-
-    # fish_basic, fish_alt (list of sets), fish_subsets (dict of sets)
-    # fish = {'fish'}
-    # print(len(fish), fish)
-    #
-    # for key, val in fish_subsets.items():
-    #     print(key, val)
-    #     union = val | {key}     # include the categegory generalisation
-    #     fish = fish | union
-    #     print(union)
-    #     print()
-    #
-    # print(len(fish), fish)
-    #
-    # for val in fish_alt:
-    #     print(val)
-    #     fish = fish | val       # include different names for each fish
-    #     print()
-    #
-    # print(len(fish), fish)
-    #
-    # fish = fish | fish_basic
-    #
-    # print(len(fish), fish)
-
-    #print(build_fish_set())
-
-    #print(cheese_subsets)
-
-    # cheese = {'cheese'}
-    # #[cheese | cheese_set for cheese_set in cheese_subsets ]
-    # for cheese_cat, cheese_set in cheese_subsets.items():
-    #     cheese = cheese | {cheese_cat} | cheese_set
-    #
-    # print(cheese) # all the cheese
-
-
+    print('>--1')
     show_txt_title_NO_match_rcp = False
     if show_txt_title_NO_match_rcp == True:
         print(f"errors['txt_title_NO_match_rcp']: {len(errors['txt_title_NO_match_rcp'])}")
@@ -1775,64 +1789,8 @@ if __name__ == '__main__':
             print(ri_name)
             pprint(atomic_LUT[ri_name]) if ri_name in atomic_LUT else print(f"NO: {ri_name} in atomic_LUT")
             print('-')
-    
-    
-    print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_ingredient)}")
-    print("\nERRORS found")
-    for e in errors.keys():
-        print(f"{e} ({len(errors[e])})")
-        
-    
-    target = 'guinea fowl tagine w couscous & salad'
-        # guinea fowl tagine (derived)
-        #     chermoula (derived)
-        # couscous chermoula (derived)
-        #     veg stock (ots)
-        # green leaf & orange beet (derived)
-        #     orange beetroot (derived)
-        #     lemon vinaigrette (derived)
-    pprint(atomic_LUT[target])
-    print('chicken - atomic_LUT')
-    pprint(atomic_LUT['chicken'])
-    print('chicken - component_file_LUT')
-    pprint(component_file_LUT[target])
-    
-    print(f"\n\n> - - - - {target} - - - - <")
-    i_list = get_ingredients_as_text_list_R(target)
-    e_list = scan_for_error_items(i_list)
-    print(f"\n{i_list}")
-    print('problems:')
-    print(f"{e_list}")
-    print('\nCall DEP')
-    #print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
-    # 
-    # target = 'hard goats cheese'
-    # print(f"\n\n> - - - - {target} - - - - <")
-    # print(f"{get_ingredients_as_text_list_R(target)}")
-    # print('\nCall DEP')
-    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
-    # 
-    # target = 'bakewell fudge'
-    # print(f"\n\n> - - - - {target} - - - - <")
-    # print(f"{get_ingredients_as_text_list_R(target)}")
-    # print('\nCall DEP')
-    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
-    # 
-    # target = 'tiger baguette round'
-    # print(f"\n\n> - - - - {target} - - - - <")
-    # print(f"{get_ingredients_as_text_list_R(target)}")
-    # print('\nCall DEP')
-    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
-    # 
-    # target = 'beef & jalapeno burger'
-    # print(f"\n\n> - - - - {target} - - - - <")
-    # print(f"{get_ingredients_as_text_list_R(target)}")
-    # print('\nCall DEP')
-    # print(f"{deprecated_get_ingredients_as_text_list_R(target)}")
-    
 
-    # print('NON VEGAN')
-    # print(build_not_vegan_set())
+    print('>--2')
     def dbg_i_list_as_text_from_component_name(c):
         print(f"\n|\n|\n \_  I_LIST_as_text_FROM_component_NAME:{c}")
         print(f"\nLIST({c}){get_ingredients_as_text_list_R(c)}")
@@ -1851,89 +1809,8 @@ if __name__ == '__main__':
         print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
         
     def tag_test(c, sp):
-        dbg_i_list_as_text_from_component_name(c)
+        #dbg_i_list_as_text_from_component_name(c)
         print(f"\n\nTAGS:{get_containsTAGS_for(c, sp)}")        
-    
-    # # dbg_i_list_as_text_from_component_name('cauliflower california')
-    # # dbg_i_list_as_text_from_component_name('cardamom donuts w lamb & harissa broth')
-    # # dbg_i_list_as_text_from_component_name('tiger baguette round')
-    # # dbg_i_list_as_text_from_component_name('plain turkey & chicken kofte mix')
-    # # print()
-    # 
-    # dbg_i_list_as_text_from_component_name('pork fennel & orange kofte')    
-    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'dairy')
-    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'soya')
-    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'gluten')
-    # dbg_does_component_contain_allergen('pork fennel & orange kofte', 'eggs')
-    # dbg_does_component_contain_allergen('plain turkey & chicken kofte mix', 'soya')
-    # dbg_get_allergens_for_component_recursive('pork fennel & orange kofte')    
-    # print()
-    # 
-    # print(f"\n\n> - - - - ALLERGENS - - - - <")
-    # sp = True # SHOW provenance of allergen
-    # dbg_get_allergens_for_component_recursive('guinea fowl tagine w couscous & salad', sp)
-    # dbg_get_allergens_for_component_recursive('patty pan & parsnip', sp)
-    # dbg_get_allergens_for_component_recursive('leeks w honey & ginger', sp)
-    # dbg_get_allergens_for_component_recursive('red onion dressing', sp)
-    # dbg_get_allergens_for_component_recursive('pork stew w leek and courgette salad', sp)    
-    # dbg_get_allergens_for_component_recursive('chicken & beansprout broth', sp)
-    # dbg_get_allergens_for_component_recursive('prawn chicken courgette broth', sp)
-    # dbg_get_allergens_for_component_recursive('prawn & salmon w courgette & mushroom broth', sp)
-    # dbg_get_allergens_for_component_recursive('smoked mussel salad w baked mash potato', sp)   
-
-    print('> = = = = DIG - - - S')
-    # dbg_unroll_all_seperately('leeks w honey & ginger', sp)
-    # dbg_unroll_all_seperately('smoked mussel salad w baked mash potato', sp)
-    # dbg_does_component_contain_allergen('smoked mussel salad w baked mash potato', 'molluscs')
-    
-    print('> = = = = DIG - - - E')
-
-
-
-    sp=True
-    tag_test('lamb kofte',sp)
-    # dbg_get_allergens_for_component_recursive
-    tag_test('lamb kofte v2',sp)
-    # dbg_get_allergens_for_component_recursive
-    tag_test('kofte & couscous salad sandwich',sp)
-    # dbg_get_allergens_for_component_recursive
-    tag_test('s&p prawns w squid',sp)
-    # dbg_get_allergens_for_component_recursive
-    tag_test('mini turkey ball kebab',sp)
-    # dbg_get_allergens_for_component_recursive
-    tag_test('prawn sauce w blue cheese & garlic',sp)
-    dbg_get_allergens_for_component_recursive('prawn sauce w blue cheese & garlic',sp)
-    dbg_get_allergens_for_component_recursive('lamb humous & kimchi mini wrap',sp)    
-    tag_test('lamb humous & kimchi mini wrap',sp)
-    
-    
-    # OTS ingredient list processing tests
-    # search_tag = 0
-    # def dbg_process_ots_ingredient_string(tx):
-    #     global search_tag
-    #     search_tag += 1
-    #     composite = process_ots_ingredient_string(tx)
-    #     print('\n')
-    #     pprint(composite)
-    #     print(f"\n>-{search_tag}\n")
-    #     print(tx)
-    #     # print('\n')
-    #     # pprint(t1.split(','))
-    #     print('\n')
-    # 
-    # 
-    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
-    # dbg_process_ots_ingredient_string("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
-    # # https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
-    # dbg_process_ots_ingredient_string("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
-    # # https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
-    # dbg_process_ots_ingredient_string("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
-    # #  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
-    # bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
-    # dbg_process_ots_ingredient_string(bpork)
-    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
-    # dbg_process_ots_ingredient_string("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
-    # 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
@@ -1947,27 +1824,49 @@ if __name__ == '__main__':
     #     error_table(e)
     
     error_keys = [
-                  'txt_title_NO_match_rcp',
-                  'derived_w_file_HAS_ndb_no',
-                  'ndb_no_neg99',
-                  'derived_HAS_http_SB_ots',
-                  'derived_HAS_atomic_alias',
-                  'ots_ingredients_missing',
-                  'ots_NO_url',
-                  'unknown_alias',                  
-                  'items_not_triggering_TAGS',
-                  'dead_ends_in_this_pass',
+                  # 'txt_title_NO_match_rcp',
+                  # 'derived_w_file_HAS_ndb_no',
+                  # 'ndb_no_neg99',
+                   'derived_HAS_http_SB_ots',
+                  # 'derived_HAS_atomic_alias',
+                  # 'ots_ingredients_missing',
+                  # 'ots_NO_url',
+                  # 'unknown_alias',                  
+                  # 'items_not_triggering_TAGS',
+                   'dead_ends_in_this_pass',
                   ]
 
     for e in error_keys:
         error_table(e)
+    
+    print(f"\nCACHE_recipe_component_or_ingredient: {len(CACHE_recipe_component_or_ingredient)}")
+    print("\nERRORS found")
+    for e in errors.keys():
+        print(f"{e} ({len(errors[e])})")
 
+    print('>--3 Aliases')
+    #pprint(aliases)
+        
+    print('>--4')
+    
+    def diagnostics(i, sp=False):
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S')
+        dbg_i_list_as_text_from_component_name(i)
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1')
+        dbg_get_allergens_for_component_recursive(i)
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2')
+        tag_test(i,sp)        
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  E')
+
+    diagnostics('beef & humous mini wrap')
+    #diagnostics('beef & humous mini wrap', True)
 
     print('\nSearch?')
     while(True):
         yn = input('Continue ingredient/(n)\n')
         if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
         search(yn)
+        diagnostics(yn)
     
     # beef & humous mini wrap:
     # exploded: baby spinach, beef, bell pepper, black pepper, bramley apples, butter, carrots, chillies, cone cabbage,
@@ -1994,8 +1893,8 @@ if __name__ == '__main__':
     #     pprint(errors)
     #     pprint(aliases)    
 
-
-
+    
+    
 # ELEMENTS
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # # HEADING
@@ -2031,3 +1930,74 @@ if __name__ == '__main__':
 #     allergen = allergen | allergen_basic
 #
 #     return allergen
+
+
+# TURN INTO TESTS
+    # sp=True
+    # tag_test('lamb kofte',sp)
+    # # dbg_get_allergens_for_component_recursive
+    # tag_test('lamb kofte v2',sp)
+    # # dbg_get_allergens_for_component_recursive
+    # tag_test('kofte & couscous salad sandwich',sp)
+    # # dbg_get_allergens_for_component_recursive
+    # tag_test('s&p prawns w squid',sp)
+    # # dbg_get_allergens_for_component_recursive
+    # tag_test('mini turkey ball kebab',sp)
+    # # dbg_get_allergens_for_component_recursive
+    # tag_test('prawn sauce w blue cheese & garlic',sp)
+    # dbg_get_allergens_for_component_recursive('prawn sauce w blue cheese & garlic',sp)
+    # dbg_get_allergens_for_component_recursive('lamb humous & kimchi mini wrap',sp)    
+    # tag_test('lamb humous & kimchi mini wrap',sp)
+    
+    
+    # OTS ingredient list processing tests
+    # search_tag = 0
+    # def dbg_process_ots_ingredient_string(tx):
+    #     global search_tag
+    #     search_tag += 1
+    #     composite = process_ots_ingredient_string(tx)
+    #     print('\n')
+    #     pprint(composite)
+    #     print(f"\n>-{search_tag}\n")
+    #     print(tx)
+    #     # print('\n')
+    #     # pprint(t1.split(','))
+    #     print('\n')
+    # 
+    # 
+    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-steak-red-wine-pie-taste-the-difference-500g
+    # dbg_process_ots_ingredient_string("British Beef (31%), Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Margarine (Palm Fat, Water, Rapeseed Oil, Salt, Emulsifier: Mono- and Diglycerides of Fatty Acids), Water, Butter 3.5% (Cows' Milk), Ruby Port (3%), Caramelised Onion (Onion, Muscovado Sugar, Sunflower Oil), Beef Stock Paste (Cooked Beef, Rehydrated Potato Flakes, Salt, Cane Molasses, Caramelised Sugar Syrup, Onion Powder, Black Pepper), Smoked Dry Cure British Bacon Lardons (2%) (Pork Belly, Sea Salt, Sugar, Preservatives: Sodium Nitrite, Sodium Nitrate; Antioxidant: Sodium Ascorbate), Malbec Red Wine (2%), Corn Starch, Barley Malt Extract, Dextrose, Rusk (Fortified Wheat Flour (Wheat Flour, Calcium Carbonate, Iron, Niacin, Thiamin), Water, Salt), Spirit Vinegar, Tomato Paste, Salt, Pasteurised Free Range Egg, White Pepper, Thyme, Bay, Black Pepper, Parsley.")
+    # # https://www.sainsburys.co.uk/gol-ui/product/higgidy-spinach--feta---pine-nut-pie-270g
+    # dbg_process_ots_ingredient_string("Water, Spinach (14%), Mature Cheddar Cheese (Milk), Feta Cheese (Milk) (12%), Sautéed Onion (Onions, Rapeseed Oil), Wheat Flour (contains Calcium Carbonate, Iron, Niacin, Thiamin), Vegetable Oils (Sustainable Palm Oil*, Rapeseed Oil), Free Range Whole Egg, Red Peppers (4%), Spelt Flour (Wheat), Dried Skimmed Milk, Cornflour, Butter (Milk), Double Cream (Milk), Pine Nuts, Brown Linseeds, Golden Linseeds, Poppy Seeds, Salt, Black Pepper, Nutmeg, Cayenne Pepper, Paprika, Mustard Powder, *www.higgidy.co.uk/palmoil")
+    # # https://www.sainsburys.co.uk/gol-ui/product/lindahls-pro-kvarg-banoffee-pie-150g
+    # dbg_process_ots_ingredient_string("Quark (Skimmed Milk, Whey Proteins (from Milk), Lactic Cultures, Microbial Rennet), Banana Caramel Flavour preparation [Water, Modified Maize Starch, Colour (Carotenes), Safflower Concentrate, Carrot Concentrate, Spirulina Concentrate, Natural Flavourings, Sweeteners (Aspartame, Acesulfame K)]")
+    # #  https://www.sainsburys.co.uk/gol-ui/product/jssc-char-sui-pork-belly-450g
+    # bpork = "British Pork Belly (80%), Char Sui Style Glaze (15%) (Water, Sugar, Soy Sauce (Water, Soy Beans (Soya), Salt, Spirit Vinegar), Fermented Soya Bean (Soy Beans (Soya), Water, Salt), Onions, Garlic Purée, Ginger Purée, Red Wine Vinegar, Cornflour, Red Chilli Purée , Caramelised Sugar Syrup, Concentrated Plum Juice, Star Anise, Cinnamon, Fennel Seed, Black Pepper, Clove), Brown Sugar, Home Pickling Mix (Sugar, Salt, Maltodextrin, Apple Cider Vinegar Powder, Acidity Regulator: Ascorbic Acid; Anti-caking Agent: Silicon Dioxide), Cornflour, Dehydrated Soy Sauce (Maltodextrin, Soy Beans (Soya), Salt, Spirit Vinegar), Garlic Powder, Caramelised Sugar, Colour: Beetroot Red; Onion Powder, Yeast Extract, Smoked Salt, Black Pepper, Acid: Citric Acid; Ginger, Salt, Chilli Powder, Stabiliser: Guar Gum; Paprika Extract, Pimento, Flavouring, Star Anise, Aniseed Extract."
+    # dbg_process_ots_ingredient_string(bpork)
+    # # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-sweet---sour-chicken-with-rice-450g
+    # dbg_process_ots_ingredient_string("Egg Fried Rice (Water, Long Grain Rice, Pasteurised Egg, Onion, Peas, Rapeseed Oil, Sesame Oil, Ginger Purée, Salt, Fermented Soya Bean, Wheat), Cooked Marinated Chicken Breast (20%) (Chicken Breast, Rapeseed Oil, Cornflour, Ginger Purée), Water, Sugar, Onion, Red Pepper, Pineapple, Tomato Paste, Cornflour, Concentrated Pineapple Juice, Spirit Vinegar, Rapeseed Oil, Ginger Purée, Salt, Colour:Paprika Extract; Fermented Soya Bean, Wheat, Cane Molasses, Onion Purée, Tamarind, Cinnamon, Clove, Garlic Purée.")
+    # 
+
+
+
+    # target = 'guinea fowl tagine w couscous & salad'
+    #     # guinea fowl tagine (derived)
+    #     #     chermoula (derived)
+    #     # couscous chermoula (derived)
+    #     #     veg stock (ots)
+    #     # green leaf & orange beet (derived)
+    #     #     orange beetroot (derived)
+    #     #     lemon vinaigrette (derived)
+    # pprint(atomic_LUT[target])
+    # print('chicken - atomic_LUT')
+    # pprint(atomic_LUT['chicken'])
+    # print('chicken - component_file_LUT')
+    # pprint(component_file_LUT[target])
+    # 
+    # print(f"\n\n> - - - - {target} - - - - <")
+    # i_list = get_ingredients_as_text_list_R(target)
+    # e_list = scan_for_error_items(i_list)
+    # print(f"\n{i_list}")
+    # print('problems:')
+    # print(f"{e_list}")
+    # print('\nCall DEP')
