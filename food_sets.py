@@ -30,18 +30,19 @@ COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 #  'txtfile': '',
 #  'url': ''}
 
+def dump_atomic_LUT(i):
+    print(f"\n{atomic_LUT[i]['igdt_type'].ljust(8)} {str(atomic_LUT[i]['ndb_no']).center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
+    if atomic_LUT[i]['alias']: print(f"\tA: {atomic_LUT[i]['alias'].ljust(40)} - Nutrinfo:{atomic_LUT[i]['alias_nutrients']} - F:{atomic_LUT[i]['alias_file']} <")
+    if atomic_LUT[i]['url']: print(f"\tU: {atomic_LUT[i]['url'].ljust(40)}")
+    if atomic_LUT[i]['ingredients']!='__igdts__': print(f"\tIL:{atomic_LUT[i]['ingredients']}")
+
+
 # enter prawn to get all components with prawn in the name!
 def search(search_term):
     print(f"\n==> Searching for {search_term} . .\n")
     for i in atomic_LUT.keys():
         if re.search(search_term, i):
-            print(f"\n{atomic_LUT[i]['igdt_type'].ljust(8)} {atomic_LUT[i]['ndb_no'].center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
-            if atomic_LUT[i]['alias']: print(f"\tA: {atomic_LUT[i]['alias'].ljust(40)} - Nutrinfo:{atomic_LUT[i]['alias_nutrients']} - F:{atomic_LUT[i]['alias_file']} <")
-            if atomic_LUT[i]['url']: print(f"\tU: {atomic_LUT[i]['url'].ljust(40)}")
-            if atomic_LUT[i]['ingredients']!='__igdts__': print(f"\tIL:{atomic_LUT[i]['ingredients']}")
-            #pprint(atomic_LUT[i])
-    
-    print(f"\n ^ ingredients w/ {search_term} \n")
+            dump_atomic_LUT(i)
 
 
 def build_file_LUT():
@@ -1792,8 +1793,10 @@ if __name__ == '__main__':
 
     print('>--2')
     def dbg_i_list_as_text_from_component_name(c):
+        i_list = get_ingredients_as_text_list_R(c)
         print(f"\n|\n|\n \_  I_LIST_as_text_FROM_component_NAME:{c}")
-        print(f"\nLIST({c}){get_ingredients_as_text_list_R(c)}")
+        print(f"\nLIST({c}){i_list}")
+        return(i_list)
 
     def dbg_does_component_contain_allergen(c, a):
         print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
@@ -1810,7 +1813,9 @@ if __name__ == '__main__':
         
     def tag_test(c, sp):
         #dbg_i_list_as_text_from_component_name(c)
-        print(f"\n\nTAGS:{get_containsTAGS_for(c, sp)}")        
+        t_list = get_containsTAGS_for(c, sp)
+        print(f"\n\nTAGS:{t_list}")
+        return(t_list)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
@@ -1849,24 +1854,37 @@ if __name__ == '__main__':
         
     print('>--4')
     
-    def diagnostics(i, sp=False):
+    def diagnostics(c, sp=False):
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S')
-        dbg_i_list_as_text_from_component_name(i)
+        i_list = get_ingredients_as_text_list_R(c)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1')
-        dbg_get_allergens_for_component_recursive(i)
+        a_list = get_allergens_for(get_ingredients_as_text_list_R(c), sp)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2')
-        tag_test(i,sp)        
-        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  E')
+        t_list = get_containsTAGS_for(c, sp)
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - S')
+        print(f"INGREDIENTS FOR ({c}): {i_list}")
+        print(f"ALLERGENS: {a_list}")
+        print(f"TAGS: {t_list}")
+        ots_i_miss_list = []
+        for i in i_list:
+            m = re.search(r'ots_i_miss>(.*?)<', i)
+            if m:
+                ots_i_miss_list.append(m.group(1))
+        print(f"OTS_I_MISS: {ots_i_miss_list}")
+        for i in ots_i_miss_list:
+            #search(i)
+            dump_atomic_LUT(i)
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - E')
 
     diagnostics('beef & humous mini wrap')
-    #diagnostics('beef & humous mini wrap', True)
+    search('beef & humous mini wrap')
 
     print('\nSearch?')
     while(True):
         yn = input('Continue ingredient/(n)\n')
         if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
-        search(yn)
         diagnostics(yn)
+        search(yn)        
     
     # beef & humous mini wrap:
     # exploded: baby spinach, beef, bell pepper, black pepper, bramley apples, butter, carrots, chillies, cone cabbage,
