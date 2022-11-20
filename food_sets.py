@@ -31,11 +31,21 @@ COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 #  'url': ''}
 
 def dump_atomic_LUT(i):
-    print(f"\n{atomic_LUT[i]['igdt_type'].ljust(8)} {str(atomic_LUT[i]['ndb_no']).center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
+    print(f"{atomic_LUT[i]['igdt_type'].ljust(8)} {str(atomic_LUT[i]['ndb_no']).center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
     if atomic_LUT[i]['alias']: print(f"\tA: {atomic_LUT[i]['alias'].ljust(40)} - Nutrinfo:{atomic_LUT[i]['alias_nutrients']} - F:{atomic_LUT[i]['alias_file']} <")
     if atomic_LUT[i]['url']: print(f"\tU: {atomic_LUT[i]['url'].ljust(40)}")
     if atomic_LUT[i]['ingredients']!='__igdts__': print(f"\tIL:{atomic_LUT[i]['ingredients']}")
 
+
+def follow_alias(i):
+    alias = atomic_LUT[i]['alias']
+    if alias:
+        if atomic_LUT[alias]['ingredients']!='__igdts__' or atomic_LUT[alias]['url']:
+            return(alias)
+        if alias in atomic_LUT:
+            return(follow_alias(alias))
+    else:
+        return(None)
 
 # enter prawn to get all components with prawn in the name!
 def search(search_term):
@@ -379,7 +389,8 @@ def remove_error(possible_err_string):
 
 
 
-# recursive compile ingredients including OTS if ingredients available    
+# recursive compile ingredients including OTS if ingredients available
+# for single item - see function below for list
 def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes str:name
     d += 1
     rcoi = remove_error(recipe_component_or_ingredient)
@@ -394,6 +405,7 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
         elif igdt_type == 'ots':
             if atomic_LUT[rcoi]['ingredients'] == '__igdts__':
                 i_list = [f"ots_i_miss>{rcoi}<"]
+                # TODO follow_alias(rcoi) to see if ingredients there!
             else:
                 # TODO test on more formats - mostly sbs at the mo!
                 # TODO pass allergen info from OTS composite['allergens']
@@ -1871,9 +1883,20 @@ if __name__ == '__main__':
             if m:
                 ots_i_miss_list.append(m.group(1))
         print(f"OTS_I_MISS: {ots_i_miss_list}")
+        switch_aliases = []
+        url_list = []
         for i in ots_i_miss_list:
-            #search(i)
-            dump_atomic_LUT(i)
+            alias = follow_alias(i)                     # alias_with_link_or_ingredients
+            if alias:
+                switch_aliases.append((i, alias))                
+                print(f"following: [{i}] alias to: [{alias}]")
+                dump_atomic_LUT(alias)
+                if atomic_LUT[alias]['url']: url_list.append(atomic_LUT[alias]['url'])
+            else:
+                dump_atomic_LUT(i)
+                if atomic_LUT[i]['url']: url_list.append(atomic_LUT[i]['url'])
+            print()
+        print(f"{url_list}")
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - E')
 
     diagnostics('beef & humous mini wrap')
