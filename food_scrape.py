@@ -79,7 +79,8 @@ if __name__ == '__main__':
         print(url)
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
         driver.get(url)
-        
+        ri_name = 'None'
+        i_list = []
 
         allow_cookies_btn_id = 'onetrust-accept-btn-handler'
         if cookie_barrier:
@@ -88,7 +89,7 @@ if __name__ == '__main__':
                 cookie_button = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
                 #cookie_button = driver.find_element(By.ID,'onetrust-accept-btn-handler')
                 print('cookie_button')
-                pprint(cookie_button)
+                #pprint(cookie_button)
             except TimeoutException:
                 print("Loading took too much time!")
             except Exception as exp:
@@ -108,6 +109,7 @@ if __name__ == '__main__':
             css_selector = 'h3.productDataItemHeader, h3.itemHeader'
             print(f'# # #> waiting for h3 tags: {css_selector}')
             h3_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+            print(f'# # #> found for h3 tags:\n{h3_tags}')
             #driver.find_elements(By.CSS_SELECTOR, 'h3.productDataItemHeader')
         except TimeoutException:
             print("Waiting for INGREDIENTS took too much time!")
@@ -119,11 +121,23 @@ if __name__ == '__main__':
             css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'
             print(f'# # #> getting list of element w selector: {css_selector}')
             #elist = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))            
-            elist = driver.find_elements(By.CSS_SELECTOR, css_selector)            
-            for e in elist:
-                print(f"len(e):{len(e)}")
-                print(f"> > > - - - - - - {e.text}")
-                pprint(e)        
+            elist = driver.find_elements(By.CSS_SELECTOR, css_selector)
+            f_igdt = False
+            f_desc = False
+            for e in elist:                
+                print(f"> > > - - - : {e.text}")
+                if f_igdt == True:
+                    f_igdt = False
+                    i_list = e.text.strip()
+                    print(f">>IGDTs:{i_list}")                    
+                if f_desc == True:
+                    f_desc = False
+                    ri_name = e.text.strip()
+                    print(f">>Item:{ri_name}")
+                if e.text.strip() == 'Ingredients':
+                    f_igdt = True
+                if e.text.strip() == 'Description':
+                    f_desc = True
         except Exception as exp:
             print(exp)
             print('NOTHING!')
@@ -154,7 +168,7 @@ if __name__ == '__main__':
         #     print(exp)
         #     print('NOTHING!')
 
-    
+        print(f"\n\nItem: {ri_name}\nIngredients:{i_list}")
         yn = input('Try again? (y)/n\n')
         if str(yn).lower() == 'n': sys.exit(0)
         elif 'http' in yn:
