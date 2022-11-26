@@ -549,7 +549,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 dairy_basic = {'milk','cows milk','goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
-               'casein','custard','ice cream','milk powder'}
+               'casein','custard','ice cream','milk powder','dried skimmed milk'}
 
 # usually product of some type katsuobushi or fish sauce for example
 dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade', 'parmesan crisps'}
@@ -629,7 +629,7 @@ def build_dairy_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
               'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk',
-              'dried free range egg white'}
+              'dried free range egg white', 'dried egg'}
 
 # usually product of some type katsuobushi or fish sauce for example
 eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
@@ -1450,8 +1450,8 @@ def build_duck_set():
     #     union = val | {key}     # include the categegory generalisation
     #     duck = duck | union
 
-    for val in duck_alt:
-        duck = duck | val       # include different names for each duck
+    # for val in duck_alt:
+    #     duck = duck | val       # include different names for each duck
 
     duck = duck | duck_derived_no_recipe
 
@@ -1643,6 +1643,7 @@ def build_other_edible_animal_set():
 # NOT veggie
 def build_not_veggie_set():
     not_veggie = build_chicken_set() |               \
+                 build_duck_set() |                  \
                  build_pork_set() |                  \
                  build_beef_set() |                  \
                  build_molluscs_set() |              \
