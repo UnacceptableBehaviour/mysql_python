@@ -15,6 +15,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+from food_sets import atomic_LUT,component_file_LUT 
+import json
+MISSING_INGREDIENTS_FILE_JSON = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json'
+MISSING_INGREDIENTS_FILE_JSON_PY = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json'
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -41,6 +45,39 @@ def main():
 
 if __name__ == '__main__':
 
+    target_components = []
+    t1 = []
+    t2 = []
+    # load missing from JSON files
+    with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'r') as f:
+        content = f.read()
+        t1 = json.loads(content)
+
+    with open(MISSING_INGREDIENTS_FILE_JSON, 'r') as f:
+        content = f.read()
+        t2 = json.loads(content)
+    
+    target_components = list(t1) + list(t2)
+    pprint(target_components)
+    
+    urls_to_process = []
+    
+    for i in target_components:
+        if i in atomic_LUT:
+            print(f"FOUND: {i}")
+            if atomic_LUT[i]['url']:
+                print(atomic_LUT[i]['url'])
+                urls_to_process.append(atomic_LUT[i]['url'])
+            else:
+                print(f"Missing URL: {i}")
+            
+        else:
+            print(f"NOT found: {i}")
+    
+    
+    #sys.exit(0)
+
+
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for ste specialisations')
     driver = webdriver.Chrome('chromedriver')
     
@@ -52,10 +89,10 @@ if __name__ == '__main__':
     
     
     url_count = 0
-    urls_to_process = [#'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g',
-                       'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-cannellini-beans-in-water-410g',
-                       'https://www.sainsburys.co.uk/shop/gb/groceries/mission-6-deli-mini-wrap-186g',
-                       'https://www.sainsburys.co.uk/gol-ui/product/flying-goose-sriracha-hot-sauce-455ml']
+    # urls_to_process = [#'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g',
+    #                    'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-cannellini-beans-in-water-410g',
+    #                    'https://www.sainsburys.co.uk/shop/gb/groceries/mission-6-deli-mini-wrap-186g',
+    #                    'https://www.sainsburys.co.uk/gol-ui/product/flying-goose-sriracha-hot-sauce-455ml']
     
     print(f"By.ID: {By.ID}")
     print(f"By.CSS_SELECTOR: {By.CSS_SELECTOR}")
@@ -124,6 +161,8 @@ if __name__ == '__main__':
             elist = driver.find_elements(By.CSS_SELECTOR, css_selector)
             f_igdt = False
             f_desc = False
+            # given element e in elist how to get sibling?
+            # looks like desc gets found productText & h3?
             for e in elist:                
                 print(f"> > > - - - : {e.text}")
                 if f_igdt == True:
@@ -176,20 +215,58 @@ if __name__ == '__main__':
             print(f"Getting: {urls_to_process[url_count]}")
             
     
-        
-    # <h3 class="productDataItemHeader">Ingredients</h3>
+    # case 1: https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g
+    # <h3 class="productDataItemHeader">Ingredients</h3>    XPATH
     # next sibling
-    # <div class="productText">
+    # <div class="productText">     < not unique
     #     <p></p>
     #     <p><strong>INGREDIENTS:</strong>Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate;&nbsp;Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.</p><p></p>
     #     <p>Packaged in a protective atmosphere</p>
     # </div>
     
+    # https://stackoverflow.com/questions/23887592/find-next-sibling-element-in-selenium-python
+    # ^ uses JS - passing webelement and 
     
-    
-    
+    # >>> driver.find_elements(By.XPATH, "//h3[contains(text(),'Ingredients')]")[0].text
+    # 'Ingredients'
+    # driver.find_element(By.XPATH, "//h3[contains(text(),'Ingredients')]").text
+    # 'Ingredients'
+    # driver.find_element(By.XPATH, "//h3[contains(text(),'Ingredients')]/following-sibling::div")
+    # >>> driver.find_element(By.XPATH, "//h3[contains(text(),'Ingredients')]/following-sibling::div").text
+    # 'INGREDIENTS:Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate; Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.\nPackaged in a protective atmosphere'
+
 
     
+    
+    #case 2: https://www.sainsburys.co.uk/gol-ui/product/flying-goose-brand-sriracha-hot-chilli-sauce-455ml
+    #
+    # ---- ingredients
+    # <div class="longTextItems">
+    # <h3 class="itemHeader">Ingredients</h3>
+    #     <ul class="productIngredients">               <- CSS '.productIngredients' driver.find_element(By.CSS_SELECTOR,'.productIngredients').text()
+    #         <li>Chilli 70%, </li>
+    #         <li>Sugar Syrup, </li>
+    #         <li>Salt, </li>
+    #         <li>Water, </li>
+    #         <li>Flavour Enhancer: E621, </li>
+    #         <li>Acids: E260, E330, </li>
+    #         <li>Stabilizer: E415, </li>
+    #         <li>Preservative: E202</li>
+    #     </ul>
+    # </div>
+    
+    # driver.find_element(By.CSS_SELECTOR,'.productIngredients').text
+    # 'Chilli 70%, Sugar Syrup, Salt, Water, Flavour Enhancer: E621, Acids: E260, E330, Stabilizer: E415, Preservative: E202'
+
+    # ---- ri_name - item
+    # <h1 class="pd__header" data-test-id="pd-product-title">Flying Goose Brand Sriracha Hot Chilli Sauce 455ml</h1>
+    
+    # >>> driver.find_elements(By.CSS_SELECTOR,'.pd__header')
+    # [<selenium.webdriver.remote.webelement.WebElement (session="f0c9bc5e7e6e8a1d8c45382f74f2d41a", element="b4c0b3a0-490a-4d9b-910a-ee133d3973ef")>]
+    # ONLY ONE - 
+    # 
+    # >>> driver.find_element(By.CSS_SELECTOR,'.pd__header').text
+    # 'Flying Goose Brand Sriracha Hot Chilli Sauce 455ml'
     
     
     
@@ -237,6 +314,7 @@ if __name__ == '__main__':
 # from selenium.webdriver.support import expected_conditions as EC
 # from selenium.common.exceptions import TimeoutException
 # driver = webdriver.Chrome('chromedriver')
+# driver.get('https://www.sainsburys.co.uk/gol-ui/product/flying-goose-brand-sriracha-hot-chilli-sauce-455ml')
 # driver.get('https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g')
 # click cookie button
 # test calls!
@@ -254,7 +332,7 @@ if __name__ == '__main__':
 
 
 
-# Experimets
+# Experimets - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # ID = "id"
 # NAME = "name"
@@ -291,6 +369,7 @@ if __name__ == '__main__':
 # driver.find_element(By.CSS_SELECTOR, "Ingredients") # nothing!
 # driver.find_elements(By.CSS_SELECTOR, 'h3:contains("^ab$")')        # Message: invalid selector: An invalid or illegal selector was specified
 # driver.find_elements(By.CSS_SELECTOR, 'h3:contains("Ingredients")') # Message: invalid selector: An invalid or illegal selector was specified
+# :contains() pseudo class deprecated CSS3 https://saucelabs.com/resources/articles/selenium-tips-css-selectors
 # driver.find_elements(By.CSS_SELECTOR, "h3:contains('Ingredients')") # Message: invalid selector: An invalid or illegal selector was specified
 # driver.find_elements(By.CSS_SELECTOR, "h3[text='Ingredients']")     # returns []
 # driver.find_elements(By.CSS_SELECTOR, 'h3.productDataItemHeader')   # returns [e1, e2. . .] e = <selenium.webdriver.remote.webelement.WebElement (session="2d914c403b343e929ad84c84ada411f7", element="a32d21a9-e4f0-4936-ac2d-87c07a14f834")>
