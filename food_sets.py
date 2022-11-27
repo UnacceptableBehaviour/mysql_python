@@ -18,6 +18,7 @@ NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 component_file_LUT = {}
 COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
 
+OTS_INGREDIENTS_FOUND = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_ots_ingredients_found.json')
 
 # Item: large dried chillies
 # {'alias': 'dried chillies',
