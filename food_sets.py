@@ -27,6 +27,11 @@ if OTS_INGREDIENTS_FOUND.exists():
         ots_I_set = set(json.loads(content))
 
 def save_ots_ingredients_found():
+    global ots_I_set
+    print(f"Prune ots_I_set from: {len(ots_I_set)}")
+    ots_I_set = ots_I_set - set(atomic_LUT.keys())      # remove ingredients we know about
+    print(f"Saving ots_I_set: {len(ots_I_set)}")    
+    
     with open(OTS_INGREDIENTS_FOUND, 'w') as f:
         ots_i_string = json.dumps(list(ots_I_set))
         f.write(ots_i_string)
