@@ -18,8 +18,22 @@ NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 component_file_LUT = {}
 COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
 
+import json
+ots_I_set = set()
 OTS_INGREDIENTS_FOUND = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_ots_ingredients_found.json')
+if OTS_INGREDIENTS_FOUND.exists():
+    with open(OTS_INGREDIENTS_FOUND, 'r') as f:
+        content = f.read()
+        ots_I_set = set(json.loads(content))
 
+def save_ots_ingredients_found():
+    with open(OTS_INGREDIENTS_FOUND, 'w') as f:
+        ots_i_string = json.dumps(list(ots_I_set))
+        f.write(ots_i_string)
+
+    
+
+        
 # Item: large dried chillies
 # {'alias': 'dried chillies',
 #  'alias_file': ('y445', '20210511_123843_dried chillies.txt'),
@@ -262,6 +276,7 @@ def flatten_tree(i_tree, with_super_ingredient=False):
 
 
 def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
+    global ots_I_set    # keep track of ingredients found in OTS items
     print(f"[process_ots_ingredient_string] for ({ingredient_name})")
     composite_data = {}
     composite_data['ri_name'] = ingredient_name
@@ -320,8 +335,9 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
         
         return(ret_list)
     
-    composite_data['i_tree'] = split_out_sublists_in_brackets()
+    composite_data['i_tree'] = split_out_sublists_in_brackets()    
     composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
+    ots_I_set = ots_I_set | set(composite_data['i_list_flat'])
     print('\n|A|')
     print(composite_data['allergens'])
     print(get_allergens_for(composite_data['allergens']))       
@@ -449,6 +465,8 @@ def get_exploded_ingredients_as_list_from_list(i_list):
     exploded_list = []
     for i in i_list:
         exploded_list += get_ingredients_as_text_list_R(i)
+    
+    save_ots_ingredients_found()
     
     return(sorted(list(set(exploded_list))))
     

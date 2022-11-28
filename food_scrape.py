@@ -15,10 +15,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+
 from food_sets import atomic_LUT,component_file_LUT 
 import json
 MISSING_INGREDIENTS_FILE_JSON = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json'
 MISSING_INGREDIENTS_FILE_JSON_PY = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json'
+NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+
+import json
+ots_I_list = set()
+OTS_INGREDIENTS_FOUND = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_ots_ingredients_found.json')
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -48,11 +54,17 @@ if __name__ == '__main__':
     target_components = []
     t1 = []
     t2 = []
-    # load missing from JSON files
+    # - - - - load MISSING INGREDIENTS from JSON files
+    # list is created by process_nutridocs.py
+    # looking for ALLERGENS, NUTRIENTS NOT IMPORTANT because the ots ingredient has nutrition info
+    # we want ingredients list
+    # cost info too for pricing a component
     with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'r') as f:
         content = f.read()
         t1 = json.loads(content)
 
+    # list is created by cost_menu.rb
+    # we want nutrition & cost information for these items
     with open(MISSING_INGREDIENTS_FILE_JSON, 'r') as f:
         content = f.read()
         t2 = json.loads(content)
