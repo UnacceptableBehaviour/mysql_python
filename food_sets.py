@@ -13,7 +13,8 @@ from collections import Counter
 aliases = {}
 
 atomic_LUT = {}
-NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+NUTRIENT_FILE_BACKUPS = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
 
 component_file_LUT = {}
 COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
@@ -36,6 +37,12 @@ def save_ots_ingredients_found():
         ots_i_string = json.dumps(list(ots_I_set))
         f.write(ots_i_string)
 
+from helpers_db import nix_time_ms
+import shutil
+def backup_nutrinfo_txt():
+    target = NUTRIENT_FILE_BACKUPS.joinpath(f"{nix_time_ms()}_{NUTRIENT_FILE_PATH.name}")
+    shutil.copy(NUTRIENT_FILE_PATH, target)
+    print(f"BACKUP: {NUTRIENT_FILE_BACKUPS.name}/{target.name}")
     
 
         
@@ -101,7 +108,7 @@ errors = {
 def build_atomic_LUT(verbose=False):
 
     content = ''
-    with NUTREINT_FILE_PATH.open('r') as f:
+    with NUTRIENT_FILE_PATH.open('r') as f:
         #content = f.readlines()
         content = f.read()
 

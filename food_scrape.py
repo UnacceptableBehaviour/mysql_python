@@ -16,15 +16,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 
-from food_sets import atomic_LUT,component_file_LUT 
+from food_sets import atomic_LUT, component_file_LUT, backup_nutrinfo_txt, ots_I_set, save_ots_ingredients_found 
 import json
 MISSING_INGREDIENTS_FILE_JSON = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json'
 MISSING_INGREDIENTS_FILE_JSON_PY = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json'
-NUTREINT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 
-import json
-ots_I_list = set()
-OTS_INGREDIENTS_FOUND = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_ots_ingredients_found.json')
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
