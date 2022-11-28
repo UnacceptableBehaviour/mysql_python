@@ -16,7 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 
-from food_sets import atomic_LUT, component_file_LUT, backup_nutrinfo_txt, ots_I_set, save_ots_ingredients_found 
+from food_sets import atomic_LUT, component_file_LUT, backup_nutrinfo_txt, ots_I_set, save_ots_ingredients_found, follow_alias 
 import json
 MISSING_INGREDIENTS_FILE_JSON = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json'
 MISSING_INGREDIENTS_FILE_JSON_PY = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json'
@@ -43,6 +43,44 @@ NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 #     
 # # > = = = =    
 
+def initialise_nutrient_hash():
+    return { 'energy': 0.0,
+            'fat': 0.0,
+            'saturates': 0.0,
+            'mono-unsaturates': 0.0,
+            'poly-unsaturates': 0.0,
+            'omega_3_oil': 0.0,
+            'carbohydrates': 0.0,
+            'sugars': 0.0,
+            'fibre': 0.0,
+            'starch': 0.0,
+            'protein': 0.0,
+            'salt': 0.0,
+            'alcohol': 0.0 }
+
+igdts = 'British Potato, Vegetable Oil (Rapeseed Oil, Sunflower Oil), Yeast Extract Powder, Rice Flour, Sugar, Onion Powder, Flavourings, Yeast Powder, Salt, Nutmeg, Smoked Salt, Black Pepper, Acid: Citric Acid; Bay Leaf, Carob Flour, Black Pepper Extract, Nutmeg Extract, Unsmoked Bacon Extract, Pork Sausage Extract.'
+
+def nutri_string(name, nutrition_info_per_100g, ndb_no='per 100g', i_list='__igdts__', igdt_type='__igdt_type__'):
+    # build nutrient
+    if 'http' in ndb_no: ndb_no=f"ndb_no='{ndb_no}'"
+    
+    nutrient_string = f"------------------ for the nutrition information {name} ({ndb_no})\n"
+    
+    for nut, val in nutrition_info_per_100g.items():
+        if nut == 'energy':
+            nutrient_string = nutrient_string + f"{nut}".ljust(20)+"\t"+f"{ round(val, 0) }".rjust(10)+"\n"
+        else:
+            nutrient_string = nutrient_string +  f"{nut}".ljust(20)+"\t"+f"{ round(val, 2) }".rjust(10)+"\n"
+    
+    nutrient_string = nutrient_string +  "Total (100g)".rjust(60)+"\n"
+    
+    nutrient_string_to_file = f"\n\n{nutrient_string}ingredients: {i_list}\nigdt_type: {igdt_type}"
+        
+    return (nutrient_string_to_file)
+
+
+
+
 def main():
     pass
 
@@ -52,39 +90,94 @@ if __name__ == '__main__':
     t1 = []
     t2 = []
     # - - - - load MISSING INGREDIENTS from JSON files
-    # list is created by process_nutridocs.py
-    # looking for ALLERGENS, NUTRIENTS NOT IMPORTANT because the ots ingredient has nutrition info
-    # we want ingredients list
-    # cost info too for pricing a component
-    with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'r') as f:
-        content = f.read()
-        t1 = json.loads(content)
 
-    # list is created by cost_menu.rb
-    # we want nutrition & cost information for these items
+    # - - list is created by cost_menu.rb
+    # we want INGREDIENTS, NUTRITION & COST information for these items
     with open(MISSING_INGREDIENTS_FILE_JSON, 'r') as f:
         content = f.read()
-        t2 = json.loads(content)
+        t1_cost = json.loads(content)
+
+    # - - list is created by process_nutridocs.py
+    # looking for ALLERGENS, nutrients NOT IMPORTANT because the ots ingredient has nutrition info
+    # we want INGREDIENTS & COST info - for pricing a component
+    with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'r') as f:
+        content = f.read()
+        t2_process = json.loads(content)
     
-    target_components = list(t1) + list(t2)
-    pprint(target_components)
     
-    urls_to_process = []
-    
-    for i in target_components:
-        if i in atomic_LUT:
-            print(f"FOUND: {i}")
-            if atomic_LUT[i]['url']:
-                print(atomic_LUT[i]['url'])
-                urls_to_process.append(atomic_LUT[i]['url'])
-            else:
-                print(f"Missing URL: {i}")
-            
+    def listing(i):
+        i_width = 30
+        if (i in atomic_LUT) and (atomic_LUT[i]['url']):
+            return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
+        elif i in atomic_LUT:
+            a = follow_alias(i)
+            pprint(a)
+            if a:
+                alias = atomic_LUT[i]['alias']
+                i_and_a = f"{i}({alias})"
+                return ({a['url']}, f"{i_and_a.rjust(i_width)}  {a['url']}")
         else:
-            print(f"NOT found: {i}")
+            return (None, f"{i.rjust(i_width)}  not in atomic_LUT")
+    
+    def show_list(title, i_list):
+        print(f"- {title} -".center(80,'-'))
+        for i in i_list:
+            _, p = listing(i)
+            print(p)    
+        print(f"- {'O'} -".center(80,'-'))
+    
+    show_list('t1_cost',t1_cost)
+    show_list('t2_process',t2_process)
+    
+    # urls_to_process = []
+    # 
+    # for i in t1_cost:
+    #     url, p = listing(i)
+    #     print(p)
+    #     if url == None:
+    #         url = input(f"URL for {i}?\n")            
+    #     urls_to_process.append((i, url))
+    # 
+    # for i in t2_process:
+    #     url, p = listing(i)
+    #     print(p)
+    #     if url == None:
+    #         url = input(f"URL for {i}?\n")            
+    #     urls_to_process.append((i, url))    
+    # 
+    # print()
+    # pprint(urls_to_process)
+    #
+    
+    print(nutri_string('flying pigs', initialise_nutrient_hash(), atomic_LUT['balsamic vinegar']['url'], igdts, 'ots'))
+
+    sys.exit(0)
     
     
-    #sys.exit(0)
+    # if its in the aLUT scrape info and insert it into the nutridoc
+    
+    # if not in aLUT scrape info insert it into template and add it to end of nutridoc
+    
+    urls_to_process = [('pearl barley',
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pearl-barley-500g'),
+                       ('cooked pearl barley', ''),
+                       ('blooming mushrooms', ''),
+                       ('veg soup', ''),
+                       ('beansprout dryfry', ''),
+                       ('niknacks',
+                        'https://www.sainsburys.co.uk/gol-ui/product/kp-nik-naks-nice-n-spicy-grab-bag-50g'),
+                       ('sbs pastry twist',
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-gruyere-poppy-twists-taste-the-difference-100g'),
+                       ('duck crown',
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-duck-breast-fillets-340g'),
+                       ('balsamic vinegar',
+                        {'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-balsamic-vinegar-500ml'}),
+                       ('goats cheese',
+                        {'https://www.sainsburys.co.uk/gol-ui/product/coeur-de-lion-la-buche-goats-cheese-150g'}),
+                       ('blackcurrant conserve',
+                        {'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-blackcurrant-conserve--taste-the-difference-340g'}),
+                       ('bread flour',
+                        {'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg'})]
 
 
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for ste specialisations')
