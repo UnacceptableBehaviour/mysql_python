@@ -292,15 +292,12 @@ yXXX_NUTRITEST_recipes_20190719-01.rtf\cf15 \
 										follows aliases and finds URL to item retailer: \
 										Uses food sets to generate TAGs & allergies inserts into \
 										rcp.txt\
-										Processes scraped (\cf17 by hand\cf15 ) recipes into ingredients\
-										\cf17 Move igdt processing into food_scrape.py\cf4 \
+										Processes scraped (\cf17 by hand\cf15 ) recipes into ingredients\cf4 \
 										\cf17 TAGS & allergies inserted into recipe\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f4\b \cf15 										$ food_scrape.py
 \f2\b0 \cf17 \
-										Get Selenium basics working & port product_info.rb to python\
-										do sainsburies first the get list form nutrinfo.txt\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 																			STOREs COMPLETE recipe pairs in\
 																			/_course_components/_i_w_r_auto_tmp\
@@ -310,13 +307,34 @@ yXXX_NUTRITEST_recipes_20190719-01.rtf\cf15 \
 																			STOREs INCOMPLETE recipe pairs in\
 																			/_course_components/_i_w_r_auto_0g\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
-\cf15 \
+
+\f4\b \cf15 										$ product_info.py\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+
+\f2\b0 \cf15 										product info class and scraper API\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf17 										Get Selenium basics working & port product_info.rb to python\
+										get sainsburies various working first igdts & nutrinfo\
+										write into back to \cf4 z_product_nutrition_info.txt\cf17 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf15 										 |
+\f4\b \cf15 \
+										$ food_scrape.py\
+
+\f2\b0 \cf15 										takes output from \cf4 process_nutridocs.py
+\f4\b \cf15  & 
+\f2\b0 \cf4 cost_menu.rb \cf15 to scrape\
+										info from retailer sites about ingredients, including their \
+										ingredients (for ALLERGIES), cost, nutrition info etc\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf4 _courses_components/z_product_nutrition_info_missing_ingredients_RB.json < from cost_menu.rb\
+_courses_components/z_product_nutrition_info_missing_ingredients_PY.json < from process_nutridocs.py\
+																			_courses_components/z_product_nutrition_info.txt\cf15 \
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\
 													
 \f4\b \cf15 $ ./scratch/scan_for_each_data.py
 \f2\b0 \cf15 \
 													Design: ./scratch/scan_for_each_data.jpg\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 All diary recipes in\
 yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
