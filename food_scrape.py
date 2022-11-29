@@ -6,15 +6,16 @@ import itertools
 from pprint import pprint
 from pathlib import Path
 
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
+# from selenium import webdriver
+# from selenium.webdriver.common.keys import Keys
+# from selenium.webdriver.common.by import By
+# 
+# # for expected conditions
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.common.exceptions import TimeoutException
 
-# for expected conditions
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-
+from product_info import ProductInfo
 
 from food_sets import atomic_LUT, component_file_LUT, backup_nutrinfo_txt, ots_I_set, save_ots_ingredients_found, follow_alias 
 import json
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     
     print(nutri_string('flying pigs', initialise_nutrient_hash(), atomic_LUT['balsamic vinegar']['url'], igdts, 'ots'))
 
-    sys.exit(0)
+    #sys.exit(0)
     
     
     # if its in the aLUT scrape info and insert it into the nutridoc
@@ -180,21 +181,9 @@ if __name__ == '__main__':
                         {'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg'})]
 
 
-    print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for ste specialisations')
-    driver = webdriver.Chrome('chromedriver')
-    
-
-    # try these - in frerquency order
-    #
-    # sainsburies - milano sausage
-    # https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g
-    
+    print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
     
     url_count = 0
-    # urls_to_process = [#'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g',
-    #                    'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-cannellini-beans-in-water-410g',
-    #                    'https://www.sainsburys.co.uk/shop/gb/groceries/mission-6-deli-mini-wrap-186g',
-    #                    'https://www.sainsburys.co.uk/gol-ui/product/flying-goose-sriracha-hot-sauce-455ml']
     
     print(f"By.ID: {By.ID}")
     print(f"By.CSS_SELECTOR: {By.CSS_SELECTOR}")
@@ -208,108 +197,18 @@ if __name__ == '__main__':
     # TAG_NAME = "tag name"
     # CLASS_NAME = "class name"
     # CSS_SELECTOR = "css selector"
-
-    cookie_barrier = True
-    delay_in_seconds = 3
     
     while (True):
-        url = urls_to_process[url_count]
+        name, url = urls_to_process[url_count]
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
         print(url)
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
-        driver.get(url)
-        ri_name = 'None'
-        i_list = []
-
-        allow_cookies_btn_id = 'onetrust-accept-btn-handler'
-        if cookie_barrier:
-            try:
-                print('try cookie_button w WAIT')
-                cookie_button = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
-                #cookie_button = driver.find_element(By.ID,'onetrust-accept-btn-handler')
-                print('cookie_button')
-                #pprint(cookie_button)
-            except TimeoutException:
-                print("Loading took too much time!")
-            except Exception as exp:
-                print(exp)
-                print('cookie_button NOT FOUND')
-            
-            try:
-                print('cookie_button CLICK')
-                cookie_button.send_keys(Keys.RETURN)
-                cookie_barrier = False            
-            except Exception as exp:
-                print(exp)
-                print('cookie_button NOT clicked')
-    
-    
-        try:    # wait content load
-            css_selector = 'h3.productDataItemHeader, h3.itemHeader'
-            print(f'# # #> waiting for h3 tags: {css_selector}')
-            h3_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
-            print(f'# # #> found for h3 tags:\n{h3_tags}')
-            #driver.find_elements(By.CSS_SELECTOR, 'h3.productDataItemHeader')
-        except TimeoutException:
-            print("Waiting for INGREDIENTS took too much time!")
-        except Exception as exp:
-            print(exp)
-            print('Ingredients NOT FOUND')
-                
-        try:
-            css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'
-            print(f'# # #> getting list of element w selector: {css_selector}')
-            #elist = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))            
-            elist = driver.find_elements(By.CSS_SELECTOR, css_selector)
-            f_igdt = False
-            f_desc = False
-            # given element e in elist how to get sibling?
-            # looks like desc gets found productText & h3?
-            for e in elist:                
-                print(f"> > > - - - : {e.text}")
-                if f_igdt == True:
-                    f_igdt = False
-                    i_list = e.text.strip()
-                    print(f">>IGDTs:{i_list}")                    
-                if f_desc == True:
-                    f_desc = False
-                    ri_name = e.text.strip()
-                    print(f">>Item:{ri_name}")
-                if e.text.strip() == 'Ingredients':
-                    f_igdt = True
-                if e.text.strip() == 'Description':
-                    f_desc = True
-        except Exception as exp:
-            print(exp)
-            print('NOTHING!')
         
+        if url == '': continue
         
-        # try:
-        #     css_selector = ".productText"
-        #     #css_selector = ".productDataItemHeader, .productText"
-        #     print(f'# # #> getting list of element w selector: {css_selector}')            
-        #     print('getting list of element w selector: .productText')
-        #     #igd = driver.find_element(By.CSS_SELECTOR(".productText[text^=INGREDIENTS:]"));
-        #     ptext_c_list = driver.find_elements(By.CSS_SELECTOR, ".productText");
-        #     for e in ptext_c_list:
-        #         print(f"> > > - - - - - - {e.text}")
-        #         pprint(e)   
-        # except Exception as exp:
-        #     print(exp)
-        #     print('No ingredients for you!')
-        # 
-        # 
-        # 
-        # try:
-        #     e = driver.find_element(By.CLASS_NAME, 'pd__header')
-        #     print(f"len(e.text):{len(e.text)}")            
-        #     print(f"> > > - - - - - - {e.text}")
-        #     pprint(e)        
-        # except Exception as exp:
-        #     print(exp)
-        #     print('NOTHING!')
+        item = ProductInfo(name, url)
 
-        print(f"\n\nItem: {ri_name}\nIngredients:{i_list}")
+        print(f"\n\nItem: {item.ri_name} - {item.product_name}\nIngredients:{item.i_list}")
         yn = input('Try again? (y)/n\n')
         if str(yn).lower() == 'n': sys.exit(0)
         elif 'http' in yn:
