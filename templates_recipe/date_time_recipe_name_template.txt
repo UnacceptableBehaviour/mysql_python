@@ -1,6 +1,6 @@
 ------------------ for the __recipe_name__ (__serving_info__)
 __ingredients__
-													Total (__total_yield__)
+						Total (__total_yield__)
 method: __method__
 description: __description__
 notes: __notes__
@@ -11,5 +11,6 @@ type: __type__
 images: __images__
 lead_image: __lead_image__
 username: __username__
+exploded: __exploded_igdt_list__
 __end_recipe__
 
