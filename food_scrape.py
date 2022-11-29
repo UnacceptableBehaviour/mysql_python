@@ -183,22 +183,10 @@ if __name__ == '__main__':
 
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
     
-    url_count = 0
-    
-    print(f"By.ID: {By.ID}")
-    print(f"By.CSS_SELECTOR: {By.CSS_SELECTOR}")
-    print(f"By.TAG_NAME: {By.TAG_NAME}")
-    print(f"By.CLASS_NAME: {By.CLASS_NAME}")
-    # ID = "id"
-    # NAME = "name"
-    # XPATH = "xpath"
-    # LINK_TEXT = "link text"
-    # PARTIAL_LINK_TEXT = "partial link text"
-    # TAG_NAME = "tag name"
-    # CLASS_NAME = "class name"
-    # CSS_SELECTOR = "css selector"
-    
+    url_count = -1
+
     while (True):
+        url_count += 1
         name, url = urls_to_process[url_count]
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
         print(url)

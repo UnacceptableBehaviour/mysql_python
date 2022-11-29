@@ -20,7 +20,7 @@ class ProductInfo:
     VALUE_WIDTH = 10
     ENERGY_TO_KCAL = 4.184
                 
-    def __init__(name, url):
+    def __init__(self, name, url):
         self.ri_name            = name  # nick_name
         self.product_name       = ''
         self.price_per_package  = 0.0
@@ -52,7 +52,7 @@ class ProductInfo:
         
         self.get_product_info()
 
-    def scrape_sainsburys():
+    def scrape_sainsburys(self):
         print(f"scraping SAINSBURIES: {self.product_url}")
         driver = webdriver.Chrome('chromedriver')        
         cookie_barrier = True
@@ -116,39 +116,39 @@ class ProductInfo:
             print('NOTHING!')
         
 
-    def scrape_morrisons():
+    def scrape_morrisons(self):
         print(f"scraping MORRISONS: {self.product_url}")        
         
-    def scrape_tesco():
+    def scrape_tesco(self):
         print(f"scraping TESCO: {self.product_url}")
         driver = webdriver.Chrome('chromedriver')
         cookie_barrier = True
         delay_in_seconds = 3    
         driver.get(self.product_url)
 
-    def scrape_waitrose():
+    def scrape_waitrose(self):
         print(f"scraping WAITROSE: {self.product_url}")      
       
-    def scrape_coop():
+    def scrape_coop(self):
         print(f"scraping COOP: {self.product_url}")
       
-    def scrape_asda():
+    def scrape_asda(self):
         print(f"scraping ASDA: {self.product_url}")
       
-    def scrape_ocado():
+    def scrape_ocado(self):
         print(f"scraping OCADO: {self.product_url}")
       
-    def scrape_booker():
+    def scrape_booker(self):
         print(f"scraping BOOKER: {self.product_url}")
       
-    def scrape_specialist():
+    def scrape_specialist(self):
         print(f"scraping WHO KNEW!?: {self.product_url}")
       
         
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # top level get nutrient request
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def get_product_info():
+    def get_product_info(self):
       
         # specialise this 
         # driver = webdriver.Chrome('chromedriver')
@@ -175,31 +175,31 @@ class ProductInfo:
               break
 
         if match == 'sainsburys':
-            scrape_sainsburys()
+            self.scrape_sainsburys()
           
         elif match == 'morrisons':
-            scrape_morrisons()
+            self.scrape_morrisons()
           
         elif match == 'tesco':
-            scrape_tesco()
+            self.scrape_tesco()
           
         elif match == 'waitrose':
-            scrape_waitrose()
+            self.scrape_waitrose()
           
         elif match == 'coop':
-            scrape_coop()
+            self.scrape_coop()
           
         elif match == 'asda':
-            scrape_asda()
+            self.scrape_asda()
           
         elif match == 'ocado':
-            scrape_ocado()
+            self.scrape_ocado()
         
         elif match == 'booker':
-            scrape_booker()
+            self.scrape_booker()
         
         elif match == None:
-            scrape_specialist()
+            self.scrape_specialist()
 
      
     # find which column the per 100g/ml is 
