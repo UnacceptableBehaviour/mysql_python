@@ -172,13 +172,13 @@ if __name__ == '__main__':
                        ('duck crown',
                         'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-duck-breast-fillets-340g'),
                        ('balsamic vinegar',
-                        {'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-balsamic-vinegar-500ml'}),
+                        'https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-balsamic-vinegar-500ml'),
                        ('goats cheese',
-                        {'https://www.sainsburys.co.uk/gol-ui/product/coeur-de-lion-la-buche-goats-cheese-150g'}),
+                        'https://www.sainsburys.co.uk/gol-ui/product/coeur-de-lion-la-buche-goats-cheese-150g'),
                        ('blackcurrant conserve',
-                        {'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-blackcurrant-conserve--taste-the-difference-340g'}),
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-blackcurrant-conserve--taste-the-difference-340g'),
                        ('bread flour',
-                        {'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg'})]
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg')]
 
 
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
