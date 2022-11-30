@@ -28,6 +28,7 @@ class ProductInfo:
         self.ri_name            = name  # nick_name
         self.product_name       = ''
         self.price_per_package  = 0.0
+        self.package_in_g       = 0.0
         self.price_per_measure  = 0.0
         self.supplier_item_code = ''
         self.product_url        = url
@@ -55,6 +56,9 @@ class ProductInfo:
         self.product_page       = None   
         
         self.get_product_info()
+
+    def __str__(self):
+        return str(pprint(vars(self)))
 
     def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")
@@ -85,8 +89,7 @@ class ProductInfo:
             except Exception as exp:
                 print(exp)
                 print('cookie_button NOT clicked')
-    
-    
+
         try:    # wait content load
             css_selector = 'h3.productDataItemHeader, h3.itemHeader'
             print(f'# # #> waiting for h3 tags: {css_selector}')
@@ -97,6 +100,55 @@ class ProductInfo:
         except Exception as exp:
             print(exp)
             print('Ingredients NOT FOUND')
+            
+        # self.product_name       = ''
+        # <h1 class="pd__header" data-test-id="pd-product-title">Nik Naks Nice'N'Spicy Grab Bag Crisps 45g</h1>
+        # data-test-id="pd-product-title"
+        try:
+            #css_selector = 'h1[data-test-id="pd-product-title"]'
+            css_selector = 'h1.pd__header[data-test-id="pd-product-title"]'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.product_name = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.product_name NOT found!')        
+        
+        # self.price_per_package  = 0.0
+        # <div aria-label="£1.80 was £2.40">£1.80</div
+        # <div data-test-id="pd-retail-price" class="pd__cost__total--promo undefined"><div aria-hidden="true"><span data-test-id="offer-original-price" class="pd__cost__original" aria-label="original price">£2.40</span></div><div aria-label="£1.80 was £2.40">£1.80</div></div>
+        # <div aria-label="65p was undefined">65p</div>
+        # <div data-test-id="pd-retail-price" class="pd__cost__total undefined"><div aria-label="65p was undefined">65p</div></div>
+        #                       ^
+        try:
+            css_selector = 'div[data-test-id="pd-retail-price"]'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_package = e.text.strip()
+            self.package_in_g = 9999
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_package NOT found!')
+            
+        # self.price_per_measure  = 0.0
+        # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£12.00 / kg</div>
+        # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£2.11 / 100g</div>
+        #                       ^
+        try:
+            css_selector = '[data-test-id="pd-unit-price"]'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_measure = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')
+            
+        # self.supplier_item_code = ''
+        # not for this supplier
+                
+        self.supplier_name      = 'Sainburys'
+        # self.nutrition_info     = None
+        
+        # self.i_list             = []    # ingredient list
+        # self.i_text             = ''    # ingredient raw text as scraped    
+    
                 
         try:
             css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'

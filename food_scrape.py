@@ -202,7 +202,10 @@ if __name__ == '__main__':
         
         item = ProductInfo(name, url)
 
-        print(f"\n\nItem: {item.ri_name} - {item.product_name}\nIngredients:{item.i_list}")
+        print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+        print(item)
+        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
+
 
             
     
