@@ -107,7 +107,7 @@ if __name__ == '__main__':
     
     
     def listing(i):
-        i_width = 30
+        i_width = 40
         if (i in atomic_LUT) and (atomic_LUT[i]['url']):
             return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
         elif i in atomic_LUT:
