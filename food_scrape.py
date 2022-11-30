@@ -193,15 +193,18 @@ if __name__ == '__main__':
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
         
         if url == '': continue
+
+        yn = input(f'Find info for "{name}"? y/n - RET to skip\n')
+        if str(yn).lower() == 'n': sys.exit(0)
+        if str(yn).lower() == '': continue
+
+        url_count += 1
+        print(f"Getting: {urls_to_process[url_count]}")
         
         item = ProductInfo(name, url)
 
         print(f"\n\nItem: {item.ri_name} - {item.product_name}\nIngredients:{item.i_list}")
-        yn = input('Try again? (y)/n\n')
-        if str(yn).lower() == 'n': sys.exit(0)
-        elif 'http' in yn:
-            url_count += 1
-            print(f"Getting: {urls_to_process[url_count]}")
+
             
     
     # case 1: https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g
