@@ -198,7 +198,6 @@ if __name__ == '__main__':
         if str(yn).lower() == 'n': sys.exit(0)
         if str(yn).lower() == '': continue
 
-        url_count += 1
         print(f"Getting: {urls_to_process[url_count]}")
         
         item = ProductInfo(name, url)
