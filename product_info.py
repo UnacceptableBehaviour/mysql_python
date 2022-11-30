@@ -19,6 +19,10 @@ class ProductInfo:
     CATEGORY_WIDTH = 24
     VALUE_WIDTH = 10
     ENERGY_TO_KCAL = 4.184
+    sbs_driver = None
+    tsc_driver = None
+    sbs_cookie_barrier = True
+    tsc_cookie_barrier = True
                 
     def __init__(self, name, url):
         self.ri_name            = name  # nick_name
@@ -52,15 +56,18 @@ class ProductInfo:
         
         self.get_product_info()
 
-    def scrape_sainsburys(self):
+    def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")
-        driver = webdriver.Chrome('chromedriver')        
-        cookie_barrier = True
+
+        if ProductInfo.sbs_driver == None:
+            ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
+        driver = ProductInfo.sbs_driver
+
         delay_in_seconds = 3    
         driver.get(self.product_url)
 
         allow_cookies_btn_id = 'onetrust-accept-btn-handler'
-        if cookie_barrier:
+        if ProductInfo.sbs_cookie_barrier:
             try:
                 print('try cookie_button w WAIT')
                 cookie_button = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
@@ -74,7 +81,7 @@ class ProductInfo:
             try:
                 print('cookie_button CLICK')
                 cookie_button.send_keys(Keys.RETURN)
-                cookie_barrier = False            
+                ProductInfo.sbs_cookie_barrier = False            
             except Exception as exp:
                 print(exp)
                 print('cookie_button NOT clicked')
@@ -121,8 +128,7 @@ class ProductInfo:
         
     def scrape_tesco(self):
         print(f"scraping TESCO: {self.product_url}")
-        driver = webdriver.Chrome('chromedriver')
-        cookie_barrier = True
+        driver = webdriver.Chrome('chromedriver')        
         delay_in_seconds = 3    
         driver.get(self.product_url)
 
