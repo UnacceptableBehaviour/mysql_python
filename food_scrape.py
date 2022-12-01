@@ -19,10 +19,15 @@ from product_info import ProductInfo
 
 from food_sets import atomic_LUT, component_file_LUT, backup_nutrinfo_txt, ots_I_set, save_ots_ingredients_found, follow_alias 
 import json
-MISSING_INGREDIENTS_FILE_JSON = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json'
-MISSING_INGREDIENTS_FILE_JSON_PY = '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json'
+MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
+MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
-
+URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_retrieved_URLs.json')
+url_LUT = {}
+if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
+    with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
+        content = f.read()
+        url_LUT = json.loads(content)
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -178,8 +183,13 @@ if __name__ == '__main__':
                        ('blackcurrant conserve',
                         'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-blackcurrant-conserve--taste-the-difference-340g'),
                        ('bread flour',
-                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg')]
-
+                        'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-strong-white-bread-flour--unbleached-15kg'),
+                        ('sweet pickled gherkins', 'https://groceries.asda.com/product/pickled-onions-vegetables/asda-pickled-gherkins/910000508756'),
+                        ('mini pickled onions','https://www.sainsburys.co.uk/shop/gb/groceries/pickled-food-208345-44/opies-cocktail-onions-227g'),
+                        ('pickled beetroot','https://www.sainsburys.co.uk/shop/gb/groceries/sainsburys-beetroot-in-vinegar-300g'),
+                        ('pickled ginger','https://www.sainsburys.co.uk/shop/gb/groceries/yutaka-sushi-ginger-190g'),
+                        ('pickled gherkins','https://www.sainsburys.co.uk/shop/gb/groceries/pickled-food-208345-44/sainsburys-pickled-gherkins-675g'),
+                        ('pickled jalapeno','https://www.sainsburys.co.uk/shop/gb/groceries/santa-maria-latin-american-kitchen-green-jalapenos-200g')]
 
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
     

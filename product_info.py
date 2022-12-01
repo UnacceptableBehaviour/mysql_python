@@ -19,10 +19,23 @@ class ProductInfo:
     CATEGORY_WIDTH = 24
     VALUE_WIDTH = 10
     ENERGY_TO_KCAL = 4.184
-    sbs_driver = None
-    tsc_driver = None
+    sbs_driver = None  # sbs        # TODO - register driver into a hash: driver['sbs']
+    mrs_driver = None  # mrs             # can we use API for this?
+    tsc_driver = None  # tsc
+    wtr_driver = None  # wtr
+    cop_driver = None  # cop
+    asd_driver = None  # asd
+    ocd_driver = None  # ocd
+    bkr_driver = None  # bkr        
     sbs_cookie_barrier = True
+    mrs_cookie_barrier = True
     tsc_cookie_barrier = True
+    wtr_cookie_barrier = True
+    cop_cookie_barrier = True
+    asd_cookie_barrier = True
+    ocd_cookie_barrier = True
+    bkr_cookie_barrier = True
+
                 
     def __init__(self, name, url):
         self.ri_name            = name  # nick_name
@@ -215,14 +228,14 @@ class ProductInfo:
         # driver.get(url)
       
         supplier_regex = [  
-          r'(sainsburys)',
-          r'(morrisons)',
-          r'(tesco)',
-          r'(waitrose)',
-          r'(coop)',
-          r'(asda)',
-          r'(ocado)',
-          r'(booker)'
+          r'(sainsburys)',  # sbs
+          r'(morrisons)',   # mrs
+          r'(tesco)',       # tsc
+          r'(waitrose)',    # wtr
+          r'(coop)',        # cop
+          r'(asda)',        # asd
+          r'(ocado)',       # ocd
+          r'(booker)'       # bkr
         ]
         
         match = None
