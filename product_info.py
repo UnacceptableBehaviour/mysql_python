@@ -3,7 +3,7 @@
 import re
 #import sys
 #import itertools
-from pprint import pprint
+from pprint import pprint, pformat
 #from pathlib import Path
 
 from selenium import webdriver
@@ -71,7 +71,10 @@ class ProductInfo:
         self.get_product_info()
 
     def __str__(self):
-        return str(pprint(vars(self)))
+        json = pformat(vars(self), indent=2, sort_dicts=False)
+        #return str(pprint(vars(self)))
+        #print(json)
+        return json
 
     def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")

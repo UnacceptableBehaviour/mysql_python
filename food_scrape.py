@@ -22,12 +22,12 @@ import json
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
-URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_retrieved_URLs.json')
-url_LUT = {}
+URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
+url_CACHE = {}
 if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
     with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
         content = f.read()
-        url_LUT = json.loads(content)
+        url_CACHE = json.loads(content)
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -50,7 +50,7 @@ if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
 # # > = = = =    
 
 def initialise_nutrient_hash():
-    return { 'energy': 0.0,
+    return {'energy': 0.0,
             'fat': 0.0,
             'saturates': 0.0,
             'mono-unsaturates': 0.0,
@@ -194,8 +194,16 @@ if __name__ == '__main__':
     print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
     
     url_count = -1
-
+    item = None
+    
     while (True):
+        if item:
+            yn = input(f"Save info for > {item.ri_name} <? y/n - RET to skip\n")
+            if str(yn).lower() == 'y':            
+                with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
+                    url_CACHE[item.product_url] = json.dumps(str(item))
+                    f.write(json.dumps(url_CACHE))
+        
         url_count += 1
         name, url = urls_to_process[url_count]
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
