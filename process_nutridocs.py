@@ -17,6 +17,7 @@ from striprtf.striprtf import rtf_to_text
 from helpers_db import nix_time_ms
 
 from food_sets import get_allergens_for, get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, get_exploded_ingredients_as_list_from_list, scan_for_error_items
+from food_sets import atomic_LUT # debug - TODO REMOVE
 from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
 import json
 from collections import Counter # to dump debug
@@ -706,6 +707,41 @@ print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # 
 for k in errors.keys():
     print(k, len(errors[k]))
 print("# # # # # # # # # # # errors.keys # # # # # # # # # # # E\n\n")
+
+def print_urls_to_process():
+    dict_of_urls_to_process = {}
+    
+    supplier_regex = [  
+      r'(sainsburys)',  # sbs
+      r'(morrisons)',   # mrs
+      r'(tesco)',       # tsc
+      r'(waitrose)',    # wtr
+      r'(coop)',        # cop
+      r'(asda)',        # asd
+      r'(ocado)',       # ocd
+      r'(booker)'       # bkr
+    ]
+    
+    for ri_name in atomic_LUT:
+        url = atomic_LUT[ri_name]['url']
+        if url:
+            match = None
+            for r in supplier_regex:
+                m = re.search(r, url)            
+                if m:
+                    match = m.group(1)
+                    break
+            if match in dict_of_urls_to_process:
+                dict_of_urls_to_process[match].append( (ri_name, url) )
+            else:
+                dict_of_urls_to_process[match] = [ (ri_name, url) ]
+            
+    pprint(dict_of_urls_to_process)
+    return dict_of_urls_to_process
+    
+print_urls_to_process()
+print()
+pprint(atomic_LUT['crispy orange beef'])
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
 if not opt_setting: print(help)
