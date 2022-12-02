@@ -238,7 +238,8 @@ class ProductInfo:
           r'(coop)',        # cop
           r'(asda)',        # asd
           r'(ocado)',       # ocd
-          r'(booker)'       # bkr
+          r'(booker)',      # bkr
+          r'(aldi)'         # ald
         ]
         
         match = None
