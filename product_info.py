@@ -215,6 +215,9 @@ class ProductInfo:
     def scrape_booker(self):
         print(f"scraping BOOKER: {self.product_url}")
       
+    def scrape_aldi(self):
+        print(f"scraping ALDI: {self.product_url}")
+      
     def scrape_specialist(self):
         print(f"scraping WHO KNEW!?: {self.product_url}")
       
@@ -272,6 +275,9 @@ class ProductInfo:
         
         elif match == 'booker':
             self.scrape_booker()
+        
+        elif match == 'aldi':
+            self.scrape_aldi()
         
         elif match == None:
             self.scrape_specialist()
