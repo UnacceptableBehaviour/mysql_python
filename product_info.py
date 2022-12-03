@@ -180,6 +180,23 @@ class ProductInfo:
             print(exp)
             print('self.price_per_package NOT found!')
 
+        
+        try:
+            # list of h3.productDataItemHeader and div.productText PAIRS
+            e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+            print(f"> element PAIRS {len(e_list)/2}")
+            print(f"> 0 {e_list[0].text}")
+            print(f"> 1 {e_list[1].text}")
+            print(f"> 2 {e_list[2].text}")
+            print(f"> 3 {e_list[3].text}")    
+            elements = iter(e_list)
+            for elem in elements:
+                print(f"\nt:>{elem.text}<\nc:>{next(elements).text}<\n\n")
+                        
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_package NOT found!')
+
         # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
         # >>> pprint(list)
         # [<selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="227f94ae-f2ef-4547-a3fe-15004956af84")>,
@@ -287,7 +304,7 @@ class ProductInfo:
             print(exp)
             print('NOTHING!')
         
-        self.display_all_tags(driver)
+        #self.display_all_tags(driver)
         
 
     def scrape_morrisons(self):
