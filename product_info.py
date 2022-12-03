@@ -15,6 +15,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+
 class ProductInfo:
     CATEGORY_WIDTH = 24
     VALUE_WIDTH = 10
@@ -76,6 +77,37 @@ class ProductInfo:
         #print(json)
         return json
 
+
+    def display_all_tags(self, driver):
+        print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - S")
+        try:
+            #css_selector = 'h1[data-test-id="pd-product-title"]'
+            css_selector = '*'
+            e_list = driver.find_elements(By.CSS_SELECTOR, css_selector)
+            for e in e_list:
+                #object_methods = [method_name for method_name in dir(object) if callable(getattr(object, method_name))]
+                #print('methods')
+                #print([method_name for method_name in dir(e) if callable(getattr(e, method_name))])
+                #print('m--')
+                print(f"\n>TAG: <{e.tag_name}>")
+                print(f"class: {e.get_attribute('class')} <")
+                print(f"data-test-id: {e.get_attribute('data-test-id')} <")
+                print(f"Text: {e.text} <")
+                #print(f"Text: {e.text} <")
+                pprint(e)
+                # print(f"{}")
+                # print(f"{}")
+                # print(f"{}")
+                # print(f"{}")
+                # print(f"{}")
+            
+        except Exception as exp:
+            print('Expetion S')
+            print(exp)
+            print('Expetion E')        
+        print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
+        
+
     def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")
 
@@ -116,18 +148,32 @@ class ProductInfo:
         except Exception as exp:
             print(exp)
             print('Ingredients NOT FOUND')
+        
+        # self.product_name
+        # >TAG: <h1>
+        # class: pd__header <
+        # data-test-id: pd-product-title <
+        # Text: Sainsbury's Pearl Barley 500g <
+        try:
+            css_selector = '[data-test-id="pd-product-title"]'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_measure = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')        
             
         # self.product_name       = ''
         # <h1 class="pd__header" data-test-id="pd-product-title">Nik Naks Nice'N'Spicy Grab Bag Crisps 45g</h1>
         # data-test-id="pd-product-title"
-        try:
-            #css_selector = 'h1[data-test-id="pd-product-title"]'
-            css_selector = 'h1.pd__header[data-test-id="pd-product-title"]'
-            e = driver.find_element(By.CSS_SELECTOR, css_selector)
-            self.product_name = e.text.strip()
-        except Exception as exp:
-            print(exp)
-            print('self.product_name NOT found!')        
+        # this predictably gets the description
+        # try:
+        #     #css_selector = 'h1[data-test-id="pd-product-title"]'
+        #     css_selector = 'h1.pd__header[data-test-id="pd-product-title"]'
+        #     e = driver.find_element(By.CSS_SELECTOR, css_selector)
+        #     self.product_name = e.text.strip()
+        # except Exception as exp:
+        #     print(exp)
+        #     print('self.product_name NOT found!')        
         
         # self.price_per_package  = 0.0
         # <div aria-label="£1.80 was £2.40">£1.80</div
@@ -189,6 +235,8 @@ class ProductInfo:
         except Exception as exp:
             print(exp)
             print('NOTHING!')
+        
+        self.display_all_tags(driver)
         
 
     def scrape_morrisons(self):
@@ -296,6 +344,8 @@ class ProductInfo:
         # }
         # col_100 = col_100 || default_col  
     
+
+
 
 
 

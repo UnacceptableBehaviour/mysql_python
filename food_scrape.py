@@ -198,21 +198,22 @@ if __name__ == '__main__':
     
     while (True):
         if item:
-            yn = input(f"Save info for > {item.ri_name} <? y/n - RET to skip\n")
+            yn = input(f"SAVE info for > {item.ri_name} <? y/n - RET to skip\n")
             if str(yn).lower() == 'y':            
                 with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
                     url_CACHE[item.product_url] = json.dumps(str(item))
                     f.write(json.dumps(url_CACHE))
+                item = None
         
         url_count += 1
         name, url = urls_to_process[url_count]
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+        print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
         print(url)
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
+        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
         
         if url == '': continue
 
-        yn = input(f'Find info for "{name}"? y/n - RET to skip\n')
+        yn = input(f'FIND info for "{name}"? y/n - RET to skip\n')
         if str(yn).lower() == 'n': sys.exit(0)
         if str(yn).lower() == '': continue
 
@@ -316,6 +317,7 @@ if __name__ == '__main__':
 # open python and load driver
 # % python
 # uncommment & paste in interactive shell:
+# - -
 # from pprint import pprint
 # from selenium import webdriver
 # from selenium.webdriver.common.keys import Keys
@@ -328,6 +330,7 @@ if __name__ == '__main__':
 # driver = webdriver.Chrome('chromedriver')
 # driver.get('https://www.sainsburys.co.uk/gol-ui/product/flying-goose-brand-sriracha-hot-chilli-sauce-455ml')
 # driver.get('https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g')
+# - -
 # click cookie button
 # test calls!
 
@@ -340,7 +343,9 @@ if __name__ == '__main__':
 # children, sibling dynamically created id
 # https://devqa.io/selenium-css-selectors/
 
-
+# Selenium - WebElement interface
+# https://www.selenium.dev/
+# https://www.selenium.dev/documentation/webdriver/elements/
 
 
 
