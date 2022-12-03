@@ -160,7 +160,7 @@ class ProductInfo:
             # css_selector = 'h1[class=pd__header][data-test-id=pd-product-title]' # SAME - works
             css_selector = 'h1.pd__header[data-test-id=pd-product-title]' 
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
-            self.price_per_measure = e.text.strip()
+            self.product_name = e.text.strip()
         except Exception as exp:
             print(exp)
             print('self.product_name NOT found!')         
@@ -180,7 +180,7 @@ class ProductInfo:
             print(exp)
             print('self.price_per_package NOT found!')
 
-        
+        item_info = {}
         try:
             # list of h3.productDataItemHeader and div.productText PAIRS
             e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
@@ -191,8 +191,15 @@ class ProductInfo:
             print(f"> 3 {e_list[3].text}")    
             elements = iter(e_list)
             for elem in elements:
-                print(f"\nt:>{elem.text}<\nc:>{next(elements).text}<\n\n")
-                        
+                #print(f"\nt:>{elem.text}<\nc:>{next(elements).text}<\n\n")
+                ne = next(elements)
+                item_info[elem.text.lower()] = ne                
+                print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
+            
+            self.package_in_g = item_info['size'].text
+            self.i_text       = item_info['ingredients'].text
+            self.product_desc = item_info['description'].text
+            
         except Exception as exp:
             print(exp)
             print('self.price_per_package NOT found!')
@@ -280,29 +287,29 @@ class ProductInfo:
         # self.product_desc       = ''    # Description
         # self.i_list             = []    # ingredient list
         # self.i_text             = ''    # ingredient raw text as scraped    
-        try:
-            css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'
-            print(f'# # #> getting list of element w selector: {css_selector}')
-            elist = driver.find_elements(By.CSS_SELECTOR, css_selector)
-            f_igdt = False
-            f_desc = False
-            for e in elist:                
-                print(f"> > > - - - : {e.text}")
-                if f_igdt == True:
-                    f_igdt = False
-                    self.i_list = e.text.strip()
-                    print(f">>IGDTs:{self.i_list}")                    
-                if f_desc == True:
-                    f_desc = False
-                    self.product_desc = e.text.strip()
-                    print(f">>Desc:{self.product_desc}")
-                if e.text.strip() == 'Ingredients':
-                    f_igdt = True
-                if e.text.strip() == 'Description':
-                    f_desc = True
-        except Exception as exp:
-            print(exp)
-            print('NOTHING!')
+        # try:
+        #     css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'
+        #     print(f'# # #> getting list of element w selector: {css_selector}')
+        #     elist = driver.find_elements(By.CSS_SELECTOR, css_selector)
+        #     f_igdt = False
+        #     f_desc = False
+        #     for e in elist:                
+        #         print(f"> > > - - - : {e.text}")
+        #         if f_igdt == True:
+        #             f_igdt = False
+        #             self.i_list = e.text.strip()
+        #             print(f">>IGDTs:{self.i_list}")                    
+        #         if f_desc == True:
+        #             f_desc = False
+        #             self.product_desc = e.text.strip()
+        #             print(f">>Desc:{self.product_desc}")
+        #         if e.text.strip() == 'Ingredients':
+        #             f_igdt = True
+        #         if e.text.strip() == 'Description':
+        #             f_desc = True
+        # except Exception as exp:
+        #     print(exp)
+        #     print('NOTHING!')
         
         #self.display_all_tags(driver)
         
