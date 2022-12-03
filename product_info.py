@@ -50,6 +50,7 @@ class ProductInfo:
         self.nutrition_info     = None 
         self.i_list             = []    # ingredient list
         self.i_text             = ''    # ingredient raw text as scraped
+        self.product_desc       = ''
     
         self.symbol_to_regex    = {
             'energy':            r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
@@ -149,31 +150,20 @@ class ProductInfo:
             print(exp)
             print('Ingredients NOT FOUND')
         
-        # self.product_name
+        # self.product_name = ''
+        # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
         # >TAG: <h1>
         # class: pd__header <
         # data-test-id: pd-product-title <
         # Text: Sainsbury's Pearl Barley 500g <
         try:
-            css_selector = '[data-test-id="pd-product-title"]'
+            # css_selector = 'h1[class=pd__header][data-test-id=pd-product-title]' # SAME - works
+            css_selector = 'h1.pd__header[data-test-id=pd-product-title]' 
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
             self.price_per_measure = e.text.strip()
         except Exception as exp:
             print(exp)
-            print('self.price_per_measure NOT found!')        
-            
-        # self.product_name       = ''
-        # <h1 class="pd__header" data-test-id="pd-product-title">Nik Naks Nice'N'Spicy Grab Bag Crisps 45g</h1>
-        # data-test-id="pd-product-title"
-        # this predictably gets the description
-        # try:
-        #     #css_selector = 'h1[data-test-id="pd-product-title"]'
-        #     css_selector = 'h1.pd__header[data-test-id="pd-product-title"]'
-        #     e = driver.find_element(By.CSS_SELECTOR, css_selector)
-        #     self.product_name = e.text.strip()
-        # except Exception as exp:
-        #     print(exp)
-        #     print('self.product_name NOT found!')        
+            print('self.product_name NOT found!')         
         
         # self.price_per_package  = 0.0
         # <div aria-label="£1.80 was £2.40">£1.80</div
@@ -189,7 +179,62 @@ class ProductInfo:
         except Exception as exp:
             print(exp)
             print('self.price_per_package NOT found!')
-            
+
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+        # >>> pprint(list)
+        # [<selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="227f94ae-f2ef-4547-a3fe-15004956af84")>,
+        #  <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="2394d653-8540-46de-896e-3873afb77ff4")>,
+        # .
+        # .
+        # <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="e1574eb0-b607-4a3e-90e5-4e3b7acc38df")>]
+        # >>> list[0].text
+        # 'Description'
+        # >>> list[1].text
+        # 'Cured pork salami seasoned with pepper & garlic.\n  Lightly seasoned with pepper & garlic. \nA traditional Italian salami, produced in the heart of Italy with Italian pork.  \n  Great as part of an Italian inspired charcuterie platter or why not try using as an ingredient on a Pizza to provide a delicate and meaty taste.'
+        # >>> list[2].text
+        # 'Nutrition'
+        # >>> list[3].text
+        # 'Per 4 slices Typical Values\nENERGY\n342kJ\n82kcal\n4%\nFAT\n6.6g\n9%\nSATURATES\n2.5g\n13%\nSUGARS\n<0.5g\n<1%%\nSALT\n0.82g\n14%\n% of the Reference Intakes\nTypical Values Per 100g : Energy 1591 kJ/383 kcal\nRI= Reference intake of an average adult (8400 kJ/2000 kcal)\nTable of Nutritional Information\nTypical Values Per 100g  Per 4 slices  % based on RI for Average Adult\nEnergy 1591kJ 342kJ -\n383kcal 82kcal 4%\nFat 30.7g 6.6g 9%\nSaturates 11.5g 2.5g 13%\nMono-unsaturates 14.7g 3.2g -\nPolyunsaturates 3.1g 0.7g -\nCarbohydrate 1.0g <0.5g -\nSugars <0.5g <0.5g -\nFibre <0.5g <0.5g -\nProtein 25.7g 5.5g 11%\nSalt 3.81g 0.82g 14%\nReference intake of an average adult (8400 kJ / 2000 kcal)\nThis pack contains 4 servings'
+        # >>> list[4].text
+        # 'Ingredients'
+        # >>> list[5].text
+        # 'INGREDIENTS:Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate; Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.\nPackaged in a protective atmosphere'
+        # >>> list[6].text
+        # 'Country of Origin'
+        # >>> list[7].text
+        # "Packed in Italy, Italy for Sainsbury's Supermarkets Ltd, London EC1N 2HT using pork from Italy."
+        # >>> list[8].text
+        # 'Size'
+        # >>> list[9].text
+        # '86g'
+        # >>> list[10].text
+        # 'Storage'
+        # >>> list[11].text
+        # 'For use by date: see front of pack. Keep Refrigerated. Once opened, use within 2 days and do not exceed the use by date. Open pack 15 minutes before serving to allow the flavours to develop'
+        # >>> list[12].text
+        # 'Packaging'
+        # >>> list[13].text
+        # "Don't Recycle base Film\nDon't Recycle top Film\nRecycle base Label"
+        # >>> list[14].text
+        # 'Manufacturer'
+        # >>> list[15].text
+        # "We are happy to replace this item if it is not satisfactory\nSainsbury's Supermarkets Ltd.\n33 Holborn, London EC1N 2HT\nCustomer services 0800 636262"        
+        
+        # self.package_in_g = 0.0
+        # TODO - extract from end of self.product_name ??
+        # or
+        # <h3 class="productDataItemHeader">Size</h3> 
+        #     <div class="productText">
+        #         <p>500g</p>
+        #     </div>
+        # or
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+        # >>> list[8].text
+        # 'Size'
+        # >>> list[9].text
+        # '86g'
+        
+        
         # self.price_per_measure  = 0.0
         # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£12.00 / kg</div>
         # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£2.11 / 100g</div>
@@ -203,15 +248,21 @@ class ProductInfo:
             print('self.price_per_measure NOT found!')
             
         # self.supplier_item_code = ''
-        # not for this supplier
+        # <p class="pd__item-code">Item code: <span id="productSKU">952811</span></p>        
+        try:
+            e = driver.find_element(By.CSS_SELECTOR, '#productSKU')
+            self.supplier_item_code = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')        
                 
         self.supplier_name      = 'Sainburys'
         # self.nutrition_info     = None
         
+            
+        # self.product_desc       = ''    # Description
         # self.i_list             = []    # ingredient list
         # self.i_text             = ''    # ingredient raw text as scraped    
-    
-                
         try:
             css_selector = 'h3, .productDataItemHeader, .productIngredients, .productText'
             print(f'# # #> getting list of element w selector: {css_selector}')
@@ -226,8 +277,8 @@ class ProductInfo:
                     print(f">>IGDTs:{self.i_list}")                    
                 if f_desc == True:
                     f_desc = False
-                    self.product_name = e.text.strip()
-                    print(f">>Item:{self.product_name}")
+                    self.product_desc = e.text.strip()
+                    print(f">>Desc:{self.product_desc}")
                 if e.text.strip() == 'Ingredients':
                     f_igdt = True
                 if e.text.strip() == 'Description':
