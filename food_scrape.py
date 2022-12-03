@@ -203,7 +203,7 @@ if __name__ == '__main__':
                 with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
                     url_CACHE[item.product_url] = json.dumps(str(item))
                     f.write(json.dumps(url_CACHE))
-                item = None
+            item = None
         
         url_count += 1
         name, url = urls_to_process[url_count]
