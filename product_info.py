@@ -36,13 +36,28 @@ class ProductInfo:
     asd_cookie_barrier = True
     ocd_cookie_barrier = True
     bkr_cookie_barrier = True
-
+    nutition_symbol_to_regex    = {
+        'energy':            r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
+        'fat':               r'fat',
+        'saturates':         r'\bsaturates\b',
+        'mono_unsaturates':  r'mono',
+        'poly_unsaturates':  r'poly',
+        'omega_3':           r'omega',
+        'carbohydrates':     r'carbohydrate',
+        'sugars':            r'sugars',
+        'starch':            r'starch',
+        'protein':           r'protein',
+        'fibre':             r'fibre',
+        'salt':              r'salt',
+        'alcohol':           r'alcohol'
+    }
                 
     def __init__(self, name, url):
         self.ri_name            = name  # nick_name
         self.product_name       = ''
         self.price_per_package  = 0.0
         self.package_in_g       = 0.0
+        self.alt_package_in_g   = 0.0
         self.price_per_measure  = 0.0
         self.supplier_item_code = ''
         self.product_url        = url
@@ -52,21 +67,7 @@ class ProductInfo:
         self.i_text             = ''    # ingredient raw text as scraped
         self.product_desc       = ''
     
-        self.symbol_to_regex    = {
-            'energy':            r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
-            'fat':               r'fat',
-            'saturates':         r'\bsaturates\b',
-            'mono_unsaturates':  r'mono',
-            'poly_unsaturates':  r'poly',
-            'omega_3':           r'omega',
-            'carbohydrates':     r'carbohydrate',
-            'sugars':            r'sugars',
-            'starch':            r'starch',
-            'protein':           r'protein',
-            'fibre':             r'fibre',
-            'salt':              r'salt',
-            'alcohol':           r'alcohol'
-        }
+
         
         self.product_page       = None   
         
@@ -110,8 +111,8 @@ class ProductInfo:
         
 
     def scrape_sainsburys(self):        
-        print(f"scraping SAINSBURIES: {self.product_url}")
-
+        print(f"scraping SAINSBURIES: {self.product_url}")        
+        
         if ProductInfo.sbs_driver == None:
             ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
         driver = ProductInfo.sbs_driver
@@ -156,11 +157,25 @@ class ProductInfo:
         # class: pd__header <
         # data-test-id: pd-product-title <
         # Text: Sainsbury's Pearl Barley 500g <
+        #
+        # \b(x*\d+[.mlLgKk]*)\b
+        # Chavroux La Buche Goats Cheese (150g)                 match in brackets
+        # Sainsbury's White Granulated Sugar (5kg)
+        # Blue Dragon Original Thai Sweet Chilli Sauce (190ml)
+        # Blue Dragon Original Thai Sweet Chilli Sauce (380g)
+        # Yeo Valley Organic Free Range Semi Skimmed Milk (1L)
+        # Sainsbury's British Semi Skimmed Milk (1.13L) 2 pint
+        # Sainsbury's British Semi Skimmed Milk (2.27L) 4 pint
+        # Sainsbury's Fairtrade Bananas (x5)
         try:
             # css_selector = 'h1[class=pd__header][data-test-id=pd-product-title]' # SAME - works
             css_selector = 'h1.pd__header[data-test-id=pd-product-title]' 
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
             self.product_name = e.text.strip()
+            # in case there is no size specified get size from product name
+            m = re.search(r'\b(x*\d+[.mlLgKk]*)\b', self.product_name)
+            if m: self.alt_package_in_g = m.group(1)
+            
         except Exception as exp:
             print(exp)
             print('self.product_name NOT found!')         
@@ -182,27 +197,77 @@ class ProductInfo:
 
         item_info = {}
         try:
-            # list of h3.productDataItemHeader and div.productText PAIRS
-            e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
-            print(f"> element PAIRS {len(e_list)/2}")
-            print(f"> 0 {e_list[0].text}")
-            print(f"> 1 {e_list[1].text}")
-            print(f"> 2 {e_list[2].text}")
-            print(f"> 3 {e_list[3].text}")    
+            # list of PAIRS of h3.productDataItemHeader and div.productText 
+            e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')  
             elements = iter(e_list)
             for elem in elements:
-                #print(f"\nt:>{elem.text}<\nc:>{next(elements).text}<\n\n")
                 ne = next(elements)
                 item_info[elem.text.lower()] = ne                
                 print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
             
-            self.package_in_g = item_info['size'].text
+            print('+>> item_info')
+            pprint(item_info)
+            
+            if 'size' in item_info:     # not always present
+                self.package_in_g = item_info['size'].text
+            else:
+                self.package_in_g = self.alt_package_in_g
+                
             self.i_text       = item_info['ingredients'].text
             self.product_desc = item_info['description'].text
             
         except Exception as exp:
             print(exp)
             print('self.price_per_package NOT found!')
+
+        print('- - - - - - - nutrition - - - - - - - S')
+        # <table class="nutritionTable">
+        #     <thead>
+        #         <tr class="tableTitleRow">
+        #         <th scope="col">Typical Values
+        #         (cooked as per instructions)</th><th scope="col">Per 100g&nbsp;</th><th scope="col">Per 80g serving&nbsp;</th><th scope="col">% based on RI for Average Adult</th>
+        #         </tr>
+        #     </thead>
+        #     <tbody>
+        #         <tr class="tableRow1">
+        #             <th scope="row" class="rowHeader" rowspan="2">Energy</th><td class="tableRow1">477kJ</td><td class="tableRow1">381kJ</td><td class="tableRow1">-</td>
+        #         </tr>
+        #         <tr class="tableRow0">
+        #             <td class="tableRow0">113kcal</td><td class="">90kcal</td><td class="">5%</td>
+        #         </tr>
+        #         <tr class="tableRow1">
+        #             <th scope="row" class="rowHeader">Fat</th><td class="tableRow1">&lt;0.5g</td><td class="nutritionLevel1">&lt;0.5g</td><td class="nutritionLevel1">1%</td>
+        #         </tr>
+        #     </tbody>
+        # </table>
+        
+        # item_info['nutrition']
+        nut_regex = ProductInfo.nutition_symbol_to_regex
+        row_data = []
+        # nutrition tabe
+        try:
+            tb_rows = driver.find_elements(By.CSS_SELECTOR, 'table.nutritionTable tr')
+            rows = iter(tb_rows)
+            tb_head = next(rows)    # first row always col titles
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'))
+            print(f"--H: {head_cols}")
+            for row in rows:
+                cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
+                print(f"-R: {cols}")
+                row_data.append(cols)
+                    
+            # #get_attribute("innerHTML")
+            # iH = tb_head.get_attribute('innerHTML')
+            # print(f"Table: NutriHead {iH}")
+            # #re.search()
+            # for r in tb_rows:
+            #     print(f"Row: {r.text} - {r.get_attribute('innerHTML')}")
+            
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')
+        
+        print('- - - - - - - nutrition - - - - - - - E')
 
         # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
         # >>> pprint(list)
@@ -278,8 +343,8 @@ class ProductInfo:
             self.supplier_item_code = e.text.strip()
         except Exception as exp:
             print(exp)
-            print('self.price_per_measure NOT found!')        
-                
+            print('self.price_per_measure NOT found!')                    
+            
         self.supplier_name      = 'Sainburys'
         # self.nutrition_info     = None
         
