@@ -37,14 +37,14 @@ class ProductInfo:
     ocd_cookie_barrier = True
     bkr_cookie_barrier = True
     nutition_symbol_to_regex    = {
-        'energy':            r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
+        'energy':            r'energy', #r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
         'fat':               r'fat',
-        'saturates':         r'\bsaturates\b',
+        'saturates':         r'\bsaturate[sd]\b',
         'mono_unsaturates':  r'mono',
         'poly_unsaturates':  r'poly',
         'omega_3':           r'omega',
         'carbohydrates':     r'carbohydrate',
-        'sugars':            r'sugars',
+        'sugars':            r'sugar',
         'starch':            r'starch',
         'protein':           r'protein',
         'fibre':             r'fibre',
@@ -62,7 +62,7 @@ class ProductInfo:
         self.supplier_item_code = ''
         self.product_url        = url
         self.supplier_name      = ''
-        self.nutrition_info     = None 
+        self.nutrition_info     = {} 
         self.i_list             = []    # ingredient list
         self.i_text             = ''    # ingredient raw text as scraped
         self.product_desc       = ''
@@ -112,6 +112,23 @@ class ProductInfo:
 
     def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")        
+            # find which column the per 100g/ml is 
+
+        def get_nutr_per_100g_col(table_header, default_col=1):
+            col_100 = None
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S)
+            for col,text in enumerate(head_cols):
+                col_100 = col
+                if re.search(r'100[gml]+', text): return(col_100)
+
+            return(default_col)
+        
+        def remove_less_than(str_g):            
+            if '&lt;' in str_g:
+                return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
+             
+            return( round(float(str_g.lower().replace('g', '')), 2) )
+        
         
         if ProductInfo.sbs_driver == None:
             ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
@@ -244,24 +261,36 @@ class ProductInfo:
         # item_info['nutrition']
         nut_regex = ProductInfo.nutition_symbol_to_regex
         row_data = []
+        col_100 = 1
+
         # nutrition tabe
         try:
             tb_rows = driver.find_elements(By.CSS_SELECTOR, 'table.nutritionTable tr')
             rows = iter(tb_rows)
             tb_head = next(rows)    # first row always col titles
-            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'))
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S) # TODO REMOVE
+            
+            col_100 = get_nutr_per_100g_col(tb_head)
+            
             print(f"--H: {head_cols}")
             for row in rows:
                 cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
                 print(f"-R: {cols}")
                 row_data.append(cols)
+                for n_type, n_regex in nut_regex.items():
+                    if re.search(n_regex, cols[0].lower()):
+                        self.nutrition_info[n_type] = cols[col_100]
+                        if n_type == 'energy':
+                            if 'kj' in cols[col_100].lower():
+                                kj_to_kcal = cols[col_100].lower().replace('kj','')
+                                kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                                self.nutrition_info[n_type] = kj_to_kcal
+                        else:
+                            self.nutrition_info[n_type] = remove_less_than(cols[col_100])
+            
+            pprint(self.nutrition_info)
                     
-            # #get_attribute("innerHTML")
-            # iH = tb_head.get_attribute('innerHTML')
-            # print(f"Table: NutriHead {iH}")
-            # #re.search()
-            # for r in tb_rows:
-            #     print(f"Row: {r.text} - {r.get_attribute('innerHTML')}")
+
             
         except Exception as exp:
             print(exp)
@@ -471,18 +500,7 @@ class ProductInfo:
             self.scrape_specialist()
 
      
-    # find which column the per 100g/ml is 
-    def get_table_100g_colum(table, default_col=2):
-        col_100 = None
-        
-        # table.search('tr').each{ |tr|
-        #     tr.children.each_with_index{ |c, index|
-        #         if c.text =~ /per\s+100(g|ml)/i
-        #             col_100 = index
-        # 
-        #     }
-        # }
-        # col_100 = col_100 || default_col  
+
     
 
 
