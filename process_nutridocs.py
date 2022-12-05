@@ -719,7 +719,8 @@ def print_urls_to_process():
       r'(coop)',        # cop
       r'(asda)',        # asd
       r'(ocado)',       # ocd
-      r'(booker)'       # bkr
+      r'(booker)',      # bkr
+      r'(aldi)'         # ald
     ]
     
     for ri_name in atomic_LUT:
@@ -740,8 +741,7 @@ def print_urls_to_process():
     return dict_of_urls_to_process
     
 print_urls_to_process()
-print()
-pprint(atomic_LUT['crispy orange beef'])
+
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
 if not opt_setting: print(help)
