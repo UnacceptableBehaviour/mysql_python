@@ -222,20 +222,23 @@ class ProductInfo:
                 item_info[elem.text.lower()] = ne                
                 print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
             
-            print('+>> item_info')
-            pprint(item_info)
-            
-            if 'size' in item_info:     # not always present
-                self.package_in_g = item_info['size'].text
-            else:
-                self.package_in_g = self.alt_package_in_g
-                
-            self.i_text       = item_info['ingredients'].text
-            self.product_desc = item_info['description'].text
-            
         except Exception as exp:
             print(exp)
             print('self.price_per_package NOT found!')
+
+        print('+>> item_info')
+        pprint(item_info)
+            
+        if 'size' in item_info:     # not always present
+            self.package_in_g = item_info['size'].text
+        else:
+            self.package_in_g = self.alt_package_in_g
+        
+        if 'ingredients' in item_info:
+            self.i_text       = item_info['ingredients'].text
+        
+        if 'description' in item_info:
+            self.product_desc = item_info['description'].text
 
         print('- - - - - - - nutrition - - - - - - - S')
         # <table class="nutritionTable">
