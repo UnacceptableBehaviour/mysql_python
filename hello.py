@@ -643,10 +643,14 @@ if __name__ == '__main__':
     #app.run(host='192.168.1.13', port=50015, ssl_context=('server.crt', 'server.key') )
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain("./scratch/server.crt", "./scratch/server.key")
-    #serving.run_simple("0.0.0.0", 50015, app, ssl_context=context)
-    print("Running on https://dtk.health:50015/")
-    serving.run_simple("192.168.1.13", 50015, app, ssl_context=context)
-
+    
+    serving.run_simple("0.0.0.0", 50015, app, ssl_context=context)      # list on all IP addresses
+    print("Running on 0.0.0.0 - https://localhost:50015/ - https://dtk.health:50015/")
+    
+    #serving.run_simple("192.168.1.13", 50015, app, ssl_context=context)
+    #serving.run_simple("192.168.1.13", 443, app, ssl_context=context) # self.socket.bind(self.server_address)
+                                                                      # PermissionError: [Errno 13] Permission denied?
+    #print("Running on https://dtk.health:50015/")
 
 
     # setting up SSL for image capture:
