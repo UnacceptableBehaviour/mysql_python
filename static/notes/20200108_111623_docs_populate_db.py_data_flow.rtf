@@ -11,7 +11,7 @@
 \cssrgb\c80182\c18758\c0;\cssrgb\c83396\c23075\c82664;\cssrgb\c0\c60446\c100000;\cssrgb\c0\c0\c0;\cssrgb\c100000\c1836\c0;
 \cssrgb\c59964\c68375\c0;\cssrgb\c37924\c0\c68375;\cssrgb\c100000\c612\c0;\cssrgb\c53076\c0\c792;\cssrgb\c100000\c0\c2983;
 \cssrgb\c30112\c68375\c0;\cssrgb\c100000\c0\c4473;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww22400\viewh18640\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww22400\viewh14280\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 
 \f0\fs34 \cf0 REBUILD DB STEPS\
@@ -184,7 +184,7 @@ INPUTS											Script						OUTPUTS\
 
 \f2\b0 \cf15 													create DB using table specs\
 													populate with data from CSV file
-\f4\b \cf15 \
+\f4\b \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf16 							
 \f2\b0 						(All connections to DB SB closed!)\
@@ -234,13 +234,16 @@ LOCAL ASSET SERVER:\
 													
 \f4\b \cf15 $ populate_asset_server.rb
 \f2\b0 \cf4 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
+\cf15 													Copy nutinfor text file to asset.server\cf4 \
+_courses_components/z_product_nutrition_info.txt\
+																			/assest_server/scratch/nutrinfo.txt\
 													WORKING WITH LOCAL FILESYSTEM (NO URLS)\
 													ISSUES:\
 													\cf17 Uses images to drive CSV population SB: use _i_w_r_auto_tmp/*.txt
 \f4\b \cf15 \
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
-\f2\b0 \cf15 													take all recipe (image/text) pairs\
+\f2\b0 													take all recipe (image/text) pairs\
 													from /_course_components/_i_w_r_auto_tmp\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 DATE_TIME_recipe.txt\
@@ -283,7 +286,7 @@ yXXX_NUTRITEST_recipes_20190719-01.rtf\cf15 \
 
 \f4\b \cf15 \
 										$ food_sets.py
-\f2\b0 \cf15 \
+\f2\b0 \
 										turned into a bit of a tool to identify issues w/ \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 _courses_components/z_product_nutrition_info.txt\
@@ -321,10 +324,10 @@ yXXX_NUTRITEST_recipes_20190719-01.rtf\cf15 \
 										write into back to \cf4 z_product_nutrition_info.txt\cf17 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf15 										 |
-\f4\b \cf15 \
+\f4\b \
 										$ food_scrape.py\
 
-\f2\b0 \cf15 										takes output from \cf4 process_nutridocs.py
+\f2\b0 										takes output from \cf4 process_nutridocs.py
 \f4\b \cf15  & 
 \f2\b0 \cf4 cost_menu.rb \cf15 to scrape\
 										info from retailer sites about ingredients, including their \
@@ -335,8 +338,8 @@ _courses_components/z_product_nutrition_info_missing_ingredients_PY.json < from 
 																			_courses_components/z_product_nutrition_info.txt\cf15 \
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\
 													
-\f4\b \cf15 $ ./scratch/scan_for_each_data.py
-\f2\b0 \cf15 \
+\f4\b $ ./scratch/scan_for_each_data.py
+\f2\b0 \
 													Design: ./scratch/scan_for_each_data.jpg\
 \cf4 All diary recipes in\
 yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
@@ -370,7 +373,7 @@ yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 
 \f2\b0 \cf15 										Used to cost components for markets\
 										Produces ingredients list \cf19 NOT\cf15  ordered by weight (for Labelling)\
-										Produce {\field{\*\fldinst{HYPERLINK "https://www.gov.uk/guidance/food-labelling-giving-food-information-to-consumers"}}{\fldrslt \cf15 QUID}} list % of product by weight mixing stage (for Labelling)\
+										Produce {\field{\*\fldinst{HYPERLINK "https://www.gov.uk/guidance/food-labelling-giving-food-information-to-consumers"}}{\fldrslt QUID}} list % of product by weight mixing stage (for Labelling)\
 										\cf20 Produce 
 \f4\b nutrition information
 \f2\b0  (for Labelling)\cf15 \
@@ -378,8 +381,8 @@ yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 
 \f4\b \cf15 										 |\
 										$ menu_assembly.rb 
-\f2\b0 \cf15 < executed option to pass in component processed
-\f4\b \cf15 \
+\f2\b0 < executed option to pass in component processed
+\f4\b \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf15 										(Banquest asset assembly: Table menu, shop list, todo etc)\
@@ -406,7 +409,7 @@ yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f4\b \cf15 										
-\f2\b0 \cf15 FRK_2-3 Dump i_db costing info & component numbers\cf4 \
+\f2\b0 FRK_2-3 Dump i_db costing info & component numbers\cf4 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf15 										FRK_5-6 \cf20 info dump 			for paste into >	y997_costing_waypoint.rtf\cf15 \
@@ -419,17 +422,17 @@ yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf4 z_product_nutrition_info.txt
 \f4\b \cf15 			 >			
-\f2\b0 \cf15 loads nutrition_db = load_nutrition_data w
-\f4\b \cf15  recipe.rb\
+\f2\b0 loads nutrition_db = load_nutrition_data w
+\f4\b  recipe.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf15 													process components (nutridocs are components) and work out nutrition info\
 													\cf20 add any 
 \f4\b new
 \f2\b0  nutrinfo to\cf15 			>\cf4 	z_product_nutrition_info.txt\cf15 			
-\f4\b \cf15 \
+\f4\b \
 
-\f2\b0 \cf15 										FRK_10-11 NUTRITION, QUID, INGREDIENTS by component\
+\f2\b0 										FRK_10-11 NUTRITION, QUID, INGREDIENTS by component\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf19 												INGREDIENTS need to be ordered by QUID & sub ingredients included\cf15 \
 										FRK_10-11 DIARY NUTRITION / cals count by day\
@@ -448,13 +451,13 @@ yXXX_NUTRITEST_recipes_YYYYMMDD-DD.rtf\
 
 \f2\b0 \cf15 													Automatically find nutrition info from DB (working)\
 														or URL (not currently working)
-\f4\b \cf15 \
+\f4\b \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf4 z_product_nutrition_info.txt
 \f4\b \cf15 			>			
-\f2\b0 \cf15 loads nutrition_db = load_nutrition_data w
-\f4\b \cf15  recipe.rb\
+\f2\b0 loads nutrition_db = load_nutrition_data w
+\f4\b  recipe.rb\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 
 \f2\b0 \cf15 													process missing ingredients list\
