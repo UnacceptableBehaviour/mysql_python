@@ -309,6 +309,15 @@ if __name__ == '__main__':
 #   USE following to over ride the dev verification warning
 #   xattr -d com.apple.quarantine /usr/local/bin/chromedriver
 #
+# On Chrome version change an update to chromedriver will be required:
+# install ChromeDriver: https://chromedriver.chromium.org/downloads (I installed 111)
+#   download relevant zip chromedriver_mac64.zip renamed chromedriver_mac64_111.zip
+#   dblClick to extract
+#   % cd /Users/simon/Downloads/chromedriver_mac64_111
+#   % mv chromedriver /usr/local/bin/chromedriver                 # overwrite current version (107)
+#   % xattr -d com.apple.quarantine /usr/local/bin/chromedriver   # overs OS warning
+#   % run script as before!
+#
 # Selenium Hello World
 # https://www.browserstack.com/guide/locators-in-selenium
 # https://www.browserstack.com/guide/get-html-source-of-web-element-in-selenium-webdriver
