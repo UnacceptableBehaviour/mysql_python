@@ -31,6 +31,11 @@ from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_from_nix
 from helpers_db import process_search
 from helpers_db import get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
+from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
+# / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
+# to UPDATE ASSET SERVER and postgreSQL DB with current assets
+# run 'populate_db.py'
+# \ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - < 
 
 from helpers_tracker import get_daily_tracker_from_DB, store_daily_tracker_to_DB, post_DTK_info_for_processing, post_interface_file
 from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
@@ -49,25 +54,13 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 import re           # regex
 import json         # JSON tools
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# to UPDATE ASSET SERVER and postgreSQL DB with current assets
-# run 'populate_db.py'
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# default
-#engine = db.create_engine('dialect+driver://user:pass@host:port/db')
-#engine = create_engine('mysql://root:meepmeep@localhost:3306/nutridb_sr25_sanitized')
-engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
-db = scoped_session(sessionmaker(bind=engine))
-
-
 
 # each app.route is an endpoint
 @app.route('/')
 def db_hello_world():
     # execute this query
     # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
-    all_recipes = db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
+    all_recipes = helper_db_class_db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
 
     formatted_text = "<br>"
 
@@ -551,8 +544,8 @@ def db_nutrients_compare():
     BEEF_BRISKET_BROTH = 3402
     LEMON_GRASS_CHICKEN = 2001
 
-    nutrients_0 = get_nutirents_for_redipe_id(db, BEEF_BRISKET_BROTH)
-    nutrients_1 = get_nutirents_for_redipe_id(db, LEMON_GRASS_CHICKEN)
+    nutrients_0 = get_nutirents_for_redipe_id(helper_db_class_db, BEEF_BRISKET_BROTH)
+    nutrients_1 = get_nutirents_for_redipe_id(helper_db_class_db, LEMON_GRASS_CHICKEN)
 
     # nutrients_0 = {
     #   'ri_id': 6,
