@@ -30,6 +30,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 #engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
 engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
+#engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 
@@ -701,7 +702,7 @@ class RecipeTracker:
 
 
 
-def create_daily_tracker_name_from_nix_time(nix_time_ms = nix_time_ms()):
+def create_daily_tracker_name_from_nix_time(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
 
 def bootstrap_daily_tracker_create(uuid):
@@ -711,7 +712,7 @@ def bootstrap_daily_tracker_create(uuid):
             'dtk_pc_fat': 0.0,
             'dtk_pc_h2o': 0.0  }
 
-    dtk['dtk_rcp']['ri_name'] = create_daily_tracker_name_from_nix_time()
+    dtk['dtk_rcp']['ri_name'] = create_daily_tracker_name_from_nix_time(dtk['dtk_rcp']['dt_date'])
 
     return dtk
 
