@@ -23,11 +23,11 @@ MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_M
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
-url_CACHE = {}
+url_cache = {}
 if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
     with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
         content = f.read()
-        url_CACHE = json.loads(content)
+        url_cache = json.loads(content)
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     
     urls_to_process = [('pearl barley',
                         'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pearl-barley-500g'),
-                       ('cooked pearl barley', ''),
+                       ('thin chicken kabanos', 'https://www.sainsburys.co.uk/gol-ui/product/tarczynski-poultry-kabanos-120g'),
                        ('blooming mushrooms', ''),
                        ('veg soup', ''),
                        ('beansprout dryfry', ''),
@@ -201,8 +201,8 @@ if __name__ == '__main__':
             yn = input(f"SAVE info for > {item.ri_name} <? y/n - RET to skip\n")
             if str(yn).lower() == 'y':            
                 with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
-                    url_CACHE[item.product_url] = json.dumps(str(item))
-                    f.write(json.dumps(url_CACHE))
+                    url_cache[item.product_url] = json.dumps(str(item))
+                    f.write(json.dumps(url_cache))
             item = None
         
         url_count += 1
