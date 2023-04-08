@@ -79,6 +79,10 @@ class ProductInfo:
         #print(json)
         return json
 
+    def nutrinfo_str():
+        # template = ''
+        # for nut, qty in self.nutrition_info:
+        pass
 
     def display_all_tags(self, driver):
         print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - S")
@@ -219,7 +223,17 @@ class ProductInfo:
             elements = iter(e_list)
             for elem in elements:
                 ne = next(elements)
-                item_info[elem.text.lower()] = ne                
+                # sometime ingredient all in one element
+                el_text = elem.text #.lower()
+                if re.match(r'ingredient[s]?\b',el_text,re.I):
+                    i_list = re.sub(r'ingredient[s]?\b','',el_text,flags=re.I)
+                    print(f'ingredient - MATCH [{len(i_list)}]\n{el_text}\ni_list>{i_list}<E')
+                    if len(i_list.strip()) > 0:                        
+                        self.i_text = i_list.strip()
+                    else:
+                        item_info[elem.text.lower()] = ne
+                else:
+                    item_info[elem.text.lower()] = ne
                 print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
             
         except Exception as exp:
@@ -234,8 +248,15 @@ class ProductInfo:
         else:
             self.package_in_g = self.alt_package_in_g
         
-        if 'ingredients' in item_info:
+        print('ingredients  - - - - S')
+        print(f"('ingredients' in item_info): {('ingredients' in item_info)}")
+        print(f"(self.i_text == ''): {(self.i_text == '')}")
+        print('ingredients  - - - - E')
+        if ('ingredients' in item_info) and (self.i_text == ''):
             self.i_text       = item_info['ingredients'].text
+        
+        if self.i_text == '':
+            print('- - -: * * * INGREDIENTS NOT FOUND')
         
         if 'description' in item_info:
             self.product_desc = item_info['description'].text
@@ -284,8 +305,12 @@ class ProductInfo:
                     if re.search(n_regex, cols[0].lower()):
                         self.nutrition_info[n_type] = cols[col_100]
                         if n_type == 'energy':
-                            if 'kj' in cols[col_100].lower():
-                                kj_to_kcal = cols[col_100].lower().replace('kj','')
+                            # in single row:  2143 kJ /<br> 513 kcal or on two rows!
+                            m = re.search(r'(\d+)\s*kj', cols[col_100].lower())
+                            # could use - and dispense with calc?
+                            #m = re.search(r'(\d+).*kcal', cols[col_100].lower())
+                            if m:
+                                kj_to_kcal = m.group(1)
                                 kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                 self.nutrition_info[n_type] = kj_to_kcal
                         else:
@@ -465,7 +490,7 @@ class ProductInfo:
           r'(aldi)'         # ald
         ]
         
-        match = None
+        match = None                    # TODO upgrade python to 3.10 for switch case (match)
         for r in supplier_regex:
             m = re.search(r, self.product_url)            
             if m:

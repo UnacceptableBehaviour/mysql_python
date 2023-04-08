@@ -265,7 +265,8 @@ def screen_for_allergens(i_string):
 QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  QUID_PC = re.compile('\((\d+%)\)')
 PUREE = re.compile('purée')
 CONTAINS = re.compile('contains:*\s*')      # contains: allergen
-regex_noise = [QUID_PC, CONTAINS, PUREE]
+IGDT_TITLE = re.compile('ingredients:')     # ingredients:sugar cane, cane molasses.
+regex_noise = [QUID_PC, CONTAINS, PUREE, IGDT_TITLE]
 
 def filter_noise(i_string):    
     print(f"\nrgx-i:{i_string}")
