@@ -53,19 +53,8 @@ class ProductInfo:
     }
     
     def initialise_nutrient_hash(self):
-        return {'energy': 0.0,
-                'fat': 0.0,
-                'saturates': 0.0,
-                'mono-unsaturates': 0.0,
-                'poly-unsaturates': 0.0,
-                'omega_3_oil': 0.0,
-                'carbohydrates': 0.0,
-                'sugars': 0.0,
-                'fibre': 0.0,
-                'starch': 0.0,
-                'protein': 0.0,
-                'salt': 0.0,
-                'alcohol': 0.0 }
+        return { k: 0.0 for k,v in ProductInfo.nutrition_symbol_to_regex.items() }
+
                     
     def __init__(self, name, url):
         self.ri_name            = name  # nick_name
