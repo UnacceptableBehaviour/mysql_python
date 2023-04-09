@@ -2,25 +2,18 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-import itertools
 from pprint import pprint
 from pathlib import Path
 import os
 
-# from selenium import webdriver
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.common.by import By
-# 
-# # for expected conditions
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-# from selenium.common.exceptions import TimeoutException
-
 from product_info import ProductInfo
 
 from food_sets import atomic_LUT
-from food_sets import process_ots_ingredient_string, follow_alias 
+from food_sets import follow_alias 
 import json
+
+
+
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
@@ -86,48 +79,6 @@ scrub_found(urls_to_process)
 #     print("Loading took too much time!")
 #     
 # # > = = = =    
-
-def remove_ingredients_title(i_string):
-    m = re.search(r'(ingredients:)',i_string,re.I)
-    if m:
-        i_string = i_string.replace(m.group(1),'')
-    return i_string
-
-
-def initialise_nutrient_hash():
-    return {'energy': 0.0,
-            'fat': 0.0,
-            'saturates': 0.0,
-            'mono-unsaturates': 0.0,
-            'poly-unsaturates': 0.0,
-            'omega_3_oil': 0.0,
-            'carbohydrates': 0.0,
-            'sugars': 0.0,
-            'fibre': 0.0,
-            'starch': 0.0,
-            'protein': 0.0,
-            'salt': 0.0,
-            'alcohol': 0.0 }
-
-igdts = 'British Potato, Vegetable Oil (Rapeseed Oil, Sunflower Oil), Yeast Extract Powder, Rice Flour, Sugar, Onion Powder, Flavourings, Yeast Powder, Salt, Nutmeg, Smoked Salt, Black Pepper, Acid: Citric Acid; Bay Leaf, Carob Flour, Black Pepper Extract, Nutmeg Extract, Unsmoked Bacon Extract, Pork Sausage Extract.'
-
-def nutri_string(name, nutrition_info_per_100g, ndb_no='per 100g', i_list='__igdts__', igdt_type='__igdt_type__'):
-    # build nutrient
-    if 'http' in ndb_no: ndb_no=f"ndb_no='{ndb_no}'"
-    
-    nutrient_string = f"------------------ for the nutrition information {name} ({ndb_no})\n"
-    
-    for nut, val in nutrition_info_per_100g.items():
-        if nut == 'energy':
-            nutrient_string = nutrient_string + f"{nut}".ljust(20)+"\t"+f"{ round(val, 0) }".rjust(10)+"\n"
-        else:
-            nutrient_string = nutrient_string +  f"{nut}".ljust(20)+"\t"+f"{ round(val, 2) }".rjust(10)+"\n"
-    
-    nutrient_string = nutrient_string +  "Total (100g)".rjust(60)+"\n"
-    
-    nutrient_string_to_file = f"\n\n{nutrient_string}ingredients: {i_list}\nigdt_type: {igdt_type}"
-        
-    return (nutrient_string_to_file)
 
 
 
@@ -201,12 +152,7 @@ if __name__ == '__main__':
     scrub_found(ingredents_to_find, True) # True passing list
 
     show_list('ingredents_to_find',ingredents_to_find)
-    
-    
-    print(nutri_string('flying pigs', initialise_nutrient_hash(), atomic_LUT['balsamic vinegar']['url'], igdts, 'ots'))
-
-    #sys.exit(0)
-    
+        
     
     # if its in the aLUT scrape info and insert it into the nutridoc    
     # if not in aLUT scrape info insert it into template and add it to end of nutridoc
@@ -284,18 +230,13 @@ if __name__ == '__main__':
         if str(yn).lower() == 'n': sys.exit(0)
         if str(yn).lower() == '': continue
 
-        print(f"Getting: {url}")
-        
-        item = ProductInfo(name, url)
+        print(f"Getting: {url}")        
+        item = ProductInfo(name, url)        
+        nutrinfo_text = item.nutrinfo_str()
 
-        # TODO move this code into product_info
-        # TODO process_ots_ingredient_string MISSES last ingredient!
         print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
         print(item)
         print('- - - - - - - - -')
-        pprint(process_ots_ingredient_string(item.i_text, name))
-        item.i_text = remove_ingredients_title(item.i_text)
-        nutrinfo_text = nutri_string(item.ri_name, item.nutrition_info, item.product_url, item.i_text, 'ots')
         print(nutrinfo_text)
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
 

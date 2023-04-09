@@ -36,13 +36,13 @@ class ProductInfo:
     asd_cookie_barrier = True
     ocd_cookie_barrier = True
     bkr_cookie_barrier = True
-    nutition_symbol_to_regex    = {
+    nutrition_symbol_to_regex    = {
         'energy':            r'energy', #r'(\d+)\s*kj',    # $1 = kcal integer - kJ downcase kj
         'fat':               r'fat',
         'saturates':         r'\bsaturate[sd]\b',
-        'mono_unsaturates':  r'mono',
-        'poly_unsaturates':  r'poly',
-        'omega_3':           r'omega',
+        'mono-unsaturates':  r'mono',
+        'poly-unsaturates':  r'poly',
+        'omega_3_oil':       r'omega',
         'carbohydrates':     r'carbohydrate',
         'sugars':            r'sugar',
         'starch':            r'starch',
@@ -51,7 +51,22 @@ class ProductInfo:
         'salt':              r'salt',
         'alcohol':           r'alcohol'
     }
-                
+    
+    def initialise_nutrient_hash(self):
+        return {'energy': 0.0,
+                'fat': 0.0,
+                'saturates': 0.0,
+                'mono-unsaturates': 0.0,
+                'poly-unsaturates': 0.0,
+                'omega_3_oil': 0.0,
+                'carbohydrates': 0.0,
+                'sugars': 0.0,
+                'fibre': 0.0,
+                'starch': 0.0,
+                'protein': 0.0,
+                'salt': 0.0,
+                'alcohol': 0.0 }
+                    
     def __init__(self, name, url):
         self.ri_name            = name  # nick_name
         self.product_name       = ''
@@ -62,16 +77,16 @@ class ProductInfo:
         self.supplier_item_code = ''
         self.product_url        = url
         self.supplier_name      = ''
-        self.nutrition_info     = {} 
+        self.nutrition_info     = self.initialise_nutrient_hash() 
         self.i_list             = []    # ingredient list
         self.i_text             = ''    # ingredient raw text as scraped
         self.product_desc       = ''
-    
-
-        
         self.product_page       = None   
         
-        self.get_product_info()
+        self.get_product_info()        
+        self.i_text = self.remove_ingredients_title(self.i_text)
+        self.nutrinfo_text = self.build_nutri_string()
+        
 
     def __str__(self):
         json = pformat(vars(self), indent=2, sort_dicts=False)
@@ -79,10 +94,35 @@ class ProductInfo:
         #print(json)
         return json
 
-    def nutrinfo_str():
+
+    def remove_ingredients_title(self, i_string):
+        m = re.search(r'(ingredients:)',i_string,re.I)
+        if m:
+            i_string = i_string.replace(m.group(1),'')
+        return i_string
+
+
+    def build_nutri_string(self):
+        # build nutrient        
+        nutrient_string = f"------------------ for the nutrition information {self.ri_name} ({self.product_url})\n"
+        
+        for nut, val in self.nutrition_info.items():
+            if nut == 'energy':
+                nutrient_string = nutrient_string + f"{nut}".ljust(20)+"\t"+f"{ round(val, 0) }".rjust(10)+"\n"
+            else:
+                nutrient_string = nutrient_string +  f"{nut}".ljust(20)+"\t"+f"{ round(val, 2) }".rjust(10)+"\n"
+        
+        nutrient_string = nutrient_string +  "Total (100g)".rjust(60)+"\n"
+        
+        nutrient_string_to_file = f"\n\n{nutrient_string}ingredients: {self.i_text}\nigdt_type: ots"
+            
+        return (nutrient_string_to_file)
+
+
+    def nutrinfo_str(self):
         # template = ''
         # for nut, qty in self.nutrition_info:
-        pass
+        return self.nutrinfo_text
 
     def display_all_tags(self, driver):
         print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - S")
@@ -283,7 +323,7 @@ class ProductInfo:
         # </table>
         
         # item_info['nutrition']
-        nut_regex = ProductInfo.nutition_symbol_to_regex
+        nut_regex = ProductInfo.nutrition_symbol_to_regex
         row_data = []
         col_100 = 1
 
