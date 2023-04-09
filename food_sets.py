@@ -1166,21 +1166,9 @@ def build_sulphur_dioxide_set():
     return sulphur_dioxide
 
 
-
-#pork
-# coppa
-# milano salami
-# milano salami pre crisp
-# milano salami crisp
-# modena salami
-# modena crisps
-
 conv_list ='''
 plain text list here
 '''
-
-
-
 
 
 
@@ -1351,7 +1339,7 @@ pork_subsets = {
     'ham' : {'pepper ham','cooked ham','ldl smoked ham','smoked ham','w&s breadcrumb ham','parma ham','sbs parma ham',
              'sandwich ham','cooked ham trimmings lidl','sbs cooked ham','sbs basics ham','smoked ham was','smoked ham trimmings',
              'boiled ham'},
-    'cured pork' : {'milano','salami','parma','parma ham','serano ham','serano','lomo','chorizo','fuet','charcuterie','pancetta',
+    'cured pork' : {'milano','milano salami','modena salami','salami','parma','parma ham','serano ham','serano','lomo','chorizo','fuet','charcuterie','pancetta',
                     'brawn','jamon','jamon iberico','lardo','bologna','bauernschinken','butifarra','butifarra negra','butifarra blanca',
                     'morcilla','boudin','boudin blanc','zungenwurst','boudin noir','chorizo','coppa','culatello','finocchiona',
                     'guanciale','kabanos','landjager','liverwurst','lonzino','mortadella','nduja','paio','pepperoni','prosciutto',
@@ -1359,6 +1347,7 @@ pork_subsets = {
     'bacon' : {'thick smoked bacon','smoked bacon','bacon lean','smoked rindless bacon','streaky bacon','bacon rashers','lardons',
                'back bacon','smoked streaky bacon'},
 }
+
 def build_pork_set():
     pork = {'pork'}
 
