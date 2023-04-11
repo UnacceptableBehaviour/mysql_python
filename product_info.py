@@ -818,8 +818,8 @@ class ProductInfo:
 #      :energy =>            /calories\s+(\d+)$/, # $1 = kcal integer
 #      :fat =>               /total fat\s*?([\d\.]+)g/,
 #      :saturates =>         /saturated fat\s*?([\d\.]+)g/,
-#      :mono_unsaturates =>  /monounsaturated fat\s*?([\d\.]+)g/,
-#      :poly_unsaturates =>  /polyunsaturated fat\s*?([\d\.]+)g/,
+#      :mono-unsaturates =>  /monounsaturated fat\s*?([\d\.]+)g/,
+#      :poly-unsaturates =>  /polyunsaturated fat\s*?([\d\.]+)g/,
 #      :carbohydrates =>     /total carbohydrate\s*?([\d\.]+)g/,
 #      :sugars =>            /sugars\s*?([\d\.]+)g/,
 #      :protein =>           /protein\s*?([\d\.]+)g/,
