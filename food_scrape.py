@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
 import sys
 from pprint import pprint
 from pathlib import Path
@@ -12,20 +11,26 @@ from food_sets import atomic_LUT
 from food_sets import follow_alias 
 import json
 
-
-
+# missing ingreidient list sources
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
-NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,
+            MISSING_INGREDIENTS_FILE_JSON_CCM,
+            MISSING_INGREDIENTS_FILE_JSON_PY]
+
+# in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
+
+# target
+NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
 
-url_cache = {}
-if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
-    with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
-        content = f.read()
-        url_cache = json.loads(content)
+# url_cache = {}
+# if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
+#     with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
+#         content = f.read()
+#         url_cache = json.loads(content)
 
 # TODO - catch file corrupt exception
 urls_to_process = {}
@@ -42,8 +47,7 @@ def scrub_found(items_to_scrub, is_list=False):
     else:
         copy_of_urls_to_process = dict(items_to_scrub)
 
-    for i_still_to_process in copy_of_urls_to_process:
-        print(f"i_still_to_process:{i_still_to_process}")
+    for i_still_to_process in copy_of_urls_to_process:        
         if i_still_to_process in atomic_LUT.keys():
             if (atomic_LUT[i_still_to_process]['igdt_type'] == 'ots') and (atomic_LUT[i_still_to_process]['ingredients'] == '__igdts__'):
                 print(f"> - - - [{i_still_to_process}] STILL TO FIND") # pull info from net
@@ -58,7 +62,129 @@ def scrub_found(items_to_scrub, is_list=False):
 
     copy_of_urls_to_process = None
 
+
+def url_w_tuple_string_listing(i):
+    i_width = 40
+    if (i in atomic_LUT) and (atomic_LUT[i]['url']):        # i has url
+        return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
+    
+    if i in atomic_LUT:                                     # see if alias has url
+        a = follow_alias(i)
+        if a:
+            if 'url' in atomic_LUT[a].keys():
+                a_url = atomic_LUT[a]['url']
+                i_and_a = f"{i}({a})"
+                return ({a_url}, f"{i_and_a.rjust(i_width)}  {a_url}")
+                
+    return (None, f"{i.rjust(i_width)}  not in atomic_LUT")
+
+
+def show_list(title, i_list):
+    print(f"- {title} -".center(80,'-'))
+    for i in i_list:
+        _, p = url_w_tuple_string_listing(i)
+        print(p)    
+    print(f"- {'O'} -".center(80,'-'))
+
+
+
+# - - - - load MISSING INGREDIENTS from JSON files
 scrub_found(urls_to_process)
+
+ingredents_to_find = []    
+
+# - - lists created by cost_menu.rb, process_nutridocs.py and DTK
+for fname in MI_FILES:
+    with open(fname, 'r') as f:
+        content = json.load(f)
+    
+    show_list(fname.name, content)
+    ingredents_to_find = list(set(ingredents_to_find + content))
+
+show_list('ingredents_to_find', ingredents_to_find)
+
+scrub_found(ingredents_to_find, True) # True passing list
+
+show_list('ingredents_to_find', ingredents_to_find)
+    
+
+# if its in the aLUT scrape info and insert it into the nutridoc    
+# if not in aLUT scrape info insert it into template and add it to end of nutridoc
+
+
+if '-u' in sys.argv:  # problem URLS to test against
+    # - - - - - - 
+    urls_to_process = [ ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
+                        ('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
+                        ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g')
+                        ]
+    # convert list tuple to dict
+    urls_to_process = {item[0]: item[1] for item in urls_to_process}
+    print('= = = Running scrape tests = = =')
+else:
+    # BUILD list URLS for missing items
+    for i in ingredents_to_find:
+        if i in urls_to_process.keys(): continue     # already have URL
+
+        url, igdt_url_str = url_w_tuple_string_listing(i)
+        if url:
+            urls_to_process[i] = url
+        else: # ask user
+            search_url = i.replace(' ','%20')
+            default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_url}"
+            os.system(f'open {default}')
+            url = input(f'\nEnter URL for "{i}"? y/n - RET to skip\n')                
+            if str(url).lower() == '': continue
+            urls_to_process[i] = url
+            print('urls_to_process: - - - S')
+            pprint(urls_to_process)
+            print('urls_to_process: - - - E')
+            with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'w') as f:
+                json.dump(urls_to_process, f)
+
+
+
+for name,url in urls_to_process.items():        
+    
+    print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
+    print(url)
+    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
+    
+    if url == '': continue
+
+    yn = input(f'FIND info for "{name}"? y/n - RET to skip\n')
+    if str(yn).lower() == 'n': sys.exit(0)
+    if str(yn).lower() == '': continue
+
+    print(f"Getting: {url}")        
+    item = ProductInfo(name, url)        
+    nutrinfo_text = item.nutrinfo_str()
+
+    print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+    print(item)
+    print('- - - - - - - - -')
+    print(nutrinfo_text)
+    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
+
+    if item:
+        yn = input(f"SAVE info for > {item.ri_name} <? y/n - RET to skip\n")
+        if str(yn).lower() == 'y':            
+            # with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
+            #     url_cache[item.product_url] = json.dumps(str(item))
+            #     f.write(json.dumps(url_cache))
+            
+            with open(NUTRIENT_FILE_PATH, 'r') as f:
+                content = f.read()
+            
+            insert_nutridata = '__insert_from_food_scrape__\n\n' + nutrinfo_text
+            content = content.replace('__insert_from_food_scrape__', insert_nutridata)
+            
+            with open(NUTRIENT_FILE_PATH, 'w') as f:
+                f.write(content)
+
+        item = None
+        nutrinfo_text = '__blank__'
+
 
 # # > = = = = Using expected conditions to wait for cookie popup
 # 
@@ -79,169 +205,7 @@ scrub_found(urls_to_process)
 #     print("Loading took too much time!")
 #     
 # # > = = = =    
-
-
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-
-    ingredents_to_find = []    
-    t1 = []
-    t2 = []
-    t3 = []
-    # - - - - load MISSING INGREDIENTS from JSON files
-
-    # - - list is created by cost_menu.rb
-    # we want INGREDIENTS, NUTRITION & COST information for these items
-    with open(MISSING_INGREDIENTS_FILE_JSON, 'r') as f:
-        content = f.read()
-        t1_cost = json.loads(content)
-
-    # - - list is created by process_nutridocs.py
-    # looking for ALLERGENS, nutrients NOT IMPORTANT because the ots ingredient has nutrition info
-    # we want INGREDIENTS & COST info - for pricing a component
-    with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'r') as f:
-        content = f.read()
-        t2_process = json.loads(content)
-
-    # - - list is created by ccm_nutridoc_web.rb - from DTK helpers
-    # we want INGREDIENTS, NUTRITION & COST information for these items
-    with open(MISSING_INGREDIENTS_FILE_JSON_CCM, 'r') as f:
-        content = f.read()
-        t3_dtk_ccm = json.loads(content)        
-    
-    
-    def url_w_tuple_string_listing(i):
-        i_width = 40
-        if (i in atomic_LUT) and (atomic_LUT[i]['url']):        # i has url
-            return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
-        
-        if i in atomic_LUT:                                     # see if alias has url
-            a = follow_alias(i)
-            print(f'a={a}')
-            if a:
-                if 'url' in atomic_LUT[a].keys():
-                    a_url = atomic_LUT[a]['url']
-                    i_and_a = f"{i}({a})"
-                    print(f'i_and_a={i_and_a}')
-                    return ({a_url}, f"{i_and_a.rjust(i_width)}  {a_url}")
-                    
-        return (None, f"{i.rjust(i_width)}  not in atomic_LUT")
-    
-    def show_list(title, i_list):
-        print(f"- {title} -".center(80,'-'))
-        for i in i_list:
-            print(f'i={i}')
-            _, p = url_w_tuple_string_listing(i)
-            print(p)    
-        print(f"- {'O'} -".center(80,'-'))
-        #pprint(i_list[0])
-    
-    pprint(t1_cost)
-    show_list('t1_cost',t1_cost)
-    pprint(t2_process)
-    show_list('t2_process',t2_process)
-    pprint(t3_dtk_ccm)
-    show_list('t3_dtk_ccm',t3_dtk_ccm)
-
-    ingredents_to_find = t3_dtk_ccm + t1_cost + t2_process
-    
-    scrub_found(ingredents_to_find, True) # True passing list
-
-    show_list('ingredents_to_find',ingredents_to_find)
-        
-    
-    # if its in the aLUT scrape info and insert it into the nutridoc    
-    # if not in aLUT scrape info insert it into template and add it to end of nutridoc
-
-
-    if '-u' in sys.argv:  # problem URLS to test
-        # - - - - - - 
-        urls_to_process = [('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
-                        ('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
-                        ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g')
-                        ]
-        # convert list tuple to dict
-        urls_to_process = {item[0]: item[1] for item in urls_to_process}
-        print('scrape tests - JUST INGREDIENTS TO START - port the ruby design for site specialisations')    
-    else:
-        # BUILD list URLS for missing items
-        for i in ingredents_to_find:
-            if i in urls_to_process.keys(): continue     # already have URL
-
-            url, igdt_url_str = url_w_tuple_string_listing(i)
-            if url:
-                urls_to_process[i] = url
-            else: # ask user
-                search_url = i.replace(' ','%20')
-                default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_url}"
-                os.system(f'open {default}')
-                url = input(f'\nEnter URL for "{i}"? y/n - RET to skip\n')                
-                if str(url).lower() == '': continue
-                urls_to_process[i] = url
-                print('urls_to_process: - - - S')
-                pprint(urls_to_process)
-                print('urls_to_process: - - - E')
-                with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'w') as f:
-                    json.dump(urls_to_process, f)
-
-
-    
-    url_count = -1
-    item = None    
-    nutrinfo_text = '__blank__'
-
-    for name,url in urls_to_process.items():        
-
-        if item:
-            yn = input(f"SAVE info for > {item.ri_name} <? y/n - RET to skip\n")
-            if str(yn).lower() == 'y':            
-                with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
-                    url_cache[item.product_url] = json.dumps(str(item))
-                    f.write(json.dumps(url_cache))
-                
-                with open(NUTRIENT_FILE_PATH, 'r') as f:
-                    content = f.read()
-                
-                insert_nutridata = '__insert_from_food_scrape__\n\n' + nutrinfo_text
-                content = content.replace('__insert_from_food_scrape__', insert_nutridata)
-                # print('- - - - - - - - - - - - - - - - - - - |')
-                # print(insert_nutridata)
-                # print('- - - - - - - - - - - - - - - - - - - |')
-                # print(content)
-                # print('- - - - - - - - - - - - - - - - - - - |')
-                
-                with open(NUTRIENT_FILE_PATH, 'w') as f:
-                    f.write(content)
-
-            item = None
-            nutrinfo_text = '__blank__'
-        
-        print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
-        print(url)
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
-        
-        if url == '': continue
-
-        yn = input(f'FIND info for "{name}"? y/n - RET to skip\n')
-        if str(yn).lower() == 'n': sys.exit(0)
-        if str(yn).lower() == '': continue
-
-        print(f"Getting: {url}")        
-        item = ProductInfo(name, url)        
-        nutrinfo_text = item.nutrinfo_str()
-
-        print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
-        print(item)
-        print('- - - - - - - - -')
-        print(nutrinfo_text)
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
-
-
-            
+#             
     
     # case 1: https://www.sainsburys.co.uk/gol-ui/product/sainsburys-italian-milano-salami-slices-86g
     # <h3 class="productDataItemHeader">Ingredients</h3>    XPATH
