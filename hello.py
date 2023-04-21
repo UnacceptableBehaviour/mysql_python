@@ -24,11 +24,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # dev remove
 from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
 
+from timestamping import hr_readable_from_nix, roll_over_from_nix_time
+
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
-from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create, roll_over_from_nix_time
-from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB, hr_readable_from_nix
+from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
+from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
 from helpers_db import process_search
 from helpers_db import get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
@@ -440,7 +442,7 @@ def track_items():
         dro = hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
         dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
         dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
-        #print(f"TRACKING: {dro} <  NOW: {hr_readable_from_nix(nix_time_ms())} TS: {dts} <    LUP: {dlu} <")
+        
 
 
     return render_template('track_items.html', daily_tracker=dtk)

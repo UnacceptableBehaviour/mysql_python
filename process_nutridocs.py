@@ -14,7 +14,7 @@ import sys
 # RTF conversion to text
 from striprtf.striprtf import rtf_to_text
 
-from helpers_db import nix_time_ms
+from timestamping import nix_time_ms
 
 from food_sets import get_allergens_for, get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, get_exploded_ingredients_as_list_from_list, scan_for_error_items
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE

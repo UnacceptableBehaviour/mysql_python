@@ -9,10 +9,10 @@ import subprocess   # exec CLI commands
 import json
 
 from datetime import datetime
-import helpers_db       # explicitly use helpers_db.func_name()     << highlight where function is from 
-# change to from helpers_db import - isolate  iface:
-    #from helpers_db import get_daily_tracker, store_daily_tracker, time24h_from_nix_time, commit_DTK_DB
-    #from helpers_db import TRACK_NIX_TIME, QTY_IN_G_INDEX, nix_time_ms
+from timestamping import roll_over_from_nix_time, nix_time_ms, hr_readable_from_nix, time24h_from_nix_time
+
+from helpers_db import get_daily_tracker, store_daily_tracker
+
 from helper_nutrinfo import i_db
 from config_files import get_file_for_data_set
 
@@ -24,11 +24,11 @@ from config_files import get_file_for_data_set
 
 
 def get_daily_tracker_from_DB(userUUID = '014752da-b49d-4fb0-9f50-23bc90e44298'):
-    return helpers_db.get_daily_tracker(userUUID)
+    return get_daily_tracker(userUUID)
 
 # dtk contains a uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
 def store_daily_tracker_to_DB(dtk = {}):
-    return helpers_db.store_daily_tracker(dtk)
+    return store_daily_tracker(dtk)
 
 
 def post_interface_file():
@@ -64,9 +64,9 @@ def create_DTK_textcomponent(dtk, dtk_mode=True):
     dtk_text += headline + "\n"
 
     for line in recipe['ingredients']:
-        time = helpers_db.time24h_from_nix_time(line[helpers_db.TRACK_NIX_TIME])
-        qty  = line[helpers_db.QTY_IN_G_INDEX]
-        ingredient = line[helpers_db.INGREDIENT_INDEX]
+        time = time24h_from_nix_time(line[TRACK_NIX_TIME])
+        qty  = line[QTY_IN_G_INDEX]
+        ingredient = line[INGREDIENT_INDEX]
         if dtk_mode:
             human_line = f"{qty}\t{ingredient}\t# {time}\n"
         else:
@@ -247,7 +247,7 @@ def process_new_dtk_from_user(dtk_data):
     dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
     #pprint(dtk_data)
     store_daily_tracker_to_DB(dtk_data)   # ram & disc
-    #helpers_db.commit_DTK_DB()            # disc
+    #commit_DTK_DB()            # disc
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
     return(dtk_data)
@@ -307,17 +307,16 @@ def dtk_timestamp_rolled_over(dtk):
         print("WARNING 'dt_rollover' not in dtk['dtk_rcp'] . . creating . .  ")
         return True         # start a fresh dtk
 
-    dro = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
-    dts = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
-    dlu = helpers_db.hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
-    nix_now = helpers_db.nix_time_ms()                                       # time now
-    hr_now = helpers_db.hr_readable_from_nix(nix_now)
+    dro = hr_readable_from_nix(dtk['dtk_rcp']['dt_rollover'])     # roll_over
+    dts = hr_readable_from_nix(dtk['dtk_rcp']['dt_date'])         # creation date
+    dlu = hr_readable_from_nix(dtk['dtk_rcp']['dt_last_update'])  # last update
+    nix_now = nix_time_ms()                                       # time now
+    hr_now = hr_readable_from_nix(nix_now)
     # human readable
     print(f"RollOver check: RO: {dro} < NOW: {hr_now}  -  CREATED: {dts}  -  Last Update: {dlu} <")
     # nix time
     print(f"RollOver check: RO: {dtk['dtk_rcp']['dt_rollover']} < NOW: {nix_now}  -  CREATED: {dtk['dtk_rcp']['dt_date']}  -  Last Update: {dtk['dtk_rcp']['dt_last_update']} <")
 
-    #if helpers_db.nix_time_ms() > dtk['dtk_rcp']['dt_rollover']:
     if nix_now > dtk['dtk_rcp']['dt_rollover']:
         print("dtk_timestamp_rolled_over? True")
         return True

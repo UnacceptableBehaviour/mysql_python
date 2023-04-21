@@ -34,7 +34,7 @@ def save_ots_ingredients_found():
         ots_i_string = json.dumps(list(ots_I_set))
         f.write(ots_i_string)
 
-from helpers_db import nix_time_ms
+from timestamping import nix_time_ms
 import shutil
 def backup_nutrinfo_txt():
     target = NUTRIENT_FILE_BACKUPS.joinpath(f"{nix_time_ms()}_{NUTRIENT_FILE_PATH.name}")
