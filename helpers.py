@@ -29,8 +29,12 @@ from pprint import pprint # giza a look
 # do we still need --cors Cross Origin headers since its SSL?
 #
 import urllib.request
-# urllib.request.urlretrieve ("http://192.168.1.13:8000/static/sql_recipe_data.csv", "sql_recipe_data.csv")
-# url = urllib.parse.quote(url, safe='/:')  # make sure files w/ spaces OK
+
+from food_sets import get_igdt_type
+from food_sets import IGD_TYPE_UNCHECKED, IGD_TYPE_DERIVED 
+# print('food_sets import IGD_TYPE_UNCHECKED, IGD_TYPE_DERIVED ')
+# print(IGD_TYPE_UNCHECKED)
+# print(IGD_TYPE_DERIVED)
 
 # indexes for ingredients row
 ATOMIC_INDEX = 0                    # default value is 1 - TRUE
@@ -44,8 +48,7 @@ INGREDIENT_INDEX = 3
 # load a csv file into a list of dictionaries
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_csv_from_server_as_disctionary(force_reload=False):
-    url = 'https://asset.server:8080/static/sql_recipe_data.csv'
+def get_csv_from_server_as_disctionary(url):
     print("----- get_csv_from_server_as_disctionary -----------------------------------")
 
     url = urllib.parse.quote(url, safe='/:')  # replace spaces if there are any - urlencode
@@ -55,8 +58,12 @@ def get_csv_from_server_as_disctionary(force_reload=False):
     print(csv_file)
 
     local_file_name = f"./scratch/{csv_file}"
-
-    urllib.request.urlretrieve(url, local_file_name)
+    
+    print("> request <")
+    pprint(urllib.request)
+        
+    # lecacy inteface - works with HTTP
+    urllib.request.urlretrieve(url, local_file_name) # - also fails on HTTPS 
 
     sql_dict = {}
 
@@ -219,13 +226,16 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             # strip blanks out list() same as [] < assumption
             i_list[index] = list( filter(None, line) )
 
-            # default to ATOMIC until subcomponent found
-            i_list[index].insert(ATOMIC_INDEX,1)                                   # indicates atmonic ingredient
+            # default to UKNOWN until all elements present
+            i_list[index].insert(ATOMIC_INDEX, IGD_TYPE_UNCHECKED)
 
             #print(f"[{SERVING_INDEX}]\nline:{line} <\ni_list:{i_list[index]}<\nindex:{index}")
             #pprint(i_list)
             if not re.match(r'\(.*?\)', i_list[index][SERVING_INDEX]):  # look for serving info (x)
                 i_list[index].insert(SERVING_INDEX,'(0)')                           # insert (0) if not present
+
+            # look up igdt_type
+            i_list[index][ATOMIC_INDEX] = get_igdt_type(i_list[index][INGREDIENT_INDEX])
 
 
         # TODO remove after schema redesign
@@ -267,6 +277,7 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 
     print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
     base_url = 'https://asset.server:8080/static/recipe/'
+    base_url = 'http://127.0.0.1:8000/static/recipe/'
     url = f"{base_url}{recipe_text_filename}"
     print(url)
 
@@ -400,26 +411,37 @@ def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # typical recipe
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#{'ingredients': [[1, '250g', '(0)', 'cauliflower'],    # sublist
-#                 [1, '125g', '(0)', 'grapes'],
-#                 [1, '200g', '(4)', 'tangerines'],
-#                 [1, '55g', '(0)', 'dates'],
-#   atomic >-------1, '8g', '(0)', 'coriander'],
-#                 [1, '8g', '(0)', 'mint'],
-#                 [1, '4g', '(0)', 'chillies'],
-#   sub_comp >-----0, '45g', '(0)', 'pear and vanilla reduction lite'],
-#                 [1, '2g', '(0)', 'salt'],
-#                 [1, '2g', '(0)', 'black pepper'],
-#                 [1, '30g', '(0)', 'flaked almonds']],
+#{'ingredients': [[0, '250g', '(0)', 'cauliflower'],    # sublist
+#                 [0, '125g', '(0)', 'grapes'],
+#                 [0, '200g', '(4)', 'tangerines'],
+#                 [0, '55g', '(0)', 'dates'],
+#   atomic >-------0, '8g', '(0)', 'coriander'],
+#                 [0, '8g', '(0)', 'mint'],
+#                 [0, '4g', '(0)', 'chillies'],
+#   sub_comp >-----1, '45g', '(0)', 'pear and vanilla reduction lite'],
+#                 [0, '2g', '(0)', 'salt'],
+#                 [0, '2g', '(0)', 'black pepper'],
+#                 [0, '30g', '(0)', 'flaked almonds']],
 #  'ri_name': 'cauliflower california',
-#  'atomic' : 0
+#  'atomic' : 0     ** deprecated BOOL use igdt_type INT8 instead
+#  'igdt_type' : -1 to 3  see below
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# //  IGDT_TYPE: UNCHECKED / DERIVED / ATOMIC / OTS / DTK
+# //                 -1         0        1       2     3
+# let IGD_TYPE_UNCHECKED = -1;
+# let IGD_TYPE_ATOMIC    = 0;
+# let IGD_TYPE_DERIVED   = 1;
+# let IGD_TYPE_OTS       = 2;   // Off The Shelf
+# let IGD_TYPE_DTK       = 3;   // Daily TracKer 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # scans through the list of ingredients looking for subcompnents
-# marks with atomic (index 0) with a 0 to indicate a subcomponent
+# marks with atomic (index 0) with a 1 to indicate a subcomponent
 # then recurive calls on that subcompnent to process its ingredients
 def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient):
 
-    recipe_dict['atomic'] = 0
+    recipe_dict['atomic'] = 0    # deprecated use igdt_type instead
+    #recipe_dict['igdt_type'] = IGD_TYPE_UNCHECKED # TODO ATOMIC BREAKS DB create 
+
     print(f"\tFOUND: {recipe_dict['ri_name']} <")
 
     # iterate through its ingredients and see if there is an entry for
@@ -434,8 +456,7 @@ def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredien
         if recipe_is_a_subcomponent:        # found a subcomponent
             print(f"\t\t\tSUB MARKED: {recipe_is_a_subcomponent['ri_name']} <")
 
-            # mark ATOMIC 0 - false
-            recipe_dict['ingredients'][i2][ATOMIC_INDEX] = 0
+            recipe_dict['ingredients'][i2][ATOMIC_INDEX] = IGD_TYPE_DERIVED
 
             # check it's ingredients for sub components
             mark_subcomponents(recipies_and_subcomponents, recipe_is_a_subcomponent, ingredient)

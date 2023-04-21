@@ -95,15 +95,17 @@ print("----- list.py -----------------------------------------------------------
 #engine = create_engine('postgresql://root:meepmeep@localhost:3306/recipe_cs50')
 
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
-engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
+#engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
 #engine = create_engine('postgresql://simon:@localhost:5432/simon')  # database name different
+# docker container DB
+engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')  # database name different
 db = scoped_session(sessionmaker(bind=engine))
 pprint(engine)
 
-print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - S")
+print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPULATION FEEDBACK - S")
 
 force_complete_rebuild = False
-#force_complete_rebuild = True
+# force_complete_rebuild = True
 
 if ( force_complete_rebuild == True ):
     # .rb find txt recipes and jpgs of those recipes
@@ -115,16 +117,21 @@ else:
     print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
 
 
-print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPLATION FEEDBACK - E")
+print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPULATION FEEDBACK - E")
 
+
+# let IGD_TYPE_ATOMIC    = 0;
+# let IGD_TYPE_DERIVED   = 1;
+# let IGD_TYPE_OTS       = 2;   // Off The Shelf
+# let IGD_TYPE_DTK       = 3;   // Daily TracKer 
 # insert array of arrays
 def create_sql_insert_ingredients_array_text(ingredients):
-    # '{    {"1", "250", "(0)", "cheese"},          # 1 - atomic
-    #       {"1", "110", "(0)", "rice"},
-    #       {"0", "110", "(0)", "turkey mix"},      # 0 - sc - subcomponent- derived
-    #       {"1", "20", "(0)", "pepper"},
-    #       {"1", "20", "(0)", "salt"},
-    #       {"1", "55", "(1)", "eggs"}
+    # '{    {"0", "250", "(0)", "cheese"},          # 0 - atomic
+    #       {"0", "110", "(0)", "rice"},
+    #       {"1", "110", "(0)", "turkey mix"},      # 1 - sc - subcomponent- derived
+    #       {"0", "20", "(0)", "pepper"},
+    #       {"0", "20", "(0)", "salt"},
+    #       {"0", "55", "(1)", "eggs"}
     #   }'
 
     sql_insert = "'{"
@@ -246,6 +253,7 @@ def create_table_in_database_from_sql_template(data_base, template_file):
         create_table_sql_command = sql_template.read()
 
     db_lines = data_base.execute(create_table_sql_command)
+    print(f"> - create_table_in_database_from_sql_template - S\n{template_file}\n{db_lines}\n> - create_table_in_database_from_sql_template - E\n")
     data_base.commit()
 
     return(db_lines)
@@ -258,6 +266,7 @@ def drop_tables_for_fresh_start(data_base, tables):
 
         print(f"SQL cmd: {sql_command} <")
 
+        print(f"> - drop_tables_for_fresh_start - S\n{sql_command}\n> - drop_tables_for_fresh_start - E\n")
         data_base.execute(sql_command)
         data_base.commit()
 
@@ -291,7 +300,7 @@ def insert_tags_for_table_for_user(db, uuid, table, tag_sets):
     # assemble into sql command
     sql_command = f"INSERT INTO {table} (uuid_user, {column_names} ) VALUES ('{uuid}', {rows_data});"
 
-    print(sql_command)
+    print(f"> - insert_tags_for_table_for_user - S\n{sql_command}\n> - insert_tags_for_table_for_user - E\n")
     db.execute(sql_command)
     db.commit()
 
@@ -304,7 +313,7 @@ def main():
     #db_lines = db.execute("SHOW TABLES").fetchall() #msyql
     #db_lines = db.execute('SELECT * FROM sal_emp').fetchall()  # work fine
 
-    force_drop_tables = True # False
+    force_drop_tables = True 
 
     # insert default_filters
     # create setings tables
@@ -335,10 +344,15 @@ def main():
     insert_default_tag_sets_for_user(db, uuid)
     insert_empty_default_filters_for_user(db, uuid)
 
-
+    # *** SEE TOP OF HELPERS FILE - FOR SERVER SETTING INFO ***
     # http-server -p 8000 --cors
-    # url_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'
-    url_file = 'https://asset.server:8080/static/sql_recipe_data.csv'
+    #url_file = 'http://192.168.1.13:8000/static/sql_recipe_data.csv'
+    url_file = 'http://127.0.0.1:8000/static/sql_recipe_data.csv'
+    
+    
+    # http-server  --cors -S -C ./scratch/asCerts/server.crt -K ./scratch/asCerts/server.key
+    #url_file = 'https://asset.server:8080/static/sql_recipe_data.csv' # problem with cert 10.Jun.22
+    
 
     sql_dict = get_csv_from_server_as_disctionary(url_file)
 
@@ -349,7 +363,7 @@ def main():
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     # go through the CSV file of rows of recipes - parse and load data
-    max_entries = 40
+    max_entries = 20
     rcount = 0
     for entry in sql_dict:
         print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
@@ -387,14 +401,14 @@ def main():
         for recipe in recipes_from_id:
            create_entry_in_db(db, 'recipes', recipe)
 
-        rcount += 1
-        #if rcount > max_entries: sys.exit(0)
+        # rcount += 1
+        # if rcount > max_entries: sys.exit(0)
 
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
-
+    
     for entry in sql_dict:
 
         sql_row = sql_dict[entry]

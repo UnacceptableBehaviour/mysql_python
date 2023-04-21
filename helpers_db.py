@@ -29,8 +29,8 @@ print("----- helpers_db: attaching to DB ------------------------------------S")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 #engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
-engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
-#engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
+#engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
+engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print("----- helpers_db: attaching to DB ------------------------------------E")
 
@@ -142,8 +142,8 @@ def roll_over_from_nix_time(nix_ts, time_in_the_AM_to_rollover='0500'):
 # if    ts1_date:0500 > ts1     roll over = ts1_date:0500
 # else                          roll over = (ts1_date +1day):0500
 
-
-
+# from food_sets import IGD_TYPE_DERIVED  - cyclic depend
+IGD_TYPE_DERIVED = 1
 
 # indexes for ingredients row
 ATOMIC_INDEX = 0                    # default value is 1 - TRUE
@@ -205,19 +205,28 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # typical recipe
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#{'ingredients': [[1, '250g', '(0)', 'cauliflower', nix_time_in_ms],    # sublist
-#                 [1, '125g', '(0)', 'grapes', nix_time_in_ms],
-#                 [1, '200g', '(4)', 'tangerines', nix_time_in_ms],
-#                 [1, '55g', '(0)', 'dates', nix_time_in_ms],
-#   atomic >-------1, '8g', '(0)', 'coriander', nix_time_in_ms],
-#                 [1, '8g', '(0)', 'mint', nix_time_in_ms],
-#                 [1, '4g', '(0)', 'chillies', nix_time_in_ms],
-#   sub_comp >-----0, '45g', '(0)', 'pear and vanilla reduction lite', nix_time_in_ms],
-#                 [1, '2g', '(0)', 'salt', nix_time_in_ms],
-#                 [1, '2g', '(0)', 'black pepper', nix_time_in_ms],
-#                 [1, '30g', '(0)', 'flaked almonds', nix_time_in_ms]],
+#{'ingredients': [[0, '250g', '(0)', 'cauliflower', nix_time_in_ms],    # sublist
+#                 [0, '125g', '(0)', 'grapes', nix_time_in_ms],
+#                 [0, '200g', '(4)', 'tangerines', nix_time_in_ms],
+#                 [0, '55g', '(0)', 'dates', nix_time_in_ms],
+#   atomic >-------0, '8g', '(0)', 'coriander', nix_time_in_ms],
+#                 [0, '8g', '(0)', 'mint', nix_time_in_ms],
+#                 [0, '4g', '(0)', 'chillies', nix_time_in_ms],
+#   sub_comp >-----1, '45g', '(0)', 'pear and vanilla reduction lite', nix_time_in_ms],
+#                 [0, '2g', '(0)', 'salt', nix_time_in_ms],
+#                 [0, '2g', '(0)', 'black pepper', nix_time_in_ms],
+#                 [0, '30g', '(0)', 'flaked almonds', nix_time_in_ms]],
 #  'ri_name': 'cauliflower california',
-#  'atomic' : 0
+#  'atomic' : 0     ** deprecated BOOL use igdt_type INT8 instead
+#  'igdt_type' : -1 to 3  see below
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# //  IGDT_TYPE: UNCHECKED / DERIVED / ATOMIC / OTS / DTK
+# //                 -1         0        1       2     3
+# let IGD_TYPE_UNCHECKED = -1;
+# let IGD_TYPE_ATOMIC    = 0;
+# let IGD_TYPE_DERIVED   = 1;
+# let IGD_TYPE_OTS       = 2;   // Off The Shelf
+# let IGD_TYPE_DTK       = 3;   // Daily TracKer 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # cs50_recipes=# \d recipes
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -257,7 +266,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 #     "recipes_ri_id_key" UNIQUE CONSTRAINT, btree (ri_id)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # all fields
-# ['id','ri_id','ri_name','yield','units','servings','density','serving_size','atomic','ingredients','allergens','tags',
+# ['id','ri_id','ri_name','yield','units','servings','density','serving_size','atomic','igdt_type','ingredients','allergens','tags',
 # 'user_tags','lead_image','text_file','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al',]
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -273,7 +282,8 @@ def return_recipe_dictionary():
         'lead_image':'none_listed',
         'text_file':'none_listed',
         'description': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
-        'atomic': 1,        # 0 if component / further recipe info available
+        'atomic': 1,        # deprecated use 'igdt_type' instead TODO ATOMIC remove
+        'igdt_type': -1,
         'user_rating': 1,
         'dt_date': nix_time_in_ms,
         'dt_date_readable': hr_readable_date_from_nix(nix_time_in_ms),
@@ -395,7 +405,7 @@ def get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id_or_na
     # go through ingredients and load non-atomic (IE subcomponents) into components
     for ingredient in return_recipe['ingredients']:
 
-        if int(ingredient[ATOMIC_INDEX]) == 0:
+        if int(ingredient[ATOMIC_INDEX]) == IGD_TYPE_DERIVED:
 
             # NON atomic - fetch subcomponent
             sub_component_name = ingredient[INGREDIENT_INDEX]

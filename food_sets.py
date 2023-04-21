@@ -7,9 +7,6 @@ from pprint import pprint
 from pathlib import Path
 from collections import Counter
 
-# TODO remove
-#from helpers_db import get_ingredients_as_text_list as deprecated_get_ingredients_as_text_list
-
 aliases = {}
 
 atomic_LUT = {}
@@ -45,7 +42,7 @@ def backup_nutrinfo_txt():
     print(f"BACKUP: {NUTRIENT_FILE_BACKUPS.name}/{target.name}")
     
 
-        
+# atomic_LUT        
 # Item: large dried chillies
 # {'alias': 'dried chillies',
 #  'alias_file': ('y445', '20210511_123843_dried chillies.txt'),
@@ -56,6 +53,30 @@ def backup_nutrinfo_txt():
 #  'ndb_no_url_alias': 'ndb_no=dried chillies',
 #  'txtfile': '',
 #  'url': ''}
+
+IGD_TYPE_UNCHECKED = -1
+IGD_TYPE_ATOMIC    = 0
+IGD_TYPE_DERIVED   = 1
+IGD_TYPE_OTS       = 2   # Off The Shelf
+IGD_TYPE_DTK       = 3   # Daily TracKer 
+
+def get_igdt_type(ri_name):
+    igdt_type = IGD_TYPE_UNCHECKED
+
+    if ri_name in atomic_LUT.keys():
+        igdt_type_text = atomic_LUT[ri_name]['igdt_type']
+    
+        if igdt_type_text == 'atomic':
+            igdt_type = IGD_TYPE_ATOMIC
+        
+        if igdt_type_text == 'derived':
+            igdt_type = IGD_TYPE_DERIVED
+        
+        if igdt_type_text == 'ots':
+            igdt_type = IGD_TYPE_OTS    
+
+    return igdt_type
+
 
 def dump_atomic_LUT(i):
     print(f"{atomic_LUT[i]['igdt_type'].ljust(8)} {str(atomic_LUT[i]['ndb_no']).center(7)} {i.ljust(40)} - {atomic_LUT[i]['txtfile_short']}")
