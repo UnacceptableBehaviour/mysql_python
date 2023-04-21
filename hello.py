@@ -135,7 +135,7 @@ def query_status_w_js():
 
                 new_day_dtk = bootstrap_daily_tracker_create(uuid)
                 store_daily_tracker_to_DB(new_day_dtk)
-
+                
                 dtk_w_reroute = { 'route': '/weigh_in', 'dtk': new_day_dtk }
 
                 return json.dumps(dtk_w_reroute), 200
