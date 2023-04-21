@@ -1,0 +1,8 @@
+FROM postgres:13
+
+EXPOSE 5432
+
+ENV POSTGRES_USER simon
+ENV POSTGRES_PASSWORD pool
+
+CMD ["postgres"]
