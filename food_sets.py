@@ -969,7 +969,7 @@ crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shr
 crustaceans_alt = [
     {'langostino', 'squat lobster'},
     {'norway lobster', 'dublin bay prawn', 'langoustine','langostine'},
-    {'prawn','prawns','shrimp','shrimps','large head on shell on prawns', 'large head on shell on prawn',
+    {'prawn','prawns','shrimp','shrimps','large head on shell on prawns', 'large head on shell on prawn', 'large prawns', 'large prawn',
      'hoso prawn','hoso prawns','so prawn','so prawns','shell on jumbo king prawn', 'shell on jumbo king prawns'},
     {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
      'cangrejo de rio'},
