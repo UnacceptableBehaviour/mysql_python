@@ -87,6 +87,9 @@ def dump_atomic_LUT(i):
 
 def follow_alias(i):
     alias = atomic_LUT[i]['alias']
+    if alias == 'pkg':  # data was taken from ingredient packaging there is no alias
+        return(None)
+
     if alias:
         if atomic_LUT[alias]['ingredients']!='__igdts__' or atomic_LUT[alias]['url']:
             return(alias)
