@@ -296,7 +296,7 @@ NUTRIDOC_LIST = [
                 # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
                 # 'y431',       #       0912-25 - 4 /2:
                 # 'y432',       #  DONE 0929-09 - 15/42: loads of material!
-                 'y433',       #       1010-23 - 12/2:
+                # 'y433',       #       1010-23 - 12/2:
                 # 'y434',       #       1024-06 - 00/0:
                 # 'y435',       #       1107-20 -
                 # 'y436',       #       1121-04 -
@@ -319,8 +319,10 @@ NUTRIDOC_LIST = [
                 # 'y453',
                 #'y454',
                 #'y455',
+                #'y456',
+                'y457',
 
-    
+
 # * next to done means superfluous image files removed
 ]
 
@@ -362,6 +364,8 @@ NUTRIDOC_LIST = [
 # y452_NUTRITEST_recipes_20211206-0108_xmas.rtf    6        1         5           0             6      
 # y453_NUTRITEST_recipes_20220219-0930.rtf         99       67        32          8             11     
 # y454_NUTRITEST_recipes_20221001-31.rtf           40       38        2           17            1
+#
+# y457_NUTRITEST_recipes_20230215-0422.rtf         36       34        2       **  41  **        16                 26 
 #
 # y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
 # y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
@@ -454,7 +458,7 @@ def dump_missing_sub_ingredients_across_all_docs_to_JSON(sub_i_hash):
                     missing_subs[sub_i] = [nutridoc_no, component]
     
     pprint(missing_subs)
-    MISSING_INGREDIENTS_FILE_JSON_PY
+
     missing_to_file = json.dumps([ k for k,i in missing_subs.items()])
     with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'w') as f:
         f.write(missing_to_file)

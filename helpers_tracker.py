@@ -9,7 +9,8 @@ import subprocess   # exec CLI commands
 import json
 
 from datetime import datetime
-from timestamping import roll_over_from_nix_time, nix_time_ms, hr_readable_from_nix, time24h_from_nix_time
+from timestamping import roll_over_from_nix_time, nix_time_ms, hr_readable_from_nix
+from timestamping import hr_readable_date_from_nix, time24h_from_nix_time
 
 from helpers_db import get_daily_tracker, store_daily_tracker
 
@@ -279,7 +280,7 @@ def archive_dtk(dtk):
         archive_dtk = dtk
         print("Archiving DEV directly")
 
-    archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}.json"
+    archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}_{hr_readable_date_from_nix(serv_dtk['dtk_rcp']['dt_rollover'])}.json"
 
     arch_target = Path(get_file_for_data_set("archive_path")).joinpath(archfile_name)
 

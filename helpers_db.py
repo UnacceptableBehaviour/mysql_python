@@ -813,7 +813,7 @@ def get_user_info_dict_from_DB(uuid):
     filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
 
     username = helper_db_class_db.execute("SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
-    if username == None: username = 'Aardvark' # Place holder until logins implemented
+    if username == None: username = 'carter' # Place holder until logins implemented
 
 
     return_user_info = {'UUID':uuid, 'name':username}
