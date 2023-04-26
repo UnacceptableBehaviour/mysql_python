@@ -62,8 +62,16 @@ def get_csv_from_server_as_disctionary(url):
     print("> request <")
     pprint(urllib.request)
         
-    # lecacy inteface - works with HTTP
-    urllib.request.urlretrieve(url, local_file_name) # - also fails on HTTPS 
+    while (not Path(local_file_name).exists()):
+        try:    
+            urllib.request.urlretrieve(url, local_file_name) # fails on HTTPS - need certs sorting
+        except ConnectionRefusedError:
+            print('\n\nConnectionRefusedError: asset server must be serveing on HTTP  \
+                \nOpen terminal. \
+                \ncd python/assest_server \
+                \nhttp-server -p 8000 --cors \
+                \nHit RETURN to continue . .')
+            wait = input()
 
     sql_dict = {}
 
@@ -91,6 +99,8 @@ def get_csv_from_server_as_disctionary(url):
     print(type(sql_dict))
     print(f"ENTRIES: {len(sql_dict)} 0-{len(sql_dict)-1}")
     print(f">---------------------------------------- DICTIONARY LOADED >------------")
+    
+    Path(local_file_name).unlink(missing_ok=True)
 
     return sql_dict
 
