@@ -498,6 +498,7 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
     
     return sorted(list(set(i_list)))# remove duplicates    
 
+
 def get_exploded_ingredients_as_list_from_list(i_list):
     exploded_list = []
     for i in i_list:
@@ -506,6 +507,62 @@ def get_exploded_ingredients_as_list_from_list(i_list):
     save_ots_ingredients_found()
     
     return(sorted(list(set(exploded_list))))
+
+# returns (c_list: list of components in rcoi, i_list: list of ingredients and posible subcomponents)
+#            ^^                                  ^^
+def get_exploded_ingredients_and_components_for_DB_from_name(comps_and_rcoi, d=0): # takes str:name    
+    d += 1
+    c_list, recipe_component_or_ingredient = comps_and_rcoi
+    rcoi = remove_error(recipe_component_or_ingredient)        
+    i_list = [f"unknown_component>{rcoi}<"]
+    
+    if rcoi in atomic_LUT:
+        igdt_type = atomic_LUT[rcoi]['igdt_type']
+        
+        if igdt_type == 'atomic':
+            i_list = [atomic_LUT[rcoi]['ingredients']] if atomic_LUT[rcoi]['ingredients'] != '__igdts__' else [rcoi]
+        
+        elif igdt_type == 'ots':
+            i_list=[rcoi]
+        
+        elif igdt_type == 'derived':
+            if rcoi not in c_list:
+                c_list.append(rcoi)            
+
+            if rcoi not in component_file_LUT:
+                alias = re.sub('ndb_no=', '', atomic_LUT[rcoi]['ndb_no_url_alias'])
+                if alias in component_file_LUT:
+                    print(f"\n{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
+                    s_list = get_ingredients_from_component_file(alias)
+                else:
+                    s_list = [f"alias_NF>{rcoi}|{alias}<"]            
+            else:
+                print(f"\n{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
+                s_list = get_ingredients_from_component_file(rcoi)
+
+            #print(f"{'    '*(d-1)}C{c_list}")
+            print(f"{'    '*(d-1)}S{s_list}")
+            #print('-*-')
+            
+            if s_list == 'ERROR: bad_template':
+                i_list = [f"bad_template_in_file>{rcoi}<"]
+            else:
+                i_list = []
+                for i in s_list:
+                    c_list, sub_list = get_exploded_ingredients_and_components_for_DB_from_name((c_list,i),d)
+                    i_list = i_list + sub_list
+                    #print(f"{'    '*d}{sub_list}")
+            
+        else:
+            i_list = [f"unknown_igdt_type>{rcoi}<"]
+    
+    i_list = sorted(list(set(i_list))) # remove duplicates
+
+    errors['dead_ends_in_this_pass'] += scan_for_error_items(i_list) 
+    
+    return (c_list, i_list)
+
+
     
 
 
@@ -1396,7 +1453,7 @@ beef_basic = {'beef','shortribs','roast beef','beef silverside w&s','sbs ttd bee
               '20% beef mince','5% minced beef','12% minced beef','15% minced beef','20% minced beef','beef brisket','beef fillet',
               'flat iron steak','rump steak','sirloin steak','fillet steak','ribeye','ribeye steak','forerib','forerib joint',
               'beef joint','silverside','topside','top rump','ox cheek','beef shin','oxtail','beef meatballs','beef sausages',
-              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak','gelatine powder'}
+              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak','gelatine powder','aldi beef trimmings'}
 
 # usually product of some type katsuobushi or fish sauce for example
 beef_derived_no_recipe =  {'shredded beef'}
@@ -1913,16 +1970,22 @@ if __name__ == '__main__':
     print('>--4')
     
     def diagnostics(c, sp=False):
-        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S')
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S get i_list')
         i_list = get_ingredients_as_text_list_R(c)
-        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1')
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1 allergens')
         a_list = get_allergens_for(get_ingredients_as_text_list_R(c), sp)
-        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2')
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2 tags')
         t_list = get_containsTAGS_for(c, sp)
+        print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M3 exploded for DB')
+        component_list, i_sub_list = get_exploded_ingredients_and_components_for_DB_from_name(([],c))
+        #print(f"COMPONENT_LIST: {component_list}")
+        #print(f"I_SUB_LIST: {i_sub_list}")
+        exploded_list = component_list + i_sub_list
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - S')
-        print(f"INGREDIENTS FOR ({c}): {i_list}")
-        print(f"ALLERGENS: {a_list}")
-        print(f"TAGS: {t_list}")
+        print(f"\nINGREDIENTS FOR ({c}): {i_list}")
+        print(f"\nEXPLODED (included sub components DB) FOR ({c}): {exploded_list}")
+        print(f"\nALLERGENS: {a_list}")
+        print(f"\nTAGS: {t_list}")
         ots_i_miss_list = []
         for i in i_list:
             m = re.search(r'ots_i_miss>(.*?)<', i)
@@ -1943,12 +2006,19 @@ if __name__ == '__main__':
                 if atomic_LUT[i]['url']: url_list.append(atomic_LUT[i]['url'])
             print()
         print(f"{url_list}")
+        if c not in CACHE_recipe_component_or_ingredient:
+            get_ingredients_from_component_file(c)
+        print(CACHE_recipe_component_or_ingredient[c])
+        pprint(atomic_LUT[c])
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - E')
 
-    diagnostics('beef & humous mini wrap')
-    search('beef & humous mini wrap')
+    rcoi = 'beef & humous mini wrap' # Receipe Component Or Ingredient
+    diagnostics(rcoi) # diagnostics(rcoi, True) # show provenance of allegen or tags
+    search(rcoi)
+    print(f"\n>--- atomic_LUT[{rcoi}] - - \ ")
+    pprint(atomic_LUT[rcoi])
 
-    print('\nSearch?')
+    print('\n'*15 + '\nSearch?')
     while(True):
         yn = input('Continue ingredient/(n)\n')
         if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)

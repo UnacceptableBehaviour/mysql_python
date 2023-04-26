@@ -11,6 +11,5 @@ type: __type__
 images: __images__
 lead_image: __lead_image__
 username: __username__
-exploded: __exploded_igdt_list__
 __end_recipe__
 

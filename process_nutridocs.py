@@ -16,7 +16,8 @@ from striprtf.striprtf import rtf_to_text
 
 from timestamping import nix_time_ms
 
-from food_sets import get_allergens_for, get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, get_exploded_ingredients_as_list_from_list, scan_for_error_items
+from food_sets import get_allergens_for, get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
+from food_sets import get_exploded_ingredients_as_list_from_list
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE
 from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
 import json
@@ -199,8 +200,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                     '__type__' : type_tag.strip(),
                     '__images__' : get_images_from_lead_image(lead_image),
                     '__lead_image__' : lead_image,
-                    '__username__' : username,
-                    '__exploded_igdt_list__' : ', '.join(exploded_list_of_ingredients) }
+                    '__username__' : username }
         
         rcp = ''
         with TEMPLATE.open('r') as f:
@@ -321,6 +321,7 @@ NUTRIDOC_LIST = [
                 #'y455',
                 #'y456',
                 'y457',
+                'y458',
 
 
 # * next to done means superfluous image files removed
