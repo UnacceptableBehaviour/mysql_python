@@ -19,6 +19,8 @@ MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,
             MISSING_INGREDIENTS_FILE_JSON_CCM,
             MISSING_INGREDIENTS_FILE_JSON_PY]
 
+MI_FILES = [MISSING_INGREDIENTS_FILE_JSON]
+            
 # in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
 
@@ -39,6 +41,7 @@ if __name__ == '__main__':
     urls_to_process = {}
     if URL_CACHE_STILL_TO_PROCESS_JSON.exists():
         with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'r') as f:
+            print(f"LOADING JSON: {URL_CACHE_STILL_TO_PROCESS_JSON}")
             urls_to_process = json.load(f)
 
     def scrub_found(items_to_scrub, is_list=False):
