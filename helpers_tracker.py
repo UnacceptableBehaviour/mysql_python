@@ -13,6 +13,7 @@ from timestamping import roll_over_from_nix_time, nix_time_ms, hr_readable_from_
 from timestamping import hr_readable_date_from_nix, time24h_from_nix_time
 
 from helpers_db import get_daily_tracker, store_daily_tracker
+from helpers_db import ATOMIC_INDEX, QTY_IN_G_INDEX, SERVING_INDEX, INGREDIENT_INDEX, TRACK_NIX_TIME, IMAGE_INDEX, HTML_ID
 
 from helper_nutrinfo import i_db
 from config_files import get_file_for_data_set
