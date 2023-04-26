@@ -104,8 +104,8 @@ pprint(engine)
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPULATION FEEDBACK - S")
 
-force_complete_rebuild = False
-# force_complete_rebuild = True
+# force_complete_rebuild = False
+force_complete_rebuild = True
 
 if ( force_complete_rebuild == True ):
     # .rb find txt recipes and jpgs of those recipes
