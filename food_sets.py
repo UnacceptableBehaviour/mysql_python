@@ -919,7 +919,7 @@ def build_fish_set():
 # SHELLFISH - MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 molluscs_basic = {'abalone','escargot','squid','snail','snails','hereford snails','mussel','limpits','winkles','whelks','clams','mussels',
-                  'oyster','scallop','octopus','squid','cuttlefish'}
+                  'oyster','oysters','scallop','octopus','cuttlefish'}
 
 molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels', 'wood smoked mussels', 'wood smoked mussels (mollusc)',
                                'cooked squid'}
@@ -928,7 +928,7 @@ molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked
 molluscs_alt = [
     {'snails','escargot','helix aspersa'},
     {'cuttlefish', 'sepia'},
-    {'small squid','small squid tubes','squid tubes','squid'},
+    {'small squid','small squid tubes','large squid','large squid tubes','squid tubes','squid'},
 ]
 
 # subsets - common name with various types
