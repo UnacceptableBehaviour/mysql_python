@@ -435,9 +435,10 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
 # TODO REMOVE
 def remove_error(possible_err_string):
     #'unknown_component>alias_NF>coriander sauce|per 100g'
-    # 'ots_i_miss>sherry vinegar'
+    # 'ots_i_miss>sherry vinegar'    
     e_list = possible_err_string.split('>')
     if len(e_list) > 1:
+        print(f"possible_err_string:{possible_err_string}")
         return e_list.pop()
     return possible_err_string
 
@@ -512,8 +513,16 @@ def get_exploded_ingredients_as_list_from_list(i_list):
 #            ^^                                  ^^
 def get_exploded_ingredients_and_components_for_DB_from_name(comps_and_rcoi, d=0): # takes str:name    
     d += 1
+
+    #print(f"comps_and_rcoi:{comps_and_rcoi}")
+    #pprint(comps_and_rcoi)
+
     c_list, recipe_component_or_ingredient = comps_and_rcoi
-    rcoi = remove_error(recipe_component_or_ingredient)        
+
+    #print(f"c_list:{c_list}")
+    #print(f"recipe_component_or_ingredient:{recipe_component_or_ingredient}")
+
+    rcoi = remove_error(recipe_component_or_ingredient) 
     i_list = [f"unknown_component>{rcoi}<"]
     
     if rcoi in atomic_LUT:

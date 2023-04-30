@@ -70,7 +70,7 @@ HTML_ID = 6
 # using decorators to implement static vars
 # https://stackoverflow.com/questions/279561/what-is-the-python-equivalent-of-static-variables-inside-a-function
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings=0):
+def add_ingredient_w_timestamp(recipe, igdt_type, qty, ingredient, servings=0):
 
     # for dev - adding a bunch of ingredients needs to have non identical timestamp
     timestamp = nix_time_ms()                                               #
@@ -84,15 +84,16 @@ def add_ingredient_w_timestamp(recipe, atomic, qty, ingredient, servings=0):
                                                                             #
     # stop duplicate timestamps - - - - - - - - - - - - - - - - - - - - - - #
 
-    if atomic < 0:
+    if igdt_type < 0:
         # look ingredient up in DB and see if we have a recipe (0)
         # or if it's off the shelf (1)
-        atomic = -1 # not checked
+        # TODO ATOMIC
+        igdt_type = -1 # not checked
 
     if len(ingredient) == 0:
         ingredient = "ingredient was blank!"
 
-    ingredient_list = [str(atomic), qty, f"({servings})", ingredient, timestamp]
+    ingredient_list = [str(igdt_type), qty, f"({servings})", ingredient, timestamp]
 
     pprint(ingredient_list)
 
@@ -132,7 +133,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 #  'atomic' : 0     ** deprecated BOOL use igdt_type INT8 instead
 #  'igdt_type' : -1 to 3  see below
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# //  IGDT_TYPE: UNCHECKED / DERIVED / ATOMIC / OTS / DTK
+# //  IGDT_TYPE: UNCHECKED / ATOMIC / DERIVED / OTS / DTK
 # //                 -1         0        1       2     3
 # let IGD_TYPE_UNCHECKED = -1;
 # let IGD_TYPE_ATOMIC    = 0;
@@ -153,7 +154,6 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 #  servings     | numeric(9,2)             |           |          | NULL::numeric
 #  density      | numeric(9,2)             |           |          | NULL::numeric
 #  serving_size | numeric(9,2)             |           |          | NULL::numeric
-#  atomic       | boolean                  |           |          | false
 #  ingredients  | character varying(150)[] |           |          |
 #  allergens    | character varying(150)[] |           |          |
 #  tags         | character varying(150)[] |           |          |
@@ -178,7 +178,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 #     "recipes_ri_id_key" UNIQUE CONSTRAINT, btree (ri_id)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # all fields
-# ['id','ri_id','ri_name','yield','units','servings','density','serving_size','atomic','igdt_type','ingredients','allergens','tags',
+# ['id','ri_id','ri_name','yield','units','servings','density','serving_size','igdt_type','ingredients','allergens','tags',
 # 'user_tags','lead_image','text_file','n_en','n_fa','n_fs','n_fm','n_fp','n_fo3','n_ca','n_su','n_fb','n_st','n_pr','n_sa','n_al',]
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
@@ -193,8 +193,7 @@ def return_recipe_dictionary():
         'ri_name':'none_listed',
         'lead_image':'none_listed',
         'text_file':'none_listed',
-        'description': 'this fabulously tasty little number is suitable for both carnivores and vegans alike, packed with flavour and protein! Drawbacks . . none_listed',
-        'atomic': 1,        # deprecated use 'igdt_type' instead TODO ATOMIC remove
+        'description': 'add a description . . .',
         'igdt_type': -1,
         'user_rating': 1,
         'dt_date': nix_time_in_ms,
@@ -254,7 +253,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     # query db - the index from fields is used to retrive and alocate data to correct dictionary entry - -
     if fields == None:
         fields = ['id','ri_id','ri_name','description','method','notes','yield','units','servings','density','serving_size',
-                  'atomic','ingredients','allergens','type','tags','user_tags','lead_image','text_file',
+                  'igdt_type','ingredients','allergens','type','tags','user_tags','lead_image','text_file',
                   'n_En','n_Fa','n_Fs','n_Fm','n_Fp','n_Fo3','n_Ca','n_Su','n_Fb','n_St','n_Pr','n_Sa','n_Al']
 
     qry_string = ', '.join(fields)
@@ -266,6 +265,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     elif type(ri_id_or_name).__name__ == 'int':
         print(f"ri_id_or_name is an int [{ri_id_or_name}] - {type(ri_id_or_name).__name__} - {type(ri_id_or_name)}")
         sql_query = f"SELECT {qry_string} FROM recipes WHERE ri_id = {ri_id_or_name};"
+        print(sql_query)
 
     else:
         raise(TypeError, f"recipe ID should be a ri_name (str) or ri_id(int) - {ri_id_or_name}")
@@ -352,7 +352,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
 
-    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating']
+    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating']    
 
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
@@ -362,91 +362,16 @@ def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
 
     return recipe_list
 
-#
-#
-#
-#
-# query DB to see if a recipe or ingredient has sub ingredients
-#
-# should query ots_ingredients to see if its an Off The Shelf item
-# should have a URL to get ingredients and other info
-#
-def get_ingredients_as_text_list(recipe_component_or_ingredient):
-
-    # this queries recipes recursively
-    #rcp = get_single_recipe_from_db_for_display_as_dict(ri_id_or_name)
-    #pprint(rcp)
-
-    # simpler to query exploded directly
-    db_lines = 'QUERY FAILURE'
-    if recipe_component_or_ingredient.__class__.__name__ == 'str':
-        qry_string = 'ingredients'
-        sql_query = f"SELECT {qry_string} FROM exploded WHERE ri_name ='{recipe_component_or_ingredient}';"
-        #db_lines = helper_db_class_db.execute(sql_query).fetchall()
-        db_lines = helper_db_class_db.execute(sql_query).fetchone()
-    else:
-        raise(f"ingredient: {recipe_component_or_ingredient} < must be a string")
-
-    ingredients = []
-
-    if db_lines == None:
-        ingredients = None
-    else: # <class 'sqlalchemy.engine.result.RowProxy'>
-        for line_array in db_lines[0]:
-            ingredients.append(line_array[INGREDIENT_INDEX])
-
-    return ingredients
-
 
 # get_next_page_recipe_ids()
 def get_all_recipe_ids():
 
-    db_lines = helper_db_class_db.execute("SELECT ri_id FROM exploded WHERE lead_image <> '';").fetchall()
+    db_lines = helper_db_class_db.execute("SELECT ri_id FROM recipes WHERE lead_image <> '';").fetchall()
 
     ids = [ int( str(line).lstrip('(').rstrip(',)') )  for line in db_lines ]
 
     return ids
 
-# EG search
-# SELECT ri_name, ri_id, tags FROM exploded WHERE 'vegan'= ANY(tags);       # recipe w/ tag 'vegan'
-# inc ANY
-# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) OR 'vegan' = ANY( tags );
-# inc ALL
-# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) AND 'vegan' = ANY( tags );
-
-# All veggie recipes that are GF
-# SELECT ri_id  FROM exploded WHERE 'gluten_free' = ANY( tags ) AND ('vegan' =  ANY( tags ) OR 'veggie' =  ANY( tags ));
-
-
-# composition of a basic search
-
-# filter out any allergens:
-# SELECT ri_id,user_rating,ri_name, allergens FROM exploded WHERE NOT ('peanuts' = ANY(allergens) OR 'dairy' = ANY(allergens) OR 'gluten' = ANY(allergens) OR 'celery' = ANY(allergens));
-    #
-    # SELECT ri_id,user_rating,ri_name, allergens - - - - - - - - - - - - - - - - - - - -\
-    # FROM exploded                                                                      |
-    # WHERE NOT (                                                                        |
-    # 'peanuts' = ANY(allergens) OR 			# allergen settings                      |
-    # 'dairy' = ANY(allergens) OR                                                        |
-    # 'gluten' = ANY(allergens) OR                                                       |
-    # 'celery' = ANY(allergens)                                                          |
-    # );                                                                                 |
-#                                                                                        |
-#                                                                                    (- \/ - - )
-# SELECT ri_id,ri_name,igd FROM  (SELECT ri_id,ri_name, unnest(ingredients) igd FROM exploded) x WHERE igd LIKE '%beans%';
-# Look for ingredient
-#
-#         bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
-#        | - - - - - - - - |
-# SELECT ri_id,ri_name,igd, tags FROM (
-#     SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM (
-#         SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE NOT ('gluten' = ANY(allergens) OR 'celery' = ANY(allergens))
-#     ) allergens_filtered
-# ) ingredients_unnested
-# WHERE igd LIKE '%beans%';
-#
-# SELECT ri_id,ri_name,igd,tags FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM ( SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE NOT ('gluten' = ANY(allergens) OR 'celery' = ANY(allergens)) ) allergens_filtered ) ingredients_unnested WHERE igd LIKE '%beans%';
-#
 
 filter_to_column_LUT = {'allergens': 'allergens',
                         'ingredient_exc': 'ingredients',
@@ -456,9 +381,6 @@ filter_to_column_LUT = {'allergens': 'allergens',
                         'type_inc': 'user_tags'}
 
 
-# process allergens, tags_exc
-# EG
-#   SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE NOT ('gluten' = ANY(allergens) OR 'celery' = ANY(allergens))
 def construct_sql_query_to_exclude_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
 
     column = filter_to_column_LUT[table_name_from_filter]
@@ -507,7 +429,7 @@ def construct_sql_query_to_include_tags(tag_list, bubble_columns, db_name_or_sub
 #     ) allergens_filtered
 # ) ingredients_unnested
 # WHERE igd LIKE '%beans%';
-def build_search_query(search, default_filters):
+def build_search_query_v1(search, default_filters):
 
     search_words = [ word.strip() for word in search.split(',') ]
 
@@ -550,7 +472,41 @@ def build_search_query(search, default_filters):
 
     return search_query
 
+# olive oil, garlic, eggs
+def build_search_query(search, default_filters):
 
+    search_words = [ word.strip() for word in search.split(',') ]
+
+    if len(search_words) == 0:
+        return ''
+
+    def add_one_more_igdt(i):
+        return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%{i}%'))) "
+
+    # SELECT DISTINCT ri_id
+    # FROM (
+    #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters
+    # ) distinct_ids
+    # WHERE (igd LIKE '%olive oil%')
+    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%garlic%'))) 
+    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%eggs%'  )))
+    # ;
+
+    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
+
+    for w in search_words:
+        search_query = search_query + add_one_more_igdt(w)
+
+    search_query += ';'
+
+    # print("\n\n- - - - - Constructing Query - - - - S")
+    # pprint(default_filters)
+    # pprint(search_words)
+    # print(insert)
+    # print(search_query)
+    # print("\n\n- - - - - Constructing Query - - E")
+
+    return search_query
 
 
 # {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298',
@@ -559,34 +515,14 @@ def build_search_query(search, default_filters):
 #                      'tags_exc': [],
 #                      'tags_inc': ['chicken', 'pork']},
 def process_search(search, default_filters):
-    # # SELECT ri_id,ri_name, igd FROM  (SELECT ri_id,ri_name, unnest(ingredients) igd FROM exploded) x WHERE igd LIKE '%red onion%';
-    #  ri_id |                   ri_name                    |    igd
-    # -------+----------------------------------------------+------------
-    #      1 | mixed vegetable risotto                      | red onion
-    #      3 | crispy prawn and vegetable risotto           | red onion
-    #    503 | beetroot and chicken broth                   | red onion
-    #    504 | chicken beetroot w broccoli and greens       | red onion
-    #    801 | chicken and shredded lettuce soup w cardamom | red onion
-    #   1001 | fillet steak and vegetables in gravy         | red onion
-    #   1302 | beef & jalapeno burger                       | red onion
-    #   1304 | jalapeno burger w cauliflower california     | red onion
-    #   1601 | winner winner chicken dinner                 | red onion
-    #   1901 | chicken and aubergine stew                   | red onions
-    #   2301 | savoury pear grape and squash salad          | red onion
-    #   2401 | mango salsa                                  | red onion
-    #   2402 | savoury pear grape and squash salad          | red onion
-    #   2403 | prawns w crab cakes mango salsa and salad    | red onion
-    #   3101 | goats cheese and spinach omelette            | red onion
-    #   3201 | light apricot cous cous                      | red onion
-    #   3202 | ham green beans and cous cous w egg          | red onion
-    #   3301 | light apricot cous cous                      | red onion
-    # (18 rows)
 
     # split search by commas
     # build basic query from search
     # add the default filters
     #    handle empty filter arrays
     query = build_search_query(search, default_filters)
+
+    print(f"SEARCH QUERY:\n{query}")
 
     db_lines = helper_db_class_db.execute(query).fetchall()
 
@@ -626,6 +562,7 @@ class RecipeTracker:
 
 def create_daily_tracker_name_from_nix_time(nix_time_ms):
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y calories month %m %a %d").lower()
+
 
 def bootstrap_daily_tracker_create(uuid):
     dtk = { 'dtk_user_info': get_user_info_name_uuid_dict(uuid),
@@ -962,187 +899,17 @@ def update_user_info_dict(user_settings):
 
 if __name__ == '__main__':
 
-    # "402, 'tuna with vegetable and tangerine salad'",
-    # "1304, 'jalapeno burger w cauliflower california'",
-    # "2403, 'prawns w crab cakes mango salsa and salad'",
-    test_ids = [1304,2403,402]
-    test_id = [1304]
-    pprint(user_db)
-    print("-----  attaching to DB ------------------------------------E")
+    user_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    print(f"Getting user: {user_uuid}")
+    user_info = get_user_info_dict_from_DB(user_uuid)
+    print(f"Name: {user_info['name']}")
 
-    print("-----  get recipes in display format ------------------------------------S")
+    search_text = 'olive oil, garlic, eggs'
+    
+    search_words = [ word.strip() for word in search_text.split(',') ]
 
-    #recipes = get_recipes_for_display_as_list_of_dicts( test_ids )
+    sql_query = build_search_query(search_text, user_info['default_filters'])
 
-    # print("-----  get recipes in display format ------------------------------------E1")
-    #
-    # for r in recipes:
-    #    print(f"-----  recipe: {r['ri_name']} ------------------------------------S")
-    #    pprint(r)
-    #
-    # print("-----  get recipes in display format ------------------------------------E2")
+    print(f"SQL Query:\n{sql_query}\n\n")
 
-    #pprint(get_single_recipe_from_db_for_display_as_dict(test_id[0]))
-    #pprint(get_single_recipe_from_db_for_display_as_dict('beef & jalapeno burger'))
 
-    # display recipe dict
-    #json_string_from_dict = json.dumps(return_recipe_dictionary(), indent=2, sort_keys=True )
-    #print( json_string_from_dict )
-    print("-----  get subcomponents in display format ------------------------------------S")
-
-    pprint( get_single_recipe_with_subcomponents_from_db_for_display_as_dict(test_id[0]) )
-
-    print("\n\n << RECIPE DICT >>\n\n")
-    pprint(return_recipe_dictionary())
-
-    pprint(RecipeTracker())
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
-    # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior    #
-    day = datetime.now().strftime("%d") # day number                                    #
-    day = datetime.now().strftime("%a").lower() # day 3 letter                          #
-    time = datetime.now().strftime("%H%M").lower() # 4 digit 24hr clock                 #
-    #time_since_epoch = nix_time_ms(datetime.now())                                     #
-    time_since_epoch = nix_time_ms()                                                    #
-    day_from_nx = day_from_nix_time(time_since_epoch)                                   #
-    time24_from_nx = time24h_from_nix_time(time_since_epoch)                            #
-                                                                                        #
-    print(day, time, time_since_epoch, day_from_nx)                                     #
-    print(type(datetime.now()))                                                         #
-    print(create_daily_tracker_name_from_nix_time(nix_time_ms()))                       #
-
-    # rollover time 5AM tomorrow
-    print(datetime.strptime('0500',"%H%M"))
-    nix_ts = nix_time_ms()
-    # %Y 2049 year
-    # %m month
-    # %d 05 day 0pad
-    # %H 09 hours 24h 0pad
-    # %m 05 minutes 0pad
-    # get rollover 5AM time as nix time
-    time_in_the_AM_to_rollover='0500'
-    h = int(time_in_the_AM_to_rollover[0:2])
-    m = int(time_in_the_AM_to_rollover[2:4])
-    ONE_DAY_IN_MS = 24*60*60*1000
-    hrs=5
-    mins=0
-    nix_ts_plus_1_day = nix_ts + ONE_DAY_IN_MS
-    rollover_time = '0500'
-    print(datetime.utcfromtimestamp(nix_ts / 1000.0).strftime("%Y %m %d %H%M"))
-    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).strftime(f"%Y %m %d {rollover_time}"))
-    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=5, minute=0).strftime(f"%Y %m %d %H%M"))
-    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=hrs, minute=mins).strftime(f"%Y %m %d %H%M"))
-    print(datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=h, minute=m).strftime(f"%Y %m %d %H%M"))
-    # https://docs.python.org/3.5/library/datetime.html#datetime.datetime.replace
-    dt_rollover = datetime.utcfromtimestamp(nix_ts_plus_1_day / 1000.0).replace(hour=hrs, minute=mins)
-    rollover_nix_time_ms = nix_time_ms(dt_rollover)
-    print(datetime.strptime('2000 0458',"%Y %H%M"))
-    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0458',"%Y %H%M")), '0500') ) )
-    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0459',"%Y %H%M")), '0500') ) )
-    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0500',"%Y %H%M")), '0500') ) )
-    print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '0500') ) )
-    #print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '0599') ) ) # out of bounds
-    #print( hr_readable_from_nix( roll_over_from_nix_time( nix_time_ms(datetime.strptime('2000 0501',"%Y %H%M")), '2615') ) ) # out of bounds
-    # for i in range(1,240):
-    #     print(f"{i % 24}\t{i % 12}\t{i % 60}")
-    #
-    # print(int(23 / 24))
-    # print(int(12 / 24))
-    # print(int(24 / 24))
-    # print("-")
-    # print(0 or 1)
-    # print(0 or 0)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #--
-
-    # search  notes
-    # get_daily_tracker_from_DB - hello.py
-    # print("- - - USER / UUID - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    # user = 'Simon'
-    # user_info = get_user_info_name_uuid_dict(user)
-    # user_db[user_info['UUID']] = user_info['name']
-    # user_info = get_user_info_name_uuid_dict('Susan')
-    # user_db[user_info['UUID']] = user_info['name']
-    # pprint(user_db)
-    # print("- - - boot DTK - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    # test_dtk = bootstrap_daily_tracker_create(user)
-    # test_dtk['dtk_user_info']['UUID'] = '014752da-b49d-4fb0-9f50-23bc90e44298'
-    # test_dtk['dtk_user_info']['name'] = 'Simon'
-    # pprint(test_dtk)
-    # print("- - - WRITE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    # store_daily_tracker(test_dtk)
-    # print("- - - READ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    # test_dtk_read = get_daily_tracker(test_dtk['dtk_user_info']['UUID'])
-    # pprint(test_dtk_read)
-    # print("- - - COMMIT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    # commit_DTK_DB()
-    # commit_User_DB()
-    print("\n\n\n\n\n- - - - - - - - - - - - - - - - - - - - - - - User DB < < \n")
-    pprint(user_db)
-
-    pprint(bootstrap_daily_tracker_create('014752da-b49d-4fb0-9f50-23bc90e44298'))
-
-    print("\n\n\n\n\nUser Device Fingerprints\n")
-    pprint(users_devices_db)
-
-    # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
-    # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant,
-    default_filters = { 'allergens': [],
-                        'ingredient_exc': [],
-                        'tags_exc': [],
-                        'tags_inc': ['chicken',
-                                     'pork','s&c']}
-
-    user_data_db = load_dict_data_from_DB("user_database")
-    pprint(user_data_db)
-    print("CREATE USER. . .")
-    pprint(create_user('8e4475a5-218d-4153-8103-000764cf5555', {'name':'Candice'}))
-    print("ACCESS GRANTED?")
-    pprint(get_user_info_name_uuid_dict('014752da-b49d-4fb0-9f50-23bc90e44298'))
-
- #    pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5ef6'))
- #    #pprint(get_user_info_name_uuid_dict('8e4475a5-218d-4153-8103-000764cf5555'))
- #
- #    pprint(get_search_settings_dict())
- #    pprint(get_search_settings_dict(True))
- #
- #    bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
- #    print("\n\nConstructing Query")
- #          #construct_sql_query_to_exclude_tags(tag_list,                 bubble_columns,  db_name,    table_name_from_filter):
- #    print( construct_sql_query_to_exclude_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_exc') )
- #
- #    print( construct_sql_query_to_include_tags(['vegan','veggie','cbs'], bubble_columns, 'exploded', 'tags_inc') )
- #
- #    print(build_search_query(' prawn , crab , mango ', default_filters))
- #
- #    print("\n\nSinge UPDATE Command < - - - <<")
- #    test_default_filters = { 'default_filters': {'allergens': ['greedy twats', 'fake people'],
- #                             'ingredient_exc': ['coriander'],
- #                             'tags_exc': [],
- #                             'tags_inc': ['ns_pregnant']} }
- #
- #    update_settings_table_for_uuid('theDB', '014752da-b49d-4fb0-9f50-23bc90e44298', test_default_filters)
- #
- #    print("\n\nMulti UPDATE Command < - - - <<")
- #    user_settings = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44297',
- # 'default_filters': {'allergens': ['dairy'],
- #                     'ingredient_exc': ['coriander'],
- #                     'tags_exc': ['ns_pregnant'],
- #                     'tags_inc': ['gluten_free']},   # difficult customer
- # 'name': 'Simon',
- # 'tag_sets': {'allergens': ['dairy',
- #                            'sulphur_dioxide'],
- #              'ingredient_exc': ['coriander'],
- #              'tags_exc': ['vegan',
- #                           'ns_pregnant'],
- #              'tags_inc': ['vegan',
- #                           'ns_pregnant'],
- #              'type_exc': [],
- #              'type_inc': ['component',
- #                           'serve_hot']}}
- #
- #    update_settings_tables_for_uuid(helper_db_class_db, user_settings)
- #
-    pprint(get_user_info_dict('014752da-b49d-4fb0-9f50-23bc90e44298'))
-
-    pprint( get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298') )

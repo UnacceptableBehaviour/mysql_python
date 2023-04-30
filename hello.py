@@ -22,7 +22,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 # dev remove
-from helpers import get_csv_from_server_as_disctionary, get_nutirents_for_redipe_id #, create_recipe_info_dictionary
+from helpers import get_csv_from_server_as_disctionary #, create_recipe_info_dictionary
 
 from timestamping import hr_readable_from_nix, roll_over_from_nix_time
 
@@ -60,9 +60,8 @@ import json         # JSON tools
 # each app.route is an endpoint
 @app.route('/')
 def db_hello_world():
-    # execute this query
-    # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
-    all_recipes = helper_db_class_db.execute("SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';").fetchall()
+
+    all_recipes = helper_db_class_db.execute("SELECT yield, servings, ri_name, lead_image FROM recipes WHERE lead_image <> '';").fetchall()
 
     formatted_text = "<br>"
 
@@ -290,8 +289,6 @@ def buttons_inputs():
 
 @app.route('/db_gallery')
 def db_gallery():
-    # execute this query
-    # SELECT yield, servings, ri_name, lead_image FROM exploded WHERE lead_image <> '';
 
     # do this in pages when larger db - use JS to reload
     ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
@@ -545,20 +542,6 @@ def db_nutrients():
 def db_nutrients_compare():
     BEEF_BRISKET_BROTH = 3402
     LEMON_GRASS_CHICKEN = 2001
-
-    nutrients_0 = get_nutirents_for_redipe_id(helper_db_class_db, BEEF_BRISKET_BROTH)
-    nutrients_1 = get_nutirents_for_redipe_id(helper_db_class_db, LEMON_GRASS_CHICKEN)
-
-    # nutrients_0 = {
-    #   'ri_id': 6,
-    #   'ri_name': 'Light Apricot Cous Cous',
-    #   'n_En': 154.0,
-    #   'n_Fa': 3.12,
-    #   'n_Fs': 1.33,
-    #   'n_Su': 2.93,
-    #   'n_Sa': 0.58,
-    #   'serving_size': 190.0
-    # };
 
     recipes = get_recipes_for_display_as_list_of_dicts( [BEEF_BRISKET_BROTH, LEMON_GRASS_CHICKEN] )
 

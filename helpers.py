@@ -32,6 +32,7 @@ import urllib.request
 
 from food_sets import get_igdt_type
 from food_sets import IGD_TYPE_UNCHECKED, IGD_TYPE_DERIVED 
+from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
 # print('food_sets import IGD_TYPE_UNCHECKED, IGD_TYPE_DERIVED ')
 # print(IGD_TYPE_UNCHECKED)
 # print(IGD_TYPE_DERIVED)
@@ -433,10 +434,9 @@ def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
 #                 [0, '2g', '(0)', 'black pepper'],
 #                 [0, '30g', '(0)', 'flaked almonds']],
 #  'ri_name': 'cauliflower california',
-#  'atomic' : 0     ** deprecated BOOL use igdt_type INT8 instead
 #  'igdt_type' : -1 to 3  see below
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# //  IGDT_TYPE: UNCHECKED / DERIVED / ATOMIC / OTS / DTK
+# //  IGDT_TYPE: UNCHECKED / ATOMIC / DERIVED / OTS / DTK
 # //                 -1         0        1       2     3
 # let IGD_TYPE_UNCHECKED = -1;
 # let IGD_TYPE_ATOMIC    = 0;
@@ -449,8 +449,8 @@ def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
 # then recurive calls on that subcompnent to process its ingredients
 def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient):
 
-    recipe_dict['atomic'] = 0    # deprecated use igdt_type instead
-    #recipe_dict['igdt_type'] = IGD_TYPE_UNCHECKED # TODO ATOMIC BREAKS DB create 
+    #recipe_dict['atomic'] = 0    # deprecated use igdt_type instead
+    recipe_dict['igdt_type'] = IGD_TYPE_DERIVED # TODO ATOMIC BREAKS DB create 
 
     print(f"\tFOUND: {recipe_dict['ri_name']} <")
 
@@ -496,14 +496,16 @@ def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcompone
 def is_recipe_in_nutrion_database(ri_name):
     return None
 
-def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row=''):
 
+# TODO ATOMIC only 1 component ever passed in refactor
+def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row=''):
+    # TODO ATOMIC - seem to remember this was to accomodate multiple components
     db_id = int(sql_row['ri_id']) * 100
 
     for i, r in enumerate(components):
         db_id += 1
-        #print(f"merging:{r['ri_name']}")
-        #pprint(sql_row)
+        # print(f"merging:{r['ri_name']}")
+        # pprint(sql_row)
 
         nutri_dict = is_recipe_in_nutrion_database(r['ri_name'])
 
@@ -517,7 +519,9 @@ def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql
         else:
             print(f">{r['ri_name']}< NOT PRESENT IN Nutrient Database * * *")
 
-        components[i]['ri_id'] = db_id
+        # print(f"merge_nutrient_information_into_each_dictionary:C-{i}")
+        # components[i]['ri_id'] = db_id
+        components[i]['ri_id'] = sql_row['ri_id']
         #pprint(components[i])
         #print(f"merged:{r['ri_name']} ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^")
 
@@ -558,6 +562,7 @@ def create_list_of_recipes_and_components_from_recipe_id(sql_row):
     print(f" - - 'ri_name's - - ")
 
     print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <S {len(components)}")
+    # TODO ATOMIC - is this function doing anything? - it add Nutrinfo & fuck up ri_id # !?
     merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row)
     print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
 
@@ -665,95 +670,34 @@ def update_ingredients_list(master, new_item, multiplier):
     return master
 
 
+# CREATE TABLE IF NOT EXISTS exploded (
+#   id BIGSERIAL PRIMARY KEY,
+#   ri_id BIGINT NOT NULL UNIQUE,
 
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def explode_ingredients_in_recipe(recipies_and_subcomponents, headline_recipe_name):
-
-    print("== E X P L O D I N G:  explode_ingredients_in_recipe      -      -      -      -      -      -     |S - - - - - -")
-    # find headline (recipe_name) recipe in list
-    for i, rcp in enumerate(recipies_and_subcomponents):
-
-        # look for headline recipe and start there
-        if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
-            #new_ingredients = copy.deepcopy(recipies_and_subcomponents[i]['ingredients'])
-            #pprint(new_ingredients)
-            new_ingredients = {}
-            print("== EXPL HEADLINE < < S")
-            pprint(recipies_and_subcomponents[i])
-            print("== EXPL HEADLINE < < E")
-
-            add_subcomponents_ingredients(recipies_and_subcomponents, recipies_and_subcomponents[i], new_ingredients)
-            print("== E X P L O D I N G:  ------------new_list------------<S")
-            pprint(new_ingredients)
-            print("== E X P L O D I N G:  ------------new_list------------<E")
-
-            #pprint(new_ingredients.first())
-
-            # construct ingredients list: i_dict = { 'ingredients' : [] }
-            i_list = []
-
-            for build_ingredients, qty in new_ingredients.items():
-                i_list.append([1, f"{round(qty,2)}g", '(0)', build_ingredients])
-
-            #pprint(i_list)
-
-            recipies_and_subcomponents[i]['ingredients'] = i_list
-            #print(recipies_and_subcomponents) #['ingredients'] = i_list
-            print(f"i: {i}")
-
-            print("== EXPL HEADLINE EXPLODED < < S")
-            pprint(recipies_and_subcomponents[i])
-            print("== EXPL HEADLINE EXPLODED < < E")
-
-    print("== E X P L O D I N G:  explode_ingredients_in_recipe      -      -      -      -      -      -     |E")
-
-
+#   ri_name VARCHAR(100) NOT NULL,
+#   igdt_type SMALLINT DEFAULT -1,
+  
+#   ingredients     VARCHAR(1000) ARRAY,
+# );
 def create_exploded_recipe(sql_row):
-    recipe_text_filename = sql_row['text_file']
-    recipe_name = sql_row['ri_name']
+    ri_name = sql_row['ri_name']
+    c_list, i_list = get_exploded_ingredients_and_components_for_DB_from_name(([],ri_name))
+    components_and_ingerdients_list = c_list + i_list
 
-    print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - S")
+    print(f"c_list: {c_list}")
+    print(f"i_list: {i_list}")
+    print(f"components_and_ingerdients_list:\n{components_and_ingerdients_list}\n- - - /")
 
-    components = get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name)
-
-    mark_ingredients_as_subcomponents_or_leave_as_atomic(components, recipe_name)
-
-    explode_ingredients_in_recipe(components, recipe_name)
-
-    merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row)
-
-    print(f"= E  X  P  L  O  D  E:{recipe_name} - - - - - - - - - - - - - - E")
-
-    # this should return top level component only! Rest is polution.
-    return components
+    db_entry = {
+        'ri_id':        sql_row['ri_id'],
+        'ri_name':      ri_name,
+        'igdt_type':    get_igdt_type(ri_name),
+        'ingredients':  components_and_ingerdients_list
+    }
+    return db_entry
 
 
-def get_nutirents_for_redipe_id(db, ri_id):
 
-    fields = ['ri_id','ri_name','n_En','n_Fa','n_Fs','n_Su','n_Sa','serving_size']
-    qry_string = ', '.join(fields)
-
-    db_lines = db.execute(f"SELECT {qry_string} FROM exploded WHERE ri_id={ri_id};").fetchall()
-
-    # dont need this for single ID since all info on one query line
-    for line in db_lines:
-        rcp = {}
-        for index, content in enumerate(line):
-            print( f"\nQRY Line{line} {type(line)}\nC:{content} - {type(content)}<" )
-            type_string = str(type(content))
-
-            if type_string == "<class 'decimal.Decimal'>":
-                rcp[fields[index]] = round(float(content),2)
-
-            else:
-                rcp[fields[index]] = content
-
-        nutrients = rcp
-
-    return nutrients
 
 
 if __name__ == '__main__':

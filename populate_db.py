@@ -56,8 +56,6 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 print("----- list.py ------------------------------------------------------------ importing")
 
-# from helpers import get_csv_from_server_as_disctionary, inc_recipe_counter, log_exception, create_list_of_recipes_and_components_from_recipe_id
-
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
 
 
@@ -141,10 +139,26 @@ def create_sql_insert_ingredients_array_text(ingredients):
         for i in line:
             sql_insert = sql_insert + f'"{i}", '
 
-        sql_insert = sql_insert.rstrip(', ')             # remove trainling comma
+        sql_insert = sql_insert.rstrip(', ')             # remove trailing comma
         sql_insert = sql_insert + "}, "
 
-    sql_insert = sql_insert.rstrip(', ')                 # remove trainling comma
+    sql_insert = sql_insert.rstrip(', ')                 # remove trailing comma
+    sql_insert = sql_insert + "}', "
+
+    return sql_insert
+
+def create_sql_insert_exploded_ingredients_array_text(ingredients):
+    # from
+    # ['steak and chips run 2', 'chips run 2', 'potatoes', 'ribeye steak', 'veg oil']
+    # to
+    # {"steak and chips run 2", "chips run 2", "potatoes", "ribeye steak", "veg oil"}
+
+    sql_insert = "'{"
+
+    for i in ingredients:
+        sql_insert = sql_insert + f'"{i}", '
+
+    sql_insert = sql_insert.rstrip(', ')                 # remove trailing comma
     sql_insert = sql_insert + "}', "
 
     return sql_insert
@@ -186,14 +200,26 @@ def get_default_tag_sets_dictionary(state = 'with_defaults'):
 
 def create_entry_in_db(db, table, entry):
 
-    print(f"----- list.py: create_entry_in_db ------------------------------------------------------------ ")
-    print(f"----- table:{table} <> recipe: {entry['ri_name']} -------------------------------------------- ")
-    print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
-    print(f"----- description:{entry['description']} \n-------------------------------------------- ")
-    print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
-    print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
-    print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
-    print(f"----- type:{entry['type']} \n-------------------------------------------- ")
+    print(f"----- populate_db.py: create_entry_in_db: {table} -------------------------------------------- ")
+    if 'ri_id' in entry:
+        print(f"----- ri_id:{entry['ri_id']} -------------------------------------------- ")
+    if 'ri_name' in entry:
+        print(f"----- ri_name:{entry['ri_name']} -------------------------------------------- ")
+    if 'igdt_type' in entry:
+        print(f"----- igdt_type:{entry['igdt_type']} \n-------------------------------------------- ")
+    if 'ingredients' in entry:
+        print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
+    if 'description' in entry:
+        print(f"----- description:{entry['description']} \n-------------------------------------------- ")
+    if 'user_rating' in entry:
+        print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
+    if 'allergens' in entry:
+        print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
+    if 'tags' in entry:
+        print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
+    if 'type' in entry:
+        print(f"----- type:{entry['type']} \n-------------------------------------------- ")
+
 
     sql_string = f"INSERT INTO {table}"
     fields = "("
@@ -206,13 +232,21 @@ def create_entry_in_db(db, table, entry):
             print(f"{header} is an INT NUMBER")
             data = data + f"{entry[header]}, "
 
+        elif header == 'igdt_type':
+            print(f"{header} is an SMALL INT NUMBER")
+            data = data + f"{entry[header]}, "
+
         elif re.match(r'n_\w+', header ):
             print(f"{header} is a NUMBER")
             data = data + f"{entry[header]}, "
 
         elif header == 'ingredients':
             print(f"{header} is a LIST of ingredients")
-            ingredients_insert_text = create_sql_insert_ingredients_array_text(entry[header])
+            if table == 'exploded':
+                ingredients_insert_text = create_sql_insert_exploded_ingredients_array_text(entry[header])
+            else:
+                ingredients_insert_text = create_sql_insert_ingredients_array_text(entry[header])
+            
             data = data + ingredients_insert_text
             pprint(entry[header])
             print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
@@ -248,14 +282,15 @@ def create_entry_in_db(db, table, entry):
 
 def create_table_in_database_from_sql_template(data_base, template_file):
     create_table_sql_command = ''
-
+    print(f"> - create_table_in_database_from_sql_template - S\n{template_file}")
+    
     with open(template_file) as sql_template:
         create_table_sql_command = sql_template.read()
 
-    db_lines = data_base.execute(create_table_sql_command)
-    print(f"> - create_table_in_database_from_sql_template - S\n{template_file}\n{db_lines}\n> - create_table_in_database_from_sql_template - E\n")
+    db_lines = data_base.execute(create_table_sql_command)    
     data_base.commit()
 
+    print(f"\n{db_lines}\n> - create_table_in_database_from_sql_template - E\n")
     return(db_lines)
 
 
@@ -367,12 +402,8 @@ def main():
     rcount = 0
     for entry in sql_dict:
         print(f"> > > > ENTRY:{entry} {type(entry)}* * * * * * * * * * * * * * * * ")
-        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * S")
-        pprint(sql_dict[entry])
-        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M1")
 
         sql_row = sql_dict[entry]
-
         ri_id = int(sql_row['ri_id'])   # TOP level / master recipe ID - the ID in the CSV row!
 
         print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
@@ -385,42 +416,33 @@ def main():
         pprint(recipes_from_id)
         print("\n= = = = = =\n|\n|\n|")
 
-        headline_recipe = ''
-
-        for recipe in recipes_from_id:
-            if 'ri_id' in recipe:                            # create an empty dictionary - make more robust
-                if int(recipe['ri_id']) == ri_id:
-                    headline_recipe = recipe
-                    break
-
-        print(f"> > > > RECIPE: {type(sql_dict[entry]['ri_id'])} * * * * * * * * * * * * * * * * M2")
-        pprint(headline_recipe)
-        print(f"> > > > RECIPE: * * * * * * * * * * * * * * * * E")
-
         #should put some exception handling around this
         for recipe in recipes_from_id:
            create_entry_in_db(db, 'recipes', recipe)
 
         # rcount += 1
-        # if rcount > max_entries: sys.exit(0)
+        # if rcount > max_entries: break
 
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     print(f"> > > > E X P L O D E - E X P L O D E - E X P L O D E - E X P L O D E - <    <    <    <    <    <    <    <    <")
     #     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -     -==
     
+    max_entries = 20
+    rcount = 0
     for entry in sql_dict:
 
         sql_row = sql_dict[entry]
 
-        exploded = create_exploded_recipe(sql_row)
+        exploded_recipe_dict = create_exploded_recipe(sql_row)
+        
+        print(f"> > > > E X P L O D E D: {exploded_recipe_dict['ri_name']} {type(exploded_recipe_dict)} <    <    <    <    <    <    <    <    <     *")
+        pprint(exploded_recipe_dict)
 
-        #print(f"> > > > E X P L O D  E D: {exploded['ri_name']} {type(exploded)} <    <    <    <    <    <    <    <    <     *")
-        pprint(exploded)
+        create_entry_in_db(db, 'exploded', exploded_recipe_dict )
 
-        for ex_rcp in exploded:
-            create_entry_in_db(db, 'exploded', ex_rcp )
-
+        # rcount += 1
+        # if rcount > max_entries: sys.exit(0)
 
 if __name__ == '__main__':
     main()

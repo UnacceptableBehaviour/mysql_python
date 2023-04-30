@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS atomic_ingredients (
   servings DECIMAL(9,2) DEFAULT NULL,
   density DECIMAL(9,2) DEFAULT NULL,
   serving_size DECIMAL(9,2) DEFAULT NULL,
-  atomic BOOLEAN DEFAULT TRUE,
+  igdt_type SMALLINT DEFAULT 0,
 
   allergens       VARCHAR(150) ARRAY,
   tags            VARCHAR(150) ARRAY,
