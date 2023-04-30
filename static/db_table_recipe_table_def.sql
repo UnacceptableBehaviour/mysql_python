@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS recipes (
   servings DECIMAL(9,2) DEFAULT NULL,
   density DECIMAL(9,2) DEFAULT NULL,
   serving_size DECIMAL(9,2) DEFAULT NULL,
-  atomic  BOOLEAN DEFAULT FALSE,
+  igdt_type SMALLINT DEFAULT -1,
   
   ingredients     VARCHAR(150) ARRAY,
   allergens       VARCHAR(150) ARRAY,

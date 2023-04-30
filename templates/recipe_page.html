@@ -35,7 +35,7 @@
 								  <td>{{ingd_line[2]}}</td>
 							  {% endif %}
 							<td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-							  {% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->
+							  {% if ingd_line[0] == '1' %}	<!-- not an atomic engredient - expandable button -->
 								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
 							  {% else %}
 								<td></td>
@@ -61,7 +61,7 @@
 											<td>{{ingd_line[2]}}</td>
 										{% endif %}
 									  <td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-										{% if ingd_line[0] == '0' %}	<!-- not an atomic engredient - expandable button -->
+										{% if ingd_line[0] == '1' %}	<!-- not an atomic engredient - expandable button -->
 										  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
 										{% else %}
 										  <td></td>
