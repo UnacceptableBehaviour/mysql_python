@@ -29,6 +29,7 @@ from pprint import pprint # giza a look
 # do we still need --cors Cross Origin headers since its SSL?
 #
 import urllib.request
+from  urllib.error import URLError
 
 from food_sets import get_igdt_type
 from food_sets import IGD_TYPE_UNCHECKED, IGD_TYPE_DERIVED 
@@ -66,7 +67,7 @@ def get_csv_from_server_as_disctionary(url):
     while (not Path(local_file_name).exists()):
         try:    
             urllib.request.urlretrieve(url, local_file_name) # fails on HTTPS - need certs sorting
-        except ConnectionRefusedError:
+        except (ConnectionRefusedError, URLError):
             print('\n\nConnectionRefusedError: asset server must be serveing on HTTP  \
                 \nOpen terminal. \
                 \ncd python/assest_server \
