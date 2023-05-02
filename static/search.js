@@ -16,7 +16,7 @@
 
 // recipes including a tag: name
 //
-//cs50_recipes=# SELECT ri_id,ri_name, tags FROM exploded WHERE 'veggie' = ANY(tags);
+//cs50_recipes=# SELECT ri_id,ri_name, tags FROM recipes WHERE 'veggie' = ANY(tags);
 // ri_id |              ri_name              |                                   tags
 //-------+-----------------------------------+--------------------------------------------------------------------------
 //   901 | spinach tortilla                  | {veggie,gluten_free,msg,ns_pregnant}

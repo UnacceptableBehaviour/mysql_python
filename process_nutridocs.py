@@ -263,7 +263,7 @@ NUTRIDOC_LIST = [
                 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
                 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
                 # 'y964',       #  DONE         43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-                # 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
+                 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
                 # 'y966',       #  DONE         61/19 - fish, salads, carbless, veggie, sandwiches,
                 # 'y967',       #  DONE         29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
                 # 'y968',       #  DONE 0830-12 72/17 - lo-cal, pastry, creme pat, roasts, salads
@@ -320,8 +320,8 @@ NUTRIDOC_LIST = [
                 #'y454',
                 #'y455',
                 #'y456',
-                'y457',
-                'y458',
+                # 'y457',
+                # 'y458',
 
 
 # * next to done means superfluous image files removed
