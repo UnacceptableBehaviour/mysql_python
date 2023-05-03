@@ -126,7 +126,8 @@ errors = {
     'ots_NO_url':[],                    #
     'unknown_alias':[],                 #
     'dead_ends_in_this_pass': [],
-    'items_not_triggering_TAGS' :[]
+    'items_not_triggering_TAGS' :[],
+    'expected_derived_atomic_no_file': []
 }
 
 def build_atomic_LUT(verbose=False):
@@ -415,9 +416,13 @@ def get_ingredients_from_component_file(recipe_component_or_ingredient):
     if rcoi in CACHE_recipe_component_or_ingredient:
         content = CACHE_recipe_component_or_ingredient[rcoi]
     else:
-        with component_file_LUT[rcoi].open('r') as f:
-            content = f.read()
-            CACHE_recipe_component_or_ingredient[rcoi] = content
+        if rcoi in component_file_LUT:
+            with component_file_LUT[rcoi].open('r') as f:
+                content = f.read()
+                CACHE_recipe_component_or_ingredient[rcoi] = content
+        else:
+            errors['expected_derived_atomic_no_file'].append((rcoi))
+            return([rcoi])    
     
     m = re.search(r'--- for the (.*?) \((.*?)\)(.*?)Total \((.*?)\).*?__end_recipe__', content, re.MULTILINE | re.DOTALL)
     
@@ -1953,7 +1958,7 @@ if __name__ == '__main__':
     #     error_table(e)
     
     error_keys = [
-                  # 'txt_title_NO_match_rcp',
+                   'txt_title_NO_match_rcp',
                   # 'derived_w_file_HAS_ndb_no',
                   # 'ndb_no_neg99',
                    'derived_HAS_http_SB_ots',
@@ -1963,6 +1968,7 @@ if __name__ == '__main__':
                   # 'unknown_alias',                  
                   # 'items_not_triggering_TAGS',
                    'dead_ends_in_this_pass',
+                   'expected_derived_atomic_no_file'
                   ]
 
     for e in error_keys:
@@ -2016,8 +2022,12 @@ if __name__ == '__main__':
             print()
         print(f"{url_list}")
         if c not in CACHE_recipe_component_or_ingredient:
-            get_ingredients_from_component_file(c)
-        print(CACHE_recipe_component_or_ingredient[c])
+            get_ingredients_from_component_file(c)          # get & cache
+        if c in CACHE_recipe_component_or_ingredient:
+            print(CACHE_recipe_component_or_ingredient[c])
+        else:
+            print(f"I:'{c}' HAS NO FILE - atomic?:{atomic_LUT[c]['igdt_type']}")
+
         pprint(atomic_LUT[c])
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - E')
 
@@ -2026,6 +2036,8 @@ if __name__ == '__main__':
     search(rcoi)
     print(f"\n>--- atomic_LUT[{rcoi}] - - \ ")
     pprint(atomic_LUT[rcoi])
+
+
 
     print('\n'*15 + '\nSearch?')
     while(True):
