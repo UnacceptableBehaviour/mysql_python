@@ -1950,7 +1950,7 @@ if __name__ == '__main__':
 # check errors & investigate 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
     def error_table(e):
-        print(f"\n\n# # # # # # # # # # # errors['{e}'] # # # # # # # # # # # S")    
+        print(f"\n\n# # # # # # # # # # # errors['{e}'] ({len(errors[e])}) # # # # # # # # # # # S")    
         pprint(Counter(errors[e]).most_common())
         print(f"# # # # # # # # # # # errors['{e}'] # # # # # # # # # # # E\n\n")
     
