@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import itertools
 import re
 import sys
-import itertools
-from pprint import pprint
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
+from pprint import pprint
 
-from food_sets import atomic_LUT, filter_noise
+from food_sets import atomic_LUT, filter_noise, get_allergens_headings
+
 #from food_sets import process_ots_ingredient_string
 
 
@@ -50,7 +51,7 @@ rgx_any_bracket = re.compile('[\([{})\]]')
 
 # latin optional with brackets captured - need them becaus optional
 #   makes finding & replacing it trickier without them
-rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustaceans|mollusc)\)", re.I)   
+rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustacean(?:s)?|mollusc(?:s)?)\)", re.I)   
 # latin optional WITHOUT brackets captured 
 # rgx_pullout_seafood = re.compile("([\w\s\.]+)\(?([\w\s\.]+)?\)?\s*\((fish|crustaceans|mollusc)\)", re.I)  
                                                                              #
@@ -79,10 +80,14 @@ def print_subgroups(sg):
     for key in sg:
         print(f"\t{key} - {sg[key]}")
 
-
-def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}):
+# scan for base brackets
+# if allergen leave item remove allergen & addit ti allergens set
+# if list of ingredients expand 
+def replace_base_bracket_items(ots_info, sub_group_id=0, i_tree={}):
     global global_subgroup_id
-    i_string = i_string.lower()
+    
+    i_string = ots_info['i_string']
+    i_string = i_string.lower()     
 
     matches = re.findall(rgx_bracket_pair_with_title, i_string)
     pprint(matches)
@@ -101,6 +106,7 @@ def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}):
             
             i_string = i_string.replace(replace_txt, sub_group_id_str)
             i_tree = [ i.strip() for i in i_string.split(',') ]
+
         print_subgroups(sub_groups)
         print(f"\ni_string: {i_string}\n")
 
@@ -120,60 +126,72 @@ def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}):
 # 'preservative:sodium metabisulphite',
 # 'preservatives: sodium metabisulphite',
 
-def scan_for_seafood_and_fish(i_string, sub_group_id=0, i_tree={}):
-    global global_subgroup_id
+def scan_for_seafood_and_fish(i_string):
+    #global global_subgroup_id
+
+    allergens = set()
+
     i_string = i_string.lower()
-    i_string = filter_noise(i_string, False) # TODO move to fold_bracket_items
 
     print(f"\ni_string-i: {i_string}\n")
 
     matches = re.findall(rgx_pullout_seafood, i_string)
-    pprint(matches) 
+    pprint(matches) # TODO remove / log
+
     if matches:
         for m in matches:
             title, latin, allergen = m[0], m[1], m[2]
-
+            
+            allergens.add(allergen)
+            
             if not latin: latin = ''                                     # latin not present
             else: latin = latin.replace('(', '\\(').replace(')', '\\)')  # (mytilus spp.) < with brackets
             replace_rgx = f"{title}\\s*{latin}\\s*\\({allergen}\\)"
             
-            sub_group_id_str = title
-            sub_group_id += 1
-            sub_groups[sub_group_id_str] = { title: (latin, allergen, replace_rgx) }
+            # sub_group_id_str = title
+            # sub_group_id += 1
+            # sub_groups[sub_group_id_str] = { title: (latin, allergen, replace_rgx) }
 
-            sub_group_id_str = f"##{global_subgroup_id:03}"
-            global_subgroup_id += 1
-            all_sub_groups[sub_group_id_str] = { title: (latin, allergen, replace_rgx) }
+            # sub_group_id_str = f"##{global_subgroup_id:03}"
+            # global_subgroup_id += 1
+            # all_sub_groups[sub_group_id_str] = { title: (latin, allergen, replace_rgx) }
             
+            i_string = re.sub(replace_rgx, f'{title}', i_string)
 
-            i_string = re.sub(replace_rgx, f'# {title} #', i_string)
-            # i_tree = [ i.strip() for i in i_string.split(',') ]
-        print_subgroups(sub_groups)
+#        print_subgroups(sub_groups)
     
     print(f"\ni_string-r: {i_string}\n")
 
-    return i_string         
+    return {'i_string':i_string, 'allergens': allergens} 
+
+
 
 
 # ALLERGENS ARE THE REAL TARGETS HERE
 # replace (x%)
 # replace ; with ,
-# scan for allergens in () (mollusc) remove
+# scan for fish/seafood w/ latin names allergens in () (mollusc) remove - record allergens
+# scan for allergens in () (milk) remove - record
 # while (there are still base brackets)
 #   title will be classifier or ingredient
 # scan for ':'
 # think about blowing the stack haricot bean bug - tinned beans
-def unfold_bracket_items(i_string, ri_name, i_tree={}):
-    i_tree['allergens'] = []
-
+def proces_ots_i_list_into_allergens_and_base_ingredients(i_string, ri_name, i_tree={}):
     # replace (x%)
-    i_string = filter_noise(i_string, False)    
+    i_string = filter_noise(i_string, False)  # TODO test contains vs contains: may may contain
+
+    # replace ; with ,
+    i_string = i_string.replace(';', ',')
+
+    # scan for fish/seafood w/ latin names allergens in () (mollusc) remove - record allergens
+    ots_info = scan_for_seafood_and_fish(i_string)
 
     # loop until bracket pairs removed
-    matches = re.findall(rgx_bracket_pair_with_title, i_string)    
-    while(matches):
-        next_list = replace_base_bracket_items(i_string, sub_group_id=0, i_tree={})
+    # matches = re.findall(rgx_bracket_pair_with_title, ots_info['i_string'])  
+    # while(matches):
+    #     next_list = replace_base_bracket_items(ots_info)
 
+    #     matches = re.findall(rgx_bracket_pair_with_title, ots_info['i_string'])  
 
 
 
@@ -235,14 +253,20 @@ if __name__ == '__main__':
     for ri_name in ots_i_list:
         i_list = ''#process_ots_ingredient_string(atomic_LUT[ri_name]['ingredients'], ri_name)
         i_string = ots_i_list[ri_name]
-        print(f"\n\n\nR======= {ri_name} - brackets_balance:{brackets_balance(i_string)} =======     =======     =======\n\n{i_string}")        
-        #i_list = replace_base_bracket_items(i_string)
-        i_list = scan_for_seafood_and_fish(i_string)
-        print(f"i_list: {i_list}")
+        print(f"\n\n\nR======= {ri_name} - brackets_balance:{brackets_balance(i_string)} =======     =======     =======\n\n{i_string}")                
+        i_string = filter_noise(i_string, False)
+        ots_info = scan_for_seafood_and_fish(i_string)
+        print('> > - - - - scanned for seafood - - - - brackets next \/ ')
+        i_list = replace_base_bracket_items(ots_info)
+        print(f"i_string: {ots_info['i_string']}")
+        print(f"allergens: {ots_info['allergens']}")
         print('=======     =======     =======\n')
         sub_groups = {}
     
     print_subgroups(all_sub_groups)
+    print(get_allergens_headings())
+    # add (sulphites) (milk) (from milk) (cows' milk)
+    # if get_allergens_headings - loop in bracket
 
     # titles = []
     # for id, item in all_sub_groups.items():
