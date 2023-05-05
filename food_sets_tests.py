@@ -45,9 +45,14 @@ def brackets_balance(i_string, dbg=False):
 #  ,([\s\w]+)   (  [\([{]  (  [^\([{})\]]+  )  [})\]]  )                        < < - - - - #
                                                                                             #
 rgx_bracket_pair_with_title = re.compile('([\s\w:]+)([\([{]([^\([{})\]]+)[})\]])', re.I) # /
+
 rgx_any_bracket = re.compile('[\([{})\]]')
-#rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\))?\s*\((fish|crustacean|mollusc)\)", re.I)
-rgx_pullout_seafood = re.compile("([\w\s\.]+)\(?([\w\s\.]+)?\)?\s*\((fish|crustaceans|mollusc)\)", re.I)
+
+# latin optional with brackets captured - need them becaus optional
+#   makes finding & replacing it trickier without them
+rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustaceans|mollusc)\)", re.I)   
+# latin optional WITHOUT brackets captured 
+# rgx_pullout_seafood = re.compile("([\w\s\.]+)\(?([\w\s\.]+)?\)?\s*\((fish|crustaceans|mollusc)\)", re.I)  
                                                                              #
 # "([\w\s\.]+)(\([\w\s\.]+\))?\s*\((fish|crustaceans|mollusc)\)"gmi   > - - /
 # 
@@ -66,6 +71,7 @@ set_i_classifiers = set(['preservative','preservatives','colour','acidity regula
 
 global_subgroup_id = 0
 all_sub_groups = {}
+latin_names = {}
 sub_groups = {}
 allergens = set()
 def print_subgroups(sg):
@@ -119,16 +125,17 @@ def scan_for_seafood_and_fish(i_string, sub_group_id=0, i_tree={}):
     i_string = i_string.lower()
     i_string = filter_noise(i_string, False) # TODO move to fold_bracket_items
 
+    print(f"\ni_string-i: {i_string}\n")
+
     matches = re.findall(rgx_pullout_seafood, i_string)
     pprint(matches) 
     if matches:
         for m in matches:
             title, latin, allergen = m[0], m[1], m[2]
 
-            if not latin: latin = ''
-            # "([\w\s\.]+)(\([\w\s\.]+\))?\s*\((fish|crustacean|mollusc)\)"            
-            replace_rgx = f"{title}\s*{latin}\s*\({allergen}\)"
-            replace_rgx = re.compile(f"{title}{latin}")
+            if not latin: latin = ''                                     # latin not present
+            else: latin = latin.replace('(', '\\(').replace(')', '\\)')  # (mytilus spp.) < with brackets
+            replace_rgx = f"{title}\\s*{latin}\\s*\\({allergen}\\)"
             
             sub_group_id_str = title
             sub_group_id += 1
@@ -138,10 +145,12 @@ def scan_for_seafood_and_fish(i_string, sub_group_id=0, i_tree={}):
             global_subgroup_id += 1
             all_sub_groups[sub_group_id_str] = { title: (latin, allergen, replace_rgx) }
             
-            i_string = re.sub(replace_rgx, title, i_string)
+
+            i_string = re.sub(replace_rgx, f'# {title} #', i_string)
             # i_tree = [ i.strip() for i in i_string.split(',') ]
         print_subgroups(sub_groups)
-        print(f"\ni_string-r: {i_string}\n")
+    
+    print(f"\ni_string-r: {i_string}\n")
 
     return i_string         
 
@@ -152,13 +161,16 @@ def scan_for_seafood_and_fish(i_string, sub_group_id=0, i_tree={}):
 # scan for allergens in () (mollusc) remove
 # while (there are still base brackets)
 #   title will be classifier or ingredient
-# scan for :
-def fold_bracket_items(i_string, ri_name, i_tree={}):
+# scan for ':'
+# think about blowing the stack haricot bean bug - tinned beans
+def unfold_bracket_items(i_string, ri_name, i_tree={}):
+    i_tree['allergens'] = []
+
     # replace (x%)
     i_string = filter_noise(i_string, False)    
 
-    matches = re.findall(rgx_bracket_pair_with_title, i_string)
-    
+    # loop until bracket pairs removed
+    matches = re.findall(rgx_bracket_pair_with_title, i_string)    
     while(matches):
         next_list = replace_base_bracket_items(i_string, sub_group_id=0, i_tree={})
 
@@ -240,12 +252,6 @@ if __name__ == '__main__':
     # print(f"unique titles:{Counter(titles).most_common()}")
     # for title, count in Counter(titles).most_common():
     #     print(f"'{title}',")
-
-
-
-
-
-
 
 
 

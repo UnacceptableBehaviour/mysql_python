@@ -293,12 +293,14 @@ CONTAINS = re.compile('contains:*\s*')      # contains: allergen
 IGDT_TITLE = re.compile('ingredients:')     # ingredients:sugar cane, cane molasses.
 regex_noise = [QUID_PC, CONTAINS, PUREE, IGDT_TITLE]
 
-def filter_noise(i_string):    
-    print(f"\nrgx-i:{i_string}")
+def filter_noise(i_string, dbg=True):    
+    if dbg: print(f"\nrgx-i:{i_string}")
+
     for r in regex_noise:
         i_string = re.sub(r,'',i_string).strip()
     
-    print(f"\nrgx-o:{i_string}")
+    if dbg: print(f"\nrgx-o:{i_string}")
+    
     return(i_string)
 
 def flatten_tree(i_tree, with_super_ingredient=False):
@@ -340,7 +342,7 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
         sub_dict = {}
         sub_i_list = []
         #print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
-        while (c_pos < len(i_string)-1):
+        while (c_pos < len(i_string)-1): # TODO check this -1 correct
             c_pos += 1
             c = i_string[c_pos]
             print(c, end='.')
