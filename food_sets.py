@@ -715,7 +715,7 @@ cheese_subsets = {
                   'taleggio cheese','petit pont leveque cheese','hochland sortett','castello extra creamy brie',
                   'grated mozzarella','austrian smoked cheese','blue stilton standard','saint agur creme',
                   'butlers blacksticks blue','inglewhite farmhouse blue cheese','castello creamy blue ',
-                  'abergavenny goats cheese'}
+                  'abergavenny goats cheese','medium fat hard cheese'}
 }
 
 cheese = {'cheese'}
@@ -802,7 +802,8 @@ def build_peanuts_set():
 nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
               'pecans','pistachios','walnuts'}
 
-nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava','cantuccini','almond oil'}
+nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava',
+                          'cantuccini','almond oil','roasted sliced nuts'}
 
 def build_nuts_set():
     nuts = {'nuts'}
