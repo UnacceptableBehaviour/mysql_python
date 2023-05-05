@@ -152,8 +152,13 @@ def scan_for_seafood_and_fish(i_string):
 #   title will be classifier or ingredient
 # scan for ':'
 
-# TODO - use these to clear up ingredientlist?
-set_i_classifiers = set(['preservative','preservatives','colour','acidity regulator','emulsifier','antioxidant','antioxidants','stabiliser','stabilisers','stabilizer','stabilizers','acidity regulators','raising agents','vegetable fats','preservatives','colours','natural flavouring','flavour enhancer','vitamins','emulsifiers','flavouring','herbs','roasted sliced nuts','seed mix','medium fat hard cheese','spice extracts','gelling agent','sweeteners','raising agent','gelling agents','firming agent','flour treatment agent','flavour enhancers','natural flavourings','live bacterial cultures','thickener','acid','humectant','acids','flavourings','colouring','vegetable oils and fats','vegetables','mixed seeds'])
+set_i_classifiers = set(['preservative','preservatives','colour','acidity regulator','emulsifier','antioxidant','antioxidants',
+                         'stabiliser','stabilisers','stabilizer','stabilizers','acidity regulators','raising agents',
+                         'vegetable fats','preservatives','colours','natural flavouring','flavour enhancer','vitamins',                         
+                         'spice extracts','gelling agent','sweeteners','raising agent','gelling agents','firming agent',
+                         'flour treatment agent','flavour enhancers','natural flavourings','live bacterial cultures','thickener',
+                         'acid','humectant','acids','flavourings','colouring','vegetable oils and fats','vegetables',
+                         'emulsifiers','flavouring','herbs'])
 #set_igdts = set('wheat flour','spices','fortified british wheat flour','vegetable oils','lactose','butter','whey powder','fortified wheat flour','niacin','thiamin','milk','unsalted butter','vegetable oil','yogurt','mussels','alaska pollock','hake','oyster','butterfat','calcium','lecithins','cheese','cheese powder','cream','low fat yogurt','malt vinegar','anchovies','soya extract','mackerel','greek style natural yogurt','extra mature cheddar cheese','single cream','mozzarella cheese','flour','emmental cheese','semolina','half cream','manchego cheese','whipped cream','white wine','salt','grana padano cheese','moistened sultanas','moistened raisins','moistened chilean flame raisins','curry powder','seasoning with sea salt and balsamic vinegar of modena','poultry meat','salmon','rusk','butteroil','vegetable margarine','sausage casing','salted butter','squid','herring fillets','parmigiano reggiano medium fat hard cheese','worcestershire sauce','worcester sauce','anchovy','dried cream','pork','breadcrumbs','cooked marinated lamb','malt extract','herring','wholetail scampi','butter oil','mayonnaise','hydrolysed vegetable protein','casing','halloumi cheese','wood smoked mussels','chaource cheese','prawns','king prawn','paprika','beef extract powder','anchovy extract','lemon juice powder')
 def proces_ots_i_list_into_allergens_and_base_ingredients(i_string):
     orig_i_string = i_string
@@ -177,10 +182,11 @@ def proces_ots_i_list_into_allergens_and_base_ingredients(i_string):
         i_string = replace_base_bracket_items(initial_i_string)         #
 
     # scan for ':'
-    i_string = i_string.replace(':', ',').replace('.', '')
+    i_string = i_string.replace(':', ',').replace('.', '') # TODO SB replace \..*?$ -  Ie from Full stop to end - NO TIME TO analyse or test
     ots_info['i_string'] = i_string
 
-    i_list = [ i.strip() for i in i_string.split(',') ]
+    # scrub classifiers frim i_list
+    i_list = [ i.strip() for i in i_string.split(',') if i.strip() not in set_i_classifiers]
 
     allergens = get_allergens_for(i_list)
 
