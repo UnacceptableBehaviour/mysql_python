@@ -1018,7 +1018,7 @@ molluscs_subsets = {
 
 # TODO change molluscs to mollusc  - hits ots i_list (mollusc)
 def build_molluscs_set():
-    molluscs = {'molluscs'}
+    molluscs = {'mollusc','molluscs'}
 
     for key, val in molluscs_subsets.items():
         union = val | {key}     # include the categegory generalisation
@@ -1061,7 +1061,7 @@ crustaceans_subsets = {
                 'king prawn','cooked prawn','fresh prawn','fresh water prawn'}
 }
 def build_crustaceans_set():
-    crustaceans = {'crustaceans'}
+    crustaceans = {'crustacean','crustaceans'}
 
     for key, val in crustaceans_subsets.items():
         union = val | {key}     # include the categegory generalisation
@@ -1146,15 +1146,13 @@ def build_celery_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # GLUTEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-gluten_basic = {'gluten','wheat','wheat protein','wheat germ','rye','barley','bulgur','couscous','farina','graham flour',
-                'kamut','khorasan wheat','semolina','spelt','triticale','oats','oat bran','flour' }
+gluten_basic = {'gluten','wholegrain wheat','wheat','wheat protein','wheat germ','wholegrain rye','rye','wholegrain barley',
+                'barley','bulgur','couscous','farina','graham flour','kamut','khorasan wheat','semolina','spelt','triticale',
+                'flour' }
 
 # usually product of some type katsuobushi or fish sauce for example
 gluten_derived_no_recipe =  {'malt vinegar','pasta','bread','pastry','pizza','seitan','flat bread','lamb samosa','veg samosa',
                              'samosa','pie','pies','malted wheat flakes','wheat starch'}
-
-# TODO remove this once parser improved!
-gluten_parse_catch = {'wheat flour (wheat flour'}
 
 # different names same thing
 gluten_alt = [
@@ -1170,7 +1168,7 @@ gluten_subsets = {
     'flour' : { 'plain flour','self raising flour','strong flour','bread flour' },
     'flat bread' : {'torta','matzo','pita','naan','roti','paratha','banh','tortilla','wrap','injera','pancake'}, # injera is gluten free if made of 100% teff flour
     'pasta' : {'orzo','spaghetti','macaroni','tagliatele','linguini','fusili','lasagna','rigatoni','farfale','ravioli',
-               'fettuccini','penne'}, # a a million other types!
+               'fettuccini','penne'}, # and a million other types! shoul catch these unrollin ingredients list!
     'bread' : {'sliced bread','sourdough','brown bread','tiger loaf','french stick','giraffe bread','baguette','burger bun',
                'brioche','demi brioche','baton','biscuit','bagel','cornbread','rye bread','milk bread','pizza','garlic pizza',
                'garlic bread','turkish bread','ciabata','bun','focaccia','mgt','multi grain','seeded batch','thick sliced bread',
@@ -1191,8 +1189,6 @@ def build_gluten_set():
     gluten = gluten | gluten_derived_no_recipe
 
     gluten = gluten | gluten_basic
-    
-    gluten = gluten | gluten_parse_catch
 
     return gluten
 
