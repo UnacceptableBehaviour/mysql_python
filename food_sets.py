@@ -300,7 +300,6 @@ def filter_noise(i_string, dbg=True):
         i_string = re.sub(r,'',i_string).strip()
     
     if dbg: print(f"\nrgx-o:{i_string}")
-    
     return(i_string)
 
 def flatten_tree(i_tree, with_super_ingredient=False):
@@ -729,7 +728,7 @@ dairy_subsets = {
     'fermented milk' : {'sour cream','soured milk'},
     'yogurt' : {'greek yoghurt','natural yoghurt','skyr'},
     'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
-    'butter' : {'salted butter','cornish butter','ghee','clarified butter'},
+    'butter' : {'salted butter','unsalted butter','cornish butter','ghee','clarified butter'},
     'cheese' : cheese,
     'casein' : {'milk protein','whey protein'},
     'ice cream' : {'gelato','ice milk','whippy san','frozen custard','frozen yoghurt'},
@@ -1017,6 +1016,7 @@ molluscs_subsets = {
                      'sinonovacula' },
 }
 
+# TODO change molluscs to mollusc  - hits ots i_list (mollusc)
 def build_molluscs_set():
     molluscs = {'molluscs'}
 
