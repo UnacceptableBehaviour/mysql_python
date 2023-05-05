@@ -1165,7 +1165,7 @@ gluten_alt = [
 
 # subsets - common name with various types
 gluten_subsets = {
-    'flour' : { 'plain flour','self raising flour','strong flour','bread flour' },
+    'flour' : { 'plain flour','self raising flour','strong flour','bread flour','wheat flour','barley flour','rye flour' },
     'flat bread' : {'torta','matzo','pita','naan','roti','paratha','banh','tortilla','wrap','injera','pancake'}, # injera is gluten free if made of 100% teff flour
     'pasta' : {'orzo','spaghetti','macaroni','tagliatele','linguini','fusili','lasagna','rigatoni','farfale','ravioli',
                'fettuccini','penne'}, # and a million other types! shoul catch these unrollin ingredients list!
@@ -1198,7 +1198,7 @@ def build_gluten_set():
 soya_basic = {'soy','soya','edamame','soybeans','soy bean','soyabeans','soya bean','soy bean','soy sauce','tofu',
               'soy milk','condensed soy milk','miso','soy nuts','tamari','shoyu','fermented soya bean',
               'teriyaki','tempeh','textured soy protein','tsp','textured vegetable protein','tvp','soy flour',
-              'soybean oil','soy lecithin','natto','kinako'}
+              'soybean oil','soy lecithin','natto','kinako','soya flour'}
 
 # usually product of some type katsuobushi or fish sauce for example
 soya_derived_no_recipe =  {'condensed soy milk','tofu','douhua'}

@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 from pprint import pprint
 
-from food_sets import atomic_LUT, filter_noise, get_allergens_headings
+from food_sets import atomic_LUT, filter_noise, get_allergens_headings, allergenLUT
 
 #from food_sets import process_ots_ingredient_string
 
@@ -80,13 +80,32 @@ def print_subgroups(sg):
     for key in sg:
         print(f"\t{key} - {sg[key]}")
 
+
+
+def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
+    allergens_detected = []
+    print(f"get_allergens_for : {exploded_list_of_ingredients}")
+
+    for i in exploded_list_of_ingredients:
+        for allergen in allergenLUT:
+            if i in allergenLUT[allergen]:
+                allergens_detected.append((allergen, i))
+
+    if show_provenance:
+        print("ALLERGEN show_provenance:")
+        pprint(allergens_detected)
+        return allergens_detected    
+    
+    allergens_detected = set([ a for a,i in allergens_detected])
+
+    return allergens_detected
+
 # scan for base brackets
 # if allergen leave item remove allergen & addit ti allergens set
 # if list of ingredients expand 
-def replace_base_bracket_items(ots_info, sub_group_id=0, i_tree={}):
+def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}):
     global global_subgroup_id
-    
-    i_string = ots_info['i_string']
+
     i_string = i_string.lower()     
 
     matches = re.findall(rgx_bracket_pair_with_title, i_string)
@@ -95,7 +114,8 @@ def replace_base_bracket_items(ots_info, sub_group_id=0, i_tree={}):
         for m in matches:
             title, content_w_brk, content = m[0], m[1], m[2]
             replace_txt = title + content_w_brk
-            
+            with_this = f" {title.strip()}, {content}"
+
             sub_group_id_str = f"##{sub_group_id:03}"
             sub_group_id += 1
             sub_groups[sub_group_id_str] = { title: content }
@@ -104,32 +124,21 @@ def replace_base_bracket_items(ots_info, sub_group_id=0, i_tree={}):
             global_subgroup_id += 1
             all_sub_groups[sub_group_id_str] = { title: replace_txt }
             
-            i_string = i_string.replace(replace_txt, sub_group_id_str)
-            i_tree = [ i.strip() for i in i_string.split(',') ]
+            #i_string = i_string.replace(replace_txt, sub_group_id_str)
+            i_string = i_string.replace(replace_txt, with_this)
 
         print_subgroups(sub_groups)
         print(f"\ni_string: {i_string}\n")
 
-    else:
-        i_tree = [ i.strip() for i in i_string.split(',') ]
-        
-    return i_tree
+    return i_string
 
-# some exceptions
-# 'isolate',
-# 'including 113g of poultry meat',
-# '100 g of product made from 160 g meat',
 
-# 'antioxidant: sodium metabisulphite',
-# 'preservative: lysozyme',
-# 'emulsifier: lecithins',
-# 'preservative:sodium metabisulphite',
-# 'preservatives: sodium metabisulphite',
 
 def scan_for_seafood_and_fish(i_string):
     #global global_subgroup_id
 
     allergens = set()
+    #allergens_w_provenance = []
 
     i_string = i_string.lower()
 
@@ -143,6 +152,7 @@ def scan_for_seafood_and_fish(i_string):
             title, latin, allergen = m[0], m[1], m[2]
             
             allergens.add(allergen)
+            #allergens_w_provenance.append((allergen, title))
             
             if not latin: latin = ''                                     # latin not present
             else: latin = latin.replace('(', '\\(').replace(')', '\\)')  # (mytilus spp.) < with brackets
@@ -162,12 +172,13 @@ def scan_for_seafood_and_fish(i_string):
     
     print(f"\ni_string-r: {i_string}\n")
 
+    #return {'i_string':i_string, 'allergens': allergens, 'allergens_wp': allergens_w_provenance} 
     return {'i_string':i_string, 'allergens': allergens} 
 
 
 
 
-# ALLERGENS ARE THE REAL TARGETS HERE
+# - - - ALLERGENS ARE THE REAL TARGETS HERE - - - 
 # replace (x%)
 # replace ; with ,
 # scan for fish/seafood w/ latin names allergens in () (mollusc) remove - record allergens
@@ -175,8 +186,9 @@ def scan_for_seafood_and_fish(i_string):
 # while (there are still base brackets)
 #   title will be classifier or ingredient
 # scan for ':'
-# think about blowing the stack haricot bean bug - tinned beans
-def proces_ots_i_list_into_allergens_and_base_ingredients(i_string, ri_name, i_tree={}):
+# think about blowing the stack haricot bean bug - tinned beans - used a loop instead 
+def proces_ots_i_list_into_allergens_and_base_ingredients(i_string):
+    orig_i_string = i_string
     # replace (x%)
     i_string = filter_noise(i_string, False)  # TODO test contains vs contains: may may contain
 
@@ -186,13 +198,38 @@ def proces_ots_i_list_into_allergens_and_base_ingredients(i_string, ri_name, i_t
     # scan for fish/seafood w/ latin names allergens in () (mollusc) remove - record allergens
     ots_info = scan_for_seafood_and_fish(i_string)
 
-    # loop until bracket pairs removed
-    # matches = re.findall(rgx_bracket_pair_with_title, ots_info['i_string'])  
-    # while(matches):
-    #     next_list = replace_base_bracket_items(ots_info)
+    i_string = ots_info['i_string']
 
-    #     matches = re.findall(rgx_bracket_pair_with_title, ots_info['i_string'])  
+    # loop until all bracket pairs removed  -   -   -   -   -   -   -   #
+    initial_i_string = i_string                                         #
+    i_string = replace_base_bracket_items(initial_i_string)             #
+                                                                        #   
+    while(initial_i_string != i_string):                                #
+        initial_i_string = i_string                                     #
+        i_string = replace_base_bracket_items(initial_i_string)         #
 
+    # scan for ':'
+    i_string = i_string.replace(':', ',').replace('.', '')
+    ots_info['i_string'] = i_string
+
+    i_list = [ i.strip() for i in i_string.split(',') ]
+
+    allergens = get_allergens_for(i_list)
+
+    ots_info['allergens'].update(allergens)
+
+    # TODO - fix allergenLUT? get_allergens_headings
+    if 'molluscs' in ots_info['allergens']: 
+        ots_info['allergens'].add('mollusc')
+        ots_info['allergens'].discard('molluscs')
+        
+    if 'crustaceans' in ots_info['allergens']: 
+        ots_info['allergens'].add('crustacean')
+        ots_info['allergens'].discard('crustaceans')
+
+    ots_info['orig_i_string'] = orig_i_string
+
+    return ots_info
 
 
 
@@ -218,7 +255,7 @@ if __name__ == '__main__':
             # print(f"\t{atomic_LUT[i]['ingredients']}")
             ots_i_list[i] = atomic_LUT[i]['ingredients']
 
-    ots_i_list['seafood extravaganza'] = "Surimi (46%) (Alaska Pollock (Theragra chalcogramma) (Fish), Hake (Merluccius merluccius) (Fish), Sugar), Water, Sugar, Potato Starch, Wheat Starch, Rapeseed Oil, Salt, Natural Flavouring (contains Crustaceans), Dried Free Range Egg White, Colour:Lycopene, Dried Free Range Egg,Wood Smoked Mussels (Mollusc), Sunflower Oil, Salt,Mussels (Mytilus Spp.) (Mollusc) (88%), Garlic Butter Sauce (12%) [Unsalted Butter (Milk) (35%), Water, Diced Onions, Garlic Purée (7%), Roasted Garlic (7%), Maize Starch, White Wine, Parsley, White Pepper],SQUID (Todarodes Pacificus) (51%) (MOLLUSC), WHEAT Flour, Modified Tapioca Starch, Thickeners: Oxidised Starch, Xanthan Gum, Guar Gum; Cornflour, Sea Salt, Dextrose, Sugar, Raising Agents: Diphosphates, Sodium Carbonates; Yeast, Fully Refined SOYBEAN OIL."
+    #ots_i_list['seafood extravaganza'] = "Surimi (46%) (Alaska Pollock (Theragra chalcogramma) (Fish), Hake (Merluccius merluccius) (Fish), Sugar), Water, Sugar, Potato Starch, Wheat Starch, Rapeseed Oil, Salt, Natural Flavouring (contains Crustaceans), Dried Free Range Egg White, Colour:Lycopene, Dried Free Range Egg,Wood Smoked Mussels (Mollusc), Sunflower Oil, Salt,Mussels (Mytilus Spp.) (Mollusc) (88%), Garlic Butter Sauce (12%) [Unsalted Butter (Milk) (35%), Water, Diced Onions, Garlic Purée (7%), Roasted Garlic (7%), Maize Starch, White Wine, Parsley, White Pepper],SQUID (Todarodes Pacificus) (51%) (MOLLUSC), WHEAT Flour, Modified Tapioca Starch, Thickeners: Oxidised Starch, Xanthan Gum, Guar Gum; Cornflour, Sea Salt, Dextrose, Sugar, Raising Agents: Diphosphates, Sodium Carbonates; Yeast, Fully Refined SOYBEAN OIL."
     # print('\n\n')
     # pprint(atomic_LUT['s&p pork arancini w courgette & grape salad'])
 
@@ -248,22 +285,37 @@ if __name__ == '__main__':
     # ots_i_list = [tup[1] for tup in sorted_list if tup[1]]
     # #pprint(ots_i_list)
 
-    check_list = ['preserved herring','scampi','','','','','','','','','','','','']
+    check_list = ['preserved herring','scampi','ap','chicken stock cube','mussels in white wine','','','','','','','','','']
+    # some exceptions
+    # 'isolate',
+    # 'including 113g of poultry meat',
+    # '100 g of product made from 160 g meat',
+
+    # 'antioxidant: sodium metabisulphite',
+    # 'preservative: lysozyme',
+    # 'emulsifier: lecithins',
+    # 'preservative:sodium metabisulphite',
+    # 'preservatives: sodium metabisulphite',
 
     for ri_name in ots_i_list:
         i_list = ''#process_ots_ingredient_string(atomic_LUT[ri_name]['ingredients'], ri_name)
         i_string = ots_i_list[ri_name]
         print(f"\n\n\nR======= {ri_name} - brackets_balance:{brackets_balance(i_string)} =======     =======     =======\n\n{i_string}")                
-        i_string = filter_noise(i_string, False)
-        ots_info = scan_for_seafood_and_fish(i_string)
-        print('> > - - - - scanned for seafood - - - - brackets next \/ ')
-        i_list = replace_base_bracket_items(ots_info)
+        # i_string = filter_noise(i_string, False)
+        # ots_info = scan_for_seafood_and_fish(i_string)
+        # print('> > - - - - scanned for seafood - - - - brackets next \/ ')
+        # ots_info['i_string'] = replace_base_bracket_items(ots_info['i_string'])
+        ots_info = proces_ots_i_list_into_allergens_and_base_ingredients(i_string)
         print(f"i_string: {ots_info['i_string']}")
         print(f"allergens: {ots_info['allergens']}")
         print('=======     =======     =======\n')
         sub_groups = {}
     
-    print_subgroups(all_sub_groups)
+    print(get_allergens_for(['flour','milk','butter','eggs','sugar']))
+    print(get_allergens_for(['s&p ribs w prawns & squid', 's&p coating', 'dried chillies', 's&p ribs', 'aromat', 'black pepper', 'bread flour', 'chillies', 'corn flour', 'eggs', 'garlic', 'ginger', 'octopus', 'olive oil', 'pork ribs', 'prawns', 'red onion', 'red pepper', 'salt', 'spring onions', 'szechuan pepper']))
+    
+    
+    #print_subgroups(all_sub_groups)
     print(get_allergens_headings())
     # add (sulphites) (milk) (from milk) (cows' milk)
     # if get_allergens_headings - loop in bracket
