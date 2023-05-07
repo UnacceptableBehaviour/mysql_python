@@ -72,7 +72,7 @@ all_sub_groups = {}
 
 def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
     allergens_detected = []
-    print(f"get_allergens_for : {exploded_list_of_ingredients}")
+    print(f"get_allergens_for: {exploded_list_of_ingredients}")
 
     for i in exploded_list_of_ingredients:
         for allergen in allergenLUT:
@@ -157,10 +157,17 @@ set_i_classifiers = set(['preservative','preservatives','colour','acidity regula
                          'spice extracts','gelling agent','sweeteners','raising agent','gelling agents','firming agent',
                          'flour treatment agent','flavour enhancers','natural flavourings','live bacterial cultures','thickener',
                          'acid','humectant','acids','flavourings','colouring','vegetable oils and fats','vegetables',
-                         'emulsifiers','flavouring','herbs'])
+                         'emulsifiers','flavouring','herbs','flour treatment agent'])
 #set_igdts = set('wheat flour','spices','fortified british wheat flour','vegetable oils','lactose','butter','whey powder','fortified wheat flour','niacin','thiamin','milk','unsalted butter','vegetable oil','yogurt','mussels','alaska pollock','hake','oyster','butterfat','calcium','lecithins','cheese','cheese powder','cream','low fat yogurt','malt vinegar','anchovies','soya extract','mackerel','greek style natural yogurt','extra mature cheddar cheese','single cream','mozzarella cheese','flour','emmental cheese','semolina','half cream','manchego cheese','whipped cream','white wine','salt','grana padano cheese','moistened sultanas','moistened raisins','moistened chilean flame raisins','curry powder','seasoning with sea salt and balsamic vinegar of modena','poultry meat','salmon','rusk','butteroil','vegetable margarine','sausage casing','salted butter','squid','herring fillets','parmigiano reggiano medium fat hard cheese','worcestershire sauce','worcester sauce','anchovy','dried cream','pork','breadcrumbs','cooked marinated lamb','malt extract','herring','wholetail scampi','butter oil','mayonnaise','hydrolysed vegetable protein','casing','halloumi cheese','wood smoked mussels','chaource cheese','prawns','king prawn','paprika','beef extract powder','anchovy extract','lemon juice powder')
+
+# for processing off the shelf (ots) ingredents lists - NOT unrolling derived
 def process_ots_i_list_into_allergens_and_base_ingredients(i_string):
+    global set_i_classifiers
+
     orig_i_string = i_string
+
+    i_string = i_string.lower()
+
     # replace (x%)
     i_string = filter_noise(i_string, False)  # TODO test contains vs contains: may may contain
 
@@ -184,7 +191,7 @@ def process_ots_i_list_into_allergens_and_base_ingredients(i_string):
     i_string = i_string.replace(':', ',').replace('.', '') # TODO SB replace \..*?$ -  Ie from Full stop to end - NO TIME TO analyse or test
     ots_info['i_string'] = i_string
 
-    # scrub classifiers frim i_list
+    # scrub classifiers from i_list
     i_list = [ i.strip() for i in i_string.split(',') if i.strip() not in set_i_classifiers]
 
     allergens = get_allergens_for(i_list)
@@ -218,7 +225,10 @@ if __name__ == '__main__':
 
 
     # TEST FODDER
-    check_list = ['preserved herring','scampi','ap','chicken stock cube','mussels in white wine','','','','','','','','','']
+    check_list = ['preserved herring','scampi','ap','chicken stock cube','mussels in white wine','Grana Padano cheese',
+                  'mrs hazelnut spread','aldi lrg beef yorkie','sbs greek yogurt',
+                  'white chocolate cookies',    # NO flavouring x3, emulsifierx2 humectant    dairy
+                  '','','','']
     # some exceptions
     # 'isolate',
     # 'including 113g of poultry meat',
@@ -227,14 +237,19 @@ if __name__ == '__main__':
     for ri_name in ots_i_list:
         i_string = ots_i_list[ri_name]
         print(f"\n\n\nR======= {ri_name} - brackets_balance:{brackets_balance(i_string)} =======     =======     =======\n\n{i_string}")
+        if ri_name == 'white chocolate cookies':
+            print("break")
         ots_info = process_ots_i_list_into_allergens_and_base_ingredients(i_string)
         print(f"i_string: {ots_info['i_string']}")
+        print(f"i_list (classifiers removed): {ots_info['i_list']}")
         print(f"allergens: {ots_info['allergens']}")
         print('=======     =======     =======\n')
     
     print(get_allergens_for(['flour','milk','butter','eggs','sugar']))
     print(get_allergens_for(['s&p ribs w prawns & squid', 's&p coating', 'dried chillies', 's&p ribs', 'aromat', 'black pepper', 'bread flour', 'chillies', 'corn flour', 'eggs', 'garlic', 'ginger', 'octopus', 'olive oil', 'pork ribs', 'prawns', 'red onion', 'red pepper', 'salt', 'spring onions', 'szechuan pepper']))
-    
+    print(get_allergens_for(['s&p ribs w prawns & squid']))
+    print()
+    pprint(ots_info)
     #pprint(all_sub_groups, width=160)
 
 
