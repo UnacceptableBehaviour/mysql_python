@@ -100,6 +100,7 @@ def follow_alias(i):
 
 # enter prawn to get all components with prawn in the name!
 def search(search_term):
+    search_term = search_term.lower()
     print(f"\n==> Searching for {search_term} . .\n")
     for i in atomic_LUT.keys():
         if re.search(search_term, i):
@@ -1991,6 +1992,7 @@ if __name__ == '__main__':
     print('>--4')
     
     def diagnostics(c, sp=False):
+        c = c.lower()
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S get i_list')
         i_list = get_ingredients_as_text_list_R(c)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1 allergens')
