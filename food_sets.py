@@ -680,8 +680,8 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-dairy_basic = {'milk','cows milk','goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
-               'casein','custard','ice cream','milk powder','dried skimmed milk'}
+dairy_basic = {'milk','cows milk', "cows' milk",'goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
+               'casein','custard','ice cream','milk powder','dried skimmed milk', 'whey powder', "whole cows' milk powder"}
 
 # usually product of some type katsuobushi or fish sauce for example
 dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade', 'parmesan crisps'}
@@ -699,6 +699,7 @@ dairy_alt = [
     {'feta','feta cheese','greek feta'},
     {'philadelphia','philadelphia soft cheese','cream cheese','soft cheese','soft white cheese'},
     {'brie','somerset brie'},
+    {"milk fat","anhydrous milk fat","dry butter fat","dehydrated butter fat"},
 ]
 
 # have to give cheese a super set of its own!
@@ -728,16 +729,18 @@ for cheese_cat, cheese_set in cheese_subsets.items():
 
 # subsets - common name with various types
 dairy_subsets = {
-    'milk' : {'skimmed milk','semi skimmed milk','full fat milk','whole milk','1% skimmed milk','1% milk','2% milk','bob'},
+    'milk' : {'skimmed milk','semi skimmed milk','full fat milk','whole milk','1% skimmed milk','1% milk','2% milk','bob','pasteurised skimmed milk'},
     'fermented milk' : {'sour cream','soured milk'},
-    'yogurt' : {'greek yoghurt','natural yoghurt','skyr'},
+    'yogurt' : {'greek yoghurt','greek style natural yogurt','natural yoghurt','skyr'},
     'cream' : {'single cream','double cream','squirty cream','whipping cream','clotted cream','creme fraiche'},
-    'butter' : {'salted butter','unsalted butter','cornish butter','ghee','clarified butter'},
+    'butter' : {'salted butter','unsalted butter','cornish butter','ghee','clarified butter','butteroil'},
     'cheese' : cheese,
     'casein' : {'milk protein','whey protein'},
     'ice cream' : {'gelato','ice milk','whippy san','frozen custard','frozen yoghurt'},
 }
 
+
+  
 
 
 def build_dairy_set():
@@ -759,9 +762,9 @@ def build_dairy_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EGGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-eggs_basic = {'eggs','egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
+eggs_basic = {'eggs','egg', 'free range egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
               'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk',
-              'dried free range egg white', 'dried egg'}
+              'dried free range egg white', 'dried egg', 'pasteurised free range egg white'}
 
 # usually product of some type katsuobushi or fish sauce for example
 eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
@@ -996,7 +999,7 @@ def build_fish_set():
 # SHELLFISH - MOLLUSCS - theres quite a list here: https://en.wikipedia.org/wiki/List_of_edible_molluscs
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 molluscs_basic = {'abalone','escargot','squid','snail','snails','hereford snails','mussel','limpits','winkles','whelks','clams','mussels',
-                  'oyster','oysters','scallop','octopus','cuttlefish'}
+                  'oyster','oysters','oyster extract','scallop','octopus','cuttlefish'}
 
 molluscs_derived_no_recipe =  {'oyster sauce', 'smoked mussels inc oil', 'smoked mussels', 'wood smoked mussels', 'wood smoked mussels (mollusc)',
                                'cooked squid'}
