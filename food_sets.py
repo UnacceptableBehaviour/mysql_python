@@ -314,6 +314,10 @@ def flatten_tree(i_tree, with_super_ingredient=False):
     return flat
 
 
+# TODO replace with
+# def process_ots_i_list_into_allergens_and_base_ingredients(i_string):
+# in food_set_test.pt
+
 def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
     global ots_I_set    # keep track of ingredients found in OTS items
     print(f"[process_ots_ingredient_string] for ({ingredient_name})")
@@ -375,14 +379,14 @@ def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
         return(ret_list)
     
     composite_data['i_tree'] = split_out_sublists_in_brackets()    
-    composite_data['i_list_flat'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
-    ots_I_set = ots_I_set | set(composite_data['i_list_flat'])
+    composite_data['i_list'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
+    ots_I_set = ots_I_set | set(composite_data['i_list'])
     print('\n|A|')
     print(composite_data['allergens'])
     print(get_allergens_for(composite_data['allergens']))       
-    print(get_allergens_for(composite_data['i_list_flat']))
+    print(get_allergens_for(composite_data['i_list']))
     composite_data['allergens'] += get_allergens_for(composite_data['allergens'])   # filter latin & other names
-    composite_data['allergens'] += get_allergens_for(composite_data['i_list_flat']) 
+    composite_data['allergens'] += get_allergens_for(composite_data['i_list']) 
     print('|')
     pprint(composite_data)
     print('|')
@@ -471,7 +475,7 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
                 # TODO test on more formats - mostly sbs at the mo!
                 # TODO pass allergen info from OTS composite['allergens']
                 composite = process_ots_ingredient_string(atomic_LUT[rcoi]['ingredients'], rcoi)
-                i_list = composite['i_list_flat']
+                i_list = composite['i_list']
         
         elif igdt_type == 'derived':
             if rcoi not in component_file_LUT:

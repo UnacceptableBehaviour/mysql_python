@@ -8,10 +8,10 @@ from collections import Counter
 from pathlib import Path
 from pprint import pprint
 
-from food_sets import atomic_LUT, filter_noise, get_allergens_headings, allergenLUT
+from food_sets import atomic_LUT, filter_noise, allergenLUT
 
-
-def brackets_balance(i_string, dbg=False):
+# returns True if they balance
+def brackets_balance(i_string, dbg=False): 
     pair_lut = {
         ')': '(',
         ']': '[',
@@ -41,7 +41,7 @@ def brackets_balance(i_string, dbg=False):
 #    |             group 2 - content w/ brackets - use to replce
 #    |             |          group 3 - content w/o brackets
 #    |             |          |
-#  ,([\s\w]+)   (  [\([{]  (  [^\([{})\]]+  )  [})\]]  )                        < < - - - - #
+#   ([\s\w]+)   (  [\([{]  (  [^\([{})\]]+  )  [})\]]  )                        < < - - - - #
                                                                                             #
 rgx_bracket_pair_with_title = re.compile('([\s\w:]+)([\([{]([^\([{})\]]+)[})\]])', re.I) # /
 
@@ -66,9 +66,9 @@ rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustace
 
 
 # latin_names = {} # seafood
+# record all detected subgroup for inspection
 global_subgroup_id = 0
 all_sub_groups = {}
-allergens = set()
 
 def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
     allergens_detected = []
@@ -81,8 +81,7 @@ def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
 
     if show_provenance:
         print("ALLERGEN show_provenance:")
-        pprint(allergens_detected)
-        return allergens_detected    
+        pprint(allergens_detected) 
     
     allergens_detected = set([ a for a,i in allergens_detected])
 
@@ -160,7 +159,7 @@ set_i_classifiers = set(['preservative','preservatives','colour','acidity regula
                          'acid','humectant','acids','flavourings','colouring','vegetable oils and fats','vegetables',
                          'emulsifiers','flavouring','herbs'])
 #set_igdts = set('wheat flour','spices','fortified british wheat flour','vegetable oils','lactose','butter','whey powder','fortified wheat flour','niacin','thiamin','milk','unsalted butter','vegetable oil','yogurt','mussels','alaska pollock','hake','oyster','butterfat','calcium','lecithins','cheese','cheese powder','cream','low fat yogurt','malt vinegar','anchovies','soya extract','mackerel','greek style natural yogurt','extra mature cheddar cheese','single cream','mozzarella cheese','flour','emmental cheese','semolina','half cream','manchego cheese','whipped cream','white wine','salt','grana padano cheese','moistened sultanas','moistened raisins','moistened chilean flame raisins','curry powder','seasoning with sea salt and balsamic vinegar of modena','poultry meat','salmon','rusk','butteroil','vegetable margarine','sausage casing','salted butter','squid','herring fillets','parmigiano reggiano medium fat hard cheese','worcestershire sauce','worcester sauce','anchovy','dried cream','pork','breadcrumbs','cooked marinated lamb','malt extract','herring','wholetail scampi','butter oil','mayonnaise','hydrolysed vegetable protein','casing','halloumi cheese','wood smoked mussels','chaource cheese','prawns','king prawn','paprika','beef extract powder','anchovy extract','lemon juice powder')
-def proces_ots_i_list_into_allergens_and_base_ingredients(i_string):
+def process_ots_i_list_into_allergens_and_base_ingredients(i_string):
     orig_i_string = i_string
     # replace (x%)
     i_string = filter_noise(i_string, False)  # TODO test contains vs contains: may may contain
@@ -191,8 +190,9 @@ def proces_ots_i_list_into_allergens_and_base_ingredients(i_string):
     allergens = get_allergens_for(i_list)
 
     ots_info['allergens'].update(allergens)
+    ots_info['i_list'] = sorted(list(set(i_list)))
 
-    # TODO - fix allergenLUT? get_allergens_headings
+    # TODO - fix allergenLUT? food_sets.get_allergens_headings
     if 'molluscs' in ots_info['allergens']: 
         ots_info['allergens'].add('mollusc')
         ots_info['allergens'].discard('molluscs')
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     for ri_name in ots_i_list:
         i_string = ots_i_list[ri_name]
         print(f"\n\n\nR======= {ri_name} - brackets_balance:{brackets_balance(i_string)} =======     =======     =======\n\n{i_string}")
-        ots_info = proces_ots_i_list_into_allergens_and_base_ingredients(i_string)
+        ots_info = process_ots_i_list_into_allergens_and_base_ingredients(i_string)
         print(f"i_string: {ots_info['i_string']}")
         print(f"allergens: {ots_info['allergens']}")
         print('=======     =======     =======\n')
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     print(get_allergens_for(['s&p ribs w prawns & squid', 's&p coating', 'dried chillies', 's&p ribs', 'aromat', 'black pepper', 'bread flour', 'chillies', 'corn flour', 'eggs', 'garlic', 'ginger', 'octopus', 'olive oil', 'pork ribs', 'prawns', 'red onion', 'red pepper', 'salt', 'spring onions', 'szechuan pepper']))
     
     #pprint(all_sub_groups, width=160)
-    print(get_allergens_headings())
+
 
 
 
