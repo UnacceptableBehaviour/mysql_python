@@ -16,10 +16,17 @@ from striprtf.striprtf import rtf_to_text
 
 from timestamping import nix_time_ms
 
-from food_sets import get_allergens_for, get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
-from food_sets import get_exploded_ingredients_as_list_from_list
+#from food_sets import get_allergens_for # TODO REMOVE import & function replace w/ refactor
+from food_sets import get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE
 from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
+
+# refactor test
+from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
+
+from food_sets import process_ots_i_string_into_allergens_and_base_ingredients
+from food_sets import get_allergens_for_refactor
+
 import json
 from collections import Counter # to dump debug
 
@@ -182,7 +189,33 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
         print(f"allergens for: {name} <")
         
-        exploded_list_of_ingredients = get_exploded_ingredients_as_list_from_list(parse_igdt_lines_into_igdt_list(ingredients))
+
+        # roll out derived components for full ingredients list - understand allergen content
+        _,  exploded_list_of_ingredients = get_exploded_ingredients_and_components_for_DB_from_name((parse_igdt_lines_into_igdt_list(ingredients), name))
+        
+        allergens = set(get_allergens_for_refactor(exploded_list_of_ingredients))
+
+        # scan exploded_list_of_ingredients - pull in ingredients & allergens from ots ingredients
+        i_list = []
+        for rcoi in exploded_list_of_ingredients:
+            if rcoi in atomic_LUT:
+                if atomic_LUT[rcoi]['igdt_type'] == 'ots':
+                    if atomic_LUT[rcoi]['ingredients'] == '__igdts__':
+                        i_list.append(f"ots_i_miss>{rcoi}<")
+                        # TODO follow_alias(rcoi) to see if ingredients there!
+                    else:
+                        # add the ingredeints from the ots items - for TAGS detection 
+                        composite = process_ots_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
+                        i_list = i_list + composite['i_list']
+                        allergens.update(composite['allergens'])
+            else:
+                print(f"[produce_recipe_txts_from_costing_section] unknown_igdt>{rcoi}<")
+                i_list.append(f"unknown_igdt>{rcoi}<")
+        
+        exploded_list_of_ingredients_plus_ots = exploded_list_of_ingredients + i_list
+
+        containsTAGS = get_containsTAGS_for(exploded_list_of_ingredients_plus_ots)
+
         missing_ingredients = scan_for_error_items(exploded_list_of_ingredients)
         if missing_ingredients:
             missing_ingredients_list.append((name, missing_ingredients))
@@ -195,8 +228,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                     '__description__' : description.strip(),                                              #
                     '__notes__' : (str(notes).strip() + ('\n' + str(notes_after_serve)).strip()).replace("'","''"),  # if notes_after_serve existd put it on the next line!
                     '__stars__' : str(stars).strip(),
-                    '__allergens__' : ', '.join(get_allergens_for(parse_igdt_lines_into_igdt_list(ingredients))),
-                    '__tags__' : ', '.join(get_containsTAGS_for(parse_igdt_lines_into_igdt_list(ingredients))),
+                    '__allergens__' : ', '.join(allergens),
+                    '__tags__' : ', '.join(containsTAGS),
                     '__type__' : type_tag.strip(),
                     '__images__' : get_images_from_lead_image(lead_image),
                     '__lead_image__' : lead_image,
@@ -263,7 +296,7 @@ NUTRIDOC_LIST = [
                 # 'y962',       #  DONE 0607-20 19/9  - sushi, french sticks, brisket, broths
                 # 'y963',       #  DONE 0621-04 19/3  - prawns, burgers, veggie burgers, couscous
                 # 'y964',       #  DONE         43/24    - tortilla, fish, roast lamb, cheerry tart,  also alot of 3D CAD linux bike, protoyping & scenery
-                 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
+                # 'y965',       #  DONE         39/19  - burgers, pasta, fish, lamb, salads
                 # 'y966',       #  DONE         61/19 - fish, salads, carbless, veggie, sandwiches,
                 # 'y967',       #  DONE         29/6 - roast pork, fejoida, fish, veggie carbless - TODO meat free burger
                 # 'y968',       #  DONE 0830-12 72/17 - lo-cal, pastry, creme pat, roasts, salads
@@ -279,9 +312,9 @@ NUTRIDOC_LIST = [
                 # 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
                 # 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
                 # 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
-                # 
+                
                 # #_doc_#         status dateRange - RCP/incomplete : type of content
-                # 
+                
                 # 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
                 # 'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
                 # 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
@@ -317,11 +350,11 @@ NUTRIDOC_LIST = [
                 # 'y451',
                 # 'y452',
                 # 'y453',
-                #'y454',
-                #'y455',
-                #'y456',
-                # 'y457',
-                # 'y458',
+                # 'y454',
+                'y455',
+                'y456',
+                'y457',
+                'y458',
 
 
 # * next to done means superfluous image files removed
