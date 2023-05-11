@@ -16,7 +16,6 @@ from striprtf.striprtf import rtf_to_text
 
 from timestamping import nix_time_ms
 
-#from food_sets import get_allergens_for # TODO REMOVE import & function replace w/ refactor
 from food_sets import get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE
 from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
@@ -24,8 +23,8 @@ from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
 # refactor test
 from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
 
-from food_sets import process_ots_i_string_into_allergens_and_base_ingredients
-from food_sets import get_allergens_for_refactor
+from food_sets import process_OTS_i_string_into_allergens_and_base_ingredients
+from food_sets import get_allergens_for
 
 import json
 from collections import Counter # to dump debug
@@ -187,13 +186,13 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         if target_file_name == '':
             target_file_name = f"{root_date}_{get_zero_pad_6dig_count()}_{name}.txt"
 
-        print(f"allergens for: {name} <")
+        print(f"{__file__} allergens for: {name} <")
         
 
         # roll out derived components for full ingredients list - understand allergen content
         _,  exploded_list_of_ingredients = get_exploded_ingredients_and_components_for_DB_from_name((parse_igdt_lines_into_igdt_list(ingredients), name))
         
-        allergens = set(get_allergens_for_refactor(exploded_list_of_ingredients))
+        allergens = set(get_allergens_for(exploded_list_of_ingredients))
 
         # scan exploded_list_of_ingredients - pull in ingredients & allergens from ots ingredients
         i_list = []
@@ -205,7 +204,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                         # TODO follow_alias(rcoi) to see if ingredients there!
                     else:
                         # add the ingredeints from the ots items - for TAGS detection 
-                        composite = process_ots_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
+                        composite = process_OTS_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
                         i_list = i_list + composite['i_list']
                         allergens.update(composite['allergens'])
             else:
@@ -325,7 +324,7 @@ NUTRIDOC_LIST = [
                 # 'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
                 # 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
                 #               #       0801-14 - no nutridoc!?
-                # 'y429',       #       0815-28 - 50/4:
+                 'y429',       #       0815-28 - 50/4:
                 # 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
                 # 'y431',       #       0912-25 - 4 /2:
                 # 'y432',       #  DONE 0929-09 - 15/42: loads of material!
@@ -351,10 +350,10 @@ NUTRIDOC_LIST = [
                 # 'y452',
                 # 'y453',
                 # 'y454',
-                'y455',
-                'y456',
-                'y457',
-                'y458',
+                # 'y455',
+                # 'y456',
+                # 'y457',
+                # 'y458',
 
 
 # * next to done means superfluous image files removed

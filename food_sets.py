@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+    # Provides support functions for process_nutridocs.py
+    # Also provides inspection tools for content it ^ generates
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
 import re
 import sys
 from collections import Counter
 from pathlib import Path
 from pprint import pprint
 
-# = = = = food_sets_refactor = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-# from food_sets_refactor import process_ots_i_string_into_allergens_and_base_ingredients
-# from food_sets_refactor import get_allergens_for as get_allergens_for_refactor
-# = = = = food_sets_refactor = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-
-
 
 # returns True if they balance
 def brackets_balance(i_string, dbg=False): 
+    if dbg==True: print(i_string)
     pair_lut = {
         ')': '(',
         ']': '[',
@@ -35,6 +35,7 @@ def brackets_balance(i_string, dbg=False):
                 print(f"<{'-'.join(brackets).strip()}> {char}")
         c_pos += 1
 
+    if dbg==True: print(len(brackets), brackets)
     return(len(brackets) == 0)
 
 
@@ -74,9 +75,10 @@ rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustace
 global_subgroup_id = 0
 all_sub_groups = {}
 
-def get_allergens_for_refactor(exploded_list_of_ingredients, show_provenance=False):
+# no recursion - just check each item in list against allergey sets 
+def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
     allergens_detected = []
-    print(f"get_allergens_for_refactor: {exploded_list_of_ingredients}")
+    print(f"get_allergens_for: {exploded_list_of_ingredients}")
 
     for i in exploded_list_of_ingredients:
         for allergen in allergenLUT:
@@ -93,7 +95,7 @@ def get_allergens_for_refactor(exploded_list_of_ingredients, show_provenance=Fal
 
 
 # scan for base brackets - expand to list of ingredients 
-def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}):
+def replace_base_bracket_items(i_string, sub_group_id=0, i_tree={}): 
     global global_subgroup_id
 
     i_string = i_string.lower()     
@@ -165,13 +167,15 @@ set_i_classifiers = set(['preservative','preservatives','colour','acidity regula
 #set_igdts = set('wheat flour','spices','fortified british wheat flour','vegetable oils','lactose','butter','whey powder','fortified wheat flour','niacin','thiamin','milk','unsalted butter','vegetable oil','yogurt','mussels','alaska pollock','hake','oyster','butterfat','calcium','lecithins','cheese','cheese powder','cream','low fat yogurt','malt vinegar','anchovies','soya extract','mackerel','greek style natural yogurt','extra mature cheddar cheese','single cream','mozzarella cheese','flour','emmental cheese','semolina','half cream','manchego cheese','whipped cream','white wine','salt','grana padano cheese','moistened sultanas','moistened raisins','moistened chilean flame raisins','curry powder','seasoning with sea salt and balsamic vinegar of modena','poultry meat','salmon','rusk','butteroil','vegetable margarine','sausage casing','salted butter','squid','herring fillets','parmigiano reggiano medium fat hard cheese','worcestershire sauce','worcester sauce','anchovy','dried cream','pork','breadcrumbs','cooked marinated lamb','malt extract','herring','wholetail scampi','butter oil','mayonnaise','hydrolysed vegetable protein','casing','halloumi cheese','wood smoked mussels','chaource cheese','prawns','king prawn','paprika','beef extract powder','anchovy extract','lemon juice powder')
 
 # for processing off the shelf (ots) ingredents lists - NOT unrolling derived
-def process_ots_i_string_into_allergens_and_base_ingredients(i_string, ri_name=''):
+def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name=''):
     global set_i_classifiers
 
     orig_i_string = i_string
 
     #i_string = i_string.lower()
 
+    # TODO ingetrate here?
+    #composite_data['allergens'] = screen_for_allergens(i_string)     # conatains:
     # replace (x%)
     i_string = filter_noise(i_string, False)  # TODO test contains vs contains: may may contain
 
@@ -198,7 +202,7 @@ def process_ots_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
     # scrub classifiers from i_list
     i_list = [ i.strip() for i in i_string.split(',') if i.strip() not in set_i_classifiers]
 
-    allergens = get_allergens_for_refactor(i_list)
+    allergens = get_allergens_for(i_list)
 
     ots_info['allergens'].update(allergens)
     ots_info['i_list'] = sorted(list(set(i_list)))
@@ -219,14 +223,7 @@ def process_ots_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
 
 
 
-
-
-# = = = = food_sets_refactor = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-# = = = = food_sets_refactor = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-# = = = = food_sets_refactor = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-
 aliases = {}
-
 atomic_LUT = {}
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 NUTRIENT_FILE_BACKUPS = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
@@ -325,6 +322,7 @@ def search(search_term):
             dump_atomic_LUT(i)
 
 
+
 def build_file_LUT():
     file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
     for f in file_list:
@@ -332,7 +330,8 @@ def build_file_LUT():
         if m:
             #print(f"{m.group(1)} - {f.name}")
             component_file_LUT[m.group(1)] = f
-            get_ingredients_from_component_file(m.group(1)) # cache file & log rcoi/ri_name mismatch
+            # cache file & log rcoi/ri_name mismatch
+            get_ingredients_from_component_file_and_CACHE_content(m.group(1)) 
 
 
 errors = {
@@ -349,7 +348,7 @@ errors = {
     'expected_derived_atomic_no_file': []
 }
 
-def build_atomic_LUT(verbose=False):
+def build_atomic_LUT(verbose=False): # build from z_product_nutrition_info.txt * * *  < <
 
     content = ''
     with NUTRIENT_FILE_PATH.open('r') as f:
@@ -459,43 +458,7 @@ def build_atomic_LUT(verbose=False):
 
     return len(atomic_LUT)
 
-# keep it simple to start
-# remove QUID (34%) no's - these could be used to revese engineer a recipe in conjunction w/ nutrition info
-# downcase and remove whitespace and .
-# TODO - need a lot more data to REFINE
-# Scan for allergens in brackets: like wood smoked mussels (mollusc)
-# scan for ingredients in BRACKETS - allergens often inside
-# Preservative (Sodium Metabisulphite)
-# This: Acidity Regulators (Acetic Acid, Citric Acid), splits to
-# 'Acidity Regulators (Acetic Acid' and
-# 'Citric Acid'
 
-
-
-# # store these in composite
-# acidity regulator: ascorbic acid;
-# anti-caking agent: silicon dioxide)
-# colour: beetroot red;
-# acid: citric acid;
-# stabiliser: guar gum;
-
-# ingredient classifier: ingredient name
-IC_IGDT = re.compile(r"([a-z -]+):([a-z ]+)([,;\]\}\)])", re.MULTILINE | re.DOTALL )
-
-def remove_igdt_classifiers(i_string):
-    classifiers = {}
-    for m in re.finditer(IC_IGDT, i_string):
-        print(f"\ng0 - {m.group(0)}")
-        print(f"g1 - {m.group(1)}")
-        print(f"g2 - {m.group(2)}")
-        print(f"g3 - {m.group(3)}")
-        if m.group(1) in classifiers: classifiers[m.group(1)].append(m.group(2).strip())
-        else: classifiers[m.group(1)] = [m.group(2).strip()]
-    
-    i_string = re.sub(IC_IGDT, r"\2\3", i_string)    # \3 preserves brakets ), }, ], & semi colon ;
-    # print(f"\n{i_string}\n")
-    i_string = re.sub(';', ',', i_string)            # replace semicolon w/ a comma
-    return((i_string, classifiers))
 
 ALLERGENS = re.compile('\((contains)*:*\s*([\w ]+)\)')
 # assumes lower case
@@ -521,6 +484,7 @@ def filter_noise(i_string, dbg=True):
     if dbg: print(f"\nrgx-o:{i_string}")
     return(i_string)
 
+# TODO bring back i_tree
 def flatten_tree(i_tree, with_super_ingredient=False):
     flat = []
     for leaf in i_tree:
@@ -531,85 +495,6 @@ def flatten_tree(i_tree, with_super_ingredient=False):
         else:
             flat.append(leaf)
     return flat
-
-
-# TODO replace with
-# def process_ots_i_string_into_allergens_and_base_ingredients(i_string):
-# in food_set_test.pt
-
-def process_ots_ingredient_string(ingredient_string, ingredient_name=''):
-    global ots_I_set    # keep track of ingredients found in OTS items
-    print(f"[process_ots_ingredient_string] for ({ingredient_name})")
-    composite_data = {}
-    composite_data['ri_name'] = ingredient_name
-    composite_data['orig_i_string'] = ingredient_string
-    # ORDER DEPENDANT - STRING PROCESSING
-    i_string = ingredient_string.lower()    # removed from each function do ONCE!
-    composite_data['allergens'] = screen_for_allergens(i_string)     # testing
-    i_string = filter_noise(i_string)
-    i_string, composite_data['classifiers'] = remove_igdt_classifiers(i_string)
-
-    ret_list = []
-    c_pos = -1
-
-    def split_out_sublists_in_brackets(b=-1):
-        nonlocal c_pos
-        nonlocal i_string
-        nonlocal ret_list
-        
-        # scan by character
-        b += 1          # bracket count () start at 0
-        i = ''          # ingredient
-        key_igdt = ''   # ingredient with sub ingredients
-        sub_dict = {}
-        sub_i_list = []
-        #print(f"\n\n> - split_out_sublists_in_brackets (b={b})")
-        while (c_pos < len(i_string)-1): # TODO check this -1 correct
-            c_pos += 1
-            c = i_string[c_pos]
-            print(c, end='.')
-            if (c==',') and not b:               # no bracket in ingredient - store it
-                if i: ret_list.append(i.strip())
-                if sub_dict: ret_list.append(sub_dict)
-                #print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-                i = ''
-                sub_dict = {}
-                continue
-            if (c==',') and b:                  # inside brackets store ingredients in sublist
-                if i: sub_i_list.append(i.strip())
-                if sub_dict: sub_i_list.append(sub_dict)
-                i = ''
-                sub_dict = {}            
-                #print(f"\n[,{b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-                continue
-            if (c=='('):
-                key_igdt = i.strip()
-                sub_dict[key_igdt] = split_out_sublists_in_brackets(b)
-                i = ''
-                #print(f"\n[({b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-                continue
-            if (c==')'):    # bracket end to construct dict with result
-                sub_i_list.append(i.strip())
-                #print(f"\n[){b}] i:{i} - k:{key_igdt} - {sub_i_list} - {sub_dict}")
-                return(sub_i_list)
-    
-            i += c        
-        
-        return(ret_list)
-    
-    composite_data['i_tree'] = split_out_sublists_in_brackets()    
-    composite_data['i_list'] = sorted(list(set(flatten_tree(composite_data['i_tree']))))
-    ots_I_set = ots_I_set | set(composite_data['i_list'])
-    print('\n|A|')
-    print(composite_data['allergens'])
-    print(get_allergens_for_refactor(composite_data['allergens']))       
-    print(get_allergens_for_refactor(composite_data['i_list']))
-    composite_data['allergens'] += get_allergens_for_refactor(composite_data['allergens'])   # filter latin & other names
-    composite_data['allergens'] += get_allergens_for_refactor(composite_data['i_list']) 
-    print('|')
-    pprint(composite_data)
-    print('|')
-    return composite_data
             
 
 def parse_igdt_lines_into_igdt_list(lines=''):
@@ -634,7 +519,7 @@ def parse_igdt_lines_into_igdt_list(lines=''):
 
 
 CACHE_recipe_component_or_ingredient = {}
-def get_ingredients_from_component_file(recipe_component_or_ingredient):
+def get_ingredients_from_component_file_and_CACHE_content(recipe_component_or_ingredient):
     rcoi = recipe_component_or_ingredient
     
     if rcoi in CACHE_recipe_component_or_ingredient:
@@ -693,8 +578,8 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
             else:
                 # TODO test on more formats - mostly sbs at the mo!
                 # TODO pass allergen info from OTS composite['allergens']
-                #composite = process_ots_ingredient_string(atomic_LUT[rcoi]['ingredients'], rcoi)                
-                composite = process_ots_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
+                # TODO is should be added to the relevant set ^^
+                composite = process_OTS_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
                 i_list = composite['i_list']                
         
         elif igdt_type == 'derived':
@@ -702,12 +587,12 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
                 alias = re.sub('ndb_no=', '', atomic_LUT[rcoi]['ndb_no_url_alias'])
                 if alias in component_file_LUT:
                     print(f"\n{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
-                    s_list = get_ingredients_from_component_file(alias)
+                    s_list = get_ingredients_from_component_file_and_CACHE_content(alias)
                 else:
                     s_list = [f"alias_NF>{rcoi}|{alias}<"]            
             else:
                 print(f"\n{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
-                s_list = get_ingredients_from_component_file(rcoi)
+                s_list = get_ingredients_from_component_file_and_CACHE_content(rcoi)
 
             print(f"{'    '*(d-1)}{s_list}")
             #print('-*-')
@@ -730,17 +615,9 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
     return sorted(list(set(i_list)))# remove duplicates    
 
 
-def get_exploded_ingredients_as_list_from_list(i_list):
-    exploded_list = []
-    for i in i_list:
-        exploded_list += get_ingredients_as_text_list_R(i)
-    
-    save_ots_ingredients_found()
-    
-    return(sorted(list(set(exploded_list))))
-
 # returns (c_list: list of components in rcoi, i_list: list of ingredients and posible subcomponents)
 #            ^^                                  ^^
+# DOES NOT unroll OTS ingredients
 def get_exploded_ingredients_and_components_for_DB_from_name(comps_and_rcoi, d=0): # takes str:name    
     d += 1
     #print(f"comps_and_rcoi:{comps_and_rcoi}")
@@ -768,12 +645,12 @@ def get_exploded_ingredients_and_components_for_DB_from_name(comps_and_rcoi, d=0
                 alias = re.sub('ndb_no=', '', atomic_LUT[rcoi]['ndb_no_url_alias'])
                 if alias in component_file_LUT:
                     print(f"\n{'    '*(d-1)}=A> {alias} < file [{component_file_LUT[alias].name}]")
-                    s_list = get_ingredients_from_component_file(alias)
+                    s_list = get_ingredients_from_component_file_and_CACHE_content(alias)
                 else:
                     s_list = [f"alias_NF>{rcoi}|{alias}<"]            
             else:
                 print(f"\n{'    '*(d-1)}==> {rcoi} < file [{component_file_LUT[rcoi].name}]")
-                s_list = get_ingredients_from_component_file(rcoi)
+                s_list = get_ingredients_from_component_file_and_CACHE_content(rcoi)
 
             #print(f"{'    '*(d-1)}C{c_list}")
             print(f"{'    '*(d-1)}S{s_list}")
@@ -1268,7 +1145,7 @@ crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shr
 # different names same thing
 crustaceans_alt = [
     {'langostino', 'squat lobster'},
-    {'norway lobster', 'dublin bay prawn', 'langoustine','langostine'},
+    {'norway lobster', 'dublin bay prawn', 'langoustine', 'langostine'}, #'wholetail scampi', 'scampi'},
     {'prawn','prawns','shrimp','shrimps','large head on shell on prawns', 'large head on shell on prawn', 'large prawns', 'large prawn',
      'hoso prawn','hoso prawns','so prawn','so prawns','shell on jumbo king prawn', 'shell on jumbo king prawns'},
     {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
@@ -1496,8 +1373,8 @@ def get_allergens_headings():
     #return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'shellfish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
     return {'dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'crustaceans', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'}
 
-# ingredients for each component already recursed and stored in exploded
-# add_subcomponents_ingredients
+
+# testing ONLY
 def does_component_contain_allergen(component, allergen):
     allergen_present = False
 
@@ -1545,45 +1422,6 @@ allergenLUT = {
     'soya' : build_soya_set(),
     'sulphur_dioxide' : build_sulphur_dioxide_set()
 }
-
-    
-def get_allergens_for(list_of_ingredients, show_provenance=False):
-    allergens_detected = []
-
-    if list_of_ingredients.__class__ == str:
-        list_of_ingredients = [list_of_ingredients]
-
-    if list_of_ingredients.__class__ == list:
-        # build complete list - from local assets
-        # will not follow URL to inet for ingredients of off the shelf items
-
-        add_ingredients = []
-        for i in list_of_ingredients:
-            add_ingredients += get_ingredients_as_text_list_R(i)
-
-        # flatten so there's only one of each
-        list_of_ingredients = list(set(list_of_ingredients + add_ingredients))
-
-        # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
-            # scan_for_error_items returns a list of tuples (err, ingredient)
-            # only errors unless return_all_ingredients=True
-        list_of_ingredients = [i for e, i in scan_for_error_items(list_of_ingredients, return_all_ingredients=True) ]
-
-        for i in list_of_ingredients:
-            for allergen in allergenLUT:
-                if i in allergenLUT[allergen]:
-                    allergens_detected.append((allergen, i))
-
-    else:
-        raise(IncorrectTypeForIngredients("get_allergens_for: pass str or list"))
-
-    if show_provenance:
-        print("ALLERGEN show_provenance:")
-        pprint(allergens_detected)
-        
-    allergens_detected = list(set([ a for a,i in allergens_detected]))
-
-    return allergens_detected
 
 
 
@@ -2036,7 +1874,7 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
     TAGS_detected = []
 
     if list_of_ingredients.__class__ == str:
-        list_of_ingredients = [list_of_ingredients]
+        list_of_ingredients = [list_of_ingredients] # if single ingredient string
 
     if list_of_ingredients.__class__ == list:
         # build complete list - from local DB
@@ -2153,14 +1991,14 @@ if __name__ == '__main__':
         print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
     
     def dbg_get_allergens_for_component_recursive(c,sp=False):
-        print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
-        print(f"\nALLERGENS:{get_allergens_for_refactor(get_ingredients_as_text_list_R(c), sp)}")
+        print(f"\nget_allergens_for: {c}")
+        print(f"\nALLERGENS:{get_allergens_for(get_ingredients_as_text_list_R(c), sp)}")
     
     def dbg_unroll_all_seperately(c,sp=False):
         for a in get_allergens_headings():
             print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
-        print(f"\nget_ALLERGENS_FOR_Recurse: {c}")
-        print(get_allergens_for_refactor(get_ingredients_as_text_list_R(c), sp))
+        print(f"\nget_allergens_for: {c}")
+        print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
         
     def tag_test(c, sp):
         #dbg_i_list_as_text_from_component_name(c)
@@ -2211,7 +2049,7 @@ if __name__ == '__main__':
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S get i_list')
         i_list = get_ingredients_as_text_list_R(c)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1 allergens')
-        a_list = get_allergens_for_refactor(get_ingredients_as_text_list_R(c), sp)
+        a_list = get_allergens_for(get_ingredients_as_text_list_R(c), sp)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2 tags')
         t_list = get_containsTAGS_for(c, sp)
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M3 exploded for DB')
@@ -2245,7 +2083,7 @@ if __name__ == '__main__':
             print()
         print(f"{url_list}")
         if c not in CACHE_recipe_component_or_ingredient:
-            get_ingredients_from_component_file(c)          # get & cache
+            get_ingredients_from_component_file_and_CACHE_content(c)          # get & cache
         if c in CACHE_recipe_component_or_ingredient:
             print(CACHE_recipe_component_or_ingredient[c])
         else:
@@ -2357,7 +2195,7 @@ if __name__ == '__main__':
     # def dbg_process_ots_ingredient_string(tx):
     #     global search_tag
     #     search_tag += 1
-    #     composite = process_ots_ingredient_string(tx)
+    #     composite = process_OTS_i_string_into_allergens_and_base_ingredients(tx)
     #     print('\n')
     #     pprint(composite)
     #     print(f"\n>-{search_tag}\n")
