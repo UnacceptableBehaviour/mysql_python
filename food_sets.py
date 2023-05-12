@@ -14,6 +14,7 @@ from pprint import pprint
 
 
 # returns True if they balance
+# TODO run check on ots_i_list before processing
 def brackets_balance(i_string, dbg=False): 
     if dbg==True: print(i_string)
     pair_lut = {
@@ -82,8 +83,8 @@ def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
     print(f"get_allergens_for: {exploded_list_of_ingredients}")
 
     for i in exploded_list_of_ingredients:
-        # TODO remove prepended 'cured', 'salted', 'smoked', 'fried', 'boiled'  from ingredients
-        # r'(cured|salted|smoked|fried|boiled)\s*'
+        # remove prepended 'cured', 'salted', 'smoked', 'fried', 'dried', 'boiled'  from ingredients
+        i = re.sub(r'(cured|salted|smoked|fried|dried|boiled)\s*', '', i, re.I)
         for allergen in allergenLUT:
             if i in allergenLUT[allergen]:
                 allergens_detected.append((allergen, i))
@@ -586,6 +587,7 @@ def remove_error(possible_err_string):
 
 # recursive compile ingredients including OTS if ingredients available
 # for single item - see function below for list
+# TODO check allergens for all ingredients not just OTS list
 def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes str:name
     d += 1
     rcoi = remove_error(recipe_component_or_ingredient)
@@ -1880,12 +1882,12 @@ def build_not_vegan_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 containsTAGS_LUT = {
-    'chicken' : build_chicken_set(),
+    'chicken' : build_chicken_set(),    # need this for veggie / vegan
     'pork' : build_pork_set(),
     'beef' : build_beef_set(),
     'shellfish' : build_molluscs_set() | build_crustaceans_set(),
-    #'molluscs' : build_molluscs_set(),
-    #'crustaceans' : build_crustaceans_set(),
+    #'molluscs' : build_molluscs_set(),             # in shellfish
+    #'crustaceans' : build_crustaceans_set(),       # in shellfish
     'lamb' : build_lamb_set(),
     'fish' : build_fish_set(),
     'game' : build_game_set(),
@@ -1922,7 +1924,9 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
         # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
             # scan_for_error_items returns a list of tuples (err, ingredient)
             # only errors unless return_all_ingredients=True
-        exploded_list = [i for e, i in scan_for_error_items(exploded_list, return_all_ingredients=True) ]
+            # replace
+            # i = re.sub(r'(cured|salted|smoked|fried|dried|boiled)\s*', '', i, re.I)
+        exploded_list = [ re.sub(r'(cured|salted|smoked|fried|dried|boiled)\s*', '', i, re.I) for e, i in scan_for_error_items(exploded_list, return_all_ingredients=True) ]
 
         # flatten so there's only one of each
         list_of_ingredients = list(set(exploded_list))

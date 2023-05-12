@@ -229,6 +229,29 @@ class Food_sets_test(unittest.TestCase):
         self.assertEqual(expected_value, actual_value)   
 
 
+    def test_allergens_processed_food(self):
+        """
+        Get list of allergens from ingredients list
+        """
+        i_list = ['cured trout', 'salted duck egg', 'smoked cheese', 'fried bread', 'dried prawn', 'boiled edamame']
+        
+        expected_value = set(['fish','eggs','dairy','gluten','crustaceans','soya'])
+        
+        actual_value = get_allergens_for(i_list)
+        
+        self.assertEqual(expected_value, actual_value)    
+
+    def test_TAGS_processed_food(self):
+        """
+        Get list of allergens from ingredients list
+        """
+        i_list = ['cured ham', 'salted cod', 'smoked egg yolk', 'fried bread', 'dried beef', 'boiled milk']
+        
+        expected_value = set(['pork','fish','beef'])
+        
+        actual_value = set(get_containsTAGS_for(i_list))
+        
+        self.assertEqual(expected_value, actual_value)   
 
 
     # def test_get_OTS_i_list(self):
