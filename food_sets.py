@@ -75,12 +75,15 @@ rgx_pullout_seafood = re.compile("([\w\s\.]+)(\([\w\s\.]+\)\s*)?\((fish|crustace
 global_subgroup_id = 0
 all_sub_groups = {}
 
+# https://www.food.gov.uk/business-guidance/allergen-labelling-for-food-manufacturers
 # no recursion - just check each item in list against allergey sets 
 def get_allergens_for(exploded_list_of_ingredients, show_provenance=False):
     allergens_detected = []
     print(f"get_allergens_for: {exploded_list_of_ingredients}")
 
     for i in exploded_list_of_ingredients:
+        # TODO remove prepended 'cured', 'salted', 'smoked', 'fried', 'boiled'  from ingredients
+        # r'(cured|salted|smoked|fried|boiled)\s*'
         for allergen in allergenLUT:
             if i in allergenLUT[allergen]:
                 allergens_detected.append((allergen, i))
@@ -517,6 +520,29 @@ def parse_igdt_lines_into_igdt_list(lines=''):
     i_list = list(filter(None, i_list))         # remove empty strings
     return i_list
 
+# this is to process ingredients from recipes scanned from nutridocs to create
+# DATE_ri_name.txt DATE_ri_name.jpg pairs before they're processed into database 
+def nutridoc_scan_to_exploded_i_list_and_allergens(i_list, ri_name):
+    composite = { 'i_list': [], 'allergens': set() }
+    exploded_i_list = []
+    allergens = set()
+
+    for i in i_list:
+        sub_composite = get_ingredients_as_text_list_R(i)
+
+        exploded_i_list += sub_composite['i_list']
+        allergens.update(sub_composite['allergens'])                # catch alergies in sub_composite
+
+        allergens.update(get_allergens_for(exploded_i_list))        # catch rest
+        
+        # accumulate
+        composite['i_list'] = list(set(composite['i_list'] + sub_composite['i_list']))  # remove duplicates
+        composite['allergens'].update(sub_composite['allergens']) 
+        
+
+    return composite
+
+
 
 CACHE_recipe_component_or_ingredient = {}
 def get_ingredients_from_component_file_and_CACHE_content(recipe_component_or_ingredient):
@@ -564,7 +590,9 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
     d += 1
     rcoi = remove_error(recipe_component_or_ingredient)
     i_list = [f"unknown_component>{rcoi}<"]
-    
+    allergens = set()
+    composite = {}
+
     if rcoi in atomic_LUT:
         igdt_type = atomic_LUT[rcoi]['igdt_type']
         
@@ -579,8 +607,9 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
                 # TODO test on more formats - mostly sbs at the mo!
                 # TODO pass allergen info from OTS composite['allergens']
                 # TODO is should be added to the relevant set ^^
-                composite = process_OTS_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
-                i_list = composite['i_list']                
+                ots_composite = process_OTS_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
+                i_list = ots_composite['i_list']
+                allergens.update(ots_composite['allergens'])               
         
         elif igdt_type == 'derived':
             if rcoi not in component_file_LUT:
@@ -602,17 +631,22 @@ def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0): # takes
             else:
                 i_list = []
                 for i in s_list:
-                    sub_list = get_ingredients_as_text_list_R(i,d)
-                    i_list = i_list + sub_list
+                    sub_composite = get_ingredients_as_text_list_R(i,d)
+                    i_list = i_list + sub_composite['i_list']
+                    allergens.update(sub_composite['allergens'])
                     #print(f"{'    '*d}{sub_list}")
             
         else:
             i_list = [f"unknown_igdt_type>{rcoi}<"]
     
     i_list = sorted(list(set(i_list)))
+    
     errors['dead_ends_in_this_pass'] += scan_for_error_items(i_list) 
     
-    return sorted(list(set(i_list)))# remove duplicates    
+    composite['i_list'] = i_list
+    composite['allergens'] = allergens
+
+    return composite
 
 
 # returns (c_list: list of components in rcoi, i_list: list of ingredients and posible subcomponents)
@@ -1882,7 +1916,8 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
 
         exploded_list = []
         for i in list_of_ingredients:
-            exploded_list += get_ingredients_as_text_list_R(i)
+            composite = get_ingredients_as_text_list_R(i)
+            exploded_list += composite['i_list']
 
         # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
             # scan_for_error_items returns a list of tuples (err, ingredient)

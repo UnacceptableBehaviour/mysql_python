@@ -17,14 +17,9 @@ from striprtf.striprtf import rtf_to_text
 from timestamping import nix_time_ms
 
 from food_sets import get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
+from food_sets import nutridoc_scan_to_exploded_i_list_and_allergens
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE
 from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
-
-# refactor test
-from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
-
-from food_sets import process_OTS_i_string_into_allergens_and_base_ingredients
-from food_sets import get_allergens_for
 
 import json
 from collections import Counter # to dump debug
@@ -187,35 +182,18 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             target_file_name = f"{root_date}_{get_zero_pad_6dig_count()}_{name}.txt"
 
         print(f"{__file__} allergens for: {name} <")
-        
 
-        # roll out derived components for full ingredients list - understand allergen content
-        _,  exploded_list_of_ingredients = get_exploded_ingredients_and_components_for_DB_from_name((parse_igdt_lines_into_igdt_list(ingredients), name))
-        
-        allergens = set(get_allergens_for(exploded_list_of_ingredients))
+        nutridoc_i_list = parse_igdt_lines_into_igdt_list(ingredients)
 
-        # scan exploded_list_of_ingredients - pull in ingredients & allergens from ots ingredients
-        i_list = []
-        for rcoi in exploded_list_of_ingredients:
-            if rcoi in atomic_LUT:
-                if atomic_LUT[rcoi]['igdt_type'] == 'ots':
-                    if atomic_LUT[rcoi]['ingredients'] == '__igdts__':
-                        i_list.append(f"ots_i_miss>{rcoi}<")
-                        # TODO follow_alias(rcoi) to see if ingredients there!
-                    else:
-                        # add the ingredeints from the ots items - for TAGS detection 
-                        composite = process_OTS_i_string_into_allergens_and_base_ingredients(atomic_LUT[rcoi]['ingredients'], rcoi)
-                        i_list = i_list + composite['i_list']
-                        allergens.update(composite['allergens'])
-            else:
-                print(f"[produce_recipe_txts_from_costing_section] unknown_igdt>{rcoi}<")
-                i_list.append(f"unknown_igdt>{rcoi}<")
-        
-        exploded_list_of_ingredients_plus_ots = exploded_list_of_ingredients + i_list
+        containsTAGS = get_containsTAGS_for(nutridoc_i_list)
 
-        containsTAGS = get_containsTAGS_for(exploded_list_of_ingredients_plus_ots)
+        composite = nutridoc_scan_to_exploded_i_list_and_allergens(nutridoc_i_list, name)
+
+        allergens                    = composite['allergens']
+        exploded_list_of_ingredients = composite['i_list']
 
         missing_ingredients = scan_for_error_items(exploded_list_of_ingredients)
+
         if missing_ingredients:
             missing_ingredients_list.append((name, missing_ingredients))
         
