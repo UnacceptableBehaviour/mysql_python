@@ -212,9 +212,9 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
     ots_info['i_list'] = sorted(list(set(i_list)))
 
     # TODO - fix allergenLUT? food_sets.get_allergens_headings
-    if 'molluscs' in ots_info['allergens']: 
-        ots_info['allergens'].add('mollusc')
-        ots_info['allergens'].discard('molluscs')
+    if 'mollusc' in ots_info['allergens']: 
+        ots_info['allergens'].add('molluscs')
+        ots_info['allergens'].discard('mollusc')
 
     if 'crustaceans' in ots_info['allergens']: 
         ots_info['allergens'].add('crustacean')
@@ -473,11 +473,13 @@ def screen_for_allergens(i_string):
     return(list(set(allergens)))  
 
 
-QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  QUID_PC = re.compile('\((\d+%)\)')
+#QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  also catches 18.5%) = ERROR
+QUID_PC = re.compile('[\d.]+%')             # 3% 45% 3.5% 
+EMPTY_BRACKETS = re.compile('\(\)')
 PUREE = re.compile('purée')
 CONTAINS = re.compile('contains(?::)*\s*')      # contains(:)? allergen colon optional
 IGDT_TITLE = re.compile('ingredients:')     # ingredients:sugar cane, cane molasses.
-regex_noise = [QUID_PC, CONTAINS, PUREE, IGDT_TITLE]
+regex_noise = [QUID_PC, EMPTY_BRACKETS, CONTAINS, PUREE, IGDT_TITLE]
 
 def filter_noise(i_string, dbg=True):    
     if dbg: print(f"\nrgx-i:{i_string}")
@@ -523,23 +525,24 @@ def parse_igdt_lines_into_igdt_list(lines=''):
 
 # this is to process ingredients from recipes scanned from nutridocs to create
 # DATE_ri_name.txt DATE_ri_name.jpg pairs before they're processed into database 
-def nutridoc_scan_to_exploded_i_list_and_allergens(i_list, ri_name):
-    composite = { 'i_list': [], 'allergens': set() }
+def nutridoc_scan_to_exploded_i_list_and_allergens(i_list, ri_name):    
     exploded_i_list = []
     allergens = set()
+    composite = {}
 
+    # if ri_name == 'golden cardamom rice': print(' ')
     for i in i_list:
-        sub_composite = get_ingredients_as_text_list_R(i)
+        sub_composite = get_ingredients_as_text_list_R(i)   # catches allergens in brackets from things like seafood in OTS only
 
         exploded_i_list += sub_composite['i_list']
-        allergens.update(sub_composite['allergens'])                # catch alergies in sub_composite
+        allergens.update(sub_composite['allergens'])        # catch alergies in sub_composite
 
-        allergens.update(get_allergens_for(exploded_i_list))        # catch rest
-        
-        # accumulate
-        composite['i_list'] = list(set(composite['i_list'] + sub_composite['i_list']))  # remove duplicates
-        composite['allergens'].update(sub_composite['allergens']) 
-        
+    exploded_i_list = [ remove_error(e) for e in list(set(exploded_i_list)) ]  # remove duplicates & error TODO errors should be logged on removal
+
+    allergens.update(get_allergens_for(exploded_i_list))    # catch rest
+    
+    composite['i_list'] = exploded_i_list
+    composite['allergens'] = allergens
 
     return composite
 
@@ -573,6 +576,19 @@ def get_ingredients_from_component_file_and_CACHE_content(recipe_component_or_in
     else:
         return 'ERROR: bad_template'
 
+# TODO fixed version of function below causes a recursion problem
+# def remove_error(possible_err_string):
+#     #'unknown_component>alias_NF>coriander sauce|per 100g<<'
+#     # 'ots_i_miss>sherry vinegar'    
+#     e_list = possible_err_string.split('>')
+#     if len(e_list) > 1:
+#         print(f"possible_err_string:{possible_err_string}")
+#         scrubbed_i = e_list.pop().replace('<','')
+#         if '|' in scrubbed_i: scrubbed_i = scrubbed_i.split('|')[0]
+#         return scrubbed_i
+    
+#     return possible_err_string
+
 # TODO REMOVE
 def remove_error(possible_err_string):
     #'unknown_component>alias_NF>coriander sauce|per 100g'
@@ -580,9 +596,8 @@ def remove_error(possible_err_string):
     e_list = possible_err_string.split('>')
     if len(e_list) > 1:
         print(f"possible_err_string:{possible_err_string}")
-        return e_list.pop()
+        return e_list.pop().replace('<','')
     return possible_err_string
-
 
 
 # recursive compile ingredients including OTS if ingredients available
@@ -1419,7 +1434,8 @@ def does_component_contain_allergen(component, allergen):
     else:
         raise(UnkownAllergenType(f"ERROR: unknown allergen: {allergen} <"))
 
-    ingredients_of_component = get_ingredients_as_text_list_R(component)
+    composite = get_ingredients_as_text_list_R(component)
+    ingredients_of_component = composite['i_list']    
         
     # filter err out of err>name<   - TODO REMOVE w/ ATOMIC implementation? Its passive only
         # scan_for_error_items returns a list of tuples (err, ingredient)
@@ -1464,7 +1480,7 @@ allergenLUT = {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # CHICKEN
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-chicken_basic = {'chicken','chicken dark meat','chicken breast',
+chicken_basic = {'chicken','chicken dark meat','chicken breast', 'mechanically recovered chicken',
                  'chicken fat','chicken wing w skin','cornfed chicken','chicken wing','chicken roll',
                  'crispy chicken skin','chicken bites','chicken liver','chicken stock cube','chicken stock cubes',
                  'chicken thigh','chicken brown meat','chicken dark meat','chicken breast','poached chicken thigh',
@@ -1914,7 +1930,7 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
 
     if list_of_ingredients.__class__ == list:
         # build complete list - from local DB
-        # will not follow URL to inet for ingredients of off the shelf items
+        # will not follow URL to inet for ingredients of off the shelf items        
 
         exploded_list = []
         for i in list_of_ingredients:
@@ -1939,11 +1955,10 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
 
         # INVERSE LOOKUP - build_atomic_ingredients
         # I think we only need this loop to get provenance info!
-        if show_provenance:
-            for i in list_of_ingredients:
-                for tag in inverse_containsTAGS_LUT:
-                    if i not in inverse_containsTAGS_LUT[tag]:
-                        TAGS_detected.append((tag, i))
+        for i in list_of_ingredients:
+            for tag in inverse_containsTAGS_LUT:
+                if i not in inverse_containsTAGS_LUT[tag]:
+                    TAGS_detected.append((tag, i))
         
         vv_flag = True
         for i in list_of_ingredients:
@@ -1999,7 +2014,7 @@ def get_containsTAGS_for(list_of_ingredients, show_provenance=False):
     else:
         TAGS_detected = TAGS_detected - set(['gluten_free'])
 
-    return list(TAGS_detected)
+    return TAGS_detected
 
 
 
@@ -2021,7 +2036,8 @@ if __name__ == '__main__':
 
     print('>--2')
     def dbg_i_list_as_text_from_component_name(c):
-        i_list = get_ingredients_as_text_list_R(c)
+        composite = get_ingredients_as_text_list_R(c)
+        i_list = composite['i_list']
         print(f"\n|\n|\n \_  I_LIST_as_text_FROM_component_NAME:{c}")
         print(f"\nLIST({c}){i_list}")
         return(i_list)
@@ -2037,13 +2053,15 @@ if __name__ == '__main__':
         for a in get_allergens_headings():
             print(f"\nDoes COMPONENT <<{c}>> contain ALLERGEN <<{a}>> ? <<{does_component_contain_allergen(c, a)}>> ")
         print(f"\nget_allergens_for: {c}")
-        print(get_allergens_for(get_ingredients_as_text_list_R(c), sp))
+        composite = get_ingredients_as_text_list_R(c)
+        i_list = composite['i_list']
+        print(get_allergens_for(gi_list, sp))
         
     def tag_test(c, sp):
         #dbg_i_list_as_text_from_component_name(c)
-        t_list = get_containsTAGS_for(c, sp)
-        print(f"\n\nTAGS:{t_list}")
-        return(t_list)
+        t_set = get_containsTAGS_for(c, sp)
+        print(f"\n\nTAGS:{t_set}")
+        return t_set
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
@@ -2086,11 +2104,16 @@ if __name__ == '__main__':
     def diagnostics(c, sp=False):
         c = c.lower()
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  S get i_list')
-        i_list = get_ingredients_as_text_list_R(c)
+        composite = get_ingredients_as_text_list_R(c)
+        i_list = composite['i_list']
+        print(f"i_list: {i_list}")
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M1 allergens')
-        a_list = get_allergens_for(get_ingredients_as_text_list_R(c), sp)
+        composite = get_ingredients_as_text_list_R(c)
+        a_set = get_allergens_for(composite['i_list'], sp)
+        print(f"ALLERGENS: {a_set}")
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M2 tags')
-        t_list = get_containsTAGS_for(c, sp)
+        t_set = get_containsTAGS_for(c, sp)
+        print(f"TAGS: {t_set}")
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  M3 exploded for DB')
         component_list, i_sub_list = get_exploded_ingredients_and_components_for_DB_from_name(([],c))
         #print(f"COMPONENT_LIST: {component_list}")
@@ -2099,8 +2122,8 @@ if __name__ == '__main__':
         print('> DIG = = = = - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -  RESULT - S')
         print(f"\nINGREDIENTS FOR ({c}): {i_list}")
         print(f"\nEXPLODED (included sub components DB) FOR ({c}): {exploded_list}")
-        print(f"\nALLERGENS: {a_list}")
-        print(f"\nTAGS: {t_list}")
+        print(f"\nALLERGENS: {a_set}")
+        print(f"\nTAGS: {t_set}")
         ots_i_miss_list = []
         for i in i_list:
             m = re.search(r'ots_i_miss>(.*?)<', i)

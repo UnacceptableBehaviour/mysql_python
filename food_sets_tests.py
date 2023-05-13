@@ -17,6 +17,7 @@ from food_sets import get_allergens_for, get_containsTAGS_for
 
 from food_sets import process_OTS_i_string_into_allergens_and_base_ingredients
 from food_sets import get_ingredients_as_text_list_R 
+from food_sets import nutridoc_scan_to_exploded_i_list_and_allergens
 
 
 # 'chicken','pork','beef','shellfish' ('molluscs','crustacean'),'lamb','fish','game','gluten_free','vegan','veggie','other' = 'insect, ausie game'
@@ -32,7 +33,7 @@ class Food_sets_test(unittest.TestCase):
     tsc_01 = 'Water, Sugar, Oyster Extract (9%) (Water, Oyster (Molluscs), Salt), Modified Tapioca Starch, Salt, Wheat Flour, Acid (Lactic Acid), Colour (Ammonia Caramel)'
     tsc_01f = 'Water, Sugar, Oyster Extract (9%) (Water, Oyster (Molluscs], Salt), Modified Tapioca Starch, Salt, Wheat Flour, Acid (Lactic Acid), Colour (Ammonia Caramel)'
     tsc_01_i_list = ['water','sugar','oyster extract','oyster','salt','modified tapioca starch','wheat flour','lactic acid','ammonia caramel']
-    tsc_01_alg = set(['mollusc','gluten'])
+    tsc_01_alg = set(['molluscs','gluten'])
     tsc_01_tag = set(['shellfish'])
 
     # https://www.tesco.com/groceries/en-GB/products/289204714 - Mcvities Gold Chocolate Biscuit 8 Pack 176G
@@ -253,6 +254,57 @@ class Food_sets_test(unittest.TestCase):
         
         self.assertEqual(expected_value, actual_value)   
 
+    # TODO can wee loop through a set of test with arrays of data?
+
+    def test_get_derived_i_list_allergies(self):
+        """
+        Get list of allegens from list of ingredients of any type
+        """
+        
+        expected_value = Food_sets_test.tsc_01_alg
+        
+        composite = nutridoc_scan_to_exploded_i_list_and_allergens(Food_sets_test.tsc_01_i_list,'')
+
+        actual_value = get_allergens_for(composite['allergens'])
+        
+        self.assertEqual(expected_value, actual_value)   
+
+# ==== random tests
+    def test_TAGS_r000(self):
+        """
+        Apple should be gluten_free
+        """
+        i_list = ['apple', 'banana', 'water melon', 'coconut']
+        
+        expected_value = set(['gluten_free','veggie','vegan'])
+        
+        actual_value = set(get_containsTAGS_for(i_list))
+        
+        self.assertEqual(expected_value, actual_value)   
+
+    def test_TAGS_r001(self):
+        """
+        Apple should be gluten_free
+        """
+        i_list = ['apple', 'banana', 'water melon', 'coconut', 'boiled milk']
+        
+        expected_value = set(['gluten_free','veggie'])
+        
+        actual_value = set(get_containsTAGS_for(i_list))
+        
+        self.assertEqual(expected_value, actual_value)   
+
+    def test_TAGS_r002(self):
+        """
+        Roast lamb should should tag as lamb!
+        """
+        i_list = ['roast lamb shoulder']
+        
+        expected_value = set(['lamb'])
+        
+        actual_value = set(get_containsTAGS_for(i_list))
+        
+        self.assertEqual(expected_value, actual_value)   
 
     # def test_get_OTS_i_list(self):
     #     """
@@ -277,6 +329,7 @@ if __name__ == '__main__':
 
     # TEST FODDER
     ots_check_list = [
+        'chicken frankfurter',
         'preserved herring',
         'scampi',                       # 'Wholetail Scampi (Nephrops Norvegicus) (Crustacean) - remove 'wholetail scampi', 'scampi' from crustaceans_alt 
                                         # the fish section should catch the crustacean allergy even if its not explicitly in the set!
