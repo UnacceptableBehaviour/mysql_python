@@ -216,9 +216,9 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
         ots_info['allergens'].add('molluscs')
         ots_info['allergens'].discard('mollusc')
 
-    if 'crustaceans' in ots_info['allergens']: 
-        ots_info['allergens'].add('crustacean')
-        ots_info['allergens'].discard('crustaceans')
+    if 'crustacean' in ots_info['allergens']: 
+        ots_info['allergens'].add('crustaceans')
+        ots_info['allergens'].discard('crustacean')
 
     ots_info['orig_i_string'] = orig_i_string
     ots_info['ri_name'] = ri_name                   # detect provenance
