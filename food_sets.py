@@ -910,7 +910,7 @@ eggs_basic = {'eggs','egg', 'free range egg','quails egg','duck egg','hens egg',
               'dried free range egg white', 'dried egg', 'pasteurised free range egg white'}
 
 # usually product of some type katsuobushi or fish sauce for example
-eggs_derived_no_recipe =  {'lecithin','marzipan','marshmallows','nougat','pretzels','pasta', 'eggnog','lysozyme'
+eggs_derived_no_recipe =  {'lysozyme','marzipan','marshmallows','nougat','pretzels','pasta','eggnog',
                            'mayo','mayonnaise','meringue','meringue powder','ovalbumin','surimi','egg tofu'}
 
 eggs_alt = [{'mayo','hman mayo','chefs larder mayo','mayonaise'}]
@@ -2075,16 +2075,16 @@ if __name__ == '__main__':
     #     error_table(e)
     
     error_keys = [
-                   'txt_title_NO_match_rcp',
+                  # 'txt_title_NO_match_rcp',
                   # 'derived_w_file_HAS_ndb_no',
                   # 'ndb_no_neg99',
                    'derived_HAS_http_SB_ots',
                   # 'derived_HAS_atomic_alias',
-                  # 'ots_ingredients_missing',
-                  # 'ots_NO_url',
+                   'ots_ingredients_missing',
+                   'ots_NO_url',
                   # 'unknown_alias',                  
                   # 'items_not_triggering_TAGS',
-                   'dead_ends_in_this_pass',
+                  # 'dead_ends_in_this_pass',
                    'expected_derived_atomic_no_file'
                   ]
 
@@ -2163,7 +2163,7 @@ if __name__ == '__main__':
 
 
 
-    print('\n'*15 + '\nSearch?')
+    print('\n'*25 + '\nSearch?')
     while(True):
         yn = input('Continue ingredient/(n)\n')
         if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
