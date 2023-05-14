@@ -211,7 +211,6 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
     ots_info['allergens'].update(allergens)
     ots_info['i_list'] = sorted(list(set(i_list)))
 
-    # TODO - fix allergenLUT? food_sets.get_allergens_headings
     if 'mollusc' in ots_info['allergens']: 
         ots_info['allergens'].add('molluscs')
         ots_info['allergens'].discard('mollusc')
