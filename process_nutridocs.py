@@ -336,7 +336,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-
+#NUTRIDOC_LIST = ['y966']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
@@ -700,6 +700,8 @@ No arguments:            Report status of files selected in NUTRIDOC_LIST
                          
 -go                      Generate Output in tmp folders - for populate_db.py
 
+-u                       Show URLs of missing OTS ingrediets
+
 '''
 
 print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
@@ -741,21 +743,28 @@ def print_urls_to_process():
     for ri_name in atomic_LUT:
         url = atomic_LUT[ri_name]['url']
         if url:
-            match = None
-            for r in supplier_regex:
-                m = re.search(r, url)            
-                if m:
-                    match = m.group(1)
-                    break
-            if match in dict_of_urls_to_process:
-                dict_of_urls_to_process[match].append( (ri_name, url) )
-            else:
-                dict_of_urls_to_process[match] = [ (ri_name, url) ]
+            if atomic_LUT[ri_name]['ingredients'] == '__igdts__':
+                match = None
+                for r in supplier_regex:
+                    m = re.search(r, url)            
+                    if m:
+                        match = m.group(1)
+                        break
+                if match in dict_of_urls_to_process:
+                    dict_of_urls_to_process[match].append( (ri_name, url) )
+                else:
+                    dict_of_urls_to_process[match] = [ (ri_name, url) ]
             
     pprint(dict_of_urls_to_process)
+
+    print()
+    for source in dict_of_urls_to_process:
+        print(f"S: {str(source).rjust(10)} [{len(dict_of_urls_to_process[source])}]")
+
     return dict_of_urls_to_process
     
-#print_urls_to_process()
+if '-u' in sys.argv:
+    print_urls_to_process()
 
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
