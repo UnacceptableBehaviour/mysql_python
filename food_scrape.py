@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
+import re
 from pprint import pprint
 from pathlib import Path
+import shutil
 import os
+
+from timestamping import hr_readable_from_nix, nix_time_ms
 
 from product_info import ProductInfo
 
@@ -19,13 +23,14 @@ MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,
             MISSING_INGREDIENTS_FILE_JSON_CCM,
             MISSING_INGREDIENTS_FILE_JSON_PY]
 
-MI_FILES = [MISSING_INGREDIENTS_FILE_JSON]
+MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_PY]
             
 # in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
 
 # target
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+NUTRINFO_BACKUP_DIR = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
 URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
 
 # url_cache = {}
@@ -34,8 +39,63 @@ URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab
 #         content = f.read()
 #         url_cache = json.loads(content)
 
+def backup_file_with_nix_timestamp(file_path, backup_dir=NUTRINFO_BACKUP_DIR):
+    print("backup_product_nutrition_info_nix_time - - - -  S")
+    #hr_readable_from_nix, nix_time_ms
+    nutri_file = Path(file_path).name
+    print(nutri_file)
+    nix_t=nix_time_ms()
+    backup_name = f"{hr_readable_from_nix(nix_t).replace(' ','_')}_{nix_t}_{nutri_file}"
+    print(backup_name)
+    bu_target = backup_dir.joinpath(backup_name)
+    print(bu_target)
+    shutil.copyfile(file_path, bu_target)
+    print("backup_product_nutrition_info_nix_time - - - -  e")
+
+
+def get_outstanding_urls_to_process_from_atomicLUT():
+    dict_of_urls_to_process = {}
+    
+    supplier_regex = [  
+      r'(sainsburys)',  # sbs
+      r'(morrisons)',   # mrs
+      r'(tesco)',       # tsc
+      r'(waitrose)',    # wtr
+      r'(coop)',        # cop
+      r'(asda)',        # asd
+      r'(ocado)',       # ocd
+      r'(booker)',      # bkr
+      r'(aldi)'         # ald
+    ]
+    
+    for ri_name in atomic_LUT:
+        url = atomic_LUT[ri_name]['url']
+        if url:
+            if atomic_LUT[ri_name]['ingredients'] == '__igdts__':
+                match = None
+                for r in supplier_regex:
+                    m = re.search(r, url)            
+                    if m:
+                        match = m.group(1)
+                        break
+                if match in dict_of_urls_to_process:
+                    dict_of_urls_to_process[match].append( (ri_name, url) )
+                else:
+                    dict_of_urls_to_process[match] = [ (ri_name, url) ]
+            
+    pprint(dict_of_urls_to_process)
+
+    print()
+    for source in dict_of_urls_to_process:
+        print(f"S: {str(source).rjust(10)} [{len(dict_of_urls_to_process[source])}]")
+
+    return dict_of_urls_to_process
+
 
 if __name__ == '__main__':
+
+    backup_file_with_nix_timestamp(NUTRIENT_FILE_PATH)
+    sys.exit(0)
 
     # TODO - catch file corrupt exception
     urls_to_process = {}
@@ -127,6 +187,16 @@ if __name__ == '__main__':
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
         print('= = = Running scrape tests = = =')
+
+    elif '-a' in sys.argv: # use atomicLUT as source        
+        utp = get_outstanding_urls_to_process_from_atomicLUT()
+        # S: sainsburys [259]
+        # S:      tesco [4]
+        # S:  morrisons [28]
+        # S:       asda [3]
+        for ri_name, url in utp['sainsburys']:
+            urls_to_process[ri_name] = url
+
     else:
         # BUILD list URLS for missing items
         for i in ingredents_to_find:
