@@ -1523,7 +1523,7 @@ def build_chicken_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PORK
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pork_basic = {'pork','carvery pork','pork belly','british pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
+pork_basic = {'pork','pork fat','carvery pork','pork belly','british pork belly','roast pork','trotters','pigs trotters','pigs ears','roast peppered pork loin',
               'pork ribs','pork_alt loin','pork_alt chop','pork tenderloin','pork shoulder chop','pork shoulder','pork leg',
               'pigs cheeks','pig cheeks','pigs cheeks oyesters','osso buco','pigs hock','spare ribs','rack of ribs','bacon',
               'cured pork','pork sausage','ham','gelatine sheets'
@@ -1573,12 +1573,13 @@ def build_pork_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # BEEF
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-beef_basic = {'beef','shortribs','roast beef','beef silverside w&s','sbs ttd beef steak burger','beef burger','beef stock cube',
+beef_basic = {'beef','shortribs','roast beef','beef silverside w&s','beef fat','beef burger','beef stock cube',
               'mrs beef stock cube as prepared','beef stock','mrs beef stock cube','5% beef mince','12% beef mince','15% beef mince',
               '20% beef mince','5% minced beef','12% minced beef','15% minced beef','20% minced beef','beef brisket','beef fillet',
               'flat iron steak','rump steak','sirloin steak','fillet steak','ribeye','ribeye steak','forerib','forerib joint',
               'beef joint','silverside','topside','top rump','ox cheek','beef shin','oxtail','beef meatballs','beef sausages',
-              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak','gelatine powder','aldi beef trimmings'}
+              'diced beef','stewing beef','casserole steak','braising steak','beef flank','hanger steak','gelatine powder',
+              'sbs ttd beef steak burger','aldi beef trimmings'}
 
 # usually product of some type katsuobushi or fish sauce for example
 beef_derived_no_recipe =  {'shredded beef'}
@@ -1615,7 +1616,7 @@ def build_beef_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # LAMB
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-lamb_basic = {'lamb','hogget','mutton','roast lamb shoulder','lamb shoulder','lamb leg','lamb shank','lamb leg kabob',
+lamb_basic = {'lamb','lamb fat','hogget','mutton','roast lamb shoulder','lamb shoulder','lamb leg','lamb shank','lamb leg kabob',
               'lamb leg kabab','roast leg lamb lean','lamb chop lean','lamb chops lean','lamb chop wfat','lamb chops wfat',
               'barnsley chop','lamb chop rounds','diced lamb','lambs liver','lamb neck','rack of lamb','lamb cutlets',
               'leg of lamb','roast lamb','roast leg of lamb','lamb rump','lamb breast','lamb belly','lamb flank',
