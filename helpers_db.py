@@ -54,6 +54,9 @@ class DBAccessKeyError(DBHelperError):
     '''Key not in DB'''
     pass
 
+class DBWriteError(DBHelperError):
+    '''Key not in DB'''
+    pass
 
 from food_sets import IGD_TYPE_DERIVED
 
@@ -740,7 +743,7 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         commit_User_DB()
         return user_db[uuid]
 
-    except e:
+    except DBWriteError as e:
         raise('What could possibly go wrong!?', e)
 
 # DATABASE_URL
