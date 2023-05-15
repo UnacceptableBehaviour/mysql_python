@@ -40,17 +40,19 @@ URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab
 #         url_cache = json.loads(content)
 
 def backup_file_with_nix_timestamp(file_path, backup_dir=NUTRINFO_BACKUP_DIR):
-    print("backup_product_nutrition_info_nix_time - - - -  S")
-    #hr_readable_from_nix, nix_time_ms
     nutri_file = Path(file_path).name
-    print(nutri_file)
-    nix_t=nix_time_ms()
+    nix_t = nix_time_ms()
     backup_name = f"{hr_readable_from_nix(nix_t).replace(' ','_')}_{nix_t}_{nutri_file}"
-    print(backup_name)
     bu_target = backup_dir.joinpath(backup_name)
-    print(bu_target)
-    shutil.copyfile(file_path, bu_target)
-    print("backup_product_nutrition_info_nix_time - - - -  e")
+    try:
+        shutil.copyfile(file_path, bu_target)
+        print(f"\n\nBACKED UP {file_path.name} to:\n{bu_target}\n")
+    except Exception as e:
+        print(f"\n\n* * * WARNING * * *\n\nBackup failed: {bu_target}\n")
+        print(e)
+        print("* * * WARNING * * *\n\n")
+
+    return (bu_target)
 
 
 def get_outstanding_urls_to_process_from_atomicLUT():
