@@ -16,12 +16,15 @@ from food_sets import follow_alias
 import json
 
 # missing ingreidient list sources
+from food_sets import OTS_INGREDIENTS_FOUND # check format is compatible and integrate it into items to scrape
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
 MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,
             MISSING_INGREDIENTS_FILE_JSON_CCM,
-            MISSING_INGREDIENTS_FILE_JSON_PY]
+            MISSING_INGREDIENTS_FILE_JSON_PY,
+            #OTS_INGREDIENTS_FOUND
+            ]
 
 MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_PY]
             
@@ -93,11 +96,45 @@ def get_outstanding_urls_to_process_from_atomicLUT():
 
     return dict_of_urls_to_process
 
+CACHED_NUTRINFO_ENTRIES = {}
+def build_cached_nutrinfo_entries():
+    print("- - - Building: CACHED_NUTRINFO_ENTRIES:")
+    duplicates = 0
+    content = ''
+    with NUTRIENT_FILE_PATH.open('r') as f:
+        #content = f.readlines()
+        content = f.read()
+    
+    content_copy = content
+
+    for m in re.finditer( r'------------------ for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
+        component, ndb_no_url_alias, ingredients, igdt_type = m.group(1).strip(), m.group(2).strip(), m.group(3).strip(), m.group(4).strip()
+        if component == '': continue
+        
+        component_match_string = m.group(0)
+        
+        if component in CACHED_NUTRINFO_ENTRIES:
+            duplicates += 1
+            if CACHED_NUTRINFO_ENTRIES[component] == component_match_string:
+                print(f"\nDuplicate found: [{component}] removing item")
+                content_copy = content_copy.replace(component_match_string, '', 1)
+            else:
+                print(f"\nDuplicate found: [{component}]\n{CACHED_NUTRINFO_ENTRIES[component]}\n{component_match_string}\n\n")
+        else:
+            CACHED_NUTRINFO_ENTRIES[component] = component_match_string
+
+    print(f"- - - Finished Building: CACHED_NUTRINFO_ENTRIES: [{len(CACHED_NUTRINFO_ENTRIES)}] entries. [{duplicates}] duplicates found")
+
+    with open(NUTRIENT_FILE_PATH, 'w') as f:
+        f.write(content_copy)
+
+
 
 if __name__ == '__main__':
 
-    backup_file_with_nix_timestamp(NUTRIENT_FILE_PATH)
-    sys.exit(0)
+    build_cached_nutrinfo_entries()
+
+    backup_file_with_nix_timestamp(NUTRIENT_FILE_PATH)    
 
     # TODO - catch file corrupt exception
     urls_to_process = {}
@@ -184,7 +221,17 @@ if __name__ == '__main__':
         # - - - - - - 
         urls_to_process = [ ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
                             ('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
-                            ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g')
+                            ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g'),
+                            ('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), # 404 - should open a search page with name, allow new URL to be entered but 'macsween haggis' CORRECT!
+                            ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), # suspect trying to round 'energy': '514 kcal '  ERROR: nutrient_string = nutrient_string + f"{nut}".ljust(20)+"\t"+f"{ round(val, 0) }".rjust(10)+"\n" - TypeError: type str doesn't define __round__ method
+                            ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),                            # similar to ^
+                            ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),  # similar to ^
+                            ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),                            # similar to ^
+                            ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),                # similar to ^
+                            ('',''),
+                            ('',''),
+                            ('',''),
+                            ('',''),
                             ]
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
@@ -221,41 +268,54 @@ if __name__ == '__main__':
                     json.dump(urls_to_process, f)
 
 
-
     for name,url in urls_to_process.items():        
         
-        print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
-        print(url)
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
-        
-        if url == '': continue
+        item = None
 
-        yn = input(f'FIND info for "{name}"? y/n - RET to skip\n')
-        if str(yn).lower() == 'n': sys.exit(0)
-        if str(yn).lower() == '': continue
+        while True:
+            print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
+            print(url)
+            print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
+            
+            if url == '': continue
 
-        print(f"Getting: {url}")        
-        item = ProductInfo(name, url)        
-        nutrinfo_text = item.nutrinfo_str()
+            yn = input(f'FIND info for "{name}"? y/n \n- n to skip\nRET to get info\n')
+            if str(yn).lower() == 'n': break
+            #if str(yn).lower() == '': continue
+            if 'http' in yn: url = yn
 
-        print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
-        print(item)
-        print('- - - - - - - - -')
-        print(nutrinfo_text)
-        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
+            print(f"Getting: {url}")        
+            item = ProductInfo(name, url)        
+            nutrinfo_text = item.nutrinfo_str()
+
+            print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+            print(item)
+            print('- - - - - - - - -')
+            print(nutrinfo_text)
+            print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
+
+            #if item['nutrition_info']['energy'] != 0: break
+            #pprint(item)
+            #pprint(item.nutrition_info['energy'])
+            if item.nutrition_info['energy'] != 0: break
 
         if item:
-            yn = input(f"SAVE info for > {item.ri_name} <? y/n - RET to skip\n")
-            if str(yn).lower() == 'y':            
+            yn = input(f"SAVE info for > {item.ri_name} <? y/n - n to skip\nRET to SAVE\n")
+            if str(yn).lower() == '':            
                 # with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
                 #     url_cache[item.product_url] = json.dumps(str(item))
                 #     f.write(json.dumps(url_cache))
-                
                 with open(NUTRIENT_FILE_PATH, 'r') as f:
                     content = f.read()
                 
-                insert_nutridata = '__insert_from_food_scrape__\n\n' + nutrinfo_text
-                content = content.replace('__insert_from_food_scrape__', insert_nutridata)
+                if name in atomic_LUT:
+                    target_rcp = CACHED_NUTRINFO_ENTRIES[name]
+                    content = content.replace(target_rcp, nutrinfo_text, 1)
+                    print(f"\n\n== ri_name: {name}\n---\n{target_rcp}\n---\n")
+
+                else: # new ingredient
+                    insert_nutridata = '__insert_from_food_scrape__\n\n' + nutrinfo_text
+                    content = content.replace('__insert_from_food_scrape__', insert_nutridata)
                 
                 with open(NUTRIENT_FILE_PATH, 'w') as f:
                     f.write(content)
