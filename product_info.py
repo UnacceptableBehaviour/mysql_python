@@ -156,7 +156,7 @@ class ProductInfo:
 
             return(default_col)
         
-        def remove_less_than(str_g):            
+        def remove_g_and_less_than(str_g):            
             if '&lt;' in str_g:
                 return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
              
@@ -332,18 +332,28 @@ class ProductInfo:
                 row_data.append(cols)
                 for n_type, n_regex in nut_regex.items():
                     if re.search(n_regex, cols[0].lower()):
-                        self.nutrition_info[n_type] = cols[col_100]
+                        #self.nutrition_info[n_type] = cols[col_100]
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
-                            m = re.search(r'(\d+)\s*kj', cols[col_100].lower())
-                            # could use - and dispense with calc?
-                            #m = re.search(r'(\d+).*kcal', cols[col_100].lower())
+                            e_str = cols[col_100].lower()
+                            # m = re.search(r'(\d+)\s*kj', e_str)     # using kj
+                            # if m:
+                            #     kj_to_kcal = m.group(1)
+                            #     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                            #     self.nutrition_info[n_type] = int(kj_to_kcal)
+                            
+                            m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
-                                kj_to_kcal = m.group(1)
-                                kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
-                                self.nutrition_info[n_type] = kj_to_kcal
+                                kcal = m.group(1)                                
+                                self.nutrition_info[n_type] = int(kcal)
+                            else:
+                                print(f"\tenergy: NO MATCH:{e_str}")
+                                if 'kj' in e_str:                                    
+                                    kj_to_kcal = e_str.replace('kj','').strip()
+                                    kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                                    self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_less_than(cols[col_100])
+                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
                     
