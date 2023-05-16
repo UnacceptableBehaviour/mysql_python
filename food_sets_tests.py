@@ -345,7 +345,12 @@ if __name__ == '__main__':
         # 'aldi lrg beef yorkie',
         # 'sbs greek yogurt',
         # 'white chocolate cookies',
-        #'haricot beans',               # recursion test self referencing ingredient    
+        #'haricot beans',               # recursion test self referencing ingredient 
+        'sbs bakewell tarts',
+        'cumberland sausage',
+        'veg stock'         # weird symbols in i_list # https://www.sainsburys.co.uk/gol-ui/product/knorr-stock-cubes--vegetable-x8-80g
+        'actimel veg',      # weird symbols in i_list # https://www.sainsburys.co.uk/gol-ui/product/actimel-strawberry-yogurt-12x100g
+        '',
     ]
     derived_check = [
         '',
