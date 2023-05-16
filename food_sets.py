@@ -2057,7 +2057,7 @@ if __name__ == '__main__':
         print(f"\nget_allergens_for: {c}")
         composite = get_ingredients_as_text_list_R(c)
         i_list = composite['i_list']
-        print(get_allergens_for(gi_list, sp))
+        print(get_allergens_for(i_list, sp))
         
     def tag_test(c, sp):
         #dbg_i_list_as_text_from_component_name(c)
