@@ -459,6 +459,7 @@ class ProductInfo:
 
             # find which column the per 100g/ml is 
 
+        # - - - - Helpers factor out where generic - - - S
         # TODO factor out
         def get_nutr_per_100g_col(table_header, default_col=1):
             col_100 = None
@@ -469,18 +470,19 @@ class ProductInfo:
 
             return(default_col)
         
-        # TODO factor out
         def remove_g_and_less_than(str_g):            
             if '&lt;' in str_g:
                 return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
              
             return( round(float(str_g.lower().replace('g', '')), 2) )
+        # - - - - Helpers factor out where generic - - - E
         
-        
+        # register driver
         if ProductInfo.tsc_driver == None:
             ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')        
         driver = ProductInfo.tsc_driver
 
+        # remove cookie request
         delay_in_seconds = 3
         time_out_inSec = 20  
         driver.get(self.product_url)
@@ -498,9 +500,10 @@ class ProductInfo:
                 print('CLICKED cookie_button')
             except TimeoutException:
                 print("Loading took too much time!")
-        
 
-        try:    # wait content load
+        # wait content load
+        # TODO H - get info at same time as wait load
+        try:
             # <h1 class="product-details-tile__title">Tesco Black Turtle Beans 500G</h1>
             css_selector = 'h1.product-details-tile__title'
             print(f'# # #> waiting for Title & QTY: {css_selector}')
@@ -512,8 +515,11 @@ class ProductInfo:
             print(exp)
             print('Title NOT FOUND')
         
-        # self.product_name = ''
+        
+        # self.product_name             Sainsbury's British Semi Skimmed Milk
+        # self.alt_package_in_g         (1.13L) 2 pint        
         # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
+        #
         # >TAG: <h1>
         # class: pd__header <
         # data-test-id: pd-product-title <
@@ -557,7 +563,8 @@ class ProductInfo:
             print(exp)
             print('self.product_name NOT found!')         
         
-        # self.price_per_package  = 0.0
+        # self.price_per_package            £5.50 £2.21/kg  - can appear together
+        #                                     ^^
         # <div aria-label="£1.80 was £2.40">£1.80</div
         # <div data-test-id="pd-retail-price" class="pd__cost__total--promo undefined"><div aria-hidden="true"><span data-test-id="offer-original-price" class="pd__cost__original" aria-label="original price">£2.40</span></div><div aria-label="£1.80 was £2.40">£1.80</div></div>
         # <div aria-label="65p was undefined">65p</div>
@@ -584,10 +591,51 @@ class ProductInfo:
             print(exp)
             print('self.price_per_measure NOT found!')
 
+        # collect product info          description, package size, ingredients, manufacturer, packaging, etc
+        # list of PAIRS of h3.productDataItemHeader and div.productText 
+
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+        # >>> pprint(list)
+        # [<selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="227f94ae-f2ef-4547-a3fe-15004956af84")>,
+        #  <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="2394d653-8540-46de-896e-3873afb77ff4")>,
+        # .
+        # .
+        # <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="e1574eb0-b607-4a3e-90e5-4e3b7acc38df")>]
+        # >>> list[0].text
+        # 'Description'
+        # >>> list[1].text
+        # 'Cured pork salami seasoned with pepper & garlic.\n  Lightly seasoned with pepper & garlic. \nA traditional Italian salami, produced in the heart of Italy with Italian pork.  \n  Great as part of an Italian inspired charcuterie platter or why not try using as an ingredient on a Pizza to provide a delicate and meaty taste.'
+        # >>> list[2].text
+        # 'Nutrition'
+        # >>> list[3].text
+        # 'Per 4 slices Typical Values\nENERGY\n342kJ\n82kcal\n4%\nFAT\n6.6g\n9%\nSATURATES\n2.5g\n13%\nSUGARS\n<0.5g\n<1%%\nSALT\n0.82g\n14%\n% of the Reference Intakes\nTypical Values Per 100g : Energy 1591 kJ/383 kcal\nRI= Reference intake of an average adult (8400 kJ/2000 kcal)\nTable of Nutritional Information\nTypical Values Per 100g  Per 4 slices  % based on RI for Average Adult\nEnergy 1591kJ 342kJ -\n383kcal 82kcal 4%\nFat 30.7g 6.6g 9%\nSaturates 11.5g 2.5g 13%\nMono-unsaturates 14.7g 3.2g -\nPolyunsaturates 3.1g 0.7g -\nCarbohydrate 1.0g <0.5g -\nSugars <0.5g <0.5g -\nFibre <0.5g <0.5g -\nProtein 25.7g 5.5g 11%\nSalt 3.81g 0.82g 14%\nReference intake of an average adult (8400 kJ / 2000 kcal)\nThis pack contains 4 servings'
+        # >>> list[4].text
+        # 'Ingredients'
+        # >>> list[5].text
+        # 'INGREDIENTS:Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate; Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.\nPackaged in a protective atmosphere'
+        # >>> list[6].text
+        # 'Country of Origin'
+        # >>> list[7].text
+        # "Packed in Italy, Italy for Sainsbury's Supermarkets Ltd, London EC1N 2HT using pork from Italy."
+        # >>> list[8].text
+        # 'Size'
+        # >>> list[9].text
+        # '86g'
+        # >>> list[10].text
+        # 'Storage'
+        # >>> list[11].text
+        # 'For use by date: see front of pack. Keep Refrigerated. Once opened, use within 2 days and do not exceed the use by date. Open pack 15 minutes before serving to allow the flavours to develop'
+        # >>> list[12].text
+        # 'Packaging'
+        # >>> list[13].text
+        # "Don't Recycle base Film\nDon't Recycle top Film\nRecycle base Label"
+        # >>> list[14].text
+        # 'Manufacturer'
+        # >>> list[15].text
+        # "We are happy to replace this item if it is not satisfactory\nSainsbury's Supermarkets Ltd.\n33 Holborn, London EC1N 2HT\nCustomer services 0800 636262"        
 
         item_info = {}
-        try:
-            # list of PAIRS of h3.productDataItemHeader and div.productText 
+        try:            
             e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')  
             elements = iter(e_list)
             for elem in elements:
@@ -607,7 +655,7 @@ class ProductInfo:
             
         except Exception as exp:
             print(exp)
-            print('self.price_per_package NOT found!')
+            print('ERROR processing item_info PAIRS - NOT found!')
 
         print('+>> item_info')
         pprint(item_info)
@@ -630,10 +678,11 @@ class ProductInfo:
         if self.igdt_type == 'atomic':
             print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'")
             self.i_text = '__igdts__'
-
-
+        
         if 'description' in item_info:
             self.product_desc = item_info['description'].text
+
+
 
         print('- - - - - - - nutrition - - - - - - - S')
         # <table class="nutritionTable">
@@ -701,68 +750,13 @@ class ProductInfo:
                             self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
-                    
-
             
         except Exception as exp:
             print(exp)
-            print('self.price_per_measure NOT found!')
+            print('ERROR processing nutrition table - NOT found!')
         
         print('- - - - - - - nutrition - - - - - - - E')
 
-        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
-        # >>> pprint(list)
-        # [<selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="227f94ae-f2ef-4547-a3fe-15004956af84")>,
-        #  <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="2394d653-8540-46de-896e-3873afb77ff4")>,
-        # .
-        # .
-        # <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="e1574eb0-b607-4a3e-90e5-4e3b7acc38df")>]
-        # >>> list[0].text
-        # 'Description'
-        # >>> list[1].text
-        # 'Cured pork salami seasoned with pepper & garlic.\n  Lightly seasoned with pepper & garlic. \nA traditional Italian salami, produced in the heart of Italy with Italian pork.  \n  Great as part of an Italian inspired charcuterie platter or why not try using as an ingredient on a Pizza to provide a delicate and meaty taste.'
-        # >>> list[2].text
-        # 'Nutrition'
-        # >>> list[3].text
-        # 'Per 4 slices Typical Values\nENERGY\n342kJ\n82kcal\n4%\nFAT\n6.6g\n9%\nSATURATES\n2.5g\n13%\nSUGARS\n<0.5g\n<1%%\nSALT\n0.82g\n14%\n% of the Reference Intakes\nTypical Values Per 100g : Energy 1591 kJ/383 kcal\nRI= Reference intake of an average adult (8400 kJ/2000 kcal)\nTable of Nutritional Information\nTypical Values Per 100g  Per 4 slices  % based on RI for Average Adult\nEnergy 1591kJ 342kJ -\n383kcal 82kcal 4%\nFat 30.7g 6.6g 9%\nSaturates 11.5g 2.5g 13%\nMono-unsaturates 14.7g 3.2g -\nPolyunsaturates 3.1g 0.7g -\nCarbohydrate 1.0g <0.5g -\nSugars <0.5g <0.5g -\nFibre <0.5g <0.5g -\nProtein 25.7g 5.5g 11%\nSalt 3.81g 0.82g 14%\nReference intake of an average adult (8400 kJ / 2000 kcal)\nThis pack contains 4 servings'
-        # >>> list[4].text
-        # 'Ingredients'
-        # >>> list[5].text
-        # 'INGREDIENTS:Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate; Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.\nPackaged in a protective atmosphere'
-        # >>> list[6].text
-        # 'Country of Origin'
-        # >>> list[7].text
-        # "Packed in Italy, Italy for Sainsbury's Supermarkets Ltd, London EC1N 2HT using pork from Italy."
-        # >>> list[8].text
-        # 'Size'
-        # >>> list[9].text
-        # '86g'
-        # >>> list[10].text
-        # 'Storage'
-        # >>> list[11].text
-        # 'For use by date: see front of pack. Keep Refrigerated. Once opened, use within 2 days and do not exceed the use by date. Open pack 15 minutes before serving to allow the flavours to develop'
-        # >>> list[12].text
-        # 'Packaging'
-        # >>> list[13].text
-        # "Don't Recycle base Film\nDon't Recycle top Film\nRecycle base Label"
-        # >>> list[14].text
-        # 'Manufacturer'
-        # >>> list[15].text
-        # "We are happy to replace this item if it is not satisfactory\nSainsbury's Supermarkets Ltd.\n33 Holborn, London EC1N 2HT\nCustomer services 0800 636262"        
-        
-        # self.package_in_g = 0.0
-        # TODO - extract from end of self.product_name ??
-        # or
-        # <h3 class="productDataItemHeader">Size</h3> 
-        #     <div class="productText">
-        #         <p>500g</p>
-        #     </div>
-        # or
-        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
-        # >>> list[8].text
-        # 'Size'
-        # >>> list[9].text
-        # '86g'
         
         
         # self.price_per_measure  = 0.0
@@ -784,7 +778,7 @@ class ProductInfo:
             self.supplier_item_code = e.text.strip()
         except Exception as exp:
             print(exp)
-            print('self.price_per_measure NOT found!')                    
+            print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Tesco'
 
