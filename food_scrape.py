@@ -14,6 +14,7 @@ from product_info import ProductInfo
 
 from food_sets import atomic_LUT
 from food_sets import follow_alias 
+from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
 import json
 
 # missing ingreidient list sources
@@ -247,17 +248,30 @@ if __name__ == '__main__':
         urls_to_process = [ #('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
                             #('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
                             #('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g'),
-                            #('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), # 404 - should open a search page with name, allow new URL to be entered but 'macsween haggis' CORRECT!
-                            ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), # suspect trying to round 'energy': '514 kcal '  ERROR: nutrient_string = nutrient_string + f"{nut}".ljust(20)+"\t"+f"{ round(val, 0) }".rjust(10)+"\n" - TypeError: type str doesn't define __round__ method
-                            ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),                            # similar to ^
-                            ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),  # 404 
-                            ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),                            # similar to ^
-                            ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),                # similar to ^
-                            # ('',''),
-                            # ('',''),
-                            # ('',''),
-                            # ('',''),
+                            #('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), 
+                            # ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), 
+                            # ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),
+                            # ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),
+                            # ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),
+                            # ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),
                             ]
+        urls_to_process = [ ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
+                            ('black turtle beans','https://www.tesco.com/groceries/en-GB/products/256530942'), # frist address
+                            ('tsc chicken roll','https://www.tesco.com/groceries/en-GB/products/299955420'),
+                            ('pork ribs','https://www.tesco.com/groceries/en-GB/products/281085768'),
+                            ('chicken stock cubes',''),
+                            ('soy sauce',''),
+                            ('veg oil',''),
+                            ('large medjool dates',''),                            
+                            ('roquefort',''),
+                            ('anchovies',''),
+                            ('salted cashews',''),
+                            ('smoked mackerel fillet',''),
+                            ('smoked mackerel',''),
+                            ('',''),
+                            ('',''),                                                        
+                            #('smoked ham','https://groceries.aldi.co.uk/en-GB/p-cooked-smoked-ham-400g/5027951005828'), # horendous multiple products in single list: Cooked Ham Trimmings, Smoked Ham Trimmings, Peppered Ham Trimmings, Smoke Breaded Ham Trimmings & Honey Roasted Ham Trimmings Ingreadients back to back W/O punctuation!
+                            ]        
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
         print('= = = Running scrape tests = = =')
@@ -280,8 +294,8 @@ if __name__ == '__main__':
             if url:
                 urls_to_process[i] = url
             else: # ask user
-                search_url = i.replace(' ','%20')
-                default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_url}"
+                search_for = i.replace(' ','%20')
+                default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
                 os.system(f'open {default}')
                 url = input(f'\nEnter URL for "{i}"? y/n - RET to skip\n')                
                 if str(url).lower() == '': continue
@@ -306,19 +320,29 @@ if __name__ == '__main__':
             print(url)
             print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
             
-            if url == '': continue
+            #if url == '': continue
 
             if not opt_no_prompt:
                 yn = input(f'FIND info for "{name}"? y/n \n- n to skip\nRET to get info\n')
                 if str(yn).lower() == 'n': break
                 if 'http' in yn: url = yn
-                if 's' == yn: 
-                    search_url = name.replace(' ','%20')
-                    default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_url}"
+                if 's' == yn:                     
+                    # if 'sainsburys' in url:
+                    #     search_for = name.replace(' ','%20')
+                    #     sbs_search = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
+                    # if 'tesco' in url:
+                    #     search_for = name.replace(' ','%20')
+                    #     tsc_search = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
+                    # if 'aldi' in url
+                    #     search_for = name.replace(' ','+')
+                    #     ald_search = f"https://groceries.aldi.co.uk/en-GB/Search?keywords={search_for}"                    
+                    search_for = name.replace(' ','%20')
+                    default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
                     os.system(f'open {default}')                
 
-            print(f"Getting: {url}")        
-            item = ProductInfo(name, url)        
+            igdt_type = atomic_LUT[name]['igdt_type']
+            print(f"Getting [{name}][{igdt_type}] from: {url}")        
+            item = ProductInfo(name, url, igdt_type)        
             nutrinfo_text = item.nutrinfo_str()
 
             print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')

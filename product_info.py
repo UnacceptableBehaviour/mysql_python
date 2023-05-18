@@ -56,13 +56,15 @@ class ProductInfo:
         return { k: 0.0 for k,v in ProductInfo.nutrition_symbol_to_regex.items() }
 
                     
-    def __init__(self, name, url):
+    def __init__(self, name, url, igdt_type):
         self.ri_name            = name  # nick_name
+        self.igdt_type          = igdt_type
         self.product_name       = ''
         self.price_per_package  = 0.0
+        self.units              = '?'               # g, kg, l, ml, ea (each)     [all lower case]
         self.package_in_g       = 0.0
-        self.alt_package_in_g   = 0.0
-        self.price_per_measure  = 0.0
+        self.alt_package_in_g   = 0.0               # unprocess txt string 
+        self.price_per_measure  = 0.0               # price per measurement unit
         self.supplier_item_code = ''
         self.product_url        = url
         self.supplier_name      = ''
@@ -103,7 +105,7 @@ class ProductInfo:
         
         nutrient_string = nutrient_string +  "Total (100g)".rjust(60)+"\n"
         
-        nutrient_string_to_file = f"\n\n{nutrient_string}ingredients: {self.i_text}\nigdt_type: ots"
+        nutrient_string_to_file = f"\n\n{nutrient_string}ingredients: {self.i_text}\nigdt_type: {self.igdt_type}"
             
         return (nutrient_string_to_file)
 
@@ -131,10 +133,6 @@ class ProductInfo:
                 #print(f"Text: {e.text} <")
                 pprint(e)
                 # print(f"{}")
-                # print(f"{}")
-                # print(f"{}")
-                # print(f"{}")
-                # print(f"{}")
             
         except Exception as exp:
             print('Expetion S')
@@ -147,6 +145,7 @@ class ProductInfo:
         print(f"scraping SAINSBURIES: {self.product_url}")        
             # find which column the per 100g/ml is 
 
+        # - - - - Helpers factor out where generic - - - S
         def get_nutr_per_100g_col(table_header, default_col=1):
             col_100 = None
             head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S)
@@ -161,12 +160,14 @@ class ProductInfo:
                 return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
              
             return( round(float(str_g.lower().replace('g', '')), 2) )
+        # - - - - Helpers factor out where generic - - - E
         
-        
+        # register driver
         if ProductInfo.sbs_driver == None:
             ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
         driver = ProductInfo.sbs_driver
 
+        # remove cookie request
         delay_in_seconds = 3    
         driver.get(self.product_url)
 
@@ -190,7 +191,8 @@ class ProductInfo:
                 print(exp)
                 print('cookie_button NOT clicked')
 
-        try:    # wait content load
+        # wait content load
+        try:    
             css_selector = 'h3.productDataItemHeader, h3.itemHeader'
             print(f'# # #> waiting for h3 tags: {css_selector}')
             h3_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
@@ -201,7 +203,9 @@ class ProductInfo:
             print(exp)
             print('Ingredients NOT FOUND')
         
-        # self.product_name = ''
+        # self.product_name             Sainsbury's British Semi Skimmed Milk
+        # self.alt_package_in_g         (1.13L) 2 pint
+        #
         # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
         # >TAG: <h1>
         # class: pd__header <
@@ -230,7 +234,8 @@ class ProductInfo:
             print(exp)
             print('self.product_name NOT found!')         
         
-        # self.price_per_package  = 0.0
+        # self.price_per_package            £5.50 £2.21/kg  - can appear together
+        #                                     ^^
         # <div aria-label="£1.80 was £2.40">£1.80</div
         # <div data-test-id="pd-retail-price" class="pd__cost__total--promo undefined"><div aria-hidden="true"><span data-test-id="offer-original-price" class="pd__cost__original" aria-label="original price">£2.40</span></div><div aria-label="£1.80 was £2.40">£1.80</div></div>
         # <div aria-label="65p was undefined">65p</div>
@@ -240,14 +245,16 @@ class ProductInfo:
             css_selector = 'div[data-test-id="pd-retail-price"]'
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
             self.price_per_package = e.text.strip()
-            self.package_in_g = 9999
+            self.package_in_g = 99999999
         except Exception as exp:
             print(exp)
             print('self.price_per_package NOT found!')
 
+
+        # collect product info          description, ingredients, manufacturer, packaging
+        # list of PAIRS of h3.productDataItemHeader and div.productText 
         item_info = {}
-        try:
-            # list of PAIRS of h3.productDataItemHeader and div.productText 
+        try:            
             e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')  
             elements = iter(e_list)
             for elem in elements:
@@ -285,10 +292,16 @@ class ProductInfo:
             self.i_text       = item_info['ingredients'].text
         
         if self.i_text == '':
-            print('- - -: * * * INGREDIENTS NOT FOUND')
+            print('- - -: * * * INGREDIENTS NOT FOUND')            
+
+        if self.igdt_type == 'atomic':
+            print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'")
+            self.i_text = '__igdts__'
         
         if 'description' in item_info:
             self.product_desc = item_info['description'].text
+
+
 
         print('- - - - - - - nutrition - - - - - - - S')
         # <table class="nutritionTable">
@@ -477,12 +490,346 @@ class ProductInfo:
 
     def scrape_morrisons(self):
         print(f"scraping MORRISONS: {self.product_url}")        
-        
+
+
+
+
+
+
     def scrape_tesco(self):
         print(f"scraping TESCO: {self.product_url}")
-        driver = webdriver.Chrome('chromedriver')        
-        delay_in_seconds = 3    
+
+            # find which column the per 100g/ml is 
+
+        # TODO factor out
+        def get_nutr_per_100g_col(table_header, default_col=1):
+            col_100 = None
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S)
+            for col,text in enumerate(head_cols):
+                col_100 = col
+                if re.search(r'100[gml]+', text): return(col_100)
+
+            return(default_col)
+        
+        # TODO factor out
+        def remove_g_and_less_than(str_g):            
+            if '&lt;' in str_g:
+                return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
+             
+            return( round(float(str_g.lower().replace('g', '')), 2) )
+        
+        
+        if ProductInfo.tsc_driver == None:
+            ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')        
+        driver = ProductInfo.tsc_driver
+
+        delay_in_seconds = 3
+        time_out_inSec = 20  
         driver.get(self.product_url)
+
+        allow_cookies_btn_class = '.beans-cookies-notification__button'
+        if ProductInfo.tsc_cookie_barrier:                        
+            try:
+                # ALL work
+                # using a class
+                print(f'try cookie_button w WAIT: {time_out_inSec}')
+                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
+                WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
+                # using XPath w text content
+                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
+                print('CLICKED cookie_button')
+            except TimeoutException:
+                print("Loading took too much time!")
+        
+
+        try:    # wait content load
+            # <h1 class="product-details-tile__title">Tesco Black Turtle Beans 500G</h1>
+            css_selector = 'h1.product-details-tile__title'
+            print(f'# # #> waiting for Title & QTY: {css_selector}')
+            h_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+            print(f'# # #> found:\n{h_tags.text.strip()}')
+        except TimeoutException:
+            print("Waiting for Title took too much time!")
+        except Exception as exp:
+            print(exp)
+            print('Title NOT FOUND')
+        
+        # self.product_name = ''
+        # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
+        # >TAG: <h1>
+        # class: pd__header <
+        # data-test-id: pd-product-title <
+        # Text: Sainsbury's Pearl Barley 500g <
+        #
+        # replace(' - Tesco Groceries')
+        # get QTY
+        # qty_rgx = r'(\d+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l)\s*(?:(\/)?\d+\s*Pint(s)?)?'
+        # Tesco Black Turtle Beans 500G - Tesco Groceries
+        # Tesco Pork Individual Ribs 700G - Tesco Groceries
+        # Tesco Pure Sunflower Oil 5 Litre - Tesco Groceries
+        # Tesco Tomato Puree Tube 200G - Tesco Groceries
+        # Hask Argan Oil 5 In 1 Leave In Conditioner 175Ml - Tesco Groceries
+        # Tesco British Semi Skimmed Milk 2.272L 4 Pints - Tesco Groceries
+        # The Original Oatly Light Oat Drink 1 Litre - Tesco Groceries
+        # Cravendale Semi Skimmed Milk 2 Litre - Tesco Groceries
+        # Tesco Semi Skimmed Milk 1.13L/2 Pints - Tesco Groceries
+        # Tesco Semi Skimmed Longlife Milk 6X1l - Tesco Groceries
+        # Tesco Semi Skimmed Milk 568Ml/1 Pint - Tesco Groceries
+        # Tesco Filtered Semi Skimmed Milk 2 Litre - Tesco Groceries
+        # Tesco Organic Fair Trade Bananas 5 Pack - Tesco Groceries
+        # Bananas Loose - Tesco Groceries
+        # Tesco Pink Lady Apple Minimum 5 Pack - Tesco Groceries
+        # Rosedene Farms Gala Apples 6 Pack - Tesco Groceries
+        # Large Pink Lady Apples Class 1 Loose - Tesco Groceries
+        # Granulated Sugar 1Kg
+        # Heinz Baked Beans In Tomato Sauce 6 X 415
+        # Tesco No Added Sugar Cream Soda 330Ml
+        try:
+            css_selector = 'h1.product-details-tile__title' 
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.product_name = e.text.strip()
+            # in case there is no size specified get size from product name            
+            qty_rgx = r'(\d+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l)\s*(?:(\/)?\d+\s*Pint(s)?)?'
+            m = re.search(qty_rgx, self.product_name)
+            if m:
+                self.alt_package_in_g = m.group(1)
+                print(f"QTY: {self.alt_package_in_g} [self.alt_package_in_g]")
+            
+        except Exception as exp:
+            print(exp)
+            print('self.product_name NOT found!')         
+        
+        # self.price_per_package  = 0.0
+        # <div aria-label="£1.80 was £2.40">£1.80</div
+        # <div data-test-id="pd-retail-price" class="pd__cost__total--promo undefined"><div aria-hidden="true"><span data-test-id="offer-original-price" class="pd__cost__original" aria-label="original price">£2.40</span></div><div aria-label="£1.80 was £2.40">£1.80</div></div>
+        # <div aria-label="65p was undefined">65p</div>
+        # <div data-test-id="pd-retail-price" class="pd__cost__total undefined"><div aria-label="65p was undefined">65p</div></div>
+        #                       ^
+        # self.price_per_package    in      price-per-sellable-unit
+        # self.price_per_measure    in      price-per-quantity-weight
+        try:
+            css_selector = '.price-per-sellable-unit'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_package = e.text.strip()
+            self.package_in_g = 9999
+            print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_package NOT found!')
+
+        try:
+            css_selector = '.price-per-quantity-weight'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_measure = e.text.strip()
+            print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')
+
+
+        item_info = {}
+        try:
+            # list of PAIRS of h3.productDataItemHeader and div.productText 
+            e_list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')  
+            elements = iter(e_list)
+            for elem in elements:
+                ne = next(elements)
+                # sometime ingredient all in one element
+                el_text = elem.text #.lower()
+                if re.match(r'ingredient[s]?\b',el_text,re.I):
+                    i_list = re.sub(r'ingredient[s]?\b','',el_text,flags=re.I)
+                    print(f'ingredient - MATCH [{len(i_list)}]\n{el_text}\ni_list>{i_list}<E')
+                    if len(i_list.strip()) > 0:                        
+                        self.i_text = i_list.strip()
+                    else:
+                        item_info[elem.text.lower()] = ne
+                else:
+                    item_info[elem.text.lower()] = ne
+                print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
+            
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_package NOT found!')
+
+        print('+>> item_info')
+        pprint(item_info)
+            
+        if 'size' in item_info:     # not always present
+            self.package_in_g = item_info['size'].text
+        else:
+            self.package_in_g = self.alt_package_in_g
+        
+        print('ingredients  - - - - S')
+        print(f"('ingredients' in item_info): {('ingredients' in item_info)}")
+        print(f"(self.i_text == ''): {(self.i_text == '')}")
+        print('ingredients  - - - - E')
+        if ('ingredients' in item_info) and (self.i_text == ''):
+            self.i_text       = item_info['ingredients'].text
+        
+        if self.i_text == '':
+            print('- - -: * * * INGREDIENTS NOT FOUND')            
+
+        if self.igdt_type == 'atomic':
+            print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'")
+            self.i_text = '__igdts__'
+
+
+        if 'description' in item_info:
+            self.product_desc = item_info['description'].text
+
+        print('- - - - - - - nutrition - - - - - - - S')
+        # <table class="nutritionTable">
+        #     <thead>
+        #         <tr class="tableTitleRow">
+        #         <th scope="col">Typical Values
+        #         (cooked as per instructions)</th><th scope="col">Per 100g&nbsp;</th><th scope="col">Per 80g serving&nbsp;</th><th scope="col">% based on RI for Average Adult</th>
+        #         </tr>
+        #     </thead>
+        #     <tbody>
+        #         <tr class="tableRow1">
+        #             <th scope="row" class="rowHeader" rowspan="2">Energy</th><td class="tableRow1">477kJ</td><td class="tableRow1">381kJ</td><td class="tableRow1">-</td>
+        #         </tr>
+        #         <tr class="tableRow0">
+        #             <td class="tableRow0">113kcal</td><td class="">90kcal</td><td class="">5%</td>
+        #         </tr>
+        #         <tr class="tableRow1">
+        #             <th scope="row" class="rowHeader">Fat</th><td class="tableRow1">&lt;0.5g</td><td class="nutritionLevel1">&lt;0.5g</td><td class="nutritionLevel1">1%</td>
+        #         </tr>
+        #     </tbody>
+        # </table>
+        
+        # item_info['nutrition']
+        nut_regex = ProductInfo.nutrition_symbol_to_regex
+        row_data = []
+        col_100 = 1
+
+        # nutrition tabe
+        try:
+            tb_rows = driver.find_elements(By.CSS_SELECTOR, 'table.nutritionTable tr')
+            rows = iter(tb_rows)
+            tb_head = next(rows)    # first row always col titles
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S) # TODO REMOVE
+            
+            col_100 = get_nutr_per_100g_col(tb_head)
+            
+            print(f"--H: {head_cols}")
+            for row in rows:
+                cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
+                print(f"-R: {cols}")
+                row_data.append(cols)
+                for n_type, n_regex in nut_regex.items():
+                    if re.search(n_regex, cols[0].lower()):
+                        #self.nutrition_info[n_type] = cols[col_100]
+                        if n_type == 'energy':
+                            # in single row:  2143 kJ /<br> 513 kcal or on two rows!
+                            e_str = cols[col_100].lower()
+                            # m = re.search(r'(\d+)\s*kj', e_str)     # using kj
+                            # if m:
+                            #     kj_to_kcal = m.group(1)
+                            #     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                            #     self.nutrition_info[n_type] = int(kj_to_kcal)
+                            
+                            m = re.search(r'(\d+)\s*kcal', e_str)
+                            if m:
+                                kcal = m.group(1)                                
+                                self.nutrition_info[n_type] = int(kcal)
+                            else:
+                                print(f"\tenergy: NO MATCH:{e_str}")
+                                if 'kj' in e_str:                                    
+                                    kj_to_kcal = e_str.replace('kj','').strip()
+                                    kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                                    self.nutrition_info[n_type] = int(kj_to_kcal)
+                        else:
+                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+            
+            pprint(self.nutrition_info)
+                    
+
+            
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')
+        
+        print('- - - - - - - nutrition - - - - - - - E')
+
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+        # >>> pprint(list)
+        # [<selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="227f94ae-f2ef-4547-a3fe-15004956af84")>,
+        #  <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="2394d653-8540-46de-896e-3873afb77ff4")>,
+        # .
+        # .
+        # <selenium.webdriver.remote.webelement.WebElement (session="97f3784a97842e5220dfe009d47e96d0", element="e1574eb0-b607-4a3e-90e5-4e3b7acc38df")>]
+        # >>> list[0].text
+        # 'Description'
+        # >>> list[1].text
+        # 'Cured pork salami seasoned with pepper & garlic.\n  Lightly seasoned with pepper & garlic. \nA traditional Italian salami, produced in the heart of Italy with Italian pork.  \n  Great as part of an Italian inspired charcuterie platter or why not try using as an ingredient on a Pizza to provide a delicate and meaty taste.'
+        # >>> list[2].text
+        # 'Nutrition'
+        # >>> list[3].text
+        # 'Per 4 slices Typical Values\nENERGY\n342kJ\n82kcal\n4%\nFAT\n6.6g\n9%\nSATURATES\n2.5g\n13%\nSUGARS\n<0.5g\n<1%%\nSALT\n0.82g\n14%\n% of the Reference Intakes\nTypical Values Per 100g : Energy 1591 kJ/383 kcal\nRI= Reference intake of an average adult (8400 kJ/2000 kcal)\nTable of Nutritional Information\nTypical Values Per 100g  Per 4 slices  % based on RI for Average Adult\nEnergy 1591kJ 342kJ -\n383kcal 82kcal 4%\nFat 30.7g 6.6g 9%\nSaturates 11.5g 2.5g 13%\nMono-unsaturates 14.7g 3.2g -\nPolyunsaturates 3.1g 0.7g -\nCarbohydrate 1.0g <0.5g -\nSugars <0.5g <0.5g -\nFibre <0.5g <0.5g -\nProtein 25.7g 5.5g 11%\nSalt 3.81g 0.82g 14%\nReference intake of an average adult (8400 kJ / 2000 kcal)\nThis pack contains 4 servings'
+        # >>> list[4].text
+        # 'Ingredients'
+        # >>> list[5].text
+        # 'INGREDIENTS:Pork, Salt, Sugar, Dextrose, White Pepper, Antioxidant: Sodium Ascorbate; Garlic, Preservatives: Potassium Nitrate, Sodium Nitrite.\nPackaged in a protective atmosphere'
+        # >>> list[6].text
+        # 'Country of Origin'
+        # >>> list[7].text
+        # "Packed in Italy, Italy for Sainsbury's Supermarkets Ltd, London EC1N 2HT using pork from Italy."
+        # >>> list[8].text
+        # 'Size'
+        # >>> list[9].text
+        # '86g'
+        # >>> list[10].text
+        # 'Storage'
+        # >>> list[11].text
+        # 'For use by date: see front of pack. Keep Refrigerated. Once opened, use within 2 days and do not exceed the use by date. Open pack 15 minutes before serving to allow the flavours to develop'
+        # >>> list[12].text
+        # 'Packaging'
+        # >>> list[13].text
+        # "Don't Recycle base Film\nDon't Recycle top Film\nRecycle base Label"
+        # >>> list[14].text
+        # 'Manufacturer'
+        # >>> list[15].text
+        # "We are happy to replace this item if it is not satisfactory\nSainsbury's Supermarkets Ltd.\n33 Holborn, London EC1N 2HT\nCustomer services 0800 636262"        
+        
+        # self.package_in_g = 0.0
+        # TODO - extract from end of self.product_name ??
+        # or
+        # <h3 class="productDataItemHeader">Size</h3> 
+        #     <div class="productText">
+        #         <p>500g</p>
+        #     </div>
+        # or
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'h3.productDataItemHeader, div.productText')
+        # >>> list[8].text
+        # 'Size'
+        # >>> list[9].text
+        # '86g'
+        
+        
+        # self.price_per_measure  = 0.0
+        # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£12.00 / kg</div>
+        # <div data-test-id="pd-unit-price" class="pd__cost__per-unit" aria-label="unit price and measure on offer">£2.11 / 100g</div>
+        #                       ^
+        try:
+            css_selector = '[data-test-id="pd-unit-price"]'
+            e = driver.find_element(By.CSS_SELECTOR, css_selector)
+            self.price_per_measure = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')
+            
+        # self.supplier_item_code = ''
+        # <p class="pd__item-code">Item code: <span id="productSKU">952811</span></p>        
+        try:
+            e = driver.find_element(By.CSS_SELECTOR, '#productSKU')
+            self.supplier_item_code = e.text.strip()
+        except Exception as exp:
+            print(exp)
+            print('self.price_per_measure NOT found!')                    
+            
+        self.supplier_name      = 'Tesco'
+
 
     def scrape_waitrose(self):
         print(f"scraping WAITROSE: {self.product_url}")      
