@@ -350,6 +350,9 @@ if __name__ == '__main__':
         'cumberland sausage',
         'veg stock'         # weird symbols in i_list # https://www.sainsburys.co.uk/gol-ui/product/knorr-stock-cubes--vegetable-x8-80g
         'actimel veg',      # weird symbols in i_list # https://www.sainsburys.co.uk/gol-ui/product/actimel-strawberry-yogurt-12x100g
+        'lambs lettuce',    # has INGREDIENT: in i_list NO S
+        'wasabi paste',
+        'chocolate',
         '',
     ]
     derived_check = [
