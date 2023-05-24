@@ -245,18 +245,19 @@ if __name__ == '__main__':
     if '-u' in sys.argv:  # problem URLS to test against
     #if True: # debugger
         # - - - - - - 
+        # urls_to_process = [ 
+        #                     ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
+        #                     ('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
+        #                     ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g'),
+        #                     ('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), 
+        #                     ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), 
+        #                     ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),
+        #                     ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),
+        #                     ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),
+        #                     ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),
+        #                     ]
         urls_to_process = [ #('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
-                            #('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
-                            #('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g'),
-                            #('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), 
-                            # ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), 
-                            # ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),
-                            # ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),
-                            # ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),
-                            # ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),
-                            ]
-        urls_to_process = [ ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
-                            ('black turtle beans','https://www.tesco.com/groceries/en-GB/products/256530942'), # frist address
+                            #('black turtle beans','https://www.tesco.com/groceries/en-GB/products/256530942'), # frist address
                             ('tsc chicken roll','https://www.tesco.com/groceries/en-GB/products/299955420'),
                             ('pork ribs','https://www.tesco.com/groceries/en-GB/products/281085768'),
                             ('chicken stock cubes',''),
@@ -340,7 +341,9 @@ if __name__ == '__main__':
                     default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
                     os.system(f'open {default}')                
 
-            igdt_type = atomic_LUT[name]['igdt_type']
+            igdt_type = 'atomic'    # default
+            if name in atomic_LUT:
+                igdt_type = atomic_LUT[name]['igdt_type']
             print(f"Getting [{name}][{igdt_type}] from: {url}")        
             item = ProductInfo(name, url, igdt_type)        
             nutrinfo_text = item.nutrinfo_str()

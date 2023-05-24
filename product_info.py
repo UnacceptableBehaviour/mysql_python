@@ -60,11 +60,16 @@ class ProductInfo:
         self.ri_name            = name  # nick_name
         self.igdt_type          = igdt_type
         self.product_name       = ''
-        self.price_per_package  = 0.0
+        self.price_per_package  = 0
         self.units              = '?'               # g, kg, l, ml, ea (each)     [all lower case]
-        self.package_in_g       = 0.0
-        self.alt_package_in_g   = 0.0               # unprocess txt string 
-        self.price_per_measure  = 0.0               # price per measurement unit
+        self.qty                = 0
+        self.no_of_each         = 0                 # 6 for pack of 6 apples, units = 'ea', multipack_qty = 1
+        self.package_in_g       = 0
+        self.alt_package_in_g   = 0                 # package weight from title in g
+        self.package_qty_str    = ''                # package weight from title
+        self.price_per_measure  = 0                 # price per measurement unit 3.80 / kg
+        self.multipack_qty      = 1                 # 4 tins of 415g - this number is 4, 6x1L milk it would be 6,
+                                                    # 6 pack of apples this would be 1 and the units would be 'ea'
         self.supplier_item_code = ''
         self.product_url        = url
         self.supplier_name      = ''
@@ -140,6 +145,24 @@ class ProductInfo:
             print('Expetion E')        
         print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
         
+    def convert_pkg_str_to_qty_in_g(self):          #     ea                kg                g
+        # (Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l) - (Loose|Pack|Each) - (Litre|Kg|L|l) - (mg|Ml|ml|g|G)  
+        qty_in_g = 0
+        multiplier = 1
+
+        if (self.units == 'kg') or (self.units == 'l') or (self.units == 'litre'):
+            multiplier = 1000
+            
+        qty_in_g = self.qty * multiplier
+
+        if (self.units == 'loose') or (self.units == 'pack') or (self.units == 'each') or (self.units == 'ea'):
+            qty_in_g = None
+            self.units == 'ea'
+            self.no_of_each = self.qty
+
+        self.alt_package_in_g = qty_in_g    
+        self.package_in_g = qty_in_g        # this is overwritten with more accurate data if available
+
 
     def scrape_sainsburys(self):        
         print(f"scraping SAINSBURIES: {self.product_url}")        
@@ -171,6 +194,7 @@ class ProductInfo:
         delay_in_seconds = 3    
         driver.get(self.product_url)
 
+        # TODO - H use Tesco cookie - wait click together
         allow_cookies_btn_id = 'onetrust-accept-btn-handler'
         if ProductInfo.sbs_cookie_barrier:
             try:
@@ -204,7 +228,8 @@ class ProductInfo:
             print('Ingredients NOT FOUND')
         
         # self.product_name             Sainsbury's British Semi Skimmed Milk
-        # self.alt_package_in_g         (1.13L) 2 pint
+        # self.package_qty_str          (1.13L) 2 pint
+        # self.alt_package_in_g         1130 grams
         #
         # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
         # >TAG: <h1>
@@ -228,7 +253,7 @@ class ProductInfo:
             self.product_name = e.text.strip()
             # in case there is no size specified get size from product name
             m = re.search(r'\b(x*\d+[.mlLgKk]*)\b', self.product_name)
-            if m: self.alt_package_in_g = m.group(1)
+            if m: self.package_qty_str = m.group(1)
             
         except Exception as exp:
             print(exp)
@@ -321,7 +346,7 @@ class ProductInfo:
         pprint(item_info)
             
         if 'size' in item_info:     # not always present
-            self.package_in_g = item_info['size'].text
+            self.package_in_g = item_info['size'].text      # TODO H - process text SB wiegit in grams
         else:
             self.package_in_g = self.alt_package_in_g
         
@@ -457,8 +482,6 @@ class ProductInfo:
     def scrape_tesco(self):
         print(f"scraping TESCO: {self.product_url}")
 
-            # find which column the per 100g/ml is 
-
         # - - - - Helpers factor out where generic - - - S
         # TODO factor out
         def get_nutr_per_100g_col(table_header, default_col=1):
@@ -484,7 +507,7 @@ class ProductInfo:
 
         # remove cookie request
         delay_in_seconds = 3
-        time_out_inSec = 20  
+        time_out_inSec = 5  
         driver.get(self.product_url)
 
         allow_cookies_btn_class = '.beans-cookies-notification__button'
@@ -503,27 +526,52 @@ class ProductInfo:
 
         # wait content load
         # TODO H - get info at same time as wait load
-        try:
-            # <h1 class="product-details-tile__title">Tesco Black Turtle Beans 500G</h1>
-            css_selector = 'h1.product-details-tile__title'
-            print(f'# # #> waiting for Title & QTY: {css_selector}')
-            h_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
-            print(f'# # #> found:\n{h_tags.text.strip()}')
+        # selector
+        # asparagus-root > div > div.template-wrapper > main > div > div > div.styled__PDPTileContainer-mfe-pdp__sc-ebmhjv-0.cEAseF.pdp-tile > div > section.styled__GridSection-mfe-pdp__sc-ebmhjv-1.bjEIyj > h1
+        
+        # chrome class
+        # <h1 class="product-details-tile__title">Tesco Black Turtle Beans 500G</h1>
+
+        # slenium chrome class - surfshark
+        # <h1 class="product-details-tile__title">Tesco Black Turtle Beans 500G</h1>
+
+        # slenium chrome class
+        # <h1 class="component__StyledHeading-cy778r-0 ernAnS styled__ProductTitle-mfe-pdp__sc-ebmhjv-6 flNJKr">Tesco Black Turtle Beans 500G</h1>
+
+        # xpath - startwith: styled__ProductTitle-mfe-pdp  skip uuid tag __sc-ebmhjv-6
+        # "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]"
+        h_tags = h2_tags = ''
+        delay_in_seconds = 10
+        try:            
+            css_selector_h1 = 'h1.product-details-tile__title' #'-1- CSS'
+            print(f'# # #> waiting for Title & QTY CSS: {css_selector_h1}')
+            h_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector_h1)))                        
+            h_tags = h_tags.text.strip()
+            print(f'# # #> found h_tags:\n{h_tags}')
         except TimeoutException:
             print("Waiting for Title took too much time!")
         except Exception as exp:
             print(exp)
             print('Title NOT FOUND')
+
+        try:
+            css_selector_h2 = "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]" #'-2- XPATH'
+            print(f'# # #> waiting for Title & QTY XPATH: {css_selector_h2}')
+            h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.XPATH, css_selector_h2)))
+            h2_tags = h2_tags.text.strip()
+            print(f'# # #> found h2_tags:\n{h2_tags}')
+        except TimeoutException:
+            print(f'# # # TIMEOUT> waiting for Title & QTY XPATH: {css_selector_h2}')
+        except Exception as exp:
+            print(exp)
+            print('Title NOT FOUND - h2_tags')
+
         
-        
-        # self.product_name             Sainsbury's British Semi Skimmed Milk
-        # self.alt_package_in_g         (1.13L) 2 pint        
-        # <h1 class="pd__header" data-test-id="pd-product-title">Sainsbury's Pearl Barley 500g</h1>
-        #
-        # >TAG: <h1>
-        # class: pd__header <
-        # data-test-id: pd-product-title <
-        # Text: Sainsbury's Pearl Barley 500g <
+        # self.product_name             Tesco's British Semi Skimmed Milk
+        # self.package_qty_str          (1.13L) 2 pint
+        # self.alt_package_in_g         1130 grams
+        #      
+
         #
         # replace(' - Tesco Groceries')
         # get QTY
@@ -549,15 +597,38 @@ class ProductInfo:
         # Heinz Baked Beans In Tomato Sauce 6 X 415
         # Tesco No Added Sugar Cream Soda 330Ml
         try:
-            css_selector = 'h1.product-details-tile__title' 
-            e = driver.find_element(By.CSS_SELECTOR, css_selector)
-            self.product_name = e.text.strip()
-            # in case there is no size specified get size from product name            
-            qty_rgx = r'(\d+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l)\s*(?:(\/)?\d+\s*Pint(s)?)?'
-            m = re.search(qty_rgx, self.product_name)
+            css_selector = 'h1.product-details-tile__title'                 # chrome
+            css_selector = ".styled__ProductTitle-mfe-pdp__sc-ebmhjv-6"     # selenium chrome
+
+            if h_tags or h2_tags:                
+                self.product_name = h_tags if h_tags else h2_tags 
+                self.product_name = self.product_name.strip()
+                print(f"[self.product_name] {self.product_name} <")
+            else:
+                print(f"[self.product_name] {self.product_name} <")
+                e = driver.find_element(By.CSS_SELECTOR, css_selector)
+                self.product_name = e.text.strip()
+            
+            # remove multipack X no
+            multibuy_rgx = r'(\d+)\s*x'
+            m = re.search(multibuy_rgx, self.product_name, re.I)
             if m:
-                self.alt_package_in_g = m.group(1)
-                print(f"QTY: {self.alt_package_in_g} [self.alt_package_in_g]")
+                product_name_multiby_removed = self.product_name.replace(m.group(0), '')
+                self.multipack_qty = m.group(1)
+            else:
+                product_name_multiby_removed = self.product_name
+
+            # in case there is no size specified get size from product name            
+            alt_package_in_g_rgx = r'(([\.\d]+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l)\s*(?:(\/)?\d+\s*Pint(?:s)?)?)'
+            m = re.search(alt_package_in_g_rgx, product_name_multiby_removed, re.I)
+            if m:
+                self.package_qty_str = m.group(1)
+                self.units = m.group(3)
+                self.qty = m.group(2)
+                self.convert_pkg_str_to_qty_in_g() # alt_package_in_g <- None if units is Pack / Loose
+                print(f"INFO FROM TITLE  - - - - - - - - : S [self.package_qty_str] - {self.package_qty_str} <")
+                pprint(self)
+                print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
             print(exp)
@@ -576,7 +647,7 @@ class ProductInfo:
             css_selector = '.price-per-sellable-unit'
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
             self.price_per_package = e.text.strip()
-            self.package_in_g = 9999
+            self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
         except Exception as exp:
             print(exp)
@@ -675,6 +746,7 @@ class ProductInfo:
         if self.i_text == '':
             print('- - -: * * * INGREDIENTS NOT FOUND')            
 
+        # TODO - process i_text into i_list if len(i_list) is one its atomic
         if self.igdt_type == 'atomic':
             print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'")
             self.i_text = '__igdts__'
@@ -710,9 +782,9 @@ class ProductInfo:
         row_data = []
         col_100 = 1
 
-        # nutrition tabe
+        # nutrition table - - - - WORKING: tsc chicken roll
         try:
-            tb_rows = driver.find_elements(By.CSS_SELECTOR, 'table.nutritionTable tr')
+            tb_rows = driver.find_elements(By.CSS_SELECTOR, 'table.product__info-table tr')
             rows = iter(tb_rows)
             tb_head = next(rows)    # first row always col titles
             head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S) # TODO REMOVE
@@ -1469,4 +1541,4 @@ class ProductInfo:
 #   
 #end
 #
-## Use get_product_info.rb for CLI access test urls etc
+## Use get_product_info.rb for CLI access test urls etc         
