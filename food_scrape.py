@@ -282,7 +282,35 @@ if __name__ == '__main__':
                             ('',''),
                             ('',''),
                             #('smoked ham','https://groceries.aldi.co.uk/en-GB/p-cooked-smoked-ham-400g/5027951005828'), # horendous multiple products in single list: Cooked Ham Trimmings, Smoked Ham Trimmings, Peppered Ham Trimmings, Smoke Breaded Ham Trimmings & Honey Roasted Ham Trimmings Ingreadients back to back W/O punctuation!
-                            ]        
+                            ]
+        urls_to_process = [('mrs butterscotch crunch','https://groceries.morrisons.com/webshop/product/Border-Sweet-Memories-Butterscotch-Crunch/483706011'),
+                           ('mrs chicken korma','https://groceries.morrisons.com/webshop/product/Morrisons-Takeaway-Chicken-Korma/299170011'),
+                           ('70% choc','https://groceries.morrisons.com/webshop/product/Lindt-Excellence-70-Cocoa-Dark-Chocolate/115160011'),
+                           ('clarified butter','https://groceries.morrisons.com/webshop/product/KTC-Pure-Butter-Ghee/233485011'),
+                           ('condensed milk','https://groceries.morrisons.com/webshop/product/Carnation-Cook-with-Condensed-Milk/110802011'),
+                           ('mature gouda','https://groceries.morrisons.com/webshop/product/Morrisons-The-Best-Mature-Old-Amsterdam-Gouda/416709011?from=search&param=mature%20gouda'),
+                           ('hovis cracker','https://groceries.morrisons.com/webshop/product/Hovis-Crackers/289557011'),
+                           ('diced chorizo','https://groceries.morrisons.com/webshop/product/Elpozo-Iberico-Chorizo-Ring/456216011'),
+                           ('chorizo','https://groceries.morrisons.com/webshop/product/Elpozo-Iberico-Chorizo-Ring/456216011'),
+                           ('clay oven garlic and coriander naan','https://groceries.morrisons.com/webshop/product/The-Clay-Oven-Bakery-Garlic--Coriander-Naan-Bread/336891011?param=naan&from=search'),
+                           ('smoked mackerel fillet','https://groceries.morrisons.com/webshop/product/Morrisons-Smoked-Mackerel-Fillets/442534011'),
+                           ('beetroot brioche bun','https://groceries.morrisons.com/webshop/product/Morrisons-The-Best-Beetroot-Brioche-Rolls-/427428011'),
+                           ('mrs tikka masala sauce','https://groceries.morrisons.com/webshop/product/Morrisons-Tikka-Masala-Sauce/215269011'),
+                           ('spanish goats cheese','https://groceries.morrisons.com/webshop/product/Morrisons-Somerset-Goats-Cheese/111950011'),
+                           ('caramac buttons','https://groceries.morrisons.com/webshop/product/Caramac-Giant-Buttons/450664011?from=search&param=caramac'),
+                           ('caramac','https://groceries.morrisons.com/webshop/product/Caramac-Giant-Buttons/450664011?from=search&param=caramac'),
+                           ('cream cheese','https://groceries.morrisons.com/webshop/product/Philadelphia-Original-Soft-Cheese/251401011'),
+                           ('pistachios','https://groceries.morrisons.com/webshop/product/Morrisons-Pistachios/120506011'),
+                           ('pistachio nuts','https://groceries.morrisons.com/webshop/product/Morrisons-Pistachios/120506011'),
+                           ('crunchie bar','https://groceries.morrisons.com/webshop/product/Cadbury-Crunchie-Chocolate-Bar-4-Pack/269519011'),
+                           ('white bread','https://groceries.morrisons.com/webshop/product/Morrisons-White-Toastie-Loaf/217833011'),
+                           ('hoisin sauce','https://groceries.morrisons.com/webshop/product/Flying-Goose-Hoisin-Sauce/387755011'),
+                           ('giant mrs yorkshire pudding','https://groceries.morrisons.com/webshop/product/Morrisons-Giant-Yorkshire-Pudding/111374011'),
+                           ('mrs beef stock cube as prepared','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
+                           ('beef stock','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
+                           ('mrs beef stock cube','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
+                           ('wholegrain mustard','https://groceries.morrisons.com/webshop/product/Morrisons-Wholegrain-Mustard/121390011'),
+                           ('mrs veg samosa','https://groceries.morrisons.com/webshop/product/Morrisons-Indian-Takeaway-Vegetable-Samosas/114583011?from=search&param=samosa')],     
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
         print('= = = Running scrape tests = = =')
