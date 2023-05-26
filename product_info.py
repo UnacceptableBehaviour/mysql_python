@@ -437,8 +437,8 @@ class ProductInfo:
             
             pprint(self.nutrition_info)
             
-        except Exception as exp:
-            print(exp.msg)
+        except StopIteration as exp:
+            print(exp)
             print('ERROR processing nutrition table - NOT found!')
         
         print('- - - - - - - nutrition - - - - - - - E')
@@ -494,11 +494,16 @@ class ProductInfo:
 
             return(default_col)
         
-        def remove_g_and_less_than(str_g):            
+        # replace 2,2 w/ 2.2
+        # replace (2,2) w/ 2.2
+        def remove_g_and_less_than(str_g):
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.')
+
+            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
             if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
+                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
              
-            return( round(float(str_g.lower().replace('g', '')), 2) )
+            return( round(float(str_g), 2) )
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -529,15 +534,14 @@ class ProductInfo:
             # '':[(,),(,)],
             # '':[(,),(,)],
         }
-        item_info_pairs = [
-            'ingredients',
-            'allergy information',
-            'number of uses',
-            'net contents',
-        ]
-
-        # TODO - get the ingredients! TESCO
-
+        item_info_pairs = {
+            'product description': [],
+            'ingredients': [],
+            'allergy information': [],
+            'number of uses': [],
+            'net contents': [],
+            'unadopted': []
+        }
 
         # for desktop replace [DSK] for [MOB] for mobile
         # (query['cookie_b'][DSK][BY], query['cookie_b'][DSK][SEL])
@@ -551,7 +555,7 @@ class ProductInfo:
         driver.get(self.product_url)
 
         allow_cookies_btn_class = '.beans-cookies-notification__button'
-        if ProductInfo.tsc_cookie_barrier:                        
+        if ProductInfo.tsc_cookie_barrier:
             try:
                 # ALL work
                 # using a class
@@ -562,6 +566,7 @@ class ProductInfo:
                 # using XPath w text content
                 #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
                 print('CLICKED cookie_button')
+                ProductInfo.tsc_cookie_barrier = False
             except TimeoutException:
                 print("Loading took too much time!")
 
@@ -757,43 +762,56 @@ class ProductInfo:
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
-        try:
-            elements = iter(e_list)
-            for elem in elements:
-                ne = next(elements)
-                
-                # skip the 'Information' super title
-                if re.match(r'information\b',elem.text,re.I): # skip 
-                    elem = ne
-                    ne = next(elements)
-                
-                # sometime ingredient all in one element
-                el_text = elem.text #.lower()
-                if re.match(r'ingredient[s]?\b',el_text,re.I):
-                    i_string = re.sub(r'ingredient[s]?\b','',el_text,flags=re.I)
-                    print(f'ingredient - MATCH [{len(i_string)}]\n{el_text}\ni_string>{i_string}<E')
-                    if len(i_string.strip()) > 0:                        
-                        self.i_text = i_string.strip()
-                    else:
-                        item_info[elem.text.lower()] = ne
-                else:
-                    item_info[elem.text.lower()] = ne
-                print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
-
-        except StopIteration as exp:
-            print('StopIteration - ')
-            pass
-
+        # item_info_pairs
         try:
             print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - S')
             for i, elmnt in enumerate(e_list):
-                print(f"{i:02} - {elmnt}")
-        except:
-            pass
+                for marker, data_list in item_info_pairs.items():
+                    print(f"\n{i:02} - {elmnt.text}")
+                    if (i+1 < len(e_list)-1):
+                        print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
+                    print(f"-- {marker} in {elmnt.text.lower()} = {marker in elmnt.text.lower()}")
+                    if marker in elmnt.text.lower():
+                        if (i+1 < len(e_list)-1):
+                            item_info_pairs[marker].append(e_list[i+1].text)
+                        break
+
+        except Exception as exp:
+            print(exp.msg)
+            #pprint(exp)
+            print('ERROR processing item_info_pairs - ??!')
+
         print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - E')
 
+        # try:          # prone to synch faults
+        #     elements = iter(e_list)
+        #     for elem in elements:
+        #         ne = next(elements)
+                
+        #         # skip the 'Information' super title
+        #         if re.match(r'information\b',elem.text,re.I): # skip 
+        #             elem = ne
+        #             ne = next(elements)
+                
+        #         # sometime ingredient all in one element
+        #         el_text = elem.text #.lower()
+        #         if re.match(r'ingredient[s]?\b',el_text,re.I):
+        #             i_string = re.sub(r'ingredient[s]?[:]?\s*','',el_text,flags=re.I)   # take the colon out if its there!
+        #             print(f'ingredient - MATCH [{len(i_string)}]\n{el_text}\ni_string>{i_string}<E')
+        #             if len(i_string.strip()) > 0:                        
+        #                 self.i_text = i_string.strip()
+        #             else:
+        #                 item_info[elem.text.lower()] = ne
+        #         else:
+        #             item_info[elem.text.lower()] = ne
+        #         print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
+
+        # except StopIteration as exp:
+        #     print('StopIteration - ')
+        #     pass
+
         print('+>> item_info - - - - - - - - - - - - - - - - - - - S')
-        pprint(item_info)
+        pprint(item_info_pairs)
         print('+>> item_info - - - - - - - - - - - - - - - - - - - E')
                 
         # Pack size in Product Description - TODO L 
@@ -896,8 +914,8 @@ class ProductInfo:
             
             pprint(self.nutrition_info)
             
-        except Exception as exp:
-            print(exp.msg)
+        except StopIteration as exp:
+            print(exp)
             print('ERROR processing nutrition table - NOT found!')
         
         print('- - - - - - - nutrition - - - - - - - E')
