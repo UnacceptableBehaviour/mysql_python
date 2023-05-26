@@ -168,6 +168,12 @@ set_i_classifiers = set(['preservative','preservatives','colour','acidity regula
                          'flour treatment agent','flavour enhancers','natural flavourings','live bacterial cultures','thickener',
                          'acid','humectant','acids','flavourings','colouring','vegetable oils and fats','vegetables',
                          'emulsifiers','flavouring','herbs','flour treatment agent'])
+# TODO L - remove FAO classifiers - needs a regex really 'FAO\s+\d\d' kind of thing
+# Fish may have a classifer such as (FAO 87) next to it
+# Food and Agriculture Organization of the United Nations
+# FAO 87 https://fish-commercial-names.ec.europa.eu/fish-names/area_en?code=87
+# https://fish-commercial-names.ec.europa.eu/fish-names/fishing-areas_en#marine-areas
+
 #set_igdts = set('wheat flour','spices','fortified british wheat flour','vegetable oils','lactose','butter','whey powder','fortified wheat flour','niacin','thiamin','milk','unsalted butter','vegetable oil','yogurt','mussels','alaska pollock','hake','oyster','butterfat','calcium','lecithins','cheese','cheese powder','cream','low fat yogurt','malt vinegar','anchovies','soya extract','mackerel','greek style natural yogurt','extra mature cheddar cheese','single cream','mozzarella cheese','flour','emmental cheese','semolina','half cream','manchego cheese','whipped cream','white wine','salt','grana padano cheese','moistened sultanas','moistened raisins','moistened chilean flame raisins','curry powder','seasoning with sea salt and balsamic vinegar of modena','poultry meat','salmon','rusk','butteroil','vegetable margarine','sausage casing','salted butter','squid','herring fillets','parmigiano reggiano medium fat hard cheese','worcestershire sauce','worcester sauce','anchovy','dried cream','pork','breadcrumbs','cooked marinated lamb','malt extract','herring','wholetail scampi','butter oil','mayonnaise','hydrolysed vegetable protein','casing','halloumi cheese','wood smoked mussels','chaource cheese','prawns','king prawn','paprika','beef extract powder','anchovy extract','lemon juice powder')
 
 # for processing off the shelf (ots) ingredents lists - NOT unrolling derived
