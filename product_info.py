@@ -529,6 +529,12 @@ class ProductInfo:
             # '':[(,),(,)],
             # '':[(,),(,)],
         }
+        item_info_pairs = [
+            'ingredients',
+            'allergy information',
+            'number of uses',
+            'net contents',
+        ]
 
         # TODO - get the ingredients! TESCO
 
@@ -819,7 +825,7 @@ class ProductInfo:
         
         if 'product description' in item_info:      
             # TODO need to process/accumulate down to 'Information' and pull out Pack size if present
-            self.product_desc = item_info['description'].text
+            self.product_desc = item_info['product description'].text
 
 
 
