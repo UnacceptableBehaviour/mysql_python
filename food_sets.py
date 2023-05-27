@@ -4,6 +4,7 @@
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
     # Provides support functions for process_nutridocs.py
     # Also provides inspection tools for content it ^ generates
+    # Allergen detection in i_strings - search for simple allergen detection in this code
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 import re
@@ -793,6 +794,7 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # simple allergen detection - this could explode into a massively time consuming exersize so keep it simple!
 # Brief: should work with the ingredients in the current data set ~1400 ingredients
 # Basic guide: https://www.food.gov.uk/sites/default/files/media/document/top-allergy-types.pdf
+# Good Resouce: https://farrp.unl.edu/informalltreenuts
 #
 # a call to get_allergens_for(['cod','flour','egg','water','soda water','salt','veg oil','corn flour'])
 # should return ['dairy', 'eggs', 'fish', 'gluten']
@@ -831,7 +833,8 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-dairy_basic = {'milk','cows milk', 'from milk', "cows' milk",'goats milk','sheeps milk','fermented milk','yogurt','cream','butter','cheese',
+dairy_basic = {'milk','condensed milk','cows milk', 'from milk', "cows' milk",'goats milk','sheeps milk','fermented milk',
+               'yogurt','cream','butter','cheese',
                'casein','custard','ice cream','milk powder','dried skimmed milk', 'whey powder', "whole cows' milk powder"}
 
 # usually product of some type katsuobushi or fish sauce for example
@@ -955,12 +958,15 @@ def build_peanuts_set():
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# NUTS
+# NUTS - TODO - flesh out nuts
+# https://farrp.unl.edu/informalltreenuts
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-nuts_basic = {'almonds','brazil nuts','cashews','chestnuts','filberts','hazelnuts','hickory nuts','macadamia nuts',
-              'pecans','pistachios','walnuts'}
+nuts_basic = {'almond','almonds','brazil nut','brazil nuts','cashews','cashew nut','cashew nuts','chestnuts','filberts','cobnuts',
+              'hazelnut', 'hazelnuts','hickory nut','hickory nuts','macadamia nut','macadamia nuts','macadamia','macadamias',
+              'pecan','pecans','pistachio','pistachios','walnut','walnuts'}
 
-nuts_derived_no_recipe = {'mortadella','salted cashews','honey roast peanuts','honey roast cashews','baklava',
+nuts_derived_no_recipe = {'mortadella','honey roast peanuts','honey roast cashews','baklava','salted cashews','salted cashew nut',
+                          'salted cashew nuts',
                           'cantuccini','almond oil','roasted sliced nuts'}
 
 def build_nuts_set():
