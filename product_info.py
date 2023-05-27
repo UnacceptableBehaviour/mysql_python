@@ -181,11 +181,16 @@ class ProductInfo:
 
             return(default_col)
         
-        def remove_g_and_less_than(str_g):            
+        # replace 2,2 w/ 2.2
+        # replace (2,2) w/ 2.2
+        def remove_g_and_less_than(str_g):
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.')
+
+            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
             if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','').replace('g', '')) * 0.8), 2 ) )
+                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
              
-            return( round(float(str_g.lower().replace('g', '')), 2) )
+            return( round(float(str_g), 2) )
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -620,31 +625,6 @@ class ProductInfo:
         # self.package_qty_str          (1.13L) 2 pint
         # self.alt_package_in_g         1130 grams
         #      
-
-        #
-        # replace(' - Tesco Groceries')
-        # get QTY
-        # qty_rgx = r'(\d+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l)\s*(?:(\/)?\d+\s*Pint(s)?)?'
-        # Tesco Black Turtle Beans 500G - Tesco Groceries
-        # Tesco Pork Individual Ribs 700G - Tesco Groceries
-        # Tesco Pure Sunflower Oil 5 Litre - Tesco Groceries
-        # Tesco Tomato Puree Tube 200G - Tesco Groceries
-        # Hask Argan Oil 5 In 1 Leave In Conditioner 175Ml - Tesco Groceries
-        # Tesco British Semi Skimmed Milk 2.272L 4 Pints - Tesco Groceries
-        # The Original Oatly Light Oat Drink 1 Litre - Tesco Groceries
-        # Cravendale Semi Skimmed Milk 2 Litre - Tesco Groceries
-        # Tesco Semi Skimmed Milk 1.13L/2 Pints - Tesco Groceries
-        # Tesco Semi Skimmed Longlife Milk 6X1l - Tesco Groceries
-        # Tesco Semi Skimmed Milk 568Ml/1 Pint - Tesco Groceries
-        # Tesco Filtered Semi Skimmed Milk 2 Litre - Tesco Groceries
-        # Tesco Organic Fair Trade Bananas 5 Pack - Tesco Groceries
-        # Bananas Loose - Tesco Groceries
-        # Tesco Pink Lady Apple Minimum 5 Pack - Tesco Groceries
-        # Rosedene Farms Gala Apples 6 Pack - Tesco Groceries
-        # Large Pink Lady Apples Class 1 Loose - Tesco Groceries
-        # Granulated Sugar 1Kg
-        # Heinz Baked Beans In Tomato Sauce 6 X 415
-        # Tesco No Added Sugar Cream Soda 330Ml
         print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
         try:
 
@@ -657,11 +637,6 @@ class ProductInfo:
                     print(f"[self.product_name] {self.product_name} < * * * NO h_tags or h2_tags * * *")
                     e = driver.find_element(*query['product_title'][cur])
                     self.product_name = e.text.strip()                
-                    # css_selector = 'h1.product-details-tile__title'                 # chrome
-                    # css_selector = ".styled__ProductTitle-mfe-pdp__sc-ebmhjv-6"     # selenium chrome                
-                    # print(f"[self.product_name] {self.product_name} <")
-                    # e = driver.find_element(By.CSS_SELECTOR, css_selector)
-                    # self.product_name = e.text.strip()
                 except Exception as exp:
                     print(exp.msg)
                     print('self.product_name NOT found! no h / h2 / or retry')
@@ -722,7 +697,7 @@ class ProductInfo:
             print(exp.msg)
             print('self.price_per_measure NOT found!')
 
-        # Product Description & Infomation
+        # Product Description (TODO) & Infomation
         # document.querySelectorAll('h2.product-info-block__title')
         # gives description and 
         # 
@@ -730,26 +705,6 @@ class ProductInfo:
         #
         # more generic gives all info blocks except nutrition (whic we already have)
         # document.querySelectorAll('div.product-info-block')
-        #
-        # 0: div#product-description.product-info-block.product-info-block--product-description
-        # 1: div#product-marketing.product-info-block.product-info-block--product-marketing
-        # 2: div#pack-size.product-info-block.product-info-block--pack-size
-        # 3: div.product-info-block.product-info-block--undefined
-        # 4: div#ingredients.product-info-block.product-info-block--ingredients
-        # 5: div#allergens.product-info-block.product-info-block--allergens
-        # 6: div#storage-details.product-info-block.product-info-block--storage-details
-        # 7: div#other-instructions.product-info-block.product-info-block--other-instructions
-        # 8: div#uses.product-info-block.product-info-block--uses
-        # 9: div#recycling-info.product-info-block.product-info-block--recycling-info
-        # 10: div#return-address.product-info-block.product-info-block--return-address
-        # 11: div#net-contents.product-info-block.product-info-block--net-contents
-        # length: 12
-        #
-        # The content followint te title:
-        # document.querySelectorAll('.product-info-block__content')
-        #
-        #  collect product info          description, package size, ingredients, manufacturer, packaging, etc
-        # list of PAIRS of h3.productDataItemHeader and div.productText 
 
         # >>> list = driver.find_elements(By.CSS_SELECTOR,'div.product-info-block, .product-info-block__content')
 
