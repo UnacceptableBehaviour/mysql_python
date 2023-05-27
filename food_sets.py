@@ -483,9 +483,9 @@ def screen_for_allergens(i_string):
 #QUID_PC = re.compile('\(*[\d.]+%\)*')       # 3% (45%) 3.5% (3.5%)  also catches 18.5%) = ERROR
 QUID_PC = re.compile('[\d.]+%')             # 3% 45% 3.5% 
 EMPTY_BRACKETS = re.compile('\(\)')
-PUREE = re.compile('purée')
-CONTAINS = re.compile('contains(?::)*\s*')      # contains(:)? allergen colon optional
-IGDT_TITLE = re.compile('ingredients:')     # ingredients:sugar cane, cane molasses.
+PUREE = re.compile('purée',re.I)
+CONTAINS = re.compile('contains(?::)*\s*',re.I)      # contains(:)? allergen colon optional
+IGDT_TITLE = re.compile('ingredients:',re.I)     # ingredients:sugar cane, cane molasses.
 regex_noise = [QUID_PC, EMPTY_BRACKETS, CONTAINS, PUREE, IGDT_TITLE]
 
 def filter_noise(i_string, dbg=True):    
@@ -1403,7 +1403,7 @@ def build_soya_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SULPHUR_DIOXIDE
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites', 'sodium metabisulphite', 'triphosphates'}
+sulphur_dioxide_basic = {'sulphur dioxide', 'sulphites', 'sodium metabisulphite', 'pentasodium triphosphate', 'triphosphates'}
 
 # usually product of some type katsuobushi or fish sauce for example
 #sulphur_dioxide_derived_no_recipe =  {'',''}
