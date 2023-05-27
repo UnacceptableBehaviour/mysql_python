@@ -266,15 +266,15 @@ if __name__ == '__main__':
                             #('tsc soy sauce','https://www.tesco.com/groceries/en-GB/products/294781229'),
                             #('veg oil','https://www.tesco.com/groceries/en-GB/products/254918073'),
                             #('large medjool dates','https://www.tesco.com/groceries/en-GB/products/302676947'),                            
-                            ('tsc roquefort','https://www.tesco.com/groceries/en-GB/products/277465578'),
-                            ('anchovies','https://www.tesco.com/groceries/en-GB/products/310103367'),
-                            ('salted cashews','https://www.tesco.com/groceries/en-GB/products/297385240'),    # NO NUTRITION TABLE - USE AS test case fall back on 
-                            ('tsc smoked mackerel','https://www.tesco.com/groceries/en-GB/products/251631139'), # NUTRITION table has ug & mg in nutrition table
-                            ('beaujolais villages','https://www.tesco.com/groceries/en-GB/products/252285938'),
-                            ('tsc chicken roll','https://www.tesco.com/groceries/en-GB/products/299955420'),
-                            ('pork ribs','https://www.tesco.com/groceries/en-GB/products/281085768'),
-                            ('chicken stock cubes',''),
-                            ('fish fingers','https://www.tesco.com/groceries/en-GB/products/302861814'),
+                            #('tsc roquefort','https://www.tesco.com/groceries/en-GB/products/277465578'),   # has no ingredient but does have allergens
+                            #('anchovies','https://www.tesco.com/groceries/en-GB/products/310103367'),
+                            #('salted cashews','https://www.tesco.com/groceries/en-GB/products/297385240'),    # NO NUTRITION TABLE - USE AS test case fall back on 
+                            #('tsc smoked mackerel','https://www.tesco.com/groceries/en-GB/products/251631139'), # NUTRITION table has ug & mg in nutrition table
+                            #('beaujolais villages','https://www.tesco.com/groceries/en-GB/products/252285938'),
+                            #('tsc chicken roll','https://www.tesco.com/groceries/en-GB/products/299955420'),
+                            #('pork ribs','https://www.tesco.com/groceries/en-GB/products/281085768'),
+                            #('chicken stock cubes',''),
+                            #('fish fingers','https://www.tesco.com/groceries/en-GB/products/302861814'),   # * in ingredients
                             ('',''),
                             ('',''),
                             ('',''),
