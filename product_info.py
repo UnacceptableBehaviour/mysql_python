@@ -77,6 +77,8 @@ class ProductInfo:
         self.nutrition_info     = self.initialise_nutrient_hash() 
         self.i_list             = []    # ingredient list
         self.i_text             = ''    # ingredient raw text as scraped
+        self.allergens          = set() # pulled from ingredient list
+        self.allergens_raw      = ''    # scraped allergens section
         self.product_desc       = ''
         self.product_page       = None   
         
@@ -534,13 +536,12 @@ class ProductInfo:
             # '':[(,),(,)],
             # '':[(,),(,)],
         }
-        item_info_pairs = {
+        item_info = {
             'product description': [],
             'ingredients': [],
             'allergy information': [],
             'number of uses': [],
-            'net contents': [],
-            #'unadopted': []
+            'net contents': []
         }
 
         # for desktop replace [DSK] for [MOB] for mobile
@@ -753,7 +754,7 @@ class ProductInfo:
         # >>> list = driver.find_elements(By.CSS_SELECTOR,'div.product-info-block, .product-info-block__content')
 
         print(f"\n\nquery['item_info'][{cur}] {query['item_info'][cur]}")
-        item_info = {}
+
         e_list = []
         try:            
             e_list = driver.find_elements(*query['item_info'][cur]) 
@@ -762,11 +763,11 @@ class ProductInfo:
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
-        # item_info_pairs - remove marker at they are found
-        #item_info_marker = ['product description','ingredients','allergy information','number of uses','net contents']
+        # item_info - remove marker at they are found
+        #item_info_markers = ['product description','ingredients','allergy information','number of uses','net contents']
         #or 
-        #item_info_marker = [ m for m,l in item_info_pairs ]
-        item_info_marker = list(item_info_pairs.keys())
+        #item_info_markers = [ m for m,l in item_info ]
+        item_info_markers = list(item_info.keys())
 
         print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - S')
         # skip on fin=d
@@ -774,35 +775,35 @@ class ProductInfo:
         while i < len(e_list):
             elmnt = e_list[i]
             found_mk = None
-            for marker in item_info_marker:
+            for marker in item_info_markers:
                 print(f"\n{i:02} - {elmnt.text}")
                 if i+1 < len(e_list): print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
                 if marker in elmnt.text.lower():
-                    item_info_pairs[marker].append(e_list[i+1].text)
+                    item_info[marker].append(e_list[i+1].text)
                     found_mk = marker
                     i += 1  # skip next index
                     break
-            if found_mk: item_info_marker.remove(found_mk)
+            if found_mk: item_info_markers.remove(found_mk)
             i += 1
         print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - E')
 
         # try:
         #     print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - S')
         #     for i, elmnt in enumerate(e_list):
-        #         for marker, data_list in item_info_pairs.items():
+        #         for marker, data_list in item_info.items():
         #             print(f"\n{i:02} - {elmnt.text}")
         #             if (i+1 < len(e_list)-1):
         #                 print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
         #             print(f"-- {marker} in {elmnt.text.lower()} = {marker in elmnt.text.lower()}")
         #             if marker in elmnt.text.lower():
         #                 if (i+1 < len(e_list)-1):
-        #                     item_info_pairs[marker].append(e_list[i+1].text)
+        #                     item_info[marker].append(e_list[i+1].text)
         #                 break
 
         # except Exception as exp:
         #     print(exp.msg)
         #     #pprint(exp)
-        #     print('ERROR processing item_info_pairs - ??!')
+        #     print('ERROR processing item_info - ??!')
 
         # print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - E')
 
@@ -834,39 +835,59 @@ class ProductInfo:
         #     pass
 
         print('+>> item_info - - - - - - - - - - - - - - - - - - - S')
-        pprint(item_info_pairs)
+        pprint(item_info)
         print('+>> item_info - - - - - - - - - - - - - - - - - - - E')
                 
         # Pack size in Product Description - TODO L 
         # Net Contents also has same info ? multibuy
         if 'size' in item_info:     # not always present
-            self.package_in_g = item_info['size'].text
+            self.package_in_g = item_info['size'][0]
         else:
             self.package_in_g = self.alt_package_in_g
         
         print('ingredients  - - - - - - - - S')
-        print(f"('ingredients' in item_info): {('ingredients' in item_info)}")
-        print(f"(self.i_text == ''): {(self.i_text == '')}")
-        
-        if ('ingredients' in item_info) and (self.i_text == ''):
-            self.i_text = item_info['ingredients'].text
+        print(f"len(item_info['ingredients']) {len(item_info['ingredients'])}")
+        print(f"item_info['ingredients'] {item_info['ingredients']} <")
+                                                # TODO scan for water salt oil and only other ingredients - cashews, smoke mackerel
+        if len(item_info['ingredients']) == 0:  # if no ingredient assume atomic roqufort, milk, smoked mackerel
+            print(f"NO INGREDIUENT FOUND: {item_info['ingredients']} <")
+            self.i_text = ''
+            self.igdt_type = 'atomic'            
+        else:
+            self.i_text = item_info['ingredients'][0]
             ots_info = process_OTS_i_string_into_allergens_and_base_ingredients(self.i_text, self.ri_name)
+            self.allergens = ots_info['allergens']
+            print(f"- - - - - - - ots_info")
             pprint(ots_info)
             self.i_list = ots_info['i_list']
-            if len(self.i_list) == 1: self.igdt_type = 'atomic'
+            if len(self.i_list) == 1: 
+                print(f"ATOMIC: len(self.i_list) [{len(self.i_list)}]\n{self.i_list}\nself.i_text: {self.i_text}")
+                self.igdt_type = 'atomic'
+            else:
+                self.igdt_type = 'ots'  # override ctor atomic
         
-        if self.i_text == '':
-            print('- - -: * * * INGREDIENTS NOT FOUND')                    
-
+        # product may have been set atomic by args passed to constructor/init
         if self.igdt_type == 'atomic':
-            print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'")
+            print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'\n self.i_text was: {self.i_text} <")
             self.i_text = '__igdts__'
+
+
+        # update allergens from scrape info
+        if (len(item_info['allergy information']) > 0): self.allergens_raw = item_info['allergy information'][0]
+
+        ots_info = process_OTS_i_string_into_allergens_and_base_ingredients(self.allergens_raw, self.ri_name)
         
+        print(f"processing self.allergens_raw[{self.allergens_raw}] = [{ots_info['allergens']}]")
+        
+        self.allergens.update(ots_info['allergens'])
+        if (self.igdt_type == 'atomic') and (len(self.allergens)) and (self.i_text == '__igdts__'):
+            self.i_text = f"{self.ri_name}, (contains {', '.join(self.allergens)})"
+
         print('ingredients  - - - - - - - - E')        
         
         if 'product description' in item_info:      
             # TODO need to process/accumulate down to 'Information' and pull out Pack size if present
-            self.product_desc = item_info['product description'].text
+            self.product_desc = item_info['product description']
 
 
 
