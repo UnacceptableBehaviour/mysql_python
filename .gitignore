@@ -1,5 +1,6 @@
-# for osx
+## for osx
 .DS_Store
+geckodriver.log
 
 # ignore directory and contents
 /__pycache__
