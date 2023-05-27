@@ -834,8 +834,9 @@ class IncorrectTypeForIngredients(FoodSetsError):
 # DAIRY
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 dairy_basic = {'milk','condensed milk','cows milk', 'from milk', "cows' milk",'goats milk','sheeps milk','fermented milk',
-               'yogurt','cream','butter','cheese',
-               'casein','custard','ice cream','milk powder','dried skimmed milk', 'whey powder', "whole cows' milk powder"}
+               'yogurt','cream','butter','cheese','ghee','butter ghee','anhydrous milk fat','fresh sweet cream','fresh cream',
+               'casein','custard','ice cream','milk powder','dried skimmed milk', 'whey powder', "whole cows' milk powder",
+               'anhydrous milk fat separated from 100% fresh sweet cream'}
 
 # usually product of some type katsuobushi or fish sauce for example
 dairy_derived_no_recipe =  {'panna cota','brussels pate', 'cheese cake', 'creme patissiere','roulade', 'parmesan crisps'}
