@@ -184,7 +184,7 @@ class ProductInfo:
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
         def remove_g_and_less_than(str_g):
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.')
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
             if '&lt;' in str_g:
@@ -480,6 +480,9 @@ class ProductInfo:
         
 
     def scrape_morrisons(self):
+        # TODO - check for product no longer exits
+        #        can be NO LONGER STOCKED
+        #            or OOPS  - tomato splat - URL out of date / incorrect
         print(f"scraping MORRISONS: {self.product_url}")        
 
         # - - - - Helpers factor out where generic - - - S
@@ -496,7 +499,7 @@ class ProductInfo:
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
         def remove_g_and_less_than(str_g):
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.')
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
             if '&lt;' in str_g:
@@ -506,9 +509,9 @@ class ProductInfo:
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
-        if ProductInfo.tsc_driver == None:
-            ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')        
-        driver = ProductInfo.tsc_driver
+        if ProductInfo.mrs_driver == None:
+            ProductInfo.mrs_driver = webdriver.Chrome('chromedriver')        
+        driver = ProductInfo.mrs_driver
 
         DSK = 0
         MOB = 1
@@ -516,54 +519,56 @@ class ProductInfo:
         SEL = 1
         cur = DSK
         query = {
-            'cookie_b':             [(By.CSS_SELECTOR, '.beans-cookies-notification__button'),
-                                     (By.CSS_SELECTOR, '.beans-cookies-notification__button')],
-            'product_title':        [(By.CSS_SELECTOR, 'h1.product-details-tile__title'),
-                                     (By.CSS_SELECTOR, 'h1.styled__ProductTitle-mfe-pdp__sc-ebmhjv-6')],
+            'cookie_b':             [(By.CSS_SELECTOR, '#onetrust-accept-btn-handler'),
+                                     (By.CSS_SELECTOR, '#onetrust-accept-btn-handler')],
+            'product_title':        [(By.CSS_SELECTOR, 'header > h1'), 
+                                     (By.CSS_SELECTOR, 'header > h1')],
                                      #(By.XPATH,        "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]")],
-            'price_per_package':    [(By.CSS_SELECTOR, '.price-per-sellable-unit'),
-                                     (By.CSS_SELECTOR, '.styled__Text-qgg5i6-1')],
-            'price_per_measure':    [(By.CSS_SELECTOR, '.price-per-quantity-weight'),
-                                     (By.CSS_SELECTOR, '.styled__Subtext-qgg5i6-2')],
-            'item_info':            [(By.CSS_SELECTOR, '.product-info-block__title, .product-info-block__content'),
-                                     (By.CSS_SELECTOR, 'h3.component__StyledHeading-cy778r-0, .styled__Content-mfe-pdp__sc-1od89q4-2')],
-            'nutri_table':          [(By.CSS_SELECTOR, 'table.product__info-table tr'),
-                                     (By.CSS_SELECTOR, 'table.product__info-table tr')],            
-            # '':[(,),(,)],
+            # 'package_qty_str':      [(By.CSS_SELECTOR,'.bop-catchWeight'),
+            #                          (By.CSS_SELECTOR,'.bop-catchWeight')],                                     
+            'price_per_package':    [(By.CSS_SELECTOR, '.bop-price__current'),
+                                     (By.CSS_SELECTOR, '.bop-price__current')],
+            'price_per_measure':    [(By.CSS_SELECTOR, '.bop-price__per'),
+                                     (By.CSS_SELECTOR, '.bop-price__per')],
+            'item_info':            [(By.CSS_SELECTOR, 'h6, .bop-info__content'),                                     
+                                     (By.CSS_SELECTOR, '.gn-expandableBar__header, .bop-info__content')], # Gets Description but misses i_string / allergies
+            'nutri_table':          [(By.CSS_SELECTOR, '.bop-nutritionData__origin > table tr'),
+                                     (By.CSS_SELECTOR, '.bop-nutritionData__origin > table tr')],            
+            
             # '':[(,),(,)],
         }
         item_info = {
-            'product description': [],
+            'description': [],
             'ingredients': [],
-            'allergy information': [],
-            'number of uses': [],
-            'net contents': []
+            'dietary information': [],
+            #'allergy information': [],  
+            #'number of uses': [],
+            #'net contents': []
         }
 
         # for desktop replace [DSK] for [MOB] for mobile
         # (query['cookie_b'][DSK][BY], query['cookie_b'][DSK][SEL])
         # or
         # query['cookie_b'][cur] where cur = DSK or MOB
-        # WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable(query['cookie_b'][DSK])).click()
+        # WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][DSK])).click()
 
         # remove cookie request
-        delay_in_seconds = 3
-        time_out_inSec = 5  
+        cookie_btn_timeout_inSec = 5  
         driver.get(self.product_url)
 
         allow_cookies_btn_class = '.beans-cookies-notification__button'
-        if ProductInfo.tsc_cookie_barrier:
+        if ProductInfo.mrs_cookie_barrier:
             try:
                 # ALL work
                 # using a class
-                print(f'try cookie_button w WAIT: {time_out_inSec}')
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
-                WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
+                print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
+                WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
                 # using XPath w text content
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
                 print('CLICKED cookie_button')
-                ProductInfo.tsc_cookie_barrier = False
+                ProductInfo.mrs_cookie_barrier = False
             except TimeoutException:
                 print("Loading took too much time!")
 
@@ -696,10 +701,6 @@ class ProductInfo:
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
-        # item_info - remove marker at they are found
-        #item_info_markers = ['product description','ingredients','allergy information','number of uses','net contents']
-        #or 
-        #item_info_markers = [ m for m,l in item_info ]
         item_info_markers = list(item_info.keys())
 
         print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - S')
@@ -709,10 +710,12 @@ class ProductInfo:
             elmnt = e_list[i]
             found_mk = None
             for marker in item_info_markers:
-                print(f"\n{i:02} - {elmnt.text}")
+                print(f"\n{i:02} - {elmnt.text.lower()} - Mkr: {marker}")
                 if i+1 < len(e_list): print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
-                if marker in elmnt.text.lower():
+                if marker == elmnt.text.lower().strip():
                     item_info[marker].append(e_list[i+1].text)
+                    print(f"STORE:{i:02}[{marker}] {elmnt.text} <")
+                    print(f"item_info[{marker}]:{item_info[marker]} <") 
                     found_mk = marker
                     i += 1  # skip next index
                     break
@@ -759,8 +762,9 @@ class ProductInfo:
             self.i_text = '__igdts__'
 
 
-        # update allergens from scrape info
-        if (len(item_info['allergy information']) > 0): self.allergens_raw = item_info['allergy information'][0]
+        # update allergens from scrape info - tsc
+        #if (len(item_info['allergy information']) > 0): self.allergens_raw = item_info['allergy information'][0] # tsc       
+        if (len(item_info['dietary information']) > 0): self.allergens_raw = item_info['dietary information'][0] # mrs
 
         ots_info = process_OTS_i_string_into_allergens_and_base_ingredients(self.allergens_raw, self.ri_name)
         
@@ -885,7 +889,7 @@ class ProductInfo:
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
         def remove_g_and_less_than(str_g):
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.')
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
             if '&lt;' in str_g:
@@ -934,11 +938,10 @@ class ProductInfo:
         # (query['cookie_b'][DSK][BY], query['cookie_b'][DSK][SEL])
         # or
         # query['cookie_b'][cur] where cur = DSK or MOB
-        # WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable(query['cookie_b'][DSK])).click()
+        # WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][DSK])).click()
 
         # remove cookie request
-        delay_in_seconds = 3
-        time_out_inSec = 5  
+        cookie_btn_timeout_inSec = 5  
         driver.get(self.product_url)
 
         allow_cookies_btn_class = '.beans-cookies-notification__button'
@@ -946,12 +949,12 @@ class ProductInfo:
             try:
                 # ALL work
                 # using a class
-                print(f'try cookie_button w WAIT: {time_out_inSec}')
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
-                WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
+                print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
+                WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
                 # using XPath w text content
-                #WebDriverWait(driver, time_out_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
+                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
                 print('CLICKED cookie_button')
                 ProductInfo.tsc_cookie_barrier = False
             except TimeoutException:
@@ -1099,10 +1102,6 @@ class ProductInfo:
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
-        # item_info - remove marker at they are found
-        #item_info_markers = ['product description','ingredients','allergy information','number of uses','net contents']
-        #or 
-        #item_info_markers = [ m for m,l in item_info ]
         item_info_markers = list(item_info.keys())
 
         print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - S')
@@ -1114,7 +1113,7 @@ class ProductInfo:
             for marker in item_info_markers:
                 print(f"\n{i:02} - {elmnt.text}")
                 if i+1 < len(e_list): print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
-                if marker in elmnt.text.lower():
+                if marker == elmnt.text.lower().strip():
                     item_info[marker].append(e_list[i+1].text)
                     found_mk = marker
                     i += 1  # skip next index
