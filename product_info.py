@@ -540,7 +540,7 @@ class ProductInfo:
             'allergy information': [],
             'number of uses': [],
             'net contents': [],
-            'unadopted': []
+            #'unadopted': []
         }
 
         # for desktop replace [DSK] for [MOB] for mobile
@@ -587,7 +587,7 @@ class ProductInfo:
         # xpath - startwith: styled__ProductTitle-mfe-pdp  skip uuid tag __sc-ebmhjv-6
         # "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]"
         h_tags = h2_tags = ''
-        delay_in_seconds = 10
+        delay_in_seconds = 1
         print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
         try:
             print(f'# # #> waiting for Title & QTY CSS:')
@@ -762,26 +762,49 @@ class ProductInfo:
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
-        # item_info_pairs
-        try:
-            print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - S')
-            for i, elmnt in enumerate(e_list):
-                for marker, data_list in item_info_pairs.items():
-                    print(f"\n{i:02} - {elmnt.text}")
-                    if (i+1 < len(e_list)-1):
-                        print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
-                    print(f"-- {marker} in {elmnt.text.lower()} = {marker in elmnt.text.lower()}")
-                    if marker in elmnt.text.lower():
-                        if (i+1 < len(e_list)-1):
-                            item_info_pairs[marker].append(e_list[i+1].text)
-                        break
+        # item_info_pairs - remove marker at they are found
+        #item_info_marker = ['product description','ingredients','allergy information','number of uses','net contents']
+        #or 
+        #item_info_marker = [ m for m,l in item_info_pairs ]
+        item_info_marker = list(item_info_pairs.keys())
 
-        except Exception as exp:
-            print(exp.msg)
-            #pprint(exp)
-            print('ERROR processing item_info_pairs - ??!')
+        print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - S')
+        # skip on fin=d
+        i = 0
+        while i < len(e_list):
+            elmnt = e_list[i]
+            found_mk = None
+            for marker in item_info_marker:
+                print(f"\n{i:02} - {elmnt.text}")
+                if i+1 < len(e_list): print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
+                if marker in elmnt.text.lower():
+                    item_info_pairs[marker].append(e_list[i+1].text)
+                    found_mk = marker
+                    i += 1  # skip next index
+                    break
+            if found_mk: item_info_marker.remove(found_mk)
+            i += 1
+        print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - E')
 
-        print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - E')
+        # try:
+        #     print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - S')
+        #     for i, elmnt in enumerate(e_list):
+        #         for marker, data_list in item_info_pairs.items():
+        #             print(f"\n{i:02} - {elmnt.text}")
+        #             if (i+1 < len(e_list)-1):
+        #                 print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
+        #             print(f"-- {marker} in {elmnt.text.lower()} = {marker in elmnt.text.lower()}")
+        #             if marker in elmnt.text.lower():
+        #                 if (i+1 < len(e_list)-1):
+        #                     item_info_pairs[marker].append(e_list[i+1].text)
+        #                 break
+
+        # except Exception as exp:
+        #     print(exp.msg)
+        #     #pprint(exp)
+        #     print('ERROR processing item_info_pairs - ??!')
+
+        # print('for i, elmnt in enumerate(e_list): - - - - - - - - - - - - - - - - - - - - - - - - E')
 
         # try:          # prone to synch faults
         #     elements = iter(e_list)
