@@ -304,11 +304,31 @@ if __name__ == '__main__':
                            ('mrs beef stock cube','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
                            ('wholegrain mustard','https://groceries.morrisons.com/webshop/product/Morrisons-Wholegrain-Mustard/121390011'),
                            ('mrs veg samosa','https://groceries.morrisons.com/webshop/product/Morrisons-Indian-Takeaway-Vegetable-Samosas/114583011'),
-                           ('',''),
-                           ('',''),
-                           ('',''),
-                           ('',''),
-                           ('',''),                           
+                           ]
+        urls_to_process = [ ('10% minced beef','https://groceries.asda.com/product/beef-mince-meatballs/asda-butchers-selection-beef-reduced-fat-mince/1000269713149'), # nutritional values @ asda are for pan fried mince!!
+                            ('asd mash potato','https://groceries.asda.com/product/prepared-roasting-veg/asda-smooth-buttery-classic-mash/38759'),
+                            ('asd xtra mash potato','https://groceries.asda.com/product/prepared-potatoes/asda-extra-special-creamy-mash/13852585'),
+                            ('white flatbread','https://groceries.asda.com/product/pitta-naan-bread-flatbread/asda-2-plain-naans/1000197472217'),
+                            ('smoked salmon trimmings','https://groceries.asda.com/product/smoked-salmon/asda-smoked-salmon-trimmings/910003094926'),        
+                            ('asd spring onions','https://groceries.asda.com/product/celery-spring-onions/asda-fragrant-crunchy-spring-onions/43994118'),
+                            ('leeks','https://groceries.asda.com/product/onions-leeks/asda-mild-sweet-trimmed-leeks/27003'),
+                            ('asd cooked red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'),
+                            ('asd red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'), # 30g = 80g cooked so uncooked x 80/30 x 80g numbers x 10/8 to per 100g
+                            ('mayo','https://groceries.asda.com/product/mayonnaise/hellmanns-mayonnaise-real/910000246685'),
+                            ('asd mango chutney','https://groceries.asda.com/product/indian-takeaway/asda-indian-pickle-tray/910002615465'),
+                            ('asd garlic flatbread','https://groceries.asda.com/product/flatbreads-ciabatta/asda-garlic-herb-flatbread/910002092926'),
+                            ('limes','https://groceries.asda.com/product/lemons-limes-grapefruit/asda-zingy-zesty-limes/910002721111'),
+                            ('aromat','https://groceries.asda.com/product/marinades-rubs/knorr-aromat-seasoning/450621'),
+                            ('asd olive oil','https://groceries.asda.com/product/olive-oil/asda-olive-oil/1000219339167'),
+                            ('asd extra virgin olive oil','https://groceries.asda.com/product/olive-oil/asda-extra-virgin-olive-oil/1000219339224'),
+                            ('cheese & onion kettle','https://groceries.asda.com/product/sharing-crisps/kettle-chips-mature-cheddar-red-onion-sharing-crisps/1000383133444'),                           
+                            ('asd onion rings','https://groceries.asda.com/product/sharing-crisps/asda-onion-rings-sharing-snacks/910000826621'),
+                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),
+                            ('',''),
+                            ('',''),
+                            ('',''),
+                            ('',''),
+                            ('',''),
                            ]     
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
