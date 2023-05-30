@@ -307,6 +307,7 @@ if __name__ == '__main__':
                            ]
         urls_to_process = [ ('10% minced beef','https://groceries.asda.com/product/beef-mince-meatballs/asda-butchers-selection-beef-reduced-fat-mince/1000269713149'), # nutritional values @ asda are for pan fried mince!!
                             ('asd mash potato','https://groceries.asda.com/product/prepared-roasting-veg/asda-smooth-buttery-classic-mash/38759'),
+                            ('asd honey nut cornflakes','https://groceries.asda.com/product/cornflakes-honey-nut/asda-corn-flakes/1000383159255'),
                             ('asd xtra mash potato','https://groceries.asda.com/product/prepared-potatoes/asda-extra-special-creamy-mash/13852585'),
                             ('white flatbread','https://groceries.asda.com/product/pitta-naan-bread-flatbread/asda-2-plain-naans/1000197472217'),
                             ('smoked salmon trimmings','https://groceries.asda.com/product/smoked-salmon/asda-smoked-salmon-trimmings/910003094926'),        
@@ -323,8 +324,7 @@ if __name__ == '__main__':
                             ('asd extra virgin olive oil','https://groceries.asda.com/product/olive-oil/asda-extra-virgin-olive-oil/1000219339224'),
                             ('cheese & onion kettle','https://groceries.asda.com/product/sharing-crisps/kettle-chips-mature-cheddar-red-onion-sharing-crisps/1000383133444'),                           
                             ('asd onion rings','https://groceries.asda.com/product/sharing-crisps/asda-onion-rings-sharing-snacks/910000826621'),
-                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),
-                            ('',''),
+                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),                            
                             ('',''),
                             ('',''),
                             ('',''),
