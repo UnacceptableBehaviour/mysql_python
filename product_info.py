@@ -34,7 +34,7 @@ class ProductInfo:
     tsc_cookie_barrier = True
     wtr_cookie_barrier = True
     cop_cookie_barrier = True
-    asd_cookie_barrier = True
+    asd_cookie_barrier = False
     ocd_cookie_barrier = True
     bkr_cookie_barrier = True
     nutrition_symbol_to_regex    = {
@@ -149,7 +149,7 @@ class ProductInfo:
         print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
         
     def convert_pkg_str_to_qty_in_g(self):          #     ea                kg                g
-        # (Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l) - (Loose|Pack|Each) - (Litre|Kg|L|l) - (mg|Ml|ml|g|G)  
+        # (Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|L|l) - (Loose|Pack|Each) - (Litre|Kg|L|l) - (mg|Ml|ml|g|G|Grams)  
         qty_in_g = 0
         multiplier = 1
 
@@ -165,6 +165,8 @@ class ProductInfo:
 
         self.alt_package_in_g = qty_in_g    
         self.package_in_g = qty_in_g        # this is overwritten with more accurate data if available
+
+
 
 
     def scrape_sainsburys(self):        
@@ -198,8 +200,8 @@ class ProductInfo:
             ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
         driver = ProductInfo.sbs_driver
 
-        # remove cookie request
-        delay_in_seconds = 3    
+        # remove cookie request            
+        cookie_btn_timeout_inSec = 3
         driver.get(self.product_url)
 
         # TODO - H use Tesco cookie - wait click together
@@ -207,7 +209,7 @@ class ProductInfo:
         if ProductInfo.sbs_cookie_barrier:
             try:
                 print('try cookie_button w WAIT')
-                cookie_button = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
+                cookie_button = WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
                 print('cookie_button')
             except TimeoutException:
                 print("Loading took too much time!")
@@ -224,6 +226,7 @@ class ProductInfo:
                 print('cookie_button NOT clicked')
 
         # wait content load
+        delay_in_seconds = 2  # TODO is this an actual delay = bad, or a timeout = fine if so rename - check API
         try:    
             css_selector = 'h3.productDataItemHeader, h3.itemHeader'
             print(f'# # #> waiting for h3 tags: {css_selector}')
@@ -277,7 +280,7 @@ class ProductInfo:
         try:
             css_selector = 'div[data-test-id="pd-retail-price"]'
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
-            self.price_per_package = e.text.strip()
+            self.price_per_package = e.text.strip().replace('now\n','')
             self.package_in_g = 99999999
         except Exception as exp:
             print(exp.msg)
@@ -423,11 +426,6 @@ class ProductInfo:
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
                             e_str = cols[col_100].lower()
-                            # m = re.search(r'(\d+)\s*kj', e_str)     # using kj
-                            # if m:
-                            #     kj_to_kcal = m.group(1)
-                            #     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
-                            #     self.nutrition_info[n_type] = int(kj_to_kcal)
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -459,7 +457,7 @@ class ProductInfo:
         try:
             css_selector = '[data-test-id="pd-unit-price"]'
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
-            self.price_per_measure = e.text.strip()
+            self.price_per_measure = e.text.strip().replace('(','').replace(')','')
         except Exception as exp:
             print(exp.msg)
             print('self.price_per_measure NOT found!')
@@ -523,7 +521,6 @@ class ProductInfo:
                                      (By.CSS_SELECTOR, '#onetrust-accept-btn-handler')],
             'product_title':        [(By.CSS_SELECTOR, 'header > h1'), 
                                      (By.CSS_SELECTOR, 'header > h1')],
-                                     #(By.XPATH,        "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]")],
             # 'package_qty_str':      [(By.CSS_SELECTOR,'.bop-catchWeight'),
             #                          (By.CSS_SELECTOR,'.bop-catchWeight')],                                     
             'price_per_package':    [(By.CSS_SELECTOR, '.bop-price__current'),
@@ -556,17 +553,10 @@ class ProductInfo:
         cookie_btn_timeout_inSec = 5  
         driver.get(self.product_url)
 
-        allow_cookies_btn_class = '.beans-cookies-notification__button'
         if ProductInfo.mrs_cookie_barrier:
             try:
-                # ALL work
-                # using a class
                 print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
                 WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
-                # using XPath w text content
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
                 print('CLICKED cookie_button')
                 ProductInfo.mrs_cookie_barrier = False
             except TimeoutException:
@@ -662,7 +652,7 @@ class ProductInfo:
         try:
             #css_selector = '.price-per-sellable-unit'
             e = driver.find_element(*query['price_per_package'][cur])
-            self.price_per_package = e.text.strip()
+            self.price_per_package = e.text.strip().replace('now\n','')
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
         except Exception as exp:
@@ -674,7 +664,7 @@ class ProductInfo:
         try:
             #css_selector = '.price-per-quantity-weight'
             e = driver.find_element(*query['price_per_measure'][cur])
-            self.price_per_measure = e.text.strip()
+            self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
             print(exp.msg)
@@ -740,7 +730,7 @@ class ProductInfo:
         print(f"item_info['ingredients'] {item_info['ingredients']} <")
                                                 # TODO scan for water salt oil and only other ingredients - cashews, smoke mackerel
         if len(item_info['ingredients']) == 0:  # if no ingredient assume atomic roqufort, milk, smoked mackerel
-            print(f"NO INGREDIUENT FOUND: {item_info['ingredients']} <")
+            print(f"NO INGREDIENT FOUND: {item_info['ingredients']} <")
             self.i_text = ''
             self.igdt_type = 'atomic'            
         else:
@@ -828,11 +818,6 @@ class ProductInfo:
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
                             e_str = cols[col_100].lower()
-                            # m = re.search(r'(\d+)\s*kj', e_str)     # using kj
-                            # if m:
-                            #     kj_to_kcal = m.group(1)
-                            #     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
-                            #     self.nutrition_info[n_type] = int(kj_to_kcal)
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -913,7 +898,6 @@ class ProductInfo:
                                      (By.CSS_SELECTOR, '.beans-cookies-notification__button')],
             'product_title':        [(By.CSS_SELECTOR, 'h1.product-details-tile__title'),
                                      (By.CSS_SELECTOR, 'h1.styled__ProductTitle-mfe-pdp__sc-ebmhjv-6')],
-                                     #(By.XPATH,        "//*[starts-with(@class, 'styled__ProductTitle-mfe-pdp')]")],
             'price_per_package':    [(By.CSS_SELECTOR, '.price-per-sellable-unit'),
                                      (By.CSS_SELECTOR, '.styled__Text-qgg5i6-1')],
             'price_per_measure':    [(By.CSS_SELECTOR, '.price-per-quantity-weight'),
@@ -944,17 +928,10 @@ class ProductInfo:
         cookie_btn_timeout_inSec = 5  
         driver.get(self.product_url)
 
-        allow_cookies_btn_class = '.beans-cookies-notification__button'
         if ProductInfo.tsc_cookie_barrier:
             try:
-                # ALL work
-                # using a class
                 print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".styled__SecondaryButton-rsekm1-3"))).click()
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.CSS_SELECTOR, allow_cookies_btn_class))).click()
                 WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
-                # using XPath w text content
-                #WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Accept all cookies']]"))).click()
                 print('CLICKED cookie_button')
                 ProductInfo.tsc_cookie_barrier = False
             except TimeoutException:
@@ -1005,7 +982,7 @@ class ProductInfo:
             print('Title NOT FOUND - h2_tags')
 
         
-        # self.product_name             Tesco's British Semi Skimmed Milk
+        # self.product_name             British Semi Skimmed Milk
         # self.package_qty_str          (1.13L) 2 pint
         # self.alt_package_in_g         1130 grams
         #      
@@ -1063,7 +1040,7 @@ class ProductInfo:
         try:
             #css_selector = '.price-per-sellable-unit'
             e = driver.find_element(*query['price_per_package'][cur])
-            self.price_per_package = e.text.strip()
+            self.price_per_package = e.text.strip().replace('now\n','')
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
         except Exception as exp:
@@ -1075,7 +1052,7 @@ class ProductInfo:
         try:
             #css_selector = '.price-per-quantity-weight'
             e = driver.find_element(*query['price_per_measure'][cur])
-            self.price_per_measure = e.text.strip()
+            self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
             print(exp.msg)
@@ -1139,7 +1116,7 @@ class ProductInfo:
         print(f"item_info['ingredients'] {item_info['ingredients']} <")
                                                 # TODO scan for water salt oil and only other ingredients - cashews, smoke mackerel
         if len(item_info['ingredients']) == 0:  # if no ingredient assume atomic roqufort, milk, smoked mackerel
-            print(f"NO INGREDIUENT FOUND: {item_info['ingredients']} <")
+            print(f"NO INGREDIENT FOUND: {item_info['ingredients']} <")
             self.i_text = ''
             self.igdt_type = 'atomic'            
         else:
@@ -1226,11 +1203,6 @@ class ProductInfo:
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
                             e_str = cols[col_100].lower()
-                            # m = re.search(r'(\d+)\s*kj', e_str)     # using kj
-                            # if m:
-                            #     kj_to_kcal = m.group(1)
-                            #     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
-                            #     self.nutrition_info[n_type] = int(kj_to_kcal)
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -1265,15 +1237,375 @@ class ProductInfo:
             
         self.supplier_name      = 'Tesco'
 
+    def scrape_asda(self):
+        print(f"scraping ASDA: {self.product_url}")     
+
+        # - - - - Helpers factor out where generic - - - S
+        # TODO factor out
+        def get_nutr_per_100g_col(table_header, default_col=1):
+            col_100 = None
+            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S)
+            for col,text in enumerate(head_cols):
+                col_100 = col
+                if re.search(r'100[gml]+', text): return(col_100)
+
+            return(default_col)
+        
+        # replace 2,2 w/ 2.2
+        # replace (2,2) w/ 2.2
+        def remove_g_and_less_than(str_g):
+            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+
+            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
+            if '&lt;' in str_g:
+                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
+             
+            return( round(float(str_g), 2) )
+        # - - - - Helpers factor out where generic - - - E
+        
+        # register driver
+        if ProductInfo.asd_driver == None:
+            ProductInfo.asd_driver = webdriver.Chrome('chromedriver')        
+        driver = ProductInfo.asd_driver
+
+        DSK = 0
+        MOB = 1
+        BY  = 0
+        SEL = 1
+        cur = DSK
+        query = {
+            'cookie_b':             [(By.CSS_SELECTOR, '#onetrust-accept-btn-handler'),
+                                     (By.CSS_SELECTOR, '#onetrust-accept-btn-handler')],
+            'product_title':        [(By.CSS_SELECTOR, '.pdp-main-details > div'),
+                                     (By.CSS_SELECTOR, '.pdp-main-details > div')],
+            'package_qty_str':      [(By.CSS_SELECTOR,'.pdp-main-details__weight'),
+                                     (By.CSS_SELECTOR,'.pdp-main-details__weight')],                                     
+            'price_per_package':    [(By.CSS_SELECTOR, '.pdp-main-details__price-container'),
+                                     (By.CSS_SELECTOR, '.pdp-main-details__price-container')],
+            'price_per_measure':    [(By.CSS_SELECTOR, '.pdp-main-details__price-and-uom .co-product__price-per-uom'),
+                                     (By.CSS_SELECTOR, '.pdp-main-details__price-and-uom .co-product__price-per-uom')],
+            'item_info':            [(By.CSS_SELECTOR, '.pdp-description-reviews__product-details-title, .pdp-description-reviews__product-details-content'),
+                                     (By.CSS_SELECTOR, '.pdp-description-reviews__product-details-title, .pdp-description-reviews__product-details-content')], # Gets Description but misses i_string / allergies
+            'nutri_table':          [(By.CSS_SELECTOR, '.pdp-description-reviews__nutrition-table-cntr > div'), # NOT table!!
+                                     (By.CSS_SELECTOR, '.pdp-description-reviews__nutrition-table-cntr > div')],
+            
+            # '':[(,),(,)],
+        }
+        item_info = {
+            #'description': [],
+            'features': [],
+            'ingredients': [],
+            #'dietary information': [],
+            #'allergy information': [],  
+            'allergy advice': [],
+            'additives': [],
+            #'number of uses': [],
+            #'net contents': [],
+            #'net content': [],
+            'life style': []
+        }
+
+        # for desktop replace [DSK] for [MOB] for mobile
+        # (query['cookie_b'][DSK][BY], query['cookie_b'][DSK][SEL])
+        # or
+        # query['cookie_b'][cur] where cur = DSK or MOB
+        # WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][DSK])).click()
+
+        # remove cookie request
+        cookie_btn_timeout_inSec = 5  
+        driver.get(self.product_url)
+
+        if ProductInfo.asd_cookie_barrier:
+            try:
+                print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
+                WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
+                print('CLICKED cookie_button')
+                ProductInfo.asd_cookie_barrier = False
+            except TimeoutException:
+                print("Loading took too much time!")
+
+        # wait content load
+        # TODO H - get info at same time as wait load
+        # selector
+        h_tags = h2_tags = ''
+        delay_in_seconds = 1
+        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+        try:
+            print(f'# # #> waiting for Title & QTY CSS:')
+            h_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
+            h_tags = h_tags.text.strip()
+            print(f'# # #> found h_tags:\n{h_tags}')
+        except TimeoutException:
+            print("# # # TIMEOUT> Waiting for Title took too much time!")
+            cur = MOB if cur == DSK else MOB
+        except Exception as exp:
+            print(exp.msg)
+            print('Title NOT FOUND')
+            cur = MOB if cur == DSK else MOB
+        
+        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+        try:            
+            print(f'# # #> waiting for Title & QTY XPATH:')
+            h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
+            h2_tags = h2_tags.text.strip()
+            print(f'# # #> found h2_tags:\n{h2_tags}')
+        except TimeoutException:
+            print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
+        except Exception as exp:
+            print(exp.msg)
+            print('Title NOT FOUND - h2_tags')
+
+        
+        # self.product_name             British Semi Skimmed Milk
+        # self.package_qty_str          (1.13L) 2 pint
+        # self.alt_package_in_g         1130 grams
+        #      
+        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+        try:
+
+            if h_tags or h2_tags:
+                product_title = h_tags if h_tags else h2_tags 
+                product_title_sections = product_title.split('\n')
+                self.product_name = product_title_sections[0].strip() +' ' + product_title_sections[1].strip()
+                self.supplier_item_code = product_title_sections[5].replace('Product code:','').strip()
+
+                print(f"[self.product_name] {self.product_name} < h_tags {h_tags}<  h2_tags {h2_tags}<")
+            else:
+                try:
+                    print(f"[self.product_name] {self.product_name} < * * * NO h_tags or h2_tags * * *")
+                    e = driver.find_element(*query['product_title'][cur])
+                    self.product_name = e.text.strip()                
+                except Exception as exp:
+                    print(exp.msg)
+                    print('self.product_name NOT found! no h / h2 / or retry')
+
+            # remove multipack X no
+            multibuy_rgx = r'(\d+)\s*x'
+            m = re.search(multibuy_rgx, self.product_name, re.I)
+            if m:
+                product_name_multiby_removed = self.product_name.replace(m.group(0), '')
+                self.multipack_qty = m.group(1)
+            else:
+                product_name_multiby_removed = self.product_name
+
+            # in case there is no size specified get size from product name            
+            alt_package_in_g_rgx = r'(([\.\d]+)\s*(Litre|Loose|Pack|mg|Kg|Ml|ml|g|G|Grams|L|l)\s*(?:(\/)?\d+\s*Pint(?:s)?)?)'
+            m = re.search(alt_package_in_g_rgx, product_name_multiby_removed, re.I)
+            if m:
+                self.package_qty_str = m.group(1)
+                self.units = m.group(3)
+                self.qty = m.group(2)
+                self.convert_pkg_str_to_qty_in_g() # alt_package_in_g <- None if units is Pack / Loose
+                print(f"INFO FROM TITLE  - - - - - - - - : S [self.package_qty_str] - {self.package_qty_str} <")
+                pprint(self)
+                print("INFO FROM TITLE  - - - - - - - - : E")
+            
+        except Exception as exp:
+            print(exp.msg)
+            print('self.product_name NOT found!')         
+        
+        # self.price_per_package            £5.50 £2.21/kg  - can appear together
+        #                                     ^^
+        # self.price_per_package    in      
+        # self.price_per_measure    in      
+        print(f"\n\nquery['price_per_package'][{cur}] {query['price_per_package'][cur]}")
+        try:
+            #css_selector = '.price-per-sellable-unit'
+            e = driver.find_element(*query['price_per_package'][cur])
+            self.price_per_package = e.text.strip().replace('now\n','')
+            # m = re.match(r'£(\d+.\d\d)[^\/]', f"{e.text.strip()} ", re.M)       # match price NOT price/unit
+            # if m:
+            #     self.price_per_package = m.group(1)
+            self.package_in_g = 99999999
+            print(f"£/pkg: {self.price_per_package} [self.price_per_package] from >{e.text.strip()}<")
+        except Exception as exp:
+            print(exp.msg)
+            print('self.price_per_package NOT found!')
+
+        
+        print(f"\n\nquery['price_per_measure'][{cur}] {query['price_per_measure'][cur]}")
+        try:
+            #css_selector = '.price-per-quantity-weight'
+            e = driver.find_element(*query['price_per_measure'][cur])            
+            self.price_per_measure = e.text.strip().replace('(','').replace(')','')
+            print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
+        except Exception as exp:
+            print(exp.msg)
+            print('self.price_per_measure NOT found!')
+
+        # Product Description (TODO) & Infomation
+        # document.querySelectorAll('h2.product-info-block__title')
+        # gives description and 
+        # 
+        # all rest under Information
+        #
+        # more generic gives all info blocks except nutrition (whic we already have)
+        # document.querySelectorAll('div.product-info-block')
+
+        # >>> list = driver.find_elements(By.CSS_SELECTOR,'div.product-info-block, .product-info-block__content')
+
+        print(f"\n\nquery['item_info'][{cur}] {query['item_info'][cur]}")
+
+        e_list = []
+        try:            
+            e_list = driver.find_elements(*query['item_info'][cur]) 
+        except Exception as exp:
+            print(exp.msg)
+            #pprint(exp)
+            print('ERROR processing item_info PAIRS - NOT found!')
+
+        item_info_markers = list(item_info.keys())
+
+        print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - S')
+        # skip on fin=d
+        i = 0
+        while i < len(e_list):
+            elmnt = e_list[i]
+            found_mk = None
+            for marker in item_info_markers:
+                print(f"\n{i:02} - {elmnt.text.lower()} - Mkr: {marker}")
+                if i+1 < len(e_list): print(f"{i+1:02} - {e_list[i+1]}\n{e_list[i+1].text}")
+                if marker == elmnt.text.lower().strip():
+                    item_info[marker].append(e_list[i+1].text)
+                    print(f"STORE:{i:02}[{marker}] {elmnt.text} <")
+                    print(f"item_info[{marker}]:{item_info[marker]} <") 
+                    found_mk = marker
+                    i += 1  # skip next index
+                    break
+            if found_mk: item_info_markers.remove(found_mk)
+            i += 1
+        print('while i < len(e_list):: - - - - - - - - - - - - - - - - - - - - - - - - E')
+
+
+        print('+>> item_info - - - - - - - - - - - - - - - - - - - S')
+        pprint(item_info)
+        print('+>> item_info - - - - - - - - - - - - - - - - - - - E')
+                
+        # Pack size in Product Description - TODO L 
+        # Net Contents also has same info ? multibuy
+        if ('net content' in item_info) and (len(item_info['net content']) > 0):     # not always present
+            self.package_in_g = item_info['net content'][0]
+        else:
+            self.package_in_g = self.alt_package_in_g
+        
+        print('ingredients  - - - - - - - - S')
+        print(f"len(item_info['ingredients']) {len(item_info['ingredients'])}")
+        print(f"item_info['ingredients'] {item_info['ingredients']} <")
+                                                # TODO scan for water salt oil and only other ingredients - cashews, smoke mackerel
+        if len(item_info['ingredients']) == 0:  # if no ingredient assume atomic roqufort, milk, smoked mackerel
+            print(f"NO INGREDIENT FOUND: {item_info['ingredients']} <")
+            self.i_text = ''
+            self.igdt_type = 'atomic'            
+        else:
+            self.i_text = item_info['ingredients'][0]
+            ots_info = process_OTS_i_string_into_allergens_and_base_ingredients(self.i_text, self.ri_name)
+            self.allergens = ots_info['allergens']
+            print(f"- - - - - - - ots_info")
+            pprint(ots_info)
+            self.i_list = ots_info['i_list']
+            if len(self.i_list) == 1: 
+                print(f"ATOMIC: len(self.i_list) [{len(self.i_list)}]\n{self.i_list}\nself.i_text: {self.i_text}")
+                self.igdt_type = 'atomic'
+            else:
+                self.igdt_type = 'ots'  # override ctor atomic
+        
+        # product may have been set atomic by args passed to constructor/init
+        if self.igdt_type == 'atomic':
+            print(f"- - -: * * * {self.ri_name} - ATOMIC . . . .  self.i_text = '__igdts__'\n self.i_text was: {self.i_text} <")
+            self.i_text = '__igdts__'
+
+
+        # update allergens from scrape info - tsc
+        #if (len(item_info['allergy information']) > 0): self.allergens_raw = item_info['allergy information'][0] # tsc       
+        if (len(item_info['allergy advice']) > 0): self.allergens_raw = item_info['allergy advice'][0] # mrs
+
+        ots_info = process_OTS_i_string_into_allergens_and_base_ingredients(self.allergens_raw, self.ri_name)
+        
+        print(f"processing self.allergens_raw[{self.allergens_raw}] = [{ots_info['allergens']}]")
+        
+        self.allergens.update(ots_info['allergens'])
+        if (self.igdt_type == 'atomic') and (len(self.allergens)) and (self.i_text == '__igdts__'):
+            self.i_text = f"{self.ri_name}, (contains {', '.join(self.allergens)})"
+
+        print('ingredients  - - - - - - - - E')        
+        
+        if 'product description' in item_info:      
+            # TODO need to process/accumulate down to 'Information' and pull out Pack size if present
+            self.product_desc = item_info['product description']
+
+
+
+        print('- - - - - - - nutrition DIV type - - - - - - - S')
+
+        
+        # item_info['nutrition']
+        nut_regex = ProductInfo.nutrition_symbol_to_regex
+        row_data = []
+        col_100 = 1
+
+        # nutrition table - - - - NOT WORKING: for DIV style
+        try:
+            tb_rows = driver.find_elements(*query['nutri_table'][cur])
+            rows = iter(tb_rows)
+            tb_head = next(rows)    # first row always col titles
+            #head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S) # TODO REMOVE
+            
+            # TODO make asd_div version 
+            #col_100 = get_nutr_per_100g_col(tb_head)
+            
+            print(f"--H: {tb_head.text}")
+            print(f"--H: {tb_head.get_attribute('innerHTML')}")
+            for row in rows:
+                print(f"\n-R: {row.text}")
+                print(f"\t{row.get_attribute('innerHTML')}")
+                # cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
+                # print(f"-R: {cols}")
+                # row_data.append(cols)
+                # for n_type, n_regex in nut_regex.items():
+                #     if re.search(n_regex, cols[0].lower()):
+                #         #self.nutrition_info[n_type] = cols[col_100]
+                #         if n_type == 'energy':
+                #             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
+                #             e_str = cols[col_100].lower()
+                            
+                #             m = re.search(r'(\d+)\s*kcal', e_str)
+                #             if m:
+                #                 kcal = m.group(1)                                
+                #                 self.nutrition_info[n_type] = int(kcal)
+                #             else:
+                #                 print(f"\tenergy: NO MATCH:{e_str}")
+                #                 if 'kj' in e_str:                                    
+                #                     kj_to_kcal = e_str.replace('kj','').strip()
+                #                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                #                     self.nutrition_info[n_type] = int(kj_to_kcal)
+                #         else:
+                #             self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+            
+            pprint(self.nutrition_info)
+            
+        except StopIteration as exp:
+            print(exp)
+            print('ERROR processing nutrition table - NOT found!')
+        
+        print('- - - - - - - nutrition DIV type - - - - - - - E')
+
+        # sbs            
+        # self.supplier_item_code = ''
+        # <p class="pd__item-code">Item code: <span id="productSKU">952811</span></p>        
+        # try:
+        #     e = driver.find_element(*query['supplier_item_code'][cur])
+        #     self.supplier_item_code = e.text.strip()
+        # except Exception as exp:
+        #     print(exp.msg)
+        #     print('self.supplier_item_code NOT found!')                    
+            
+        self.supplier_name      = 'Asda'        
 
     def scrape_waitrose(self):
         print(f"scraping WAITROSE: {self.product_url}")      
       
     def scrape_coop(self):
         print(f"scraping COOP: {self.product_url}")
-      
-    def scrape_asda(self):
-        print(f"scraping ASDA: {self.product_url}")
       
     def scrape_ocado(self):
         print(f"scraping OCADO: {self.product_url}")
