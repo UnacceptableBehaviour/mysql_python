@@ -1589,7 +1589,8 @@ def build_pork_set():
 # BEEF
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 beef_basic = {'beef','shortribs','roast beef','beef ribeye','beef silverside w&s','beef fat','beef burger','beef stock cube',
-              'mrs beef stock cube as prepared','beef stock','mrs beef stock cube','5% beef mince','12% beef mince','15% beef mince',
+              'mrs beef stock cube as prepared','beef stock','mrs beef stock cube','reduced fat beef mince','5% beef mince',
+              '12% beef mince','15% beef mince',
               '20% beef mince','5% minced beef','12% minced beef','15% minced beef','20% minced beef','beef brisket','beef fillet',
               'flat iron steak','rump steak','sirloin steak','fillet steak','ribeye','ribeye steak','forerib','forerib joint',
               'beef joint','silverside','topside','top rump','ox cheek','beef shin','oxtail','beef meatballs','beef sausages',
