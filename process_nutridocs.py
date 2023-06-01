@@ -490,6 +490,24 @@ def dump_missing_sub_ingredients_across_all_docs_to_JSON(sub_i_hash):
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+help = '''
+Options Information
+No arguments:            Report status of files selected in NUTRIDOC_LIST
+
+-ct                      Create empty Templates from image names
+                         for recipes that have an image but for which there is no recipe template
+
+-v                       Verbose mode 
+    
+-c                       show what -clean would delete
+-clean                   Clean old files NO backup - removes asset backup directory after completion
+                         
+-go                      Generate Output in tmp folders - for populate_db.py
+
+-u                       Show URLs of missing OTS ingrediets
+
+'''
+
 opt_dict = {
     'create_empty_templates_from_image_names': False,
     'verbose_mode':  False,
@@ -517,6 +535,10 @@ if '-go' in sys.argv:
 
 if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
     opt_dict['help'] = True
+    print(f"\n\nOptions passed:")
+    pprint(opt_dict)
+    print(f"\n{help}")
+    sys.exit(0)
 
 # 'nutridoc' : (recipes process, [list missing images])
 processed_nutridocs = {}
@@ -686,23 +708,6 @@ if opt_dict['clean_old_files_NO_backup_inspect'] == True:
         print("Use: \n\tprocess_nutridocs.py -clean \n\nto HOT DELETE directories & contents.")
 
 
-help = '''
-Options Information
-No arguments:            Report status of files selected in NUTRIDOC_LIST
-
--ct                      Create empty Templates from image names
-                         for recipes that have an image but for which there is no recipe template
-
--v                       Verbose mode 
-    
--c                       show what -clean would delete
--clean                   Clean old files NO backup - removes asset backup directory after completion
-                         
--go                      Generate Output in tmp folders - for populate_db.py
-
--u                       Show URLs of missing OTS ingrediets
-
-'''
 
 print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
 pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
