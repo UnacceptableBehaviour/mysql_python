@@ -242,8 +242,8 @@ if __name__ == '__main__':
     if '-noprompt' in sys.argv:
         opt_no_prompt = True
 
-    if '-u' in sys.argv:  # problem URLS to test against
-    #if True: # debugger
+    #if '-u' in sys.argv:  # problem URLS to test against
+    if True: # debugger
         # - - - - - - 
         # urls_to_process = [ 
         #                     ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
@@ -305,31 +305,52 @@ if __name__ == '__main__':
                            ('wholegrain mustard','https://groceries.morrisons.com/webshop/product/Morrisons-Wholegrain-Mustard/121390011'),
                            ('mrs veg samosa','https://groceries.morrisons.com/webshop/product/Morrisons-Indian-Takeaway-Vegetable-Samosas/114583011'),
                            ]
-        urls_to_process = [ ('10% minced beef','https://groceries.asda.com/product/beef-mince-meatballs/asda-butchers-selection-beef-reduced-fat-mince/1000269713149'), # nutritional values @ asda are for pan fried mince!!
-                            ('asd mash potato','https://groceries.asda.com/product/prepared-roasting-veg/asda-smooth-buttery-classic-mash/38759'),
-                            ('asd honey nut cornflakes','https://groceries.asda.com/product/cornflakes-honey-nut/asda-corn-flakes/1000383159255'),
-                            ('asd xtra mash potato','https://groceries.asda.com/product/prepared-potatoes/asda-extra-special-creamy-mash/13852585'),
-                            ('white flatbread','https://groceries.asda.com/product/pitta-naan-bread-flatbread/asda-2-plain-naans/1000197472217'),
-                            ('smoked salmon trimmings','https://groceries.asda.com/product/smoked-salmon/asda-smoked-salmon-trimmings/910003094926'),        
-                            ('asd spring onions','https://groceries.asda.com/product/celery-spring-onions/asda-fragrant-crunchy-spring-onions/43994118'),
-                            ('leeks','https://groceries.asda.com/product/onions-leeks/asda-mild-sweet-trimmed-leeks/27003'),
-                            ('asd cooked red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'),
-                            ('asd red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'), # 30g = 80g cooked so uncooked x 80/30 x 80g numbers x 10/8 to per 100g
-                            ('mayo','https://groceries.asda.com/product/mayonnaise/hellmanns-mayonnaise-real/910000246685'),
-                            ('asd mango chutney','https://groceries.asda.com/product/indian-takeaway/asda-indian-pickle-tray/910002615465'),
-                            ('asd garlic flatbread','https://groceries.asda.com/product/flatbreads-ciabatta/asda-garlic-herb-flatbread/910002092926'),
-                            ('limes','https://groceries.asda.com/product/lemons-limes-grapefruit/asda-zingy-zesty-limes/910002721111'),
-                            ('aromat','https://groceries.asda.com/product/marinades-rubs/knorr-aromat-seasoning/450621'),
-                            ('asd olive oil','https://groceries.asda.com/product/olive-oil/asda-olive-oil/1000219339167'),
+        urls_to_process = [ #('10% minced beef','https://groceries.asda.com/product/beef-mince-meatballs/asda-butchers-selection-beef-reduced-fat-mince/1000269713149'), # nutritional values @ asda are for pan fried mince!!
+                            #('asd mash potato','https://groceries.asda.com/product/prepared-roasting-veg/asda-smooth-buttery-classic-mash/38759'),
+                            #('asd honey nut cornflakes','https://groceries.asda.com/product/cornflakes-honey-nut/asda-corn-flakes/1000383159255'),
+                            #('asd xtra mash potato','https://groceries.asda.com/product/prepared-potatoes/asda-extra-special-creamy-mash/13852585'),
+                            #('white flatbread','https://groceries.asda.com/product/pitta-naan-bread-flatbread/asda-2-plain-naans/1000197472217'),
+                            ('smoked salmon trimmings','https://groceries.asda.com/product/smoked-salmon/asda-smoked-salmon-trimmings/910003094926'),        # only gets title on 3rd try??
+                            #('asd spring onions','https://groceries.asda.com/product/celery-spring-onions/asda-fragrant-crunchy-spring-onions/43994118'),
+                            #('leeks','https://groceries.asda.com/product/onions-leeks/asda-mild-sweet-trimmed-leeks/27003'),
+                            #('asd cooked red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'),
+                            #('asd red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'), # 30g = 80g cooked so uncooked x 80/30 x 80g numbers x 10/8 to per 100g # check for caveats: prepared as directed , pan fried, etc
+                            #('mayo','https://groceries.asda.com/product/mayonnaise/hellmanns-mayonnaise-real/910000246685'),
+                            #('asd mango chutney','https://groceries.asda.com/product/indian-takeaway/asda-indian-pickle-tray/910002615465'),
+                            #('asd garlic flatbread','https://groceries.asda.com/product/flatbreads-ciabatta/asda-garlic-herb-flatbread/910002092926'),  # TODO 'price_per_package': 'was  \n£1.70\n£1.00'
+                            #('limes','https://groceries.asda.com/product/lemons-limes-grapefruit/asda-zingy-zesty-limes/910002721111'), # NO nutrinfo # 'units': '?', SB 'ea' 4pk . . . 'product_name': 'ASDA Zingy & Zesty Limes 4pk','price_per_package': '£1.00','price_per_measure': '25.0p/each',
+                            ('aromat','https://groceries.asda.com/product/marinades-rubs/knorr-aromat-seasoning/450621'),                # TODO Issue with FULL stop at end - remove all after full stop - food_sets
+                            ('asd olive oil','https://groceries.asda.com/product/olive-oil/asda-olive-oil/1000219339167'), # TODO H - 100 ml of Oil weigh 92 grams,         ISSUE 1l
                             ('asd extra virgin olive oil','https://groceries.asda.com/product/olive-oil/asda-extra-virgin-olive-oil/1000219339224'),
-                            ('cheese & onion kettle','https://groceries.asda.com/product/sharing-crisps/kettle-chips-mature-cheddar-red-onion-sharing-crisps/1000383133444'),                           
+                            ('cheese & onion kettle','https://groceries.asda.com/product/sharing-crisps/kettle-chips-mature-cheddar-red-onion-sharing-crisps/1000383133444'), # TODO 'price_per_package': was / now issue                           
                             ('asd onion rings','https://groceries.asda.com/product/sharing-crisps/asda-onion-rings-sharing-snacks/910000826621'),
-                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),                            
+                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),    # TODO 'price_per_package': was / now issue  # TODO also Energy 2112 kj / < random '/'
+                            ('asd es mgt','https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-wholemeal-multigrain-sliced-loaf/1000123650133'),                            
                             ('',''),
                             ('',''),
-                            ('',''),
-                            ('',''),
-                           ]     
+                           ] 
+        urls_to_process = [ ('wtr breaded calamari','https://www.waitrose.com/ecom/products/waitrose-breaded-calamari/895037-689932-689933'),
+                            ('wtr sweet pickle herring','https://www.waitrose.com/ecom/products/elsinore-herring-in-sweet-spicy-marinade/023229-11289-11290'),
+                            ('wtr raw baguette','https://www.waitrose.com/ecom/products/essential-waitrose-bake-at-home-white-baguettes/886566-746625-746626'),                            
+                            ('wtr diced yellowfin tuna','https://www.waitrose.com/ecom/products/waitrose-diced-msc-yellowfin-tuna/728814-754521-754522'),
+                            ('duchy organic side of salmon','https://www.waitrose.com/ecom/products/duchy-organic-orkney-whole-salmon-fillet/851835-486775-486776'),
+                            ('wtr chicken thighs skin & bone','https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'),
+                            ('wtr organic chicken thighs skin & bone','https://www.waitrose.com/ecom/products/duchy-organic-chicken-thighs-skin-on-bone-in/063388-32185-32186'),
+                            ('wtr battery chicken','https://www.waitrose.com/ecom/products/essential-large-whole-chicken/645021-507910-507911'),                            
+                            ('wtr baby rainbow carrots','https://www.waitrose.com/ecom/products/no1-baby-rainbow-carrots/636147-581352-581353'),
+                            ('wtr carrots','https://www.waitrose.com/ecom/products/essential-carrots/085125-43221-43222'),
+                            ('wtr unearthed jamon serano','https://www.waitrose.com/ecom/products/unearthed-spanish-serrano-ham/831503-347894-347895'),
+                            ('wtr parma ham','https://www.waitrose.com/ecom/products/waitrose-parma-ham-6-slices/525474-156519-156520'),
+                            ('organic bananas','https://www.waitrose.com/ecom/products/duchy-organic-fairtrade-bananas/088937-45726-45727'),
+                            ('wtr lrg cucumber','https://www.waitrose.com/ecom/products/essential-cucumber/086468-44158-44159'),
+                            ('wtr unwaxed limes','https://www.waitrose.com/ecom/products/cooks-ingredients-unwaxed-limes/011269-5598-5599'),
+                            ('wtr flapjack','https://www.waitrose.com/ecom/products/waitrose-mini-flapjack-bites/777243-110540-110541'),
+                            ('wtr shiraz cabernet red wine','https://www.waitrose.com/ecom/products/wolf-blass-red-label-shiraz-cabernet/868136-779851-779852'),
+                            ('biscoff icecream stick','https://www.waitrose.com/ecom/products/wolf-blass-red-label-shiraz-cabernet/868136-779851-779852'),
+                            ('wtr fr pork sausages','https://www.waitrose.com/ecom/products/no1-free-range-12-pork-sausages/824649-275729-275730'),
+                            ('duchy organic beef ribeye','https://www.waitrose.com/ecom/products/duchy-organic-british-beef-ribeye-steak/015596-7493-7494'),                            
+                            ('wtr fairtrade bananas','https://www.waitrose.com/ecom/products/essential-fairtrade-bananas/088903-45703-45704'),
+                           ]             
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
         print('= = = Running scrape tests = = =')
