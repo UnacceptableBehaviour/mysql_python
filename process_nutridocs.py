@@ -336,7 +336,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-#NUTRIDOC_LIST = ['y966']
+NUTRIDOC_LIST = ['y458']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
@@ -377,7 +377,7 @@ NUTRIDOC_LIST = [
 # y454_NUTRITEST_recipes_20221001-31.rtf           40       38        2           17            1
 #
 # y457_NUTRITEST_recipes_20230215-0422.rtf         36       34        2       **  41  **        16                 26 
-#
+# y458_NUTRITEST_recipes_20230424-0531.rtf         47       5         42          0             1                  0
 # y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
 # y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
 #
@@ -496,6 +496,7 @@ No arguments:            Report status of files selected in NUTRIDOC_LIST
 
 -ct                      Create empty Templates from image names
                          for recipes that have an image but for which there is no recipe template
+                         Must be of format '20230531_150107_red lentil w yogurt mint & chives.jpg'
 
 -v                       Verbose mode 
     
