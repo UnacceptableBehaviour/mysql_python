@@ -153,7 +153,7 @@ class ProductInfo:
         qty_in_g = 0
         multiplier = 1
 
-        if (self.units == 'kg') or (self.units == 'l') or (self.units == 'litre'):
+        if (self.units == 'kg') or (self.units == 'l') or (self.units == 'litre') or (self.units == 'litres'):
             multiplier = 1000
             
         qty_in_g = self.qty * multiplier
@@ -185,14 +185,15 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
-        def remove_g_and_less_than(str_g):
+        def remove_g_and_less_than(str_g: str) -> float:
             str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
-            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
-            if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
-             
-            return( round(float(str_g), 2) )
+            if '&lt;' in str_g or '<' in str_g:        
+                str_g = str_g.replace('&lt;', '').replace('<', '')
+            
+                return round(float(str_g) * 0.8, 2)
+            
+            return round(float(str_g), 2)  
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -425,7 +426,7 @@ class ProductInfo:
                         #self.nutrition_info[n_type] = cols[col_100]
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
-                            e_str = cols[col_100].lower()
+                            e_str = cols[col_100].lower().replace('/', '')
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -496,14 +497,15 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
-        def remove_g_and_less_than(str_g):
+        def remove_g_and_less_than(str_g: str) -> float:
             str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
-            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
-            if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
-             
-            return( round(float(str_g), 2) )
+            if '&lt;' in str_g or '<' in str_g:        
+                str_g = str_g.replace('&lt;', '').replace('<', '')
+            
+                return round(float(str_g) * 0.8, 2)
+            
+            return round(float(str_g), 2)  
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -581,17 +583,18 @@ class ProductInfo:
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
-        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
-        try:            
-            print(f'# # #> waiting for Title & QTY XPATH:')
-            h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
-            h2_tags = h2_tags.text.strip()
-            print(f'# # #> found h2_tags:\n{h2_tags}')
-        except TimeoutException:
-            print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
-        except Exception as exp:
-            print(exp.msg)
-            print('Title NOT FOUND - h2_tags')
+        if not h_tags:        
+            print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+            try:            
+                print(f'# # #> waiting for Title & QTY XPATH:')
+                h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
+                h2_tags = h2_tags.text.strip()
+                print(f'# # #> found h2_tags:\n{h2_tags}')
+            except TimeoutException:
+                print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
+            except Exception as exp:
+                print(exp.msg)
+                print('Title NOT FOUND - h2_tags')
 
         
         # self.product_name             British Semi Skimmed Milk
@@ -629,10 +632,16 @@ class ProductInfo:
             if m:
                 self.package_qty_str = m.group(1)
                 self.units = m.group(3)
-                self.qty = m.group(2)
+                self.qty = round(float(m.group(2).strip()),2)
                 self.convert_pkg_str_to_qty_in_g() # alt_package_in_g <- None if units is Pack / Loose
                 print(f"INFO FROM TITLE  - - - - - - - - : S [self.package_qty_str] - {self.package_qty_str} <")
-                pprint(self)
+                print(f"self.product_name: {self.product_name}<")
+                print(f"self.package_qty_str: {self.package_qty_str}<")
+                print(f"self.package_in_g: {self.package_in_g}<")
+                print(f"self.alt_package_in_g: {self.alt_package_in_g}<")
+                print(f"self.units: {self.units}<")
+                print(f"self.qty: {self.qty}<")
+                print(f"self.no_of_each: {self.no_of_each}<")
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
@@ -817,7 +826,7 @@ class ProductInfo:
                         #self.nutrition_info[n_type] = cols[col_100]
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
-                            e_str = cols[col_100].lower()
+                            e_str = cols[col_100].lower().replace('/', '')
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -873,14 +882,15 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
-        def remove_g_and_less_than(str_g):
+        def remove_g_and_less_than(str_g: str) -> float:
             str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
-            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
-            if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
-             
-            return( round(float(str_g), 2) )
+            if '&lt;' in str_g or '<' in str_g:        
+                str_g = str_g.replace('&lt;', '').replace('<', '')
+            
+                return round(float(str_g) * 0.8, 2)
+            
+            return round(float(str_g), 2)  
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -969,17 +979,18 @@ class ProductInfo:
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
-        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
-        try:            
-            print(f'# # #> waiting for Title & QTY XPATH:')
-            h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
-            h2_tags = h2_tags.text.strip()
-            print(f'# # #> found h2_tags:\n{h2_tags}')
-        except TimeoutException:
-            print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
-        except Exception as exp:
-            print(exp.msg)
-            print('Title NOT FOUND - h2_tags')
+        if not h_tags:
+            print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+            try:            
+                print(f'# # #> waiting for Title & QTY XPATH:')
+                h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
+                h2_tags = h2_tags.text.strip()
+                print(f'# # #> found h2_tags:\n{h2_tags}')
+            except TimeoutException:
+                print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
+            except Exception as exp:
+                print(exp.msg)
+                print('Title NOT FOUND - h2_tags')
 
         
         # self.product_name             British Semi Skimmed Milk
@@ -1017,10 +1028,16 @@ class ProductInfo:
             if m:
                 self.package_qty_str = m.group(1)
                 self.units = m.group(3)
-                self.qty = m.group(2)
+                self.qty = round(float(m.group(2).strip()),2)
                 self.convert_pkg_str_to_qty_in_g() # alt_package_in_g <- None if units is Pack / Loose
                 print(f"INFO FROM TITLE  - - - - - - - - : S [self.package_qty_str] - {self.package_qty_str} <")
-                pprint(self)
+                print(f"self.product_name: {self.product_name}<")
+                print(f"self.package_qty_str: {self.package_qty_str}<")
+                print(f"self.package_in_g: {self.package_in_g}<")
+                print(f"self.alt_package_in_g: {self.alt_package_in_g}<")
+                print(f"self.units: {self.units}<")
+                print(f"self.qty: {self.qty}<")
+                print(f"self.no_of_each: {self.no_of_each}<")
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
@@ -1196,13 +1213,13 @@ class ProductInfo:
             for row in rows:
                 cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
                 print(f"-R: {cols}")
-                row_data.append(cols)
+                row_data.append(cols)   # TODO is this even used? WHERE? REMOVE - 4 occurences
                 for n_type, n_regex in nut_regex.items():
                     if re.search(n_regex, cols[0].lower()):
                         #self.nutrition_info[n_type] = cols[col_100]
                         if n_type == 'energy':
                             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
-                            e_str = cols[col_100].lower()
+                            e_str = cols[col_100].lower().replace('/', '')
                             
                             m = re.search(r'(\d+)\s*kcal', e_str)
                             if m:
@@ -1242,9 +1259,18 @@ class ProductInfo:
 
         # - - - - Helpers factor out where generic - - - S
         # TODO factor out
-        def get_nutr_per_100g_col(table_header, default_col=1):
+        LIST = 0    # TODO get rid of manual specifier detect list/string act accordingly
+        HTML = 1    # back port to previous versions
+        def get_nutr_per_100g_col(table_header, header_type=HTML):
+            default_col=1
             col_100 = None
-            head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S)
+            head_cols = []
+
+            if header_type == HTML:
+                head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',table_header.get_attribute('innerHTML'), re.S)
+            elif header_type == LIST:
+                head_cols = table_header
+
             for col,text in enumerate(head_cols):
                 col_100 = col
                 if re.search(r'100[gml]+', text): return(col_100)
@@ -1253,14 +1279,15 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
-        def remove_g_and_less_than(str_g):
+        def remove_g_and_less_than(str_g: str) -> float:
             str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
-            # replace &lt less than <0.5 w/ 0.4, or <0.1 w/ 0.08  . . . think raptor 1, it'll be gone in raptor 2 
-            if '&lt;' in str_g:
-                return( round((float(str_g.replace('&lt;','')) * 0.8), 2 ) )
-             
-            return( round(float(str_g), 2) )
+            if '&lt;' in str_g or '<' in str_g:        
+                str_g = str_g.replace('&lt;', '').replace('<', '')
+            
+                return round(float(str_g) * 0.8, 2)
+            
+            return round(float(str_g), 2)     
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -1343,17 +1370,18 @@ class ProductInfo:
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
-        print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
-        try:            
-            print(f'# # #> waiting for Title & QTY XPATH:')
-            h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
-            h2_tags = h2_tags.text.strip()
-            print(f'# # #> found h2_tags:\n{h2_tags}')
-        except TimeoutException:
-            print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
-        except Exception as exp:
-            print(exp.msg)
-            print('Title NOT FOUND - h2_tags')
+        if not h_tags:
+            print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+            try:            
+                print(f'# # #> waiting for Title & QTY XPATH:')
+                h2_tags = WebDriverWait(driver, delay_in_seconds).until(EC.presence_of_element_located(query['product_title'][cur]))
+                h2_tags = h2_tags.text.strip()
+                print(f'# # #> found h2_tags:\n{h2_tags}')
+            except TimeoutException:
+                print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
+            except Exception as exp:
+                print(exp.msg)
+                print('Title NOT FOUND - h2_tags')
 
         
         # self.product_name             British Semi Skimmed Milk
@@ -1361,23 +1389,24 @@ class ProductInfo:
         # self.alt_package_in_g         1130 grams
         #      
         print(f"\n\nquery['product_title'][{cur}] {query['product_title'][cur]}")
+        product_title = ''
         try:
 
             if h_tags or h2_tags:
                 product_title = h_tags if h_tags else h2_tags 
-                product_title_sections = product_title.split('\n')
-                self.product_name = product_title_sections[0].strip() +' ' + product_title_sections[1].strip()
-                self.supplier_item_code = product_title_sections[5].replace('Product code:','').strip()
-
                 print(f"[self.product_name] {self.product_name} < h_tags {h_tags}<  h2_tags {h2_tags}<")
             else:
                 try:
                     print(f"[self.product_name] {self.product_name} < * * * NO h_tags or h2_tags * * *")
                     e = driver.find_element(*query['product_title'][cur])
-                    self.product_name = e.text.strip()                
+                    product_title = e.text.strip()                
                 except Exception as exp:
                     print(exp.msg)
                     print('self.product_name NOT found! no h / h2 / or retry')
+
+            product_title_sections = product_title.split('\n')
+            self.product_name = product_title_sections[0].strip() +' ' + product_title_sections[1].strip()
+            self.supplier_item_code = product_title_sections[5].replace('Product code:','').strip()
 
             # remove multipack X no
             multibuy_rgx = r'(\d+)\s*x'
@@ -1394,10 +1423,16 @@ class ProductInfo:
             if m:
                 self.package_qty_str = m.group(1)
                 self.units = m.group(3)
-                self.qty = m.group(2)
+                self.qty = round(float(m.group(2).strip()),2)
                 self.convert_pkg_str_to_qty_in_g() # alt_package_in_g <- None if units is Pack / Loose
                 print(f"INFO FROM TITLE  - - - - - - - - : S [self.package_qty_str] - {self.package_qty_str} <")
-                pprint(self)
+                print(f"self.product_name: {self.product_name}<")
+                print(f"self.package_qty_str: {self.package_qty_str}<")
+                print(f"self.package_in_g: {self.package_in_g}<")
+                print(f"self.alt_package_in_g: {self.alt_package_in_g}<")
+                print(f"self.units: {self.units}<")
+                print(f"self.qty: {self.qty}<")
+                print(f"self.no_of_each: {self.no_of_each}<")
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
@@ -1543,50 +1578,65 @@ class ProductInfo:
         row_data = []
         col_100 = 1
 
+        # tb_rows = driver.find_elements(By.CSS_SELECTOR, '.pdp-description-reviews__nutrition-table-cntr > div')
+        # if tb_rows:
+        #     for row in tb_rows:
+        #         cells = row.find_elements(By.CSS_SELECTOR, '.pdp-description-reviews__nutrition-cell')
+        #         cell_data = [cell.text for cell in cells]
+        #         row_data.append(cell_data)
+        
+        # print('- - - - - - - DIV rows S') # TODO remove
+        # pprint(row_data)
+        # print('- - - - - - - DIV rows E')
+
         # nutrition table - - - - NOT WORKING: for DIV style
         try:
             tb_rows = driver.find_elements(*query['nutri_table'][cur])
-            rows = iter(tb_rows)
+            if tb_rows:
+                for row in tb_rows:
+                    cells = row.find_elements(By.CSS_SELECTOR, '.pdp-description-reviews__nutrition-cell')
+                    cell_data = [cell.text for cell in cells]
+                    row_data.append(cell_data)
+
+            rows = iter(row_data)
             tb_head = next(rows)    # first row always col titles
             #head_cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',tb_head.get_attribute('innerHTML'), re.S) # TODO REMOVE
             
-            # TODO make asd_div version 
-            #col_100 = get_nutr_per_100g_col(tb_head)
+            col_100 = get_nutr_per_100g_col(tb_head, LIST)
             
-            print(f"--H: {tb_head.text}")
-            print(f"--H: {tb_head.get_attribute('innerHTML')}")
-            for row in rows:
-                print(f"\n-R: {row.text}")
-                print(f"\t{row.get_attribute('innerHTML')}")
-                # cols = re.findall(r'<t[hd].*?>(.*?)<\/t[hd]>',row.get_attribute('innerHTML'))
-                # print(f"-R: {cols}")
-                # row_data.append(cols)
-                # for n_type, n_regex in nut_regex.items():
-                #     if re.search(n_regex, cols[0].lower()):
-                #         #self.nutrition_info[n_type] = cols[col_100]
-                #         if n_type == 'energy':
-                #             # in single row:  2143 kJ /<br> 513 kcal or on two rows!
-                #             e_str = cols[col_100].lower()
+            for cols in rows:
+                print(f"\n-R: {cols}")
+                for n_type, n_regex in nut_regex.items():
+                    if re.search(n_regex, cols[0].lower()):
+                        #self.nutrition_info[n_type] = cols[col_100]
+                        if n_type == 'energy':
+                            # in single row:  2143 kJ /<br> 513 kcal or on two rows!
+                            e_str = cols[col_100].lower().replace('/', '')
                             
-                #             m = re.search(r'(\d+)\s*kcal', e_str)
-                #             if m:
-                #                 kcal = m.group(1)                                
-                #                 self.nutrition_info[n_type] = int(kcal)
-                #             else:
-                #                 print(f"\tenergy: NO MATCH:{e_str}")
-                #                 if 'kj' in e_str:                                    
-                #                     kj_to_kcal = e_str.replace('kj','').strip()
-                #                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
-                #                     self.nutrition_info[n_type] = int(kj_to_kcal)
-                #         else:
-                #             self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            m = re.search(r'(\d+)\s*kcal', e_str)
+                            if m:
+                                kcal = m.group(1)                                
+                                self.nutrition_info[n_type] = int(kcal)
+                            elif 'kcal' in cols[0].lower(): # check title for kcal
+                                self.nutrition_info[n_type] = int(cols[col_100].lower())
+                            else:
+                                print(f"\tenergy: NO MATCH:{e_str}")
+                                if 'kj' in e_str:                                    
+                                    kj_to_kcal = e_str.replace('kj','').strip()
+                                    kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
+                                    self.nutrition_info[n_type] = int(kj_to_kcal)
+                        else:
+                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
         except StopIteration as exp:
             print(exp)
             print('ERROR processing nutrition table - NOT found!')
-        
+
+
+
+
         print('- - - - - - - nutrition DIV type - - - - - - - E')
 
         # sbs            
