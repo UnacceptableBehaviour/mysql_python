@@ -492,6 +492,9 @@ regex_noise = [QUID_PC, EMPTY_BRACKETS, CONTAINS, PUREE, IGDT_TITLE]
 def filter_noise(i_string, dbg=True):    
     if dbg: print(f"\nrgx-i:{i_string}")
 
+    # remove &nbsp '\xa0'
+    i_string = i_string.replace('\xa0', ' ')
+
     for r in regex_noise:
         i_string = re.sub(r,'',i_string).strip()
     
