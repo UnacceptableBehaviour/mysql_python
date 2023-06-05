@@ -1712,8 +1712,8 @@ class ProductInfo:
                                      (By.CSS_SELECTOR, 'h3')],
             'ingredients':          [(By.CSS_SELECTOR, '.ingredientsText___IvfUB > p'), 
                                      (By.CSS_SELECTOR, '.ingredientsText___IvfUB > p')],                                     
-            'nutri_table':          [(By.CSS_SELECTOR, '.tableWrapper___pb8si > table'), 
-                                     (By.CSS_SELECTOR, '.tableWrapper___pb8si > table')],            
+            'nutri_table':          [(By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped'), 
+                                     (By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped')],            
             # '':[(,),(,)],
         }
         item_info = {
@@ -1955,11 +1955,7 @@ class ProductInfo:
         print(f"\n\nquery['ingredients'][{cur}] {query['ingredients'][cur]}")
         try:
             i_element = driver.find_element(*query['ingredients'][cur])
-            pprint(i_element)
-            print(i_element)
-            print(i_element.text)
-            print(i_element.get_attribute('innerHTML'))
-            item_info['ingredients'] = i_element.text
+            item_info['ingredients'] = [i_element.get_attribute("textContent")]
         except NoSuchElementException:
             item_info['ingredients'] = []
 
