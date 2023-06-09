@@ -148,7 +148,67 @@ help_info = '''
 > food_scrape.py -u                 # go through debug list of items instead
 '''
 
+tests = {}
+tests['https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'] = { 'ri_name': 'wtr chicken thighs skin & bone',
+  'igdt_type': 'atomic',
+  'product_name': 'Essential Chicken Thighs, Skin-on & Bone-in',
+  'price_per_package': '£3.60',
+  'units': 'kg',
+  'qty': 1.0,
+  'no_of_each': 0,
+  'package_in_g': 99999999,
+  'alt_package_in_g': 1000.0,
+  'package_qty_str': '1kg',
+  'price_per_measure': '£3.60/kg',
+  'multipack_qty': 1,
+  'supplier_item_code': '',
+  'product_url': 'https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755',
+  'supplier_name': 'Waitrose',
+  'nutrition_info': { 'energy': 238,
+                      'fat': 15.2,
+                      'saturates': 3.6,
+                      'mono-unsaturates': 0.0,
+                      'poly-unsaturates': 0.0,
+                      'omega_3_oil': 0.0,
+                      'carbohydrates': 0.4,
+                      'sugars': 0.0,
+                      'starch': 0.0,
+                      'protein': 25.1,
+                      'fibre': 0.0,
+                      'salt': 0.19,
+                      'alcohol': 0.0},
+  'i_list': [],
+  'i_text': '__igdts__',
+  'allergens': set(),
+  'allergens_raw': '',
+  'product_desc': '',
+  'product_page': None,
+  'nutrinfo_text': '\n'
+                   '\n'
+                   '------------------ for the nutrition information wtr '
+                   'chicken thighs skin & bone '
+                   '(https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755)\n'
+                   'energy              \t       238\n'
+                   'fat                 \t      15.2\n'
+                   'saturates           \t       3.6\n'
+                   'mono-unsaturates    \t       0.0\n'
+                   'poly-unsaturates    \t       0.0\n'
+                   'omega_3_oil         \t       0.0\n'
+                   'carbohydrates       \t       0.4\n'
+                   'sugars              \t       0.0\n'
+                   'starch              \t       0.0\n'
+                   'protein             \t      25.1\n'
+                   'fibre               \t       0.0\n'
+                   'salt                \t      0.19\n'
+                   'alcohol             \t       0.0\n'
+                   '                                                Total '
+                   '(100g)\n'
+                   'ingredients: __igdts__\n'
+                   'igdt_type: atomic'}
+
 if __name__ == '__main__':
+    pprint(tests['https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'])
+
     if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
         print(help_info)
         sys.exit(0)
@@ -339,9 +399,9 @@ if __name__ == '__main__':
                             ('wtr battery chicken','https://www.waitrose.com/ecom/products/essential-large-whole-chicken/645021-507910-507911'),                            
                             ('wtr baby rainbow carrots','https://www.waitrose.com/ecom/products/no1-baby-rainbow-carrots/636147-581352-581353'),
                             ('wtr carrots','https://www.waitrose.com/ecom/products/essential-carrots/085125-43221-43222'),
-                            ('wtr unearthed jamon serano','https://www.waitrose.com/ecom/products/unearthed-spanish-serrano-ham/831503-347894-347895'),
+                            ('wtr unearthed jamon serano','https://www.waitrose.com/ecom/products/unearthed-spanish-serrano-ham/831503-347894-347895'), # TODO should show up as pork
                             ('wtr parma ham','https://www.waitrose.com/ecom/products/waitrose-parma-ham-6-slices/525474-156519-156520'),
-                            ('organic bananas','https://www.waitrose.com/ecom/products/duchy-organic-fairtrade-bananas/088937-45726-45727'),
+                            ('organic bananas','https://www.waitrose.com/ecom/products/duchy-organic-fairtrade-bananas/088937-45726-45727'),    # TODO - units SB 'ea' qty SB 6 both missing
                             ('wtr lrg cucumber','https://www.waitrose.com/ecom/products/essential-cucumber/086468-44158-44159'),
                             ('wtr unwaxed limes','https://www.waitrose.com/ecom/products/cooks-ingredients-unwaxed-limes/011269-5598-5599'),
                             ('wtr flapjack','https://www.waitrose.com/ecom/products/waitrose-mini-flapjack-bites/777243-110540-110541'),
