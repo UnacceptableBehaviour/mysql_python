@@ -13,7 +13,7 @@ from selenium.webdriver.common.by import By
 # for expected conditions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from food_sets import process_OTS_i_string_into_allergens_and_base_ingredients
 
@@ -185,15 +185,28 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
+        # convert mg & ug into g
         def remove_g_and_less_than(str_g: str) -> float:
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+            str_g = str_g.lower()
+            multiplier = 1
+
+            # TODO switch code so it uses ug as standard unit
+            if 'mg' in str_g:
+                str_g = str_g.replace('mg', '')
+                multiplier = 1.0 / 1000.0
+
+            if ('mcg' in str_g) or ('μg' in str_g) or ('ug' in str_g):
+                str_g = str_g.replace('mcg', '').replace('μg', '').replace('ug', '')
+                multiplier = 1.0 / 1000000.0                
+            
+            str_g = str_g.replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             if '&lt;' in str_g or '<' in str_g:        
                 str_g = str_g.replace('&lt;', '').replace('<', '')
             
-                return round(float(str_g) * 0.8, 2)
+                return round(float(str_g) * multiplier * 0.8, 2)
             
-            return round(float(str_g), 2)  
+            return round(float(str_g) * multiplier, 2) 
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -497,15 +510,28 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
+        # convert mg & ug into g
         def remove_g_and_less_than(str_g: str) -> float:
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+            str_g = str_g.lower()
+            multiplier = 1
+
+            # TODO switch code so it uses ug as standard unit
+            if 'mg' in str_g:
+                str_g = str_g.replace('mg', '')
+                multiplier = 1.0 / 1000.0
+
+            if ('mcg' in str_g) or ('μg' in str_g) or ('ug' in str_g):
+                str_g = str_g.replace('mcg', '').replace('μg', '').replace('ug', '')
+                multiplier = 1.0 / 1000000.0                
+            
+            str_g = str_g.replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             if '&lt;' in str_g or '<' in str_g:        
                 str_g = str_g.replace('&lt;', '').replace('<', '')
             
-                return round(float(str_g) * 0.8, 2)
+                return round(float(str_g) * multiplier * 0.8, 2)
             
-            return round(float(str_g), 2)  
+            return round(float(str_g) * multiplier, 2) 
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -882,15 +908,28 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
+        # convert mg & ug into g
         def remove_g_and_less_than(str_g: str) -> float:
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+            str_g = str_g.lower()
+            multiplier = 1
+
+            # TODO switch code so it uses ug as standard unit
+            if 'mg' in str_g:
+                str_g = str_g.replace('mg', '')
+                multiplier = 1.0 / 1000.0
+
+            if ('mcg' in str_g) or ('μg' in str_g) or ('ug' in str_g):
+                str_g = str_g.replace('mcg', '').replace('μg', '').replace('ug', '')
+                multiplier = 1.0 / 1000000.0                
+            
+            str_g = str_g.replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             if '&lt;' in str_g or '<' in str_g:        
                 str_g = str_g.replace('&lt;', '').replace('<', '')
             
-                return round(float(str_g) * 0.8, 2)
+                return round(float(str_g) * multiplier * 0.8, 2)
             
-            return round(float(str_g), 2)  
+            return round(float(str_g) * multiplier, 2) 
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -1279,15 +1318,28 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
+        # convert mg & ug into g
         def remove_g_and_less_than(str_g: str) -> float:
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+            str_g = str_g.lower()
+            multiplier = 1
+
+            # TODO switch code so it uses ug as standard unit
+            if 'mg' in str_g:
+                str_g = str_g.replace('mg', '')
+                multiplier = 1.0 / 1000.0
+
+            if ('mcg' in str_g) or ('μg' in str_g) or ('ug' in str_g):
+                str_g = str_g.replace('mcg', '').replace('μg', '').replace('ug', '')
+                multiplier = 1.0 / 1000000.0                
+            
+            str_g = str_g.replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             if '&lt;' in str_g or '<' in str_g:        
                 str_g = str_g.replace('&lt;', '').replace('<', '')
             
-                return round(float(str_g) * 0.8, 2)
+                return round(float(str_g) * multiplier * 0.8, 2)
             
-            return round(float(str_g), 2)     
+            return round(float(str_g) * multiplier, 2)   
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -1676,15 +1728,28 @@ class ProductInfo:
         
         # replace 2,2 w/ 2.2
         # replace (2,2) w/ 2.2
+        # convert mg & ug into g
         def remove_g_and_less_than(str_g: str) -> float:
-            str_g = str_g.lower().replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
+            str_g = str_g.lower()
+            multiplier = 1
+
+            # TODO switch code so it uses ug as standard unit
+            if 'mg' in str_g:
+                str_g = str_g.replace('mg', '')
+                multiplier = 1.0 / 1000.0
+
+            if ('mcg' in str_g) or ('μg' in str_g) or ('ug' in str_g):
+                str_g = str_g.replace('mcg', '').replace('μg', '').replace('ug', '')
+                multiplier = 1.0 / 1000000.0                
+            
+            str_g = str_g.replace('g', '').replace('(', '').replace(')', '').replace(',', '.').replace('trace', '0.01')
 
             if '&lt;' in str_g or '<' in str_g:        
                 str_g = str_g.replace('&lt;', '').replace('<', '')
             
-                return round(float(str_g) * 0.8, 2)
+                return round(float(str_g) * multiplier * 0.8, 2)
             
-            return round(float(str_g), 2)     
+            return round(float(str_g) * multiplier, 2)     
         # - - - - Helpers factor out where generic - - - E
         
         # register driver
@@ -1712,8 +1777,8 @@ class ProductInfo:
                                      (By.CSS_SELECTOR, 'h3')],
             'ingredients':          [(By.CSS_SELECTOR, '.ingredientsText___IvfUB > p'), 
                                      (By.CSS_SELECTOR, '.ingredientsText___IvfUB > p')],                                     
-            'nutri_table':          [(By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped'), 
-                                     (By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped')],            
+            'nutri_table':          [(By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped tr'), 
+                                     (By.CSS_SELECTOR, '.nutrition___VCHp1 .table.table-striped tr')],            
             # '':[(,),(,)],
         }
         item_info = {
