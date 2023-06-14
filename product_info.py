@@ -362,7 +362,11 @@ class ProductInfo:
                 else:
                     item_info[elem.text.lower()] = ne
                 print(f"\nt:>{elem.text.lower()}<\nne:{ne}\nc:>{ne.text}<\n\n")
-            
+        
+        except StopIteration as exp:
+            print(exp)
+            print('StopIteration: complete') # TODO - remove on refactor
+
         except Exception as exp:
             print(exp.msg)
             print('ERROR processing item_info PAIRS - NOT found!')
@@ -458,7 +462,7 @@ class ProductInfo:
             
         except StopIteration as exp:
             print(exp)
-            print('ERROR processing nutrition table - NOT found!')
+            print('StopIteration: complete') # TODO - remove on refactor
         
         print('- - - - - - - nutrition - - - - - - - E')
 
@@ -871,7 +875,7 @@ class ProductInfo:
             
         except StopIteration as exp:
             print(exp)
-            print('ERROR processing nutrition table - NOT found!')
+            print('StopIteration: complete') # TODO - remove on refactor
         
         print('- - - - - - - nutrition - - - - - - - E')
 
@@ -1277,7 +1281,7 @@ class ProductInfo:
             
         except StopIteration as exp:
             print(exp)
-            print('ERROR processing nutrition table - NOT found!')
+            print('StopIteration: complete') # TODO - remove on refactor
         
         print('- - - - - - - nutrition - - - - - - - E')
 
@@ -1684,7 +1688,7 @@ class ProductInfo:
             
         except StopIteration as exp:
             print(exp)
-            print('ERROR processing nutrition table - NOT found!')
+            print('StopIteration: complete') # TODO - remove on refactor
 
 
 
@@ -2134,7 +2138,7 @@ class ProductInfo:
             
         except StopIteration as exp:
             print(exp)
-            print('ERROR processing nutrition table - NOT found!')
+            print('StopIteration: complete') # TODO - remove on refactor
         
         print('- - - - - - - nutrition - - - - - - - E')
 
