@@ -336,7 +336,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y458']
+NUTRIDOC_LIST = ['y458', 'y459']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
@@ -377,7 +377,8 @@ NUTRIDOC_LIST = ['y458']
 # y454_NUTRITEST_recipes_20221001-31.rtf           40       38        2           17            1
 #
 # y457_NUTRITEST_recipes_20230215-0422.rtf         36       34        2       **  41  **        16                 26 
-# y458_NUTRITEST_recipes_20230424-0531.rtf         47       5         42          0             1                  0
+# y458_NUTRITEST_recipes_20230424-0531.rtf         54       25        29          3             0                  0            
+# y459_NUTRITEST_recipes_20230601-21.rtf           34       32        2           29            1                  0            0            
 # y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
 # y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
 #
@@ -727,6 +728,10 @@ pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
 # pprint(Counter(errors['derived_HAS_atomic_alias']).most_common())
 # pprint(Counter(errors['derived_w_file_HAS_ndb_no']).most_common())
 print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
+# # print ALL errors
+# for k in errors.keys():
+#     print(f"> - - - - - {len(errors[k]):04} - {k}")
+#     pprint(Counter(errors[k]).most_common())
 for k in errors.keys():
     print(k, len(errors[k]))
 print("# # # # # # # # # # # errors.keys # # # # # # # # # # # E\n\n")
@@ -768,9 +773,22 @@ def print_urls_to_process():
         print(f"S: {str(source).rjust(10)} [{len(dict_of_urls_to_process[source])}]")
 
     return dict_of_urls_to_process
-    
+
+info_for_scrape_intermediate_file = []
+urls_dict_by_supplier = {}
 if '-u' in sys.argv:
-    print_urls_to_process()
+    urls_dict_by_supplier = print_urls_to_process()
+
+for supplier, item_url_pairs in urls_dict_by_supplier.items():
+    info_for_scrape_intermediate_file = info_for_scrape_intermediate_file + item_url_pairs
+
+info_for_scrape_intermediate_file = dict(info_for_scrape_intermediate_file)
+# write list of (ri_name, url) JSON file
+#
+#pprint(info_for_scrape_intermediate_file)
+missing_to_file = json.dumps(info_for_scrape_intermediate_file)
+with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'w') as f:
+    f.write(missing_to_file)
 
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
