@@ -14,7 +14,6 @@ from product_info import ProductInfo
 
 from food_sets import atomic_LUT
 from food_sets import follow_alias 
-from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
 import json
 
 # missing ingreidient list sources
@@ -22,13 +21,15 @@ from food_sets import OTS_INGREDIENTS_FOUND # check format is compatible and int
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
-MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,
-            MISSING_INGREDIENTS_FILE_JSON_CCM,
-            MISSING_INGREDIENTS_FILE_JSON_PY,
+MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,          # cost_menu.rb
+            MISSING_INGREDIENTS_FILE_JSON_CCM,      # DTK web interface: ccm_nutridoc_web.rb
+            MISSING_INGREDIENTS_FILE_JSON_PY,       # process_nutridocs.py 
             #OTS_INGREDIENTS_FOUND
             ]
 
-MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_PY]
+#MI_FILES = [MISSING_INGREDIENTS_FILE_JSON]          # cost_menu.rb
+#MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_CCM]      # DTK web interface: ccm_nutridoc_web.rb
+MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_PY]       # process_nutridocs.py 
             
 # in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
@@ -226,14 +227,13 @@ if __name__ == '__main__':
             print(f"LOADING JSON: {URL_CACHE_STILL_TO_PROCESS_JSON}")
             urls_to_process = json.load(f)
 
-    def scrub_found(items_to_scrub, is_list=False):
+
+    def scrub_found(items_to_scrub):
+        if items_to_scrub == None: return
         # if atomic_LUT[i] elements are the following, then they are also STILL TO FIND
         #  'igdt_type': 'ots',
         #  'ingredients': '__igdts__',
-        if is_list:
-            copy_of_urls_to_process = list(items_to_scrub)
-        else:
-            copy_of_urls_to_process = dict(items_to_scrub)
+        copy_of_urls_to_process = dict(items_to_scrub)
 
         for i_still_to_process in copy_of_urls_to_process:        
             if i_still_to_process in atomic_LUT.keys():
@@ -241,18 +241,18 @@ if __name__ == '__main__':
                     print(f"> - - - [{i_still_to_process}] STILL TO FIND") # pull info from net
                 else:
                     print(f"> - - - [{i_still_to_process}] FOUND")
-                    if is_list:
-                        items_to_scrub.remove(i_still_to_process)
-                    else:
-                        del items_to_scrub[i_still_to_process]
+                    del items_to_scrub[i_still_to_process]
             else:
                 print(f"> - - - [{i_still_to_process}] STILL TO FIND")
 
         copy_of_urls_to_process = None
 
-
+    # TODO refactor ALL info to process in dict {ri_name: one of url / '' / None}
     def url_w_tuple_string_listing(i):
         i_width = 40
+        if isinstance(i, list):     # ["belgian chocolates","https://www.sainsbu.bl.bla"]
+            return ({i[1]}, f"{i[0].rjust(i_width)}  {i[1]}")
+
         if (i in atomic_LUT) and (atomic_LUT[i]['url']):        # i has url
             return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
         
@@ -266,12 +266,16 @@ if __name__ == '__main__':
                     
         return (None, f"{i.rjust(i_width)}  not in atomic_LUT")
 
-
-    def show_list(title, i_list):
+    # TODO refactor ALL info to process in dict {ri_name: one of url / '' / None}
+    def show_list(title, i_dict):
         print(f"- {title} -".center(80,'-'))
-        for i in i_list:
-            _, p = url_w_tuple_string_listing(i)
-            print(p)    
+        if i_dict:
+            for i,url in i_dict.items():
+                if url:
+                    _, p = url_w_tuple_string_listing([i,url])
+                else:
+                    _, p = url_w_tuple_string_listing(i)
+                print(p)    
         print(f"- {'O'} -".center(80,'-'))
 
 
@@ -279,19 +283,20 @@ if __name__ == '__main__':
     # - - - - load MISSING INGREDIENTS from JSON files
     scrub_found(urls_to_process)
 
-    ingredents_to_find = []    
+    ingredents_to_find = {}    
 
     # - - lists created by cost_menu.rb, process_nutridocs.py and DTK
     for fname in MI_FILES:
         with open(fname, 'r') as f:
-            content = json.load(f)
+            content = json.load(f)          # content SB dict
         
         show_list(fname.name, content)
-        ingredents_to_find = list(set(ingredents_to_find + content))
+        
+        ingredents_to_find = ingredents_to_find.update(content)
 
     show_list('ingredents_to_find', ingredents_to_find)
 
-    scrub_found(ingredents_to_find, True) # True passing list
+    scrub_found(ingredents_to_find)
 
     show_list('ingredents_to_find', ingredents_to_find)
         
@@ -302,8 +307,8 @@ if __name__ == '__main__':
     if '-noprompt' in sys.argv:
         opt_no_prompt = True
 
-    #if '-u' in sys.argv:  # problem URLS to test against
-    if True: # debugger
+    if '-u' in sys.argv:  # problem URLS to test against
+    #if True: # debugger
         # - - - - - - 
         # urls_to_process = [ 
         #                     ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
@@ -316,7 +321,8 @@ if __name__ == '__main__':
         #                     ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),
         #                     ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),
         #                     ]
-        urls_to_process = [ #('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
+        urls_to_process = [ ('prune yogurt','https://www.tesco.com/groceries/en-GB/products/308111910'),
+                            #('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
                             #('black turtle beans','https://www.tesco.com/groceries/en-GB/products/256530942'), # frist address
                             #('cheese & garlic flat bread','https://www.tesco.com/groceries/en-GB/products/288610223'),
                             #('tsc apple and raspberry juice','https://www.tesco.com/groceries/en-GB/products/278994762'),
@@ -410,9 +416,36 @@ if __name__ == '__main__':
                             ('wtr fr pork sausages','https://www.waitrose.com/ecom/products/no1-free-range-12-pork-sausages/824649-275729-275730'),
                             ('duchy organic beef ribeye','https://www.waitrose.com/ecom/products/duchy-organic-british-beef-ribeye-steak/015596-7493-7494'),                            
                             ('wtr fairtrade bananas','https://www.waitrose.com/ecom/products/essential-fairtrade-bananas/088903-45703-45704'),
-                           ]             
+                           ]    
+        # ocado selling m&s ?!?!?!?
+        urls_to_process = [('m&s pork straws', 'https://www.ocado.com/products/m-s-british-pork-crackling-straws-515023011')]  
+
         # convert list tuple to dict
         urls_to_process = {item[0]: item[1] for item in urls_to_process}
+        urls_to_process = {#'asd es multigrain sliced bread': 'https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-multigrain-sliced-loaf/1000383113960',
+                        'tsc cooked beetroot': 'https://www.tesco.com/groceries/en-GB/products/261808728',
+                        'flying pigs': 'https://www.sainsburys.co.uk/gol-ui/product/mr-porky-original-pork-scratchings-65g',                        
+                        'ald salt & pepper calamari': 'https://groceries.aldi.co.uk/en-GB/p-the-fishmonger-salt-pepper-calamari-225g/4088600518596',
+                        'thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                        'aunties sticky toffee pudding': 'https://www.sainsburys.co.uk/gol-ui/product/auntys-sticky-toffee-puddings-200g',
+                        'sbs roast beef': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-roast-beef-130g',
+                        'breaded ham': 'https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020',
+                        'champagne': 'https://groceries.asda.com/product/champagne/moet-chandon-imperial-brut-champagne/33171',
+                        'cooked thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                        'cracker': 'https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923',                        
+                        'haagen-dazs strawberry cheesecake ice cream': 'https://www.sainsburys.co.uk/gol-ui/product/h%C3%A4agen-dazs-ice-cream-strawberry-cheesecake-460ml',
+                        'lemon tart w pistachio icecream': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-tarte-au-citron--taste-the-difference-500g',
+                        'lindt salted caramel chocolate': 'https://www.sainsburys.co.uk/gol-ui/product/lindt-lindor-salted-caramel-200g',
+                        'niknaks': 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk',
+                        'red food colouring': 'https://www.tesco.com/groceries/en-GB/products/313749125',
+                        'red lentils': 'https://www.sainsburys.co.uk/gol-ui/product/ktc-red-lentils-1kg',
+                        'red wine vinegar': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-wine-vinegar--red-wine-500ml',
+                        'sbs ancient grain pave': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-ancient-grain-pave-taste-the-difference-400g',
+                        'sbs pastry twist': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-cheddar-cheese-twists-125g',
+                        'sbs pepperoni': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pepperoni-sampling-pack-42g',
+                        'sweet chilli sauce': 'https://www.sainsburys.co.uk/gol-ui/product/blue-dragon-original-thai-sweet-chilli-sauce-380g-6529621-p',                        
+                        }       
+
         print('= = = Running scrape tests = = =')
 
     elif '-a' in sys.argv: # use atomicLUT as source        
@@ -464,27 +497,54 @@ if __name__ == '__main__':
             if not opt_no_prompt:
                 yn = input(f'FIND info for "{name}"? y/n \n- n to skip\nRET to get info\n')
                 if str(yn).lower() == 'n': break
-                if 'http' in yn: url = yn
-                if 's' == yn:                     
-                    # if 'sainsburys' in url:
-                    #     search_for = name.replace(' ','%20')
-                    #     sbs_search = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
-                    # if 'tesco' in url:
-                    #     search_for = name.replace(' ','%20')
-                    #     tsc_search = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
-                    # if 'aldi' in url
-                    #     search_for = name.replace(' ','+')
-                    #     ald_search = f"https://groceries.aldi.co.uk/en-GB/Search?keywords={search_for}"                    
-                    search_for = name.replace(' ','%20')
-                    default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
-                    os.system(f'open {default}')                
+                if 'http' in yn: product_url = yn
+
+                if '' == yn.strip(): # get url from web
+                    if ('sbs' in name) or ('sainsburys' in name):
+                        search_for = name.replace(' ','%20').replace('sbs','').replace('sainsburys','').strip()
+                        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
+                    
+                    elif ('tsc' in name) or ('tesco' in name):
+                        search_for = name.replace(' ','%20').replace('tsc','').replace('tesco','').strip()
+                        search_url = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
+                    
+                    elif ('ald' in name) or ('aldi' in name):
+                        search_for = name.replace(' ','+').replace('ald','').replace('aldi','').strip()
+                        search_url = f"https://groceries.aldi.co.uk/en-GB/Search?keywords={search_for}"
+
+                    elif ('asd' in name) or ('asda' in name):
+                        search_for = name.replace(' ','%20').replace('asd','').replace('asda','').strip()
+                        search_url = f"https://groceries.asda.com/search/{search_for}"
+
+                    elif ('wtr' in name) or ('waitrose' in name):
+                        search_for = name.replace(' ','%20').replace('wtr','').replace('waitrose','').strip()
+                        search_url = f"https://www.waitrose.com/ecom/shop/search?&searchTerm={search_for}"
+
+                    else:
+                        search_for = name.replace(' ','%20')
+                        #default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
+                        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
+
+                    os.system(f'open {search_url}')
+                    yn = input(f'Enter URL for item "{name}"? y/n \n- n to skip\n')
+                    if str(yn).lower() == 'n': break
+                    if 'http' in yn: product_url = yn
+
 
             igdt_type = 'atomic'    # default
             if name in atomic_LUT:
+                print('- - - atomic - S')
+                pprint(atomic_LUT[name])                
                 igdt_type = atomic_LUT[name]['igdt_type']
-            print(f"Getting [{name}][{igdt_type}] from: {url}")        
-            item = ProductInfo(name, url, igdt_type)        
+                print('- - - atomic - E')
+
+            print(f"Getting [{name}][{igdt_type}] from: {product_url}")        
+            item = ProductInfo(name, product_url, igdt_type)        
             nutrinfo_text = item.nutrinfo_str()
+
+            # TODO H 
+            # cache ProductInfo to disc using url as key
+            # store info in json {url: item}
 
             print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
             print(item)
