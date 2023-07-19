@@ -14,36 +14,57 @@ from product_info import ProductInfo
 
 from food_sets import atomic_LUT
 from food_sets import follow_alias 
-import json
+import json # JSONDecodeError
+
+import atexit           
+
+from scrape_tests import tests, urls_to_process_all_dict
+# pprint(tests['https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'])
+# print('\n|\n|\n|\n')
+# pprint(urls_to_process_all_dict['ocd'])
+# print('\n|\n|\n|\n')
 
 # missing ingreidient list sources
-from food_sets import OTS_INGREDIENTS_FOUND # check format is compatible and integrate it into items to scrape
+# from food_sets import OTS_INGREDIENTS_FOUND # check format is compatible and integrate it into items to scrape
 MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
 MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
 MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
-MI_FILES = [MISSING_INGREDIENTS_FILE_JSON,          # cost_menu.rb
-            MISSING_INGREDIENTS_FILE_JSON_CCM,      # DTK web interface: ccm_nutridoc_web.rb
-            MISSING_INGREDIENTS_FILE_JSON_PY,       # process_nutridocs.py 
-            #OTS_INGREDIENTS_FOUND
-            ]
-
-#MI_FILES = [MISSING_INGREDIENTS_FILE_JSON]          # cost_menu.rb
-#MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_CCM]      # DTK web interface: ccm_nutridoc_web.rb
-MI_FILES = [MISSING_INGREDIENTS_FILE_JSON_PY]       # process_nutridocs.py 
-            
 # in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
+
+MI_FILES = {'-c': MISSING_INGREDIENTS_FILE_JSON,          # cost_menu.rb
+            '-d': MISSING_INGREDIENTS_FILE_JSON_CCM,      # DTK web interface: ccm_nutridoc_web.rb
+            '-p': MISSING_INGREDIENTS_FILE_JSON_PY,       # process_nutridocs.py 
+            '-m': URL_CACHE_STILL_TO_PROCESS_JSON         # compiled list, interupted while processing
+            }            
 
 # target
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
 NUTRINFO_BACKUP_DIR = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
 URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
 
-# url_cache = {}
-# if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
-#     with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
-#         content = f.read()
-#         url_cache = json.loads(content)
+url_cache = {}
+if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
+    try:
+        with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'r') as f:
+            url_cache = json.load(f)
+    except json.decoder.JSONDecodeError:
+        print(f"\n\n\n\n\n\n\n* * * * WARNING * * * * Error loading URL cache {URL_CACHE_ALREADY_RETRIEVED_JSON.name}\n\n\n\n\n\n\n")
+        url_cache = {}
+        # TODO - L delete corrupt file?
+
+def save_url_CACHE():
+    with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
+        json.dump(url_cache, f)
+
+atexit.register(save_url_CACHE)
+
+
+missing_items_to_process = {}
+def save_urls_still_to_process():
+    with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'w') as f:
+        json.dump(missing_items_to_process, f)
+
 
 def backup_file_with_nix_timestamp(file_path, backup_dir=NUTRINFO_BACKUP_DIR):
     nutri_file = Path(file_path).name
@@ -53,7 +74,7 @@ def backup_file_with_nix_timestamp(file_path, backup_dir=NUTRINFO_BACKUP_DIR):
     try:
         shutil.copyfile(file_path, bu_target)
         print(f"\n\nBACKED UP {file_path.name} to:\n{bu_target}\n")
-    except Exception as e:
+    except Exception as e: # TODO - H remove ALL
         print(f"\n\n* * * WARNING * * *\n\nBackup failed: {bu_target}\n")
         print(e)
         print("* * * WARNING * * *\n\n")
@@ -100,7 +121,7 @@ def get_outstanding_urls_to_process_from_atomicLUT():
     return dict_of_urls_to_process
 
 CACHED_NUTRINFO_ENTRIES = {}
-def build_cached_nutrinfo_entries():
+def build_cached_nutrinfo_entries(): # removes duplicate entries from file.
     print("- - - Building: CACHED_NUTRINFO_ENTRIES:")
     duplicates = 0
     content = ''
@@ -131,175 +152,202 @@ def build_cached_nutrinfo_entries():
     with open(NUTRIENT_FILE_PATH, 'w') as f:
         f.write(content_copy)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def scrub_found(items_to_scrub):
+    if items_to_scrub == None: return
+    # if atomic_LUT[i] elements are the following, then they are also STILL TO FIND
+    #  'igdt_type': 'ots',
+    #  'ingredients': '__igdts__',
+    copy_of_urls_to_process = dict(items_to_scrub)
+
+    for i_still_to_process in copy_of_urls_to_process:        
+        if i_still_to_process in atomic_LUT.keys():
+            if (atomic_LUT[i_still_to_process]['igdt_type'] == 'ots') and (atomic_LUT[i_still_to_process]['ingredients'] == '__igdts__'):
+                print(f"> - - - [{i_still_to_process}] STILL TO FIND") # pull info from net
+            else:
+                print(f"> - - - [{i_still_to_process}] FOUND")
+                del items_to_scrub[i_still_to_process]
+        else:
+            print(f"> - - - [{i_still_to_process}] STILL TO FIND")
+
+    copy_of_urls_to_process = None
+
+
+def get_url_from_atomic_LUT(i):
+    if (i in atomic_LUT) and (atomic_LUT[i]['url']):        # i has url
+        return {atomic_LUT[i]['url']}
+    
+    if i in atomic_LUT:                                     # see if alias has url
+        a = follow_alias(i)
+        if a and (a in atomic_LUT):
+            if 'url' in atomic_LUT[a].keys():
+                return atomic_LUT[a]['url']
+                
+    return ''
+
+
+def show_list(title, i_dict):
+    i_width = 40
+    t_width = 80
+    print(f"- {title} -".center(t_width,'-'))
+    url_updates = {}
+    if i_dict:
+        for i,url in i_dict.items():            
+            if not url:                
+                url = get_url_from_atomic_LUT(i)
+                url_updates[i] = url
+
+            print(f"{i.rjust(i_width)}  [{url}]")
+    i_dict.update(url_updates)
+    print(f"- {len(url_updates)} updates -".center(t_width,'-'))
+
+def open_search_in_browser_get_url_from_user(name):
+    product_url = None
+
+    if ('sbs' in name) or ('sainsburys' in name):
+        search_for = name.replace(' ','%20').replace('sbs','').replace('sainsburys','').strip()
+        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
+
+    elif ('tsc' in name) or ('tesco' in name):
+        search_for = name.replace(' ','%20').replace('tsc','').replace('tesco','').strip()
+        search_url = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
+
+    elif ('ald' in name) or ('aldi' in name):
+        search_for = name.replace(' ','+').replace('ald','').replace('aldi','').strip()
+        search_url = f"https://groceries.aldi.co.uk/en-GB/Search?keywords={search_for}"
+
+    elif ('asd' in name) or ('asda' in name):
+        search_for = name.replace(' ','%20').replace('asd','').replace('asda','').strip()
+        search_url = f"https://groceries.asda.com/search/{search_for}"
+
+    elif ('wtr' in name) or ('waitrose' in name):
+        search_for = name.replace(' ','%20').replace('wtr','').replace('waitrose','').strip()
+        search_url = f"https://www.waitrose.com/ecom/shop/search?&searchTerm={search_for}"
+
+    else:
+        search_for = name.replace(' ','%20')
+        #default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
+        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
+
+    os.system(f'open {search_url}')
+    url_or_return = input(f'Enter URL for item "{name}"?\n- Ret to skip\n')
+    if 'http' in url_or_return: product_url = url_or_return
+
+    return product_url
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 help_info = '''
-> food_scrape.py -a                 # scan z_product_nutrition_info.txt for missing i_list / url
+> scrape.py -a                 # scan z_product_nutrition_info.txt for missing i_list / url
                                     # scrape & fill in details on prompt
 > 
-> food_scrape.py -a -noprompt       # scan z_product_nutrition_info.txt for missing i_list / url
+> scrape.py -a -noprompt       # scan z_product_nutrition_info.txt for missing i_list / url
                                     # scrape & fill in details - DON'T ASK PERMISSION
                                     #
                                     # backup of z_product_nutrition_info.txt in
                                     # '''+str(NUTRINFO_BACKUP_DIR)+'''
 
-> food_scrape.py                    # take missing ingredients generated by cost_menu.rb, process_nutridocs.py, & DTK web
+> scrape.py                    # take missing ingredients generated by cost_menu.rb, process_nutridocs.py, & DTK web
                                     # scrape & fill in details on prompt
+
+                               # if any of -c, -d, -p are present EXCLUDE thos that aren't in the options
+> scrape.py -c                 # process cost_menu.rb missing ONLY 
+> scrape.py -d                 # process ccm_nutridoc_web.rb missing ONLY (DTK web interface)
+> scrape.py -p                 # process process_nutridocs.py missing ONLY
+> scrape.py -c -d              # process cost_menu.rb & ccm_nutridoc_web.rb missing ONLY
+
 
 -noprompt                           # don't ask - works with all options                                    
                                                                                                             
-> food_scrape.py -u                 # go through debug list of items instead
+> scrape.py -u                 # go through debug list of items instead
 '''
 
-tests = {}
-tests['https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'] = { 'ri_name': 'wtr chicken thighs skin & bone',
-  'igdt_type': 'atomic',
-  'product_name': 'Essential Chicken Thighs, Skin-on & Bone-in',
-  'price_per_package': '£3.60',
-  'units': 'kg',
-  'qty': 1.0,
-  'no_of_each': 0,
-  'package_in_g': 99999999,
-  'alt_package_in_g': 1000.0,
-  'package_qty_str': '1kg',
-  'price_per_measure': '£3.60/kg',
-  'multipack_qty': 1,
-  'supplier_item_code': '',
-  'product_url': 'https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755',
-  'supplier_name': 'Waitrose',
-  'nutrition_info': { 'energy': 238,
-                      'fat': 15.2,
-                      'saturates': 3.6,
-                      'mono-unsaturates': 0.0,
-                      'poly-unsaturates': 0.0,
-                      'omega_3_oil': 0.0,
-                      'carbohydrates': 0.4,
-                      'sugars': 0.0,
-                      'starch': 0.0,
-                      'protein': 25.1,
-                      'fibre': 0.0,
-                      'salt': 0.19,
-                      'alcohol': 0.0},
-  'i_list': [],
-  'i_text': '__igdts__',
-  'allergens': set(),
-  'allergens_raw': '',
-  'product_desc': '',
-  'product_page': None,
-  'nutrinfo_text': '\n'
-                   '\n'
-                   '------------------ for the nutrition information wtr '
-                   'chicken thighs skin & bone '
-                   '(https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755)\n'
-                   'energy              \t       238\n'
-                   'fat                 \t      15.2\n'
-                   'saturates           \t       3.6\n'
-                   'mono-unsaturates    \t       0.0\n'
-                   'poly-unsaturates    \t       0.0\n'
-                   'omega_3_oil         \t       0.0\n'
-                   'carbohydrates       \t       0.4\n'
-                   'sugars              \t       0.0\n'
-                   'starch              \t       0.0\n'
-                   'protein             \t      25.1\n'
-                   'fibre               \t       0.0\n'
-                   'salt                \t      0.19\n'
-                   'alcohol             \t       0.0\n'
-                   '                                                Total '
-                   '(100g)\n'
-                   'ingredients: __igdts__\n'
-                   'igdt_type: atomic'}
 
 if __name__ == '__main__':
-    pprint(tests['https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'])
-
     if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
         print(help_info)
         sys.exit(0)
 
     opt_no_prompt = False
 
-    build_cached_nutrinfo_entries()
-
     backup_file_with_nix_timestamp(NUTRIENT_FILE_PATH)    
 
-    # TODO - catch file corrupt exception
-    urls_to_process = {}
-    if URL_CACHE_STILL_TO_PROCESS_JSON.exists():
-        with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'r') as f:
-            print(f"LOADING JSON: {URL_CACHE_STILL_TO_PROCESS_JSON}")
-            urls_to_process = json.load(f)
-
-
-    def scrub_found(items_to_scrub):
-        if items_to_scrub == None: return
-        # if atomic_LUT[i] elements are the following, then they are also STILL TO FIND
-        #  'igdt_type': 'ots',
-        #  'ingredients': '__igdts__',
-        copy_of_urls_to_process = dict(items_to_scrub)
-
-        for i_still_to_process in copy_of_urls_to_process:        
-            if i_still_to_process in atomic_LUT.keys():
-                if (atomic_LUT[i_still_to_process]['igdt_type'] == 'ots') and (atomic_LUT[i_still_to_process]['ingredients'] == '__igdts__'):
-                    print(f"> - - - [{i_still_to_process}] STILL TO FIND") # pull info from net
-                else:
-                    print(f"> - - - [{i_still_to_process}] FOUND")
-                    del items_to_scrub[i_still_to_process]
-            else:
-                print(f"> - - - [{i_still_to_process}] STILL TO FIND")
-
-        copy_of_urls_to_process = None
-
-    # TODO refactor ALL info to process in dict {ri_name: one of url / '' / None}
-    def url_w_tuple_string_listing(i):
-        i_width = 40
-        if isinstance(i, list):     # ["belgian chocolates","https://www.sainsbu.bl.bla"]
-            return ({i[1]}, f"{i[0].rjust(i_width)}  {i[1]}")
-
-        if (i in atomic_LUT) and (atomic_LUT[i]['url']):        # i has url
-            return ({atomic_LUT[i]['url']}, f"{i.rjust(i_width)}  {atomic_LUT[i]['url']}")        
+    build_cached_nutrinfo_entries() # and remove duplicate entries
         
-        if i in atomic_LUT:                                     # see if alias has url
-            a = follow_alias(i)
-            if a:
-                if 'url' in atomic_LUT[a].keys():
-                    a_url = atomic_LUT[a]['url']
-                    i_and_a = f"{i}({a})"
-                    return ({a_url}, f"{i_and_a.rjust(i_width)}  {a_url}")
-                    
-        return (None, f"{i.rjust(i_width)}  not in atomic_LUT")
 
-    # TODO refactor ALL info to process in dict {ri_name: one of url / '' / None}
-    def show_list(title, i_dict):
-        print(f"- {title} -".center(80,'-'))
-        if i_dict:
-            for i,url in i_dict.items():
-                if url:
-                    _, p = url_w_tuple_string_listing([i,url])
-                else:
-                    _, p = url_w_tuple_string_listing(i)
-                print(p)    
-        print(f"- {'O'} -".center(80,'-'))
+    # - - process lists created by cost_menu.rb, process_nutridocs.py and DTK
 
+    # look for -c -d -p option in argv
+    common_keys = set(MI_FILES.keys()).intersection(set(sys.argv))
+    if len(common_keys) == 0:
+        common_keys = set(MI_FILES.keys())
+        # don't ovewrite saved keys if only doing single set of keys
+        atexit.register(save_urls_still_to_process) # otherwise save unprocessed if theres a crash
+    
+    for key in common_keys: 
+        fname = MI_FILES[key]
 
+        try:
+            if fname.exists():
+                with open(fname, 'r') as f:            
+                    content = json.load(f)
+                    print(f"LOADED JSON: {fname} [{len(content)}]")
 
-    # - - - - load MISSING INGREDIENTS from JSON files
-    scrub_found(urls_to_process)
-
-    ingredents_to_find = {}    
-
-    # - - lists created by cost_menu.rb, process_nutridocs.py and DTK
-    for fname in MI_FILES:
-        with open(fname, 'r') as f:
-            content = json.load(f)          # content SB dict
+        except json.decoder.JSONDecodeError:
+            print(f"ERROR decoding: {fname.name} . . Deleting.")
+            Path.unlink(fname)
+        except Exception as e: # TODO - remove
+            pprint(e)
+            print(e.__traceback__)
         
         show_list(fname.name, content)
         
-        ingredents_to_find = ingredents_to_find.update(content)
+        # Keep them
+        for key, value in content.items():
+            if key not in missing_items_to_process:
+                missing_items_to_process[key] = value
 
-    show_list('ingredents_to_find', ingredents_to_find)
+        # ** unpack dict
+        # creat new dict from 2 {**d1, **d2}
+        # dict comprehension {key: value for key, value in new_content.items() if key not in missing_items_to_process}
+        # one liner version:
+        # missing_items_to_process = {**missing_items_to_process, **{key: value for key, value in new_content.items() if key not in missing_items_to_process}}
 
-    scrub_found(ingredents_to_find)
 
-    show_list('ingredents_to_find', ingredents_to_find)
-        
+    scrub_found(missing_items_to_process)
+    show_list('missing_items_to_process', missing_items_to_process)
+     
 
     # if its in the aLUT scrape info and insert it into the nutridoc    
     # if not in aLUT scrape info insert it into template and add it to end of nutridoc
@@ -309,142 +357,31 @@ if __name__ == '__main__':
 
     if '-u' in sys.argv:  # problem URLS to test against
     #if True: # debugger
-        # - - - - - - 
-        # urls_to_process = [ 
-        #                     ('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
-        #                     ('nik naks', 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk'),
-        #                     ('hot cross buns','https://www.sainsburys.co.uk/gol-ui/product/sainsburys-fruity-hot-cross-buns--taste-the-difference-x4-280g'),
-        #                     ('haggis','https://www.sainsburys.co.uk/gol-ui/product/macsween-traditional-haggis-454g'), 
-        #                     ('crisps','https://www.sainsburys.co.uk/shop/gb/groceries/walkers-cheese---onion-crisps-6x25g'), 
-        #                     ('veg stock cube','https://www.sainsburys.co.uk/shop/gb/groceries/knorr-stock-cubes--vegetable-x8-80g'),
-        #                     ('actimel veg','https://www.sainsburys.co.uk/shop/gb/groceries/actimel-fruit-veg-cultured-shot-green-smoothie-6x100g-%28600g%29'),
-        #                     ('beef monster munch','https://www.sainsburys.co.uk/shop/gb/groceries/monster-munch-roast-beef-x6-25g'),
-        #                     ('wotsits','https://www.sainsburys.co.uk/shop/gb/groceries/walkers/walkers-wotsits-really-cheesy-crisp-snacks-36g'),
-        #                     ]
-        urls_to_process = [ ('prune yogurt','https://www.tesco.com/groceries/en-GB/products/308111910'),
-                            #('kettle sea salt','https://www.sainsburys.co.uk/gol-ui/product/kettle-chips-sea-salt---balsamic-vinegar-150g'),
-                            #('black turtle beans','https://www.tesco.com/groceries/en-GB/products/256530942'), # frist address
-                            #('cheese & garlic flat bread','https://www.tesco.com/groceries/en-GB/products/288610223'),
-                            #('tsc apple and raspberry juice','https://www.tesco.com/groceries/en-GB/products/278994762'),
-                            #('bacon frazzles','https://www.tesco.com/groceries/en-GB/products/260085541'),
-                            #('frazzles','https://www.tesco.com/groceries/en-GB/products/260085541'),
-                            #('kikkoman soy sauce','https://www.tesco.com/groceries/en-GB/products/281865197'),
-                            #('tsc soy sauce','https://www.tesco.com/groceries/en-GB/products/294781229'),
-                            #('veg oil','https://www.tesco.com/groceries/en-GB/products/254918073'),
-                            #('large medjool dates','https://www.tesco.com/groceries/en-GB/products/302676947'),                            
-                            #('tsc roquefort','https://www.tesco.com/groceries/en-GB/products/277465578'),   # has no ingredient but does have allergens
-                            #('anchovies','https://www.tesco.com/groceries/en-GB/products/310103367'),
-                            #('salted cashews','https://www.tesco.com/groceries/en-GB/products/297385240'),    # NO NUTRITION TABLE - USE AS test case fall back on 
-                            #('tsc smoked mackerel','https://www.tesco.com/groceries/en-GB/products/251631139'), # NUTRITION table has ug & mg in nutrition table
-                            #('beaujolais villages','https://www.tesco.com/groceries/en-GB/products/252285938'),
-                            #('tsc chicken roll','https://www.tesco.com/groceries/en-GB/products/299955420'),
-                            #('pork ribs','https://www.tesco.com/groceries/en-GB/products/281085768'),
-                            #('chicken stock cubes',''),
-                            #('fish fingers','https://www.tesco.com/groceries/en-GB/products/302861814'),   # * in ingredients
-                            #('smoked ham','https://groceries.aldi.co.uk/en-GB/p-cooked-smoked-ham-400g/5027951005828'), # horendous multiple products in single list: Cooked Ham Trimmings, Smoked Ham Trimmings, Peppered Ham Trimmings, Smoke Breaded Ham Trimmings & Honey Roasted Ham Trimmings Ingreadients back to back W/O punctuation!
-                            ]
-        urls_to_process = [#('mrs butterscotch crunch','https://groceries.morrisons.com/webshop/product/Border-Sweet-Memories-Butterscotch-Crunch/483706011'), #NO EXIST
-                           #('mrs chicken korma','https://groceries.morrisons.com/webshop/product/Morrisons-Takeaway-Chicken-Korma/299170011'),      # ALLERGY processin i_string, Almond, Cashew nuts - MISS
-                           #('70% choc','https://groceries.morrisons.com/webshop/product/Lindt-Excellence-70-Cocoa-Dark-Chocolate/115160011'),
-                           #('clarified butter','https://groceries.morrisons.com/webshop/product/KTC-Pure-Butter-Ghee/233485011'),
-                           #('condensed milk','https://groceries.morrisons.com/webshop/product/Carnation-Cook-with-Condensed-Milk/110802011'),
-                           #('mature gouda','https://groceries.morrisons.com/products/landana-extra-mature-gouda-585420011'),                           
-                           ('diced chorizo','https://groceries.morrisons.com/products/morrisons-diced-spanish-chorizo-348095011'),
-                           ('chorizo','https://groceries.morrisons.com/products/elpozo-chorizo-ring-456221011'),
-                           ('clay oven garlic and coriander naan','https://groceries.morrisons.com/webshop/product/The-Clay-Oven-Bakery-Garlic--Coriander-Naan-Bread/336891011'),
-                           ('smoked mackerel fillet','https://groceries.morrisons.com/webshop/product/Morrisons-Smoked-Mackerel-Fillets/442534011'),
-                           ('beetroot brioche bun','https://groceries.morrisons.com/webshop/product/Morrisons-The-Best-Beetroot-Brioche-Rolls-/427428011'),
-                           ('mrs tikka masala sauce','https://groceries.morrisons.com/webshop/product/Morrisons-Tikka-Masala-Sauce/215269011'),
-                           ('spanish goats cheese','https://groceries.morrisons.com/webshop/product/Morrisons-Somerset-Goats-Cheese/111950011'),
-                           ('caramac buttons','https://groceries.morrisons.com/webshop/product/Caramac-Giant-Buttons/450664011?from=search&param=caramac'),
-                           ('caramac','https://groceries.morrisons.com/webshop/product/Caramac-Giant-Buttons/450664011?from=search&param=caramac'),
-                           ('cream cheese','https://groceries.morrisons.com/webshop/product/Philadelphia-Original-Soft-Cheese/251401011'),
-                           ('pistachios','https://groceries.morrisons.com/webshop/product/Morrisons-Pistachios/120506011'),
-                           ('pistachio nuts','https://groceries.morrisons.com/webshop/product/Morrisons-Pistachios/120506011'),
-                           ('crunchie bar','https://groceries.morrisons.com/webshop/product/Cadbury-Crunchie-Chocolate-Bar-4-Pack/269519011'),
-                           ('white bread','https://groceries.morrisons.com/webshop/product/Morrisons-White-Toastie-Loaf/217833011'),
-                           ('hoisin sauce','https://groceries.morrisons.com/webshop/product/Flying-Goose-Hoisin-Sauce/387755011'),
-                           ('giant mrs yorkshire pudding','https://groceries.morrisons.com/webshop/product/Morrisons-Giant-Yorkshire-Pudding/111374011'),
-                           ('mrs beef stock cube as prepared','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
-                           ('beef stock','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
-                           ('mrs beef stock cube','https://groceries.morrisons.com/webshop/product/Morrisons-Beef-Stock-Cubes-12s/265316011'),
-                           ('wholegrain mustard','https://groceries.morrisons.com/webshop/product/Morrisons-Wholegrain-Mustard/121390011'),
-                           ('mrs veg samosa','https://groceries.morrisons.com/webshop/product/Morrisons-Indian-Takeaway-Vegetable-Samosas/114583011'),
-                           ]
-        urls_to_process = [ #('10% minced beef','https://groceries.asda.com/product/beef-mince-meatballs/asda-butchers-selection-beef-reduced-fat-mince/1000269713149'), # nutritional values @ asda are for pan fried mince!!
-                            #('asd mash potato','https://groceries.asda.com/product/prepared-roasting-veg/asda-smooth-buttery-classic-mash/38759'),
-                            #('asd honey nut cornflakes','https://groceries.asda.com/product/cornflakes-honey-nut/asda-corn-flakes/1000383159255'),
-                            #('asd xtra mash potato','https://groceries.asda.com/product/prepared-potatoes/asda-extra-special-creamy-mash/13852585'),
-                            #('white flatbread','https://groceries.asda.com/product/pitta-naan-bread-flatbread/asda-2-plain-naans/1000197472217'),
-                            ('smoked salmon trimmings','https://groceries.asda.com/product/smoked-salmon/asda-smoked-salmon-trimmings/910003094926'),        # only gets title on 3rd try??
-                            #('asd spring onions','https://groceries.asda.com/product/celery-spring-onions/asda-fragrant-crunchy-spring-onions/43994118'),
-                            #('leeks','https://groceries.asda.com/product/onions-leeks/asda-mild-sweet-trimmed-leeks/27003'),
-                            #('asd cooked red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'),
-                            #('asd red lentils','https://groceries.asda.com/product/dried-pulses-lentils-couscous/asda-dried-red-lentils/910001794651'), # 30g = 80g cooked so uncooked x 80/30 x 80g numbers x 10/8 to per 100g # check for caveats: prepared as directed , pan fried, etc
-                            #('mayo','https://groceries.asda.com/product/mayonnaise/hellmanns-mayonnaise-real/910000246685'),
-                            #('asd mango chutney','https://groceries.asda.com/product/indian-takeaway/asda-indian-pickle-tray/910002615465'),
-                            #('asd garlic flatbread','https://groceries.asda.com/product/flatbreads-ciabatta/asda-garlic-herb-flatbread/910002092926'),  # TODO 'price_per_package': 'was  \n£1.70\n£1.00'
-                            #('limes','https://groceries.asda.com/product/lemons-limes-grapefruit/asda-zingy-zesty-limes/910002721111'), # NO nutrinfo # 'units': '?', SB 'ea' 4pk . . . 'product_name': 'ASDA Zingy & Zesty Limes 4pk','price_per_package': '£1.00','price_per_measure': '25.0p/each',
-                            ('aromat','https://groceries.asda.com/product/marinades-rubs/knorr-aromat-seasoning/450621'),                # TODO Issue with FULL stop at end - remove all after full stop - food_sets
-                            ('asd olive oil','https://groceries.asda.com/product/olive-oil/asda-olive-oil/1000219339167'), # TODO H - 100 ml of Oil weigh 92 grams,         ISSUE 1l
-                            ('asd extra virgin olive oil','https://groceries.asda.com/product/olive-oil/asda-extra-virgin-olive-oil/1000219339224'),
-                            ('cheese & onion kettle','https://groceries.asda.com/product/sharing-crisps/kettle-chips-mature-cheddar-red-onion-sharing-crisps/1000383133444'), # TODO 'price_per_package': was / now issue                           
-                            ('asd onion rings','https://groceries.asda.com/product/sharing-crisps/asda-onion-rings-sharing-snacks/910000826621'),
-                            ('thick choc bicuits','https://groceries.asda.com/product/luxury-biscuits-gifts/bahlsen-choco-leibniz-milk-chocolate-biscuits/910001769916'),    # TODO 'price_per_package': was / now issue  # TODO also Energy 2112 kj / < random '/'
-                            ('asd es mgt','https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-wholemeal-multigrain-sliced-loaf/1000123650133'),                            
-                            ('',''),
-                            ('',''),
-                           ] 
-        urls_to_process = [ ('wtr breaded calamari','https://www.waitrose.com/ecom/products/waitrose-breaded-calamari/895037-689932-689933'),
-                            ('wtr sweet pickle herring','https://www.waitrose.com/ecom/products/elsinore-herring-in-sweet-spicy-marinade/023229-11289-11290'),
-                            ('wtr raw baguette','https://www.waitrose.com/ecom/products/essential-waitrose-bake-at-home-white-baguettes/886566-746625-746626'),                            
-                            ('wtr diced yellowfin tuna','https://www.waitrose.com/ecom/products/waitrose-diced-msc-yellowfin-tuna/728814-754521-754522'),
-                            ('duchy organic side of salmon','https://www.waitrose.com/ecom/products/duchy-organic-orkney-whole-salmon-fillet/851835-486775-486776'),
-                            ('wtr chicken thighs skin & bone','https://www.waitrose.com/ecom/products/essential-chicken-thighs-skin-on-bone-in/519514-707754-707755'),
-                            ('wtr organic chicken thighs skin & bone','https://www.waitrose.com/ecom/products/duchy-organic-chicken-thighs-skin-on-bone-in/063388-32185-32186'),
-                            ('wtr battery chicken','https://www.waitrose.com/ecom/products/essential-large-whole-chicken/645021-507910-507911'),                            
-                            ('wtr baby rainbow carrots','https://www.waitrose.com/ecom/products/no1-baby-rainbow-carrots/636147-581352-581353'),
-                            ('wtr carrots','https://www.waitrose.com/ecom/products/essential-carrots/085125-43221-43222'),
-                            ('wtr unearthed jamon serano','https://www.waitrose.com/ecom/products/unearthed-spanish-serrano-ham/831503-347894-347895'), # TODO should show up as pork
-                            ('wtr parma ham','https://www.waitrose.com/ecom/products/waitrose-parma-ham-6-slices/525474-156519-156520'),
-                            ('organic bananas','https://www.waitrose.com/ecom/products/duchy-organic-fairtrade-bananas/088937-45726-45727'),    # TODO - units SB 'ea' qty SB 6 both missing
-                            ('wtr lrg cucumber','https://www.waitrose.com/ecom/products/essential-cucumber/086468-44158-44159'),
-                            ('wtr unwaxed limes','https://www.waitrose.com/ecom/products/cooks-ingredients-unwaxed-limes/011269-5598-5599'),
-                            ('wtr flapjack','https://www.waitrose.com/ecom/products/waitrose-mini-flapjack-bites/777243-110540-110541'),
-                            ('wtr shiraz cabernet red wine','https://www.waitrose.com/ecom/products/wolf-blass-red-label-shiraz-cabernet/868136-779851-779852'),
-                            ('biscoff icecream stick','https://www.waitrose.com/ecom/products/wolf-blass-red-label-shiraz-cabernet/868136-779851-779852'),
-                            ('wtr fr pork sausages','https://www.waitrose.com/ecom/products/no1-free-range-12-pork-sausages/824649-275729-275730'),
-                            ('duchy organic beef ribeye','https://www.waitrose.com/ecom/products/duchy-organic-british-beef-ribeye-steak/015596-7493-7494'),                            
-                            ('wtr fairtrade bananas','https://www.waitrose.com/ecom/products/essential-fairtrade-bananas/088903-45703-45704'),
-                           ]    
-        # ocado selling m&s ?!?!?!?
-        urls_to_process = [('m&s pork straws', 'https://www.ocado.com/products/m-s-british-pork-crackling-straws-515023011')]  
 
-        # convert list tuple to dict
-        urls_to_process = {item[0]: item[1] for item in urls_to_process}
-        urls_to_process = {#'asd es multigrain sliced bread': 'https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-multigrain-sliced-loaf/1000383113960',
-                        'tsc cooked beetroot': 'https://www.tesco.com/groceries/en-GB/products/261808728',
-                        'flying pigs': 'https://www.sainsburys.co.uk/gol-ui/product/mr-porky-original-pork-scratchings-65g',                        
-                        'ald salt & pepper calamari': 'https://groceries.aldi.co.uk/en-GB/p-the-fishmonger-salt-pepper-calamari-225g/4088600518596',
-                        'thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
-                        'aunties sticky toffee pudding': 'https://www.sainsburys.co.uk/gol-ui/product/auntys-sticky-toffee-puddings-200g',
-                        'sbs roast beef': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-roast-beef-130g',
-                        'breaded ham': 'https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020',
-                        'champagne': 'https://groceries.asda.com/product/champagne/moet-chandon-imperial-brut-champagne/33171',
-                        'cooked thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
-                        'cracker': 'https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923',                        
-                        'haagen-dazs strawberry cheesecake ice cream': 'https://www.sainsburys.co.uk/gol-ui/product/h%C3%A4agen-dazs-ice-cream-strawberry-cheesecake-460ml',
-                        'lemon tart w pistachio icecream': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-tarte-au-citron--taste-the-difference-500g',
-                        'lindt salted caramel chocolate': 'https://www.sainsburys.co.uk/gol-ui/product/lindt-lindor-salted-caramel-200g',
-                        'niknaks': 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk',
-                        'red food colouring': 'https://www.tesco.com/groceries/en-GB/products/313749125',
-                        'red lentils': 'https://www.sainsburys.co.uk/gol-ui/product/ktc-red-lentils-1kg',
-                        'red wine vinegar': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-wine-vinegar--red-wine-500ml',
-                        'sbs ancient grain pave': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-ancient-grain-pave-taste-the-difference-400g',
-                        'sbs pastry twist': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-cheddar-cheese-twists-125g',
-                        'sbs pepperoni': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pepperoni-sampling-pack-42g',
-                        'sweet chilli sauce': 'https://www.sainsburys.co.uk/gol-ui/product/blue-dragon-original-thai-sweet-chilli-sauce-380g-6529621-p',                        
-                        }       
+        missing_items_to_process = {#'asd es multigrain sliced bread': 'https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-multigrain-sliced-loaf/1000383113960',
+                            'tsc cooked beetroot': 'https://www.tesco.com/groceries/en-GB/products/261808728',
+                            'flying pigs': 'https://www.sainsburys.co.uk/gol-ui/product/mr-porky-original-pork-scratchings-65g',                        
+                            'ald salt & pepper calamari': 'https://groceries.aldi.co.uk/en-GB/p-the-fishmonger-salt-pepper-calamari-225g/4088600518596',
+                            'thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                            'aunties sticky toffee pudding': 'https://www.sainsburys.co.uk/gol-ui/product/auntys-sticky-toffee-puddings-200g',
+                            'sbs roast beef': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-roast-beef-130g',
+                            'breaded ham': 'https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020',
+                            'champagne': 'https://groceries.asda.com/product/champagne/moet-chandon-imperial-brut-champagne/33171',
+                            'cooked thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                            'cracker': 'https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923',                        
+                            'haagen-dazs strawberry cheesecake ice cream': 'https://www.sainsburys.co.uk/gol-ui/product/h%C3%A4agen-dazs-ice-cream-strawberry-cheesecake-460ml',
+                            'lemon tart w pistachio icecream': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-tarte-au-citron--taste-the-difference-500g',
+                            'lindt salted caramel chocolate': 'https://www.sainsburys.co.uk/gol-ui/product/lindt-lindor-salted-caramel-200g',
+                            'niknaks': 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk',
+                            'red food colouring': 'https://www.tesco.com/groceries/en-GB/products/313749125',
+                            'red lentils': 'https://www.sainsburys.co.uk/gol-ui/product/ktc-red-lentils-1kg',
+                            'red wine vinegar': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-wine-vinegar--red-wine-500ml',
+                            'sbs ancient grain pave': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-ancient-grain-pave-taste-the-difference-400g',
+                            'sbs pastry twist': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-cheddar-cheese-twists-125g',
+                            'sbs pepperoni': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pepperoni-sampling-pack-42g',
+                            'sweet chilli sauce': 'https://www.sainsburys.co.uk/gol-ui/product/blue-dragon-original-thai-sweet-chilli-sauce-380g-6529621-p',                        
+                            '':'https://www.sainsburys.co.uk/gol-ui/product/activia-bio-yogurt-strawberry-4x125g', # come up ZERO energy but OK other!? Split tabel issue?
+                            }       
 
         print('= = = Running scrape tests = = =')
 
@@ -454,34 +391,41 @@ if __name__ == '__main__':
         # S:      tesco [4]
         # S:  morrisons [28]
         # S:       asda [3]
-        for ri_name, url in utp['morrisons']:
-            urls_to_process[ri_name] = url
+        for ri_name, url in utp['morrisons']:   # TODO - H set to all or allow passing arg to specify
+            missing_items_to_process[ri_name] = url
 
     else:
         # BUILD list URLS for missing items
-        for i in ingredents_to_find:
-            if i in urls_to_process.keys(): continue     # already have URL
+        for name,url in missing_items_to_process.items():
+            print(f"name:{name} - url:[{url}]")
+            if (url == 'skip'): continue                    # derived don't need url
+            if url: continue                                # already have URL
 
-            url, igdt_url_str = url_w_tuple_string_listing(i)
+            url = get_url_from_atomic_LUT(name)
             if url:
-                urls_to_process[i] = url
+                missing_items_to_process[name] = url
+            
             else: # ask user
-                search_for = i.replace(' ','%20')
-                default = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
-                os.system(f'open {default}')
-                url = input(f'\nEnter URL for "{i}"? y/n - RET to skip\n')                
-                if str(url).lower() == '': continue
-                urls_to_process[i] = url
-                print('urls_to_process: - - - S')
-                pprint(urls_to_process)
-                print('urls_to_process: - - - E')
-                with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'w') as f:
-                    json.dump(urls_to_process, f)
+                product_url = open_search_in_browser_get_url_from_user(name)
+                
+                if product_url == None: 
+                    missing_items_to_process[name] = 'skip'
+                    continue
+                
+                missing_items_to_process[name] = product_url
+                
+        print('missing_items_to_process: - - - S')
+        pprint(missing_items_to_process)
+        print('missing_items_to_process: - - - E')
+        with open(URL_CACHE_STILL_TO_PROCESS_JSON, 'w') as f:
+            json.dump(missing_items_to_process, f)
 
 
     # lets process . . . 
-    for name,url in urls_to_process.items():        
-        
+    # cache entries in url_cache save cache to disc
+    for name,product_url in missing_items_to_process.items():        
+        if product_url == 'skip': continue
+
         item = None
 
         while True:
@@ -489,84 +433,53 @@ if __name__ == '__main__':
                 time.sleep(0.1) # be polite don't hammer the server
 
             print('- - - url - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \ ')
-            print(url)
+            print(product_url)
             print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - / ')        
-            
-            #if url == '': continue
 
             if not opt_no_prompt:
-                yn = input(f'FIND info for "{name}"? y/n \n- n to skip\nRET to get info\n')
+                yn = input(f'FIND info for "{name}"? y/n \n- n to skip\n- s to open browser get another url\nRET to get info\n')
+                
                 if str(yn).lower() == 'n': break
                 if 'http' in yn: product_url = yn
+                if 's' == yn.strip(): # get url from web
+                    product_url = open_search_in_browser_get_url_from_user(name)
+                    if product_url == None: break
 
-                if '' == yn.strip(): # get url from web
-                    if ('sbs' in name) or ('sainsburys' in name):
-                        search_for = name.replace(' ','%20').replace('sbs','').replace('sainsburys','').strip()
-                        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
-                    
-                    elif ('tsc' in name) or ('tesco' in name):
-                        search_for = name.replace(' ','%20').replace('tsc','').replace('tesco','').strip()
-                        search_url = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
-                    
-                    elif ('ald' in name) or ('aldi' in name):
-                        search_for = name.replace(' ','+').replace('ald','').replace('aldi','').strip()
-                        search_url = f"https://groceries.aldi.co.uk/en-GB/Search?keywords={search_for}"
-
-                    elif ('asd' in name) or ('asda' in name):
-                        search_for = name.replace(' ','%20').replace('asd','').replace('asda','').strip()
-                        search_url = f"https://groceries.asda.com/search/{search_for}"
-
-                    elif ('wtr' in name) or ('waitrose' in name):
-                        search_for = name.replace(' ','%20').replace('wtr','').replace('waitrose','').strip()
-                        search_url = f"https://www.waitrose.com/ecom/shop/search?&searchTerm={search_for}"
-
-                    else:
-                        search_for = name.replace(' ','%20')
-                        #default = f"https://www.tesco.com/groceries/en-GB/search?query={search_for}"
-                        search_url = f"https://www.sainsburys.co.uk/gol-ui/SearchResults/{search_for}"
-
-                    os.system(f'open {search_url}')
-                    yn = input(f'Enter URL for item "{name}"? y/n \n- n to skip\n')
-                    if str(yn).lower() == 'n': break
-                    if 'http' in yn: product_url = yn
-
-
-            igdt_type = 'atomic'    # default
+            igdt_type = 'ots'    # default
             if name in atomic_LUT:
-                print('- - - atomic - S')
+                print('- - - atomic? - S')
                 pprint(atomic_LUT[name])                
                 igdt_type = atomic_LUT[name]['igdt_type']
-                print('- - - atomic - E')
+                print('- - - atomic? - E')
 
-            print(f"Getting [{name}][{igdt_type}] from: {product_url}")        
+            print(f"Getting [{name}][{igdt_type}] from: {product_url}")
+            if product_url == None: break
+
+            # TODO H - check cache to see if already retrieved
             item = ProductInfo(name, product_url, igdt_type)        
             nutrinfo_text = item.nutrinfo_str()
 
-            # TODO H 
-            # cache ProductInfo to disc using url as key
-            # store info in json {url: item}
-
-            print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+            print('- - FOUND - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
             print(item)
             print('- - - - - - - - -')
             print(nutrinfo_text)
             print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')        
 
-            #if item['nutrition_info']['energy'] != 0: break
-            #pprint(item)
-            #pprint(item.nutrition_info['energy'])
             if (item.nutrition_info['energy'] != 0) or opt_no_prompt: break
 
         if item:
             if not opt_no_prompt:
                 yn = input(f"SAVE info for > {item.ri_name} <? y/n - n to skip\nRET to SAVE\n")
             else:
-                yn = ''                
+                yn = ''      
 
             if str(yn).lower() == '' and (item.nutrition_info['energy'] != 0):            
-                # with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
-                #     url_cache[item.product_url] = json.dumps(str(item))
-                #     f.write(json.dumps(url_cache))
+                # TODO H - cache ProductInfo to disc using url as key
+                # store info in json {url: item}
+                with open(URL_CACHE_ALREADY_RETRIEVED_JSON, 'w') as f:
+                    url_cache[item.product_url] = json.dumps(str(item))
+                    f.write(json.dumps(url_cache))
+ 
                 with open(NUTRIENT_FILE_PATH, 'r') as f:
                     content = f.read()
                 
