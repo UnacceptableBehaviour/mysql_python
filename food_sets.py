@@ -259,7 +259,7 @@ def save_ots_ingredients_found():
         ots_i_string = json.dumps(list(ots_I_set))
         f.write(ots_i_string)
 
-# TODO move backup_file_with_nix_timestamp from food_scrape.py if needed
+# TODO move backup_file_with_nix_timestamp from scrape.py if needed
 # more robust
 # from timestamping import nix_time_ms
 # import shutil
@@ -1213,7 +1213,7 @@ crustaceans_derived_no_recipe =  {'salt and pepper squid','lobster bisque', 'shr
 # different names same thing
 crustaceans_alt = [
     {'langostino', 'squat lobster'},
-    {'norway lobster', 'dublin bay prawn', 'langoustine', 'langostine'}, #'wholetail scampi', 'scampi'},
+    {'norway lobster', 'dublin bay prawn', 'langoustine', 'langostine', 'wholetail scampi', 'scampi'},
     {'prawn','prawns','shrimp','shrimps','large head on shell on prawns', 'large head on shell on prawn', 'large prawns', 'large prawn',
      'hoso prawn','hoso prawns','so prawn','so prawns','shell on jumbo king prawn', 'shell on jumbo king prawns'},
     {'crayfish','crawfish', 'crawdads', 'freshwater lobsters', 'mountain lobsters', 'mudbugs', 'yabbies',
