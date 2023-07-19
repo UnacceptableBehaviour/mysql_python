@@ -19,7 +19,7 @@ from timestamping import nix_time_ms
 from food_sets import get_containsTAGS_for, parse_igdt_lines_into_igdt_list, errors, scan_for_error_items
 from food_sets import nutridoc_scan_to_exploded_i_list_and_allergens
 from food_sets import atomic_LUT # debug - TODO ATOMIC REMOVE
-from food_scrape import MISSING_INGREDIENTS_FILE_JSON_PY
+from scrape import MISSING_INGREDIENTS_FILE_JSON_PY
 
 import json
 from collections import Counter # to dump debug
@@ -336,7 +336,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y458', 'y459']
+NUTRIDOC_LIST = ['y460'] #, 'y459']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
