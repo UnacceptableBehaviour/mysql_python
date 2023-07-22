@@ -224,26 +224,41 @@ class ProductInfo:
         cookie_btn_timeout_inSec = 3
         driver.get(self.product_url)
 
-        # TODO - H use Tesco cookie - wait click together
-        allow_cookies_btn_id = 'onetrust-accept-btn-handler'
+        DSK = 0
+        MOB = 1
+        BY  = 0
+        SEL = 1
+        cur = DSK        
+        query = {
+            'cookie_b':             [(By.CSS_SELECTOR, '#onetrust-accept-btn-handler'),
+                                     (By.CSS_SELECTOR, '#onetrust-accept-btn-handler')],
+            # 'product_title':        [(By.CSS_SELECTOR, 'header > h1'), 
+            #                          (By.CSS_SELECTOR, 'header > h1')],
+            # # 'package_qty_str':      [(By.CSS_SELECTOR,'.bop-catchWeight'),
+            # #                          (By.CSS_SELECTOR,'.bop-catchWeight')],                                     
+            # 'price_per_package':    [(By.CSS_SELECTOR, '.bop-price__current'),
+            #                          (By.CSS_SELECTOR, '.bop-price__current')],
+            # 'price_per_measure':    [(By.CSS_SELECTOR, '.bop-price__per'),
+            #                          (By.CSS_SELECTOR, '.bop-price__per')],
+            # 'item_info':            [(By.CSS_SELECTOR, 'h6, .bop-info__content'),                                     
+            #                          (By.CSS_SELECTOR, '.gn-expandableBar__header, .bop-info__content')], # Gets Description but misses i_string / allergies
+            # 'nutri_table':          [(By.CSS_SELECTOR, '.bop-nutritionData__origin > table tr'),
+            #                          (By.CSS_SELECTOR, '.bop-nutritionData__origin > table tr')],            
+            
+            # '':[(,),(,)],
+        }
+
         if ProductInfo.sbs_cookie_barrier:
             try:
-                print('try cookie_button w WAIT')
-                cookie_button = WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.presence_of_element_located((By.ID, allow_cookies_btn_id)))
-                print('cookie_button')
+                print(f'try cookie_button w WAIT: {cookie_btn_timeout_inSec}')
+                WebDriverWait(driver, cookie_btn_timeout_inSec).until(EC.element_to_be_clickable(query['cookie_b'][cur])).click()
+                print('CLICKED cookie_button')
+                ProductInfo.sbs_cookie_barrier = False
             except TimeoutException:
                 print("Loading took too much time!")
             except Exception as exp:
                 print(exp.msg)
-                print('cookie_button NOT FOUND')
-            
-            try:
-                print('cookie_button CLICK')
-                cookie_button.send_keys(Keys.RETURN)
-                ProductInfo.sbs_cookie_barrier = False            
-            except Exception as exp:
-                print(exp.msg)
-                print('cookie_button NOT clicked')
+                print('Ingredients NOT FOUND')                
 
         # wait content load
         delay_in_seconds = 2  # TODO is this an actual delay = bad, or a timeout = fine if so rename - check API
