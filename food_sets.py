@@ -13,6 +13,7 @@ from collections import Counter
 from pathlib import Path
 from pprint import pprint
 
+from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON_FSETS
 
 # returns True if they balance
 # TODO run check on ots_i_list before processing
@@ -2082,6 +2083,13 @@ if __name__ == '__main__':
         print(f"\n\nTAGS:{t_set}")
         return t_set
 
+    def dump_ots_i_miss_to_file_for_scrape(ots_i_miss):
+        pprint(ots_i_miss)
+        missing_to_file = json.dumps(ots_i_miss)
+        with open(MISSING_INGREDIENTS_FILE_JSON_FSETS, 'w') as f:
+            f.write(missing_to_file)
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check errors & investigate 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -2151,17 +2159,27 @@ if __name__ == '__main__':
         print(f"OTS_I_MISS: {ots_i_miss_list}")
         switch_aliases = []
         url_list = []
+        ots_i_miss_list_w_url = {}
         for i in ots_i_miss_list:
+            ots_i_miss_list_w_url[i] = ''
             alias = follow_alias(i)                     # alias_with_link_or_ingredients
             if alias:
                 switch_aliases.append((i, alias))                
                 print(f"following: [{i}] alias to: [{alias}]")
                 dump_atomic_LUT(alias)
-                if atomic_LUT[alias]['url']: url_list.append(atomic_LUT[alias]['url'])
+                if atomic_LUT[alias]['url']:
+                    url_list.append(atomic_LUT[alias]['url'])
+                    ots_i_miss_list_w_url[alias] = atomic_LUT[alias]['url']
             else:
                 dump_atomic_LUT(i)
-                if atomic_LUT[i]['url']: url_list.append(atomic_LUT[i]['url'])
+                if atomic_LUT[i]['url']:
+                    url_list.append(atomic_LUT[i]['url'])
+                    ots_i_miss_list_w_url[i] = atomic_LUT[i]['url']
             print()
+        
+        if len(ots_i_miss_list_w_url) > 0:
+            dump_ots_i_miss_to_file_for_scrape(ots_i_miss_list_w_url)
+
         print(f"{url_list}")
         if c not in CACHE_recipe_component_or_ingredient:
             get_ingredients_from_component_file_and_CACHE_content(c)          # get & cache

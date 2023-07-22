@@ -26,15 +26,17 @@ from scrape_tests import tests, urls_to_process_all_dict
 
 # missing ingreidient list sources
 # from food_sets import OTS_INGREDIENTS_FOUND # check format is compatible and integrate it into items to scrape
-MISSING_INGREDIENTS_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB.json')
-MISSING_INGREDIENTS_FILE_JSON_CCM = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_RB_CCM.json')
-MISSING_INGREDIENTS_FILE_JSON_PY = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_missing_ingredients_PY.json')
+from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON
+from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON_CCM
+from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON_PY
+from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON_FSETS
 # in progress - interrupted
 URL_CACHE_STILL_TO_PROCESS_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_TO_PROCESS.json')
 
 MI_FILES = {'-c': MISSING_INGREDIENTS_FILE_JSON,          # cost_menu.rb
             '-d': MISSING_INGREDIENTS_FILE_JSON_CCM,      # DTK web interface: ccm_nutridoc_web.rb
             '-p': MISSING_INGREDIENTS_FILE_JSON_PY,       # process_nutridocs.py 
+            '-f': MISSING_INGREDIENTS_FILE_JSON_FSETS,    # food_sets.py
             '-m': URL_CACHE_STILL_TO_PROCESS_JSON         # compiled list, interupted while processing
             }            
 
@@ -285,6 +287,7 @@ help_info = '''
 > scrape.py -c                 # process cost_menu.rb missing ONLY 
 > scrape.py -d                 # process ccm_nutridoc_web.rb missing ONLY (DTK web interface)
 > scrape.py -p                 # process process_nutridocs.py missing ONLY
+> scrape.py -f                 # process food_sets.py missing ONLY
 > scrape.py -c -d              # process cost_menu.rb & ccm_nutridoc_web.rb missing ONLY
 
 
