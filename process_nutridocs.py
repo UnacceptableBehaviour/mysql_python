@@ -282,6 +282,7 @@ NUTRIDOC_LIST = [
                 'y971',       #  DONE 1123-06 24/2 - broths, fish, bakewell tart & fudge, veg bake
                 'y972',       #  DONE 1207-20 19/4 -
                 'y973',       #  DONE 1221-03 28/11 - xmas, beef, brioche, broths, fennel pate, french stick - TODO: beef forerib, lamb chops, oils
+
                               #  * * * 2020 * * *
                 'y974',       #  DONE 0104-17 - 18/1  crispy prawns, stir fry, arancini, moussakas, roast potatoes & salads
                 'y975',       #  DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
@@ -312,6 +313,8 @@ NUTRIDOC_LIST = [
                 # 'y436',       #       1121-04 -
                 # 'y437',       #       1205-18 - 00/28
                 # 'y438',       #       1024-06 - 00/0:
+
+                              #  * * * 2021 * * *                
                 # 'y439',       #       0116-0212 - 00/0:
                 # 'y440',       #       0601-15
                 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
@@ -326,17 +329,21 @@ NUTRIDOC_LIST = [
                 # 'y450',
                 # 'y451',
                 # 'y452',
+                              #  * * * 2022 * * *                
                 # 'y453',
                 # 'y454',
                 # 'y455',
                 # 'y456',
+                              #  * * * 2023 * * *                
                 # 'y457',
                 # 'y458',
+                # 'y459',
+                # 'y460',       # DONE 0621-0706 - 31/6
 
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y460'] #, 'y459']
+NUTRIDOC_LIST = ['y459']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
@@ -379,6 +386,7 @@ NUTRIDOC_LIST = ['y460'] #, 'y459']
 # y457_NUTRITEST_recipes_20230215-0422.rtf         36       34        2       **  41  **        16                 26 
 # y458_NUTRITEST_recipes_20230424-0531.rtf         54       25        29          3             0                  0            
 # y459_NUTRITEST_recipes_20230601-21.rtf           34       32        2           29            1                  0            0            
+# y460_NUTRITEST_recipes_20230621-0706.rtf         37       31        6           2             5                  0  
 # y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
 # y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
 #
