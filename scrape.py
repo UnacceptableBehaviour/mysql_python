@@ -610,6 +610,9 @@ if __name__ == '__main__':
 #   % xattr -d com.apple.quarantine /usr/local/bin/chromedriver   # overs OS warning
 #   % run script as before!
 #
+#   ^^ AUTOMATE above with homebrew? ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ 
+#   https://stackoverflow.com/questions/46026987/selenium-gives-selenium-common-exceptions-webdriverexception-message-unknown
+#
 # Selenium Hello World
 # https://www.browserstack.com/guide/locators-in-selenium
 # https://www.browserstack.com/guide/get-html-source-of-web-element-in-selenium-webdriver

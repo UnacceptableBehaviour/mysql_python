@@ -211,7 +211,13 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.sbs_driver == None:
-            ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')        
+            #ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')
+            options = webdriver.ChromeOptions()
+            options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            chrome_driver_binary = "/usr/local/bin/chromedriver"
+            ProductInfo.sbs_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)               
+            
+
         driver = ProductInfo.sbs_driver
 
         # remove cookie request            
@@ -540,7 +546,12 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.mrs_driver == None:
-            ProductInfo.mrs_driver = webdriver.Chrome('chromedriver')        
+            #ProductInfo.mrs_driver = webdriver.Chrome('chromedriver')
+            options = webdriver.ChromeOptions()
+            options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            chrome_driver_binary = "/usr/local/bin/chromedriver"
+            ProductInfo.mrs_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
+
         driver = ProductInfo.mrs_driver
 
         DSK = 0
@@ -938,7 +949,12 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.tsc_driver == None:
-            ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')        
+            #ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')
+            options = webdriver.ChromeOptions()
+            options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            chrome_driver_binary = "/usr/local/bin/chromedriver"
+            ProductInfo.tsc_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
+
         driver = ProductInfo.tsc_driver
 
         DSK = 0
@@ -1348,7 +1364,12 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.asd_driver == None:
-            ProductInfo.asd_driver = webdriver.Chrome('chromedriver')        
+            #ProductInfo.asd_driver = webdriver.Chrome('chromedriver')
+            options = webdriver.ChromeOptions()
+            options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            chrome_driver_binary = "/usr/local/bin/chromedriver"
+            ProductInfo.asd_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
+
         driver = ProductInfo.asd_driver
 
         DSK = 0
@@ -1758,7 +1779,12 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.wtr_driver == None:
-            ProductInfo.wtr_driver = webdriver.Chrome('chromedriver')        
+            #ProductInfo.wtr_driver = webdriver.Chrome('chromedriver')
+            options = webdriver.ChromeOptions()
+            options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            chrome_driver_binary = "/usr/local/bin/chromedriver"
+            ProductInfo.wtr_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
+
         driver = ProductInfo.wtr_driver
 
         DSK = 0
