@@ -1,5 +1,5 @@
 {% block content %}
-<div class="container-fluid padding">
+<div id='recipe_dtk_multi_target' class="container-fluid padding">
 	<div class="row padding">
 
 		<!-- if re-writing in JS . . ?
@@ -10,72 +10,8 @@
           var recipes = {{ recipes|tojson }};                       // convert info using tojson filter
           console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check
         </script>
+		<script src='static/recipe_dtk_multi.js'></script>
 
-
-        <!--<div class="col-md-12">-->
-		<div>
-            <div class="card">
-                <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipes[0]['lead_image']}}"></img>
-                <div class="card-body">
-                    <h2 class="card-title">{{ recipes[0]['ri_name'] }}</h2>
-                    <p class="card-text">{{ recipes[0]['description'] }}</p>
-                    <h4 class="card-title">components
-                        <a href="#" class="btn btn-outline-secondary float-right">Contents..</a>
-                    </h4>
-					<h5>(makes {{recipes[0]['nutrinfo']['yield']|int}}g / {{recipes[0]['nutrinfo']['servings']|int}} servings)</h6></h5>
-
-					<!--headline ingredients-->
-					<table class="card-text" width='100%'>
-						{% for ingd_line in recipes[0]['ingredients'] %}
-						<tr>  <!--ingredient row items-->
-							<td>{{ingd_line[1]}}</td>			<!-- qty -->
-							  {% if ingd_line[2] == '(0)' %}	<!-- servings -->
-								  <td></td>
-							  {% else %}
-								  <td>{{ingd_line[2]}}</td>
-							  {% endif %}
-							<td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-							  {% if ingd_line[0] == '1' %}	<!-- not an atomic engredient - expandable button -->
-								<td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
-							  {% else %}
-								<td></td>
-							  {% endif %}
-							<!--extra small button - relies on additional styling recipe.css-->
-							<!--<td>{{ingd_line[3]}}<a class="btn btn-xs btn-outline-secondary float-right" href="#" role="button">expand</a></td>-->
-						</tr>
-						{% endfor %}
-					</table>
-					<br>
-					{% if recipes[0]['components']|length > 0 %}
-                    <h5 class="card-title">ingredients</h5>
-					{% endif %}
-					<table class="card-text" width='100%'>
-						{% for cmp_name, cmp_rcp in recipes[0]['components'].items() %}	<!-- ingredients for each component -->
-						  <tr><td colspan="4"><h6><b>{{cmp_name}}</b> (makes {{cmp_rcp['nutrinfo']['yield']|int}}g / {{cmp_rcp['nutrinfo']['servings']|int}} servings)</h6></td></tr>
-							  {% for ingd_line in cmp_rcp['ingredients'] %}
-								  <tr>  <!--ingredient row items-->
-									  <td>{{ingd_line[1]}}</td>			<!-- qty -->
-										{% if ingd_line[2] == '(0)' %}	<!-- servings -->
-											<td></td>
-										{% else %}
-											<td>{{ingd_line[2]}}</td>
-										{% endif %}
-									  <td>{{ingd_line[3]}}</td>			<!-- ingredient -->
-										{% if ingd_line[0] == '1' %}	<!-- not an atomic engredient - expandable button -->
-										  <td><a class="btn btn-sm btn-outline-secondary float-right" href="#" role="button">e</a></td>
-										{% else %}
-										  <td></td>
-										{% endif %}
-								  </tr>
-							  {% endfor %}
-						  <tr><td><br></td></tr>
-						{% endfor %}
-					</table>
-                </div>
-            </div>
-
-            {% include 'nutrient_traffic_lights.html' %}
-        </div>
     </div>
 </div>
 

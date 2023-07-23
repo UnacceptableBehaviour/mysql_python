@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@200&display=swap');
+
+body {
+    /*background-color: black;*/
+    /*color: lightgrey;*/
+    text-align: left;
+    font-family: arial;
+    font-size: 14px;
+    margin: 0px;
+    border: 1px;
+    padding: 1px 1px 1px 5px;
+}
+
+h2 {
+    font-weight: bold;
+    font-size: 18px;
+    margin: 0px;
+    border: 1px;
+    padding: 15px 1px 1px 5px;
+}
+/* rename h3 for page elements */
+h3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0px;
+    border: 1px;
+    padding: 15px 1px 1px 5px;
+}
+/*
+h4 {
+    font-weight: normal;
+    font-size: 12px;
+    margin: 0px;
+    border: 1px;
+    padding: 1px 1px 1px 5px;
+}
+
+p {
+    font-size: 10px;
+    font-style: italic;
+    margin: 0px;
+    border: 1px;
+    padding: 1px 1px 1px 5px;
+}
+*/
+
+/*  - - - - - recipe proper PWA adapt- - - - - */
+
+/*#pwa_page, #tracker_page_parent, #tracker_page {
+  padding: 0px;
+}
+
+.container {    
+    padding-right: 0px;
+    padding-left: 0px;
+}*/
+
+/*  - - - - - recipe proper - - - - - */
+hr {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.rcp-card-txt {
+    margin-left: 10px;
+    margin-right: 10px;  
+}
+
+.rcp-image-nav {
+    width: 100%;
+    height: auto;
+    border: 5px;
+    border-color: pink;
+    position: relative;
+}
+.rcp-image {
+    display: block;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1%;
+    border-radius: 6px;
+}
+/* READ */
+/* https://scotch.io/bar-talk/5-things-you-might-not-know-about-the-css-positioning-types */
+.rbut-bk, .rbut-x {
+    position: absolute;
+    text-align: center;
+    top: 4%;
+    opacity: 0.75;    
+}
+.rbut-x {
+    /*right: 10px;*/
+    right: 8%;
+}
+.rbut-bk {
+    /*left: 10px;*/
+    left: 8%;
+}
+.rbut-bk:hover .rbut-x:hover {
+  background-color: grey;
+  opacity: 1;
+}
+
+
+.rcp-igds-list{
+    
+}
+
+.l-just {
+    text-align:left;
+}
+.r-just {
+    text-align:right;    
+}
+.c-just {
+    text-align:center;    
+}
+
+
+.rcp-igds {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0px;
+    border: 1px;
+    padding: 15px 1px 1px 1px;
+}
+.rcp-tab-igds { 
+    width: 100%;
+}
+.rcp-tab-igds img {
+    width: 80%;
+    height 80%;
+}
+
+/* - - - - - headings - - - - - */
+.rcp-title, .rcp-name, .rcp-desc, .rcp-igds, .rcp-makes, .rcp-method, .rcp-method-title, .rcp-steps {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0px;
+    border: 1px;
+    padding: 15px 1px 1px 1px;
+}
+/* - - - - - specialisations of above */
+.rcp-name, .rcp-desc {
+    text-align:center;
+}
+.rcp-desc {
+    font-style: italic;
+    font-weight: normal;
+    padding: 5px 1px 1px 1px;    
+}
+.rcp-method-title {
+    padding: 1px 1px 1px 1px;    
+}
+.rcp-steps {
+    font-weight: normal;
+    padding: 1px 1px 1px 1px;
+    width: 100%;
+}
+
+
+/* - - - - - table general - - - - - */
+
+/* - - - - - ingredients table - - - - - */
+/* TODO import CSS from DTK list - think through */
+
+/* - - - - - traffic lights - - - - - */
+
+
+/* - - - - - nutrition table - - - - - */
+
+.nutrinfo-thick-line {
+    background-color:black;padding:0px;height:5px   
+}
+.nutrinfo-thin-line {
+    background-color:black;padding:0px;height:3px
+}
+/*table.nutrinfo, table.nutrinfo th.nutrinfo, td.nutrinfo {*/
+table.nutrinfo-table tr, table.nutrinfo-table td {
+    border: 1px solid black;
+    text-align: left;
+    border-collapse: collapse;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+table.nutrinfo-table th {
+    font-weight: bold;
+}
+
+.nut_macro_cat {
+    text-align: left;
+    font-weight: bold;
+}
+
+.nut_macro_sub_cat {
+    position: relative;
+    left: 14px;                                             /* < TODO FIX hardcoded number hack add 14px to 120px*/
+    font-weight: normal;                                    /*  |  */
+}                                                           /*  |  */
+                                                            /*  |  */
+/* set first colum width to accomodatet the offset */       /*  |  */
+table.nutrinfo-table td:nth-child(1) {                      /*  |  */
+    width: 134px;                                           /*  < col width 120px but off set pushed text into next column */
+}
+
+
