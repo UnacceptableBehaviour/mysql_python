@@ -752,7 +752,7 @@ def get_user_info_dict_from_DB(uuid):
     # get_filter_colums(from_central_source)
     filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
 
-    username = helper_db_class_db.execute("SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+    username = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
     if username == None: username = 'carter' # Place holder until logins implemented
 
 

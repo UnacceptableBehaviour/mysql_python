@@ -11,41 +11,41 @@ console.log('settings.js - START');
 //}
 
 
-// TODO - toggle should reverse oposing LOGIC
-function toggleTagInCategory(button) {
+function toggleTagTypeInCategory(button) {
 
-  var tag = button.id.replace('tag_btn_id_', '');            
+  //var tag = button.id.replace('tag_btn_id_', '');
+  var value = button.value;
   
-  var tagCat = button.parentNode.id.replace('did_','');
+  var tagTypeCat = button.parentNode.id.replace('did_','');
   
-  //console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+  //console.log(`${tagTypeCat} - ${value} - ${userInfo['default_filters'][tagTypeCat]}`);
   
-  if ( userInfo['default_filters'][tagCat].includes(tag) ){
-    //console.log(`${tag} - FROM ON to OFF`);
+  if ( userInfo['default_filters'][tagTypeCat].includes(value) ){
+    //console.log(`${value} - FROM ON to OFF`);
     button.classList.add("ftb_none");
     button.classList.remove("ftb_set");
 
-    // remove tag from category - userInfo['default_filters'][tagCat].delete(tag)    
-    var default_filters = userInfo['default_filters'][tagCat];
-    // remove tag
-    default_filters = default_filters.filter( function(tagsToKeep) { return tagsToKeep !== tag; } );
+    // remove value from category - userInfo['default_filters'][tagTypeCat].delete(value)    
+    var default_filters = userInfo['default_filters'][tagTypeCat];
+    // remove value
+    default_filters = default_filters.filter( function(tagsToKeep) { return tagsToKeep !== value; } );
     
-    userInfo['default_filters'][tagCat] = default_filters;
+    userInfo['default_filters'][tagTypeCat] = default_filters;
 
   } else {
-    //console.log(`${tag} - FROM OFF to ON`);
+    //console.log(`${value} - FROM OFF to ON`);
     button.classList.add("ftb_set");
     button.classList.remove("ftb_none");
 
-    // add tag back to category
-    userInfo['default_filters'][tagCat].push(tag)
+    // add value back to category
+    userInfo['default_filters'][tagTypeCat].push(value);
   }
   
   // typing help for touch screen - add button name to input for no type removal
-  if (button.parentNode.id.includes('did_ingredient_exc')) { document.getElementById('add_igd_form').value = tag; };
+  if (button.parentNode.id.includes('did_ingredient_exc')) { document.getElementById('add_igd_form').value = value; };
   
   
-  //console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+  //console.log(`${tagTypeCat} - ${value} - ${userInfo['default_filters'][tagTypeCat]}`);
   console.log(userInfo);
   postUpdateSettingsToServer();
 }
@@ -60,8 +60,8 @@ function clickHandler(e) {
   //console.log(e.target.parentNode.id);
   //console.log(e.target.parentNode.classList);  
   
-  if (e.target.id.includes('tag_btn_id_')) { // its a tag - toggle it
-    toggleTagInCategory(e.target);
+  if (e.target.id.includes('tag_btn_id_') || e.target.id.includes('type_btn_id_')) { // its a tag - toggle it
+    toggleTagTypeInCategory(e.target);
     
   } else if (e.target.id.includes('_igd_btn_id')) {  // and an ingredients to exclude button
     input = document.getElementById('add_igd_form');
@@ -93,9 +93,33 @@ function clickHandler(e) {
     console.log(`IGD EXC = RELOAD /settings`);
     window.location.replace('/settings');
     
+  } else if (e.target.id.includes('btn_id_toggle_tags')) {     
+    // toggle is all element in tag_sets not in default_filters
+    let toggle = userInfo['tag_sets']['tags_exc'].filter(item => !userInfo['default_filters']['tags_exc'].includes(item));
+    
+    // switch
+    userInfo['default_filters']['tags_inc'] = userInfo['default_filters']['tags_exc'];
+    userInfo['default_filters']['tags_exc'] = toggle;
+
+    fillInTagButtons();
+    postUpdateSettingsToServer();
+
+  } else if (e.target.id.includes('btn_id_toggle_types')) { 
+    
+    // toggle is all element in tag_sets not in default_filters
+    let toggle = userInfo['tag_sets']['type_exc'].filter(item => !userInfo['default_filters']['type_exc'].includes(item));
+    console.log(`TYPE = ${toggle}`);
+
+    // switch
+    userInfo['default_filters']['type_inc'] = userInfo['default_filters']['type_exc'];
+    userInfo['default_filters']['type_exc'] = toggle;
+
+    fillInTagButtons();
+    postUpdateSettingsToServer();
   } 
   
 }
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // div    id="did_tags_inc" `did_${tagCatergoryId}`     // contains is category of tags
@@ -117,28 +141,30 @@ function fillInTagButtons(e){
   
   for (var i=0; i < buttons.length; i++) {
     
-    if (buttons[i].id.includes('tag_btn_id_')) { // found one set it / or not!
-      
-      tag = buttons[i].id.replace('tag_btn_id_', '');            
-      
-      tagCat = buttons[i].parentNode.id.replace('did_','');
-      
-      // console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
-      
-      if ( userInfo['default_filters'][tagCat].includes(tag) ){
-        //console.log('ON');
-        buttons[i].classList.add("ftb_set");
-        buttons[i].classList.remove("ftb_none");
-        
-      } else {
-        //console.log('OFF');
-        buttons[i].classList.add("ftb_none");
-        buttons[i].classList.remove("ftb_set");
-      }
-      
+    if (buttons[i].id.includes('tag_btn_id_')) { // found one set it / or not!      
+      tagTypeCat = buttons[i].parentNode.id.replace('did_','');
+    
+    } else if (buttons[i].id.includes('type_btn_id_')) { // found one set it / or not!    
+      tagTypeCat = buttons[i].parentNode.id.replace('did_','');
+
     } else {
       continue; // its a nav bat button or other
     }
+
+    value = buttons[i].value;
+    //console.log(`cat:${tagTypeCat} - val:${value}`);
+    //console.log(`- user_i:${userInfo['default_filters'][tagTypeCat]}`);
+
+    if ( userInfo['default_filters'][tagTypeCat].includes(value) ){
+      //console.log('ON');
+      buttons[i].classList.add("ftb_set");
+      buttons[i].classList.remove("ftb_none");
+      
+    } else {
+      //console.log('OFF');
+      buttons[i].classList.add("ftb_none");
+      buttons[i].classList.remove("ftb_set");
+    }    
     
   }  
 }
@@ -215,11 +241,11 @@ function postUpdateSettingsToServer(){
 //  //    
 //  //    tag = buttons[i].id.replace('tag_btn_id_', '');            
 //  //    
-//  //    tagCat = buttons[i].parentNode.id.replace('did_','');
+//  //    tagTypeCat = buttons[i].parentNode.id.replace('did_','');
 //  //    
-//  //    console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+//  //    console.log(`${tagTypeCat} - ${tag} - ${userInfo['default_filters'][tagTypeCat]}`);
 //  //    
-//  //    if ( userInfo['default_filters'][tagCat].includes(tag) ){
+//  //    if ( userInfo['default_filters'][tagTypeCat].includes(tag) ){
 //  //      console.log('ON');
 //  //      buttons[i].classList.add("ftb_set");
 //  //      buttons[i].classList.remove("ftb_none");
@@ -243,11 +269,11 @@ function postUpdateSettingsToServer(){
 //  //    
 //  //    tag = button.id.replace('tag_btn_id_', '');            
 //  //    
-//  //    tagCat = button.parentNode.id.replace('did_','');
+//  //    tagTypeCat = button.parentNode.id.replace('did_','');
 //  //    
-//  //    console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+//  //    console.log(`${tagTypeCat} - ${tag} - ${userInfo['default_filters'][tagTypeCat]}`);
 //  //    
-//  //    if ( userInfo['default_filters'][tagCat].includes(tag) ){
+//  //    if ( userInfo['default_filters'][tagTypeCat].includes(tag) ){
 //  //      console.log('ON');
 //  //      button.classList.add("ftb_set");
 //  //      button.classList.remove("ftb_none");
@@ -271,11 +297,11 @@ function postUpdateSettingsToServer(){
 //  //.forEach(function(button){
 //  //    tag = button.id.replace('tag_btn_id_', '');            
 //  //    
-//  //    tagCat = button.parentNode.id.replace('did_','');
+//  //    tagTypeCat = button.parentNode.id.replace('did_','');
 //  //    
-//  //    console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+//  //    console.log(`${tagTypeCat} - ${tag} - ${userInfo['default_filters'][tagTypeCat]}`);
 //  //    
-//  //    if ( userInfo['default_filters'][tagCat].includes(tag) ){
+//  //    if ( userInfo['default_filters'][tagTypeCat].includes(tag) ){
 //  //      console.log('ON');
 //  //      button.classList.add("ftb_set");
 //  //      button.classList.remove("ftb_none");
@@ -292,11 +318,11 @@ function postUpdateSettingsToServer(){
 //  //    
 //  //    tag = button.id.replace('tag_btn_id_', '');            
 //  //    
-//  //    tagCat = button.parentNode.id.replace('did_','');
+//  //    tagTypeCat = button.parentNode.id.replace('did_','');
 //  //    
-//  //    console.log(`${tagCat} - ${tag} - ${userInfo['default_filters'][tagCat]}`);
+//  //    console.log(`${tagTypeCat} - ${tag} - ${userInfo['default_filters'][tagTypeCat]}`);
 //  //    
-//  //    if ( userInfo['default_filters'][tagCat].includes(tag) ){
+//  //    if ( userInfo['default_filters'][tagTypeCat].includes(tag) ){
 //  //      console.log('ON');
 //  //      button.classList.add("ftb_set");
 //  //      button.classList.remove("ftb_none");

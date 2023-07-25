@@ -341,8 +341,26 @@ def settings():
     #     'type_exc': [],
     #     'ingredient_exc': [] }
 
-    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
+
+    sql_query = "SELECT DISTINCT unnest(type) AS all_types FROM recipes;"
+    types = helper_db_class_db.execute(sql_query).fetchall()    # ret list of tuples [('serve_hot',),('serve_rt',),('lunchbox',), etc ]
+    # print('=\ ')
+    # pprint(types)
+    types = [ t[0] for t in types if t[0].strip() ]   # remove blanks
+    types.sort()
+    for t in types: print(f"{t},",end="")
+    print('=/ ')
+
+    # source of buttons to populate with settings from default_filters
+    user_info['tag_sets']['type_exc'] = types
+    # TODO H - remove ['tag_sets']['type_inc'] and ['tag_sets']['tags_inc']
+    # replace ['tag_sets']['type_exc'] with ['tag_sets']['type_all']
+    # replace ['tag_sets']['tags_exc'] with ['tag_sets']['tags_all']
+    user_info['tag_sets']['type_inc'] = types
+    if (len(user_info['default_filters']['type_inc']) == 0) and (len(user_info['default_filters']['type_exc']) == 0):
+        user_info['default_filters']['type_exc'] = types
 
     return render_template('settings_t.html', user_info=user_info)
 

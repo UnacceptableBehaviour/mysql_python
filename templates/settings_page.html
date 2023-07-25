@@ -12,19 +12,12 @@
       </div>
 
       <div id="did_tags_exc" class="container-fluid padding tag-div">
+          <button id='btn_id_toggle_tags' name='tags_btn_toggle' value='tags_toggle' class='btn btn-sm btn-outline-secondary'>TOGGLE</button>
           TAGS TO EXCLUDE:
           {% for tag in user_info['tag_sets']['tags_exc'] %}
           <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
           {% endfor %}
-      </div>
-
-      <div id="did_tags_inc" class="container-fluid padding tag-div">
-          TAGS TO INCLUDE:
-          {% for tag in user_info['tag_sets']['tags_inc'] %}
-          <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
-          {% endfor %}
-      </div>
-      
+      </div>      
       
       <div class="input-group mb-3">
         <input name='create_tag_button' type="text" class="form-control" placeholder="Enter new tag . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
@@ -32,7 +25,22 @@
           <button id="create_tag_btn_id" class="btn btn-outline-secondary" type="submit">CREATE TAG</button>
         </div>
       </div>
-      
+
+      <div id="did_type_exc" class="container-fluid padding tag-div">
+          <button id='btn_id_toggle_types' name='type_btn_toggle' value='type_toggle' class='btn btn-sm btn-outline-secondary'>TOGGLE</button>
+          TYPES TO EXCLUDE:
+          {% for type in user_info['tag_sets']['type_exc'] %}
+          <button id='type_btn_id_{{type}}' name='type_btn_{{type}}' value='{{type}}' class='btn btn-sm btn-outline-secondary'>{{type}}</button>
+          {% endfor %}
+      </div>
+
+      <div class="input-group mb-3">
+        <input name='create_type_button' type="text" class="form-control" placeholder="Enter new type . . ." aria-label="Personal type" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button id="create_type_btn_id" class="btn btn-outline-secondary" type="submit">CREATE TYPE</button>
+        </div>
+      </div>      
+
       <div id="did_ingredient_exc" class="container-fluid padding tag-div">
         INGREDIENTS TO EXCLUDE:        
         {% for tag in user_info['tag_sets']['ingredient_exc'] %}
@@ -40,7 +48,7 @@
         {% endfor %}
 
         <div class="input-group mb-3">
-          <input id='add_igd_form' name='add_igd_form' type="text" class="form-control" placeholder="ingredients to avoid in search . . ." aria-label="Personal tags" aria-describedby="basic-addon2">
+          <input id='add_igd_form' name='add_igd_form' type="text" class="form-control" placeholder="ingredients to avoid in search . . ." aria-label="Personal type" aria-describedby="basic-addon2">
           <div class="input-group-append">
             <button id="remove_igd_btn_id" class="btn btn-outline-secondary" type="submit">-</button>
           </div>
