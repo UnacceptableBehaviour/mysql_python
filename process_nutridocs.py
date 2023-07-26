@@ -343,7 +343,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y459']
+NUTRIDOC_LIST = ['y449']
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      

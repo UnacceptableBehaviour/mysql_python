@@ -13,6 +13,7 @@
 
       <div id="did_tags_exc" class="container-fluid padding tag-div">
           <button id='btn_id_toggle_tags' name='tags_btn_toggle' value='tags_toggle' class='btn btn-sm btn-outline-secondary'>TOGGLE</button>
+          <button id='btn_id_clear_tags' name='tags_btn_clear' value='tags_clear' class='btn btn-sm btn-outline-secondary'>CLEAR</button>
           TAGS TO EXCLUDE:
           {% for tag in user_info['tag_sets']['tags_exc'] %}
           <button id='tag_btn_id_{{tag}}' name='tag_btn_{{tag}}' value='{{tag}}' class='btn btn-sm btn-outline-secondary'>{{tag}}</button>
@@ -28,6 +29,7 @@
 
       <div id="did_type_exc" class="container-fluid padding tag-div">
           <button id='btn_id_toggle_types' name='type_btn_toggle' value='type_toggle' class='btn btn-sm btn-outline-secondary'>TOGGLE</button>
+          <button id='btn_id_clear_type' name='type_btn_clear' value='type_clear' class='btn btn-sm btn-outline-secondary'>CLEAR</button>
           TYPES TO EXCLUDE:
           {% for type in user_info['tag_sets']['type_exc'] %}
           <button id='type_btn_id_{{type}}' name='type_btn_{{type}}' value='{{type}}' class='btn btn-sm btn-outline-secondary'>{{type}}</button>
