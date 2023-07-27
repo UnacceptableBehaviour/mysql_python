@@ -921,8 +921,8 @@ def build_dairy_set():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EGGS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-eggs_basic = {'eggs','egg', 'free range egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
-              'egg solids','egg white','egg yolk','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk',
+eggs_basic = {'eggs','egg', 'large eggs','large egg', 'medium eggs','medium egg', 'free range egg','quails egg','duck egg','hens egg','albumin','albumen','dried egg','powdered egg',
+              'egg solids','egg white','egg whites','egg yolk','egg yolks','pasteurised egg','pasteurised egg white', 'pasteurised egg yolk',
               'dried free range egg white', 'dried egg', 'pasteurised free range egg white'}
 
 # usually product of some type katsuobushi or fish sauce for example
