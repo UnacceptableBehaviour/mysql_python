@@ -371,6 +371,7 @@ last_search_result_recipes = {}
 def search_ingredient():
     global last_search_result_recipes # what the point of a global if it isn't implicitly global? TODO
     search = ''
+    
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
 
     # process search post - query database
@@ -387,6 +388,8 @@ def search_ingredient():
             pprint(search)
         else:
             raise('Come on!!')
+        
+        user_info = get_user_info_dict_from_DB(uuid)
 
         ri_ids = process_search(search, user_info['default_filters'])
 
