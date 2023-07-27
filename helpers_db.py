@@ -515,7 +515,7 @@ def build_search_query_v2(search, default_filters):
 # return recipe with all the ingredients listed
 # olive oil, garlic, eggs
 # filter out ingredients that contain allergies in the user profile
-def build_search_query(search, default_filters):
+def build_search_query_v2(search, default_filters):
 
     search_words = [ word.strip() for word in search.split(',') ]
 
@@ -568,6 +568,69 @@ def build_search_query(search, default_filters):
 
     return search_query
 
+
+
+# return recipe with all the ingredients listed
+# olive oil, garlic, eggs
+# filter out ingredients that contain allergies in the user profile
+def build_search_query(search, default_filters):
+
+    search_words = [ word.strip() for word in search.split(',') ]
+
+    if len(search_words) == 0:
+        return ''
+
+    def add_one_more_igdt(i):
+        return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%{i}%'))) "
+
+    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
+
+    for w in search_words:
+        search_query = search_query + add_one_more_igdt(w)
+
+    # SELECT DISTINCT ri_id
+    # FROM (
+    #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
+    # ) distinct_ids
+    # WHERE (igd LIKE '%olive oil%')
+    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
+    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
+    # ;
+
+    # add check for filter
+    def wrap_allergy_qry(item, filter_col):
+        return f"'{item}' = ANY({filter_col})"
+
+    # type_exc, tags_exc
+    if (len(default_filters['allergens']) > 0) or (len(default_filters['type_exc']) > 0):
+        search_query = f"SELECT ri_id FROM recipes WHERE ri_id IN ( {search_query} ) "
+
+
+    filter = 'allergens'
+    if (len(default_filters[filter]) > 0):
+        exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters[filter] ]
+        # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
+
+        exclude_qry = ' OR '.join(exclude_qry_list)
+        # "'dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens)"
+
+        search_query = search_query + f"AND NOT ( {exclude_qry} ) "
+
+    # SELECT ri_id FROM recipes
+    # WHERE ri_id IN (
+    #     SELECT DISTINCT ri_id
+    #     FROM (
+    #         SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
+    #     ) distinct_ids
+    #     WHERE (igd LIKE '%olive oil%')
+    #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
+    #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
+    # )
+    # AND NOT ('dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens));
+
+    search_query += ';'
+
+    return search_query
 
 
 
