@@ -182,7 +182,7 @@ def create_sql_insert_tags_array_text(tags):
 # single unified source of default tag sets
 def get_default_tag_sets_dictionary(state = 'with_defaults'):
     # defaults
-    tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','shellfish','alcohol','celery','gluten','soya','sulphur_dioxide'],
+    tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','crustaceans','alcohol','celery','gluten','soya','sulphur_dioxide'],
                 'ingredient_exc': [],
                 'tags_exc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
                 'tags_inc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
