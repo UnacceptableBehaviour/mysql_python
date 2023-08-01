@@ -226,6 +226,7 @@ def return_recipe_dictionary():
         'allergens': [ 'none_listed' ],
         'tags': [ 'none_listed' ],
         'user_tags': [ 'none_listed' ],
+        'type': [ 'none_listed' ],
 
         # SUB COMPONENT RECIPES
         # components:  { 'component name': recipe dictionary, . . . }
@@ -250,6 +251,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     # nutrinfo:     nurients, servings, etc     Traffic Lights & Nutrition
     # components:   name, ingredients           Subcomponents & ingredients
     # tags:         tags, allergens, user_tags  Simplify classification
+    #               type
     # -
     nutrinfo_dict_keys = [ k for k, v in updated_info['nutrinfo'].items() ]
 
@@ -267,12 +269,12 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
 
     elif type(ri_id_or_name).__name__ == 'int':
         print(f"ri_id_or_name is an int [{ri_id_or_name}] - {type(ri_id_or_name).__name__} - {type(ri_id_or_name)}")
-        sql_query = f"SELECT {qry_string} FROM recipes WHERE ri_id = {ri_id_or_name};"
-        print(sql_query)
+        sql_query = f"SELECT {qry_string} FROM recipes WHERE ri_id = {ri_id_or_name};"        
 
     else:
         raise(TypeError, f"recipe ID should be a ri_name (str) or ri_id(int) - {ri_id_or_name}")
 
+    print(sql_query)
     db_lines = helper_db_class_db.execute(sql_query).fetchall()
 
     # pprint(db_lines) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,7 +306,16 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
 
     #user_R = int(random() * 5 ) + 1
     #updated_info['user_rating'] = user_R
-
+    # print(f"----- updated_info: S")
+    # print(updated_info)
+    # print(updated_info.keys())
+    # print(f"----- updated_info: F")
+    # print(fields)
+    print(f"----- updated_info: M")
+    print(updated_info['tags'])
+    print(updated_info['type'])     
+    print(updated_info['allergens'])
+    print(f"----- updated_info: E")
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
     return updated_info
 
@@ -355,7 +366,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
 
-    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating']    
+    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating', 'type']    
 
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
@@ -609,6 +620,16 @@ def build_search_query(search, default_filters):
     filter = 'allergens'
     if (len(default_filters[filter]) > 0):
         exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters[filter] ]
+        # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
+
+        exclude_qry = ' OR '.join(exclude_qry_list)
+        # "'dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens)"
+
+        search_query = search_query + f"AND NOT ( {exclude_qry} ) "
+
+    filter = 'type' # TODO aligh table column name to all type (better) or type_exc
+    if (len(default_filters['type_exc']) > 0):
+        exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters['type_exc'] ]
         # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
 
         exclude_qry = ' OR '.join(exclude_qry_list)
