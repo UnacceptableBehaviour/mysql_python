@@ -11,7 +11,7 @@ from datetime import datetime
 def nix_time_ms(dt=None):
     if dt == None: dt = datetime.now()
     epoch = datetime.utcfromtimestamp(0)                    #                ms 1572029735987
-    print(f"nix_time_ms: {int( (dt - epoch).total_seconds() * 1000.0 )}")
+    # print(f"nix_time_ms: {int( (dt - epoch).total_seconds() * 1000.0 )}")
     return int( (dt - epoch).total_seconds() * 1000.0 )     # total_seconds() > 1572029735.987234
 
 def day_from_nix_time(nix_time_ms):
