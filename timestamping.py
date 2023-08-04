@@ -8,23 +8,30 @@ from datetime import datetime
 # time helper function for time since epoch, day, 24hr clock
 # https://www.techatbloomberg.com/blog/work-dates-time-python/ < overview timezones
 #def nix_time_ms(dt=datetime.now()):  < this assign the time the def statement is execute as the default! # https://effbot.org/zone/default-values.htm
-def nix_time_ms(dt=None):
+def nix_time_ms(dt=None):                           # > 1691156542107
     if dt == None: dt = datetime.now()
-    epoch = datetime.utcfromtimestamp(0)                    #                ms 1572029735987
+    # ms 1572029735987
+    epoch = datetime.utcfromtimestamp(0) 
     # print(f"nix_time_ms: {int( (dt - epoch).total_seconds() * 1000.0 )}")
-    return int( (dt - epoch).total_seconds() * 1000.0 )     # total_seconds() > 1572029735.987234
 
-def day_from_nix_time(nix_time_ms):
+    return int( (dt - epoch).total_seconds() * 1000.0 )     
+
+def day_from_nix_time(nix_time_ms):                 # > 'fri'
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%a").lower()
 
-def time24h_from_nix_time(nix_time_ms):
+def time24h_from_nix_time(nix_time_ms):             # > '1342'
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%H%M")
 
-def hr_readable_from_nix(nix_time_ms):
+def hr_readable_from_nix(nix_time_ms):              # > '2023 08 04 1342'
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d %H%M")
 
-def hr_readable_date_from_nix(nix_time_ms):
+def hr_readable_date_from_nix(nix_time_ms):         # > '2023 08 04'
     return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y %m %d")
+
+# good for HR backup directory naming - ms on the END
+def hr_readable_w_nix_ms_from_nix(nix_time_ms):     # > '2023_08_04_134222_107'
+    ms = nix_time_ms % 1000
+    return datetime.utcfromtimestamp(nix_time_ms / 1000.0).strftime("%Y_%m_%d_%H%M%S") + "_" + str(ms)
 
 # Unecessarily complicated refactor!
 #
