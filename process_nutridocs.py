@@ -286,64 +286,85 @@ NUTRIDOC_LIST = [
                               #  * * * 2020 * * *
                 'y974',       #  DONE 0104-17 - 18/1  crispy prawns, stir fry, arancini, moussakas, roast potatoes & salads
                 'y975',       #  DONE 0118-31 - 19/14: images processed - templates in place - REQ: fill in ~50% complete  MISSING IMAGES:1 ['bst']
-                # 'y976',       #  SUSHI TODO DONE 0201-14 42/45- standard sushi templates bringing in
-                # 'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
+                'y976',       #  SUSHI TODO DONE 0201-14 42/45- standard sushi templates bringing in
+                'y977',       #  SUSHI TODO DONE 0215-28 - 18/37: images processed - templates in place - REQ: fill in ~ 4/54 complete - sushi, moussaka, tag n cheese, salads, comfort MISSING IMAGES: 1 ['red pepper & tomatoes']
                 'y978',       #* DONE 0229-13 54/5 - sushi, croquettes, wraps, fish, veg, stirfry  MISSING IMAGES: 5 ['mon8pm 200302', 'late snack 20200304', 'mpy', 'snack 20200311', 'sushi & lamb chops']
                 'y979',       #  DONE 0314-27 - 34/4: broths, dumpling dough, cabbage, figs, sticky pork
                 
                 # #_doc_#         status dateRange - RCP/incomplete : type of content
                 
-                # 'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
-                # 'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
+                'y420',       #       0328-10 - 0/21: images processed - templates in place - REQ: fill in
+                'y421',       #       0411-24 - 4/52: images processed - templates in place - REQ: fill in
                 'y422',       #* DONE 0425-08 - 46/3: salads, broths, comfort, pizza               MISSING IMAGES: 4 ['vc water', 'smoked mussels inc oil', 'buttered crumpet', 'pear pickle']
                 'y423',       #* DONE 0509-22 - 58/9: salads, steak chops kofte, tarts, cake       MISSING IMAGES: 3 ['red wine & blue cheese sauce', 'salmon fishsticks', 'coconutapple']
                 'y424',       #* DONE 0523-05 - 48/8: chermoula, guinea fowl chinese leaf wraps    MISSING IMAGES: 2 ['sourdough bap', 'hereford pate']
                 'y425',       #* DONE 0606-19 - 51/1: salads, steak chops kofte, tarts, breads     MISSING IMAGES: 6 ['waterc', 'halfwaterc', 'haggis yorkie', 'indian dips', 'roast chicken dinner', 'drink snack 20200619']
                 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
-                # 'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
+                'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
                 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
                 #               #       0801-14 - no nutridoc!?
                  'y429',       #       0815-28 - 50/4:
                 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
-                # 'y431',       #       0912-25 - 4 /2:
+                'y431',       #       0912-25 - 4 /2:
                 'y432',       #  DONE 0929-09 - 15/42: loads of material!
-                # 'y433',       #       1010-23 - 12/2:
-                # 'y434',       #       1024-06 - 00/0:
-                # 'y435',       #       1107-20 -
-                # 'y436',       #       1121-04 -
-                # 'y437',       #       1205-18 - 00/28
-                # 'y438',       #       1024-06 - 00/0:
+                'y433',       #       1010-23 - 12/2:
+                'y434',       #       1024-06 - 00/0:
+                'y435',       #       1107-20 -
+                'y436',       #       1121-04 -
+                'y437',       #       1205-18 - 00/28
+                'y438',       #       1024-06 - 00/0:
 
-                              #  * * * 2021 * * *                
-                # 'y439',       #       0116-0212 - 00/0:
-                # 'y440',       #       0601-15
+                             #  * * * 2021 * * *                
+                'y439',       #       0116-0212 - 00/0:
+                'y440',       #       0601-15
                 'y441',       #  DONE 0313-26 - 53/02: pizza, wontan, kofte, maki, salads          MISSING IMAGES: 6 ['basic broth','feijoada & maki broth','steamed veg broth','steamed veg broth w potato','hot chocolate','macchiato']
                 'y442',       #  DONE 0327-09 - 62/00: salads, sanwiches, keto, fermented          MISSING IMAGES: 7 ['liver & onions', 'feijoada broth', 'post bike ham salad ', 'turkey & squid balls w chinese leaf ', 'brined red cabbage', 'garlic butter prawns', '7.5pc brine']
                 'y443',       #  DONE 0410-23 -
-                # 'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
-                # 'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
-                # 'y446',
-                # 'y447',
-                # 'y448',       #  DONE 0703-23 - 41/30
-                # 'y449',
-                # 'y450',
-                # 'y451',
-                # 'y452',
-                              #  * * * 2022 * * *                
-                # 'y453',
-                # 'y454',
-                # 'y455',
-                # 'y456',
-                              #  * * * 2023 * * *                
-                # 'y457',
-                # 'y458',
-                # 'y459',
-                # 'y460',       # DONE 0621-0706 - 31/6
+                'y444',       #       0424-07 - 60/12: GOOD lo-cal set !! inc: prawn & melon salad w soft boiled eggs // prawn & bamboo broth
+                'y445',       #       0508-21 - 53/05: broths, bento, cassoulet, flans
+                'y446',
+                'y447',
+                'y448',       #  DONE 0703-23 - 41/30
+                'y449',
+                'y450',
+                'y451',
+                'y452',
+                # #            #  * * * 2022 * * *                
+                'y453',
+                'y454',
+                'y455',
+                'y456',
+                # #            #  * * * 2023 * * *                
+                'y457',
+                'y458',
+                'y459',
+                'y460',       # DONE 0621-0706 - 31/6
 
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y449']
+#NUTRIDOC_LIST = ['y459']
+
+# re-run for label updates
+# ['y964', 'y443', 'y426', 'y446', 'y424', 'y957', 'y429', 'y976', 'y973', 'y967', 'y425', 'y444', 'y442', 'y460', 'y459', 'y968', 'y455', 'y441', 'y955', 'y963', 'y970', 'y448', 'y454', 'y958', 'y449', 'y458', 'y956', 'y453', 'y430', 'y959', 'y461', 'y954', 'y428', 'y965']
+# ['y424', 'y443', 'y951', 'y957', 'y446', 'y453', 'y964', 'y429', 'y967', 'y954', 'y978', 'y442', 'y426', 'y966', 'y975', 'y977', 'y425', 'y444', 'y460', 'y459', 'y979', 'y968', 'y455', 'y963', 'y970', 'y454', 'y448', 'y458', 'y976', 'y958', 'y956', 'y959', 'y430', 'y973', 'y449', 'y955', 'y423', 'y461', 'y965', 'y441', 'y428']
+# ['y954', 'y443', 'y951', 'y957', 'y446', 'y964', 'y429', 'y967', 'y441', 'y458', 'y426', 'y425', 'y444', 'y442', 'y460', 'y459', 'y968', 'y422', 'y963', 'y970', 'y448', 'y454', 'y457', 'y958', 'y976', 'y956', 'y959', 'y430', 'y449', 'y453', 'y423', 'y461', 'y965', 'y428']
+# ['y443', 'y951', 'y446', 'y957', 'y429', 'y954', 'y425', 'y442', 'y444', 'y968', 'y970', 'y448', 'y454', 'y958', 'y959', 'y459', 'y449', 'y956', 'y430', 'y423', 'y461', 'y965', 'y973', 'y453', 'y428']
+
+# got to homegrown
+
+# skipped
+# breakfast(418), brunch(1193), comfort(1013), component(1123), ferment(unclear definition)
+# lightcourse(1007), keto (7 - late addition)
+# (lightcourse was 1007 - got as far as: harissa ribs & mixed roast veg when I realised that the label removed was lunch not lightcourse - tits!)
+
+
+# notes
+# broth: tag:broth  search * 
+#        tag: none  search: broth   95 hits
+# burger: more hits from serach burger than tag *
+# herb: bit sad - lemon verbena
+# keto: late label?
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
 # y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
@@ -510,7 +531,7 @@ No arguments:            Report status of files selected in NUTRIDOC_LIST
 -v                       Verbose mode 
     
 -c                       show what -clean would delete
--clean                   Clean old files NO backup - removes asset backup directory after completion
+-c -clean                Clean old files NO backup - removes asset backup directory after completion
                          
 -go                      Generate Output in tmp folders - for populate_db.py
 
@@ -690,6 +711,8 @@ dump_missing_sub_ingredients_across_all_docs_to_JSON(missing_sub_ingredients_acr
 nutridocs_found = get_nutridoc_list_rtf()
 if opt_dict['clean_old_files_NO_backup_inspect'] == True:
     print("\n\n\n* * REMOVING * * empty folders from _courses_components & _nix_time_i_w_r_auto_tmp/0g backups.\n") 
+    print(f"opt_dict['clean_old_files_NO_backup_HOT'] == {opt_dict['clean_old_files_NO_backup_HOT']}")
+    print(f"opt_dict['clean_old_files_NO_backup_inspect'] == {opt_dict['clean_old_files_NO_backup_inspect']}")
     yn = input('Continue? y/(n)\n\n')
     if yn.strip().lower() != 'y': sys.exit(0)
     
@@ -715,7 +738,7 @@ if opt_dict['clean_old_files_NO_backup_inspect'] == True:
                     if opt_dict['clean_old_files_NO_backup_HOT']: shutil.rmtree(sub_d)
                     
     if opt_dict['clean_old_files_NO_backup_HOT'] == False:
-        print("Use: \n\tprocess_nutridocs.py -clean \n\nto HOT DELETE directories & contents.")
+        print("Use: \n\tprocess_nutridocs.py -c -clean \n\nto HOT DELETE directories & contents.")
 
 
 
