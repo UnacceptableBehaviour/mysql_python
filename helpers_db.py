@@ -386,204 +386,203 @@ def get_all_recipe_ids():
 
     return ids
 
-# TODO - remove CHECK deprecated only used in build_search_query_v1
-filter_to_column_LUT = {'allergens': 'allergens',
-                        'ingredient_exc': 'ingredients',
-                        'tags_exc': 'tags',
-                        'tags_inc': 'tags',
-                        'type_exc': 'user_tags', # SB type
-                        'type_inc': 'user_tags'}
+# BUILD SEAR QUERY TEST
+# filter_to_column_LUT = {'allergens': 'allergens',
+#                         'ingredient_exc': 'ingredients',
+#                         'tags_exc': 'tags',
+#                         'tags_inc': 'tags',
+#                         'type_exc': 'user_tags', # SB type
+#                         'type_inc': 'user_tags'}
 
-# TODO - remove CHECK deprecated only used in build_search_query_v1
-def construct_sql_query_to_exclude_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
+# def construct_sql_query_to_exclude_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
 
-    column = filter_to_column_LUT[table_name_from_filter]
+#     column = filter_to_column_LUT[table_name_from_filter]
 
-    sql_query = f"( SELECT {bubble_columns} FROM {db_name_or_subquery} WHERE NOT (-*insert*-) ) {table_name_from_filter}"
-                                                                 # REFACTOR   ^  INTO ONE FUNCTION # TODO
-    insert = ""                                                                                  #
-    for tag in tag_list:                                                                         #
-        print(tag)                                                                               #
-        if insert != "": insert += " OR "                                                        #
-        insert += f"'{tag}' = ANY({column})"                                                     #
-                                                                                                 #
-    sql_query = sql_query.replace('-*insert*-', insert)                                          #
-                                                                                                 #
-    return sql_query                                                                             #
-                                                                                                 #
-                                                                                                 #
-# TODO - remove CHECK deprecated only used in build_search_query_v1                              #
-def construct_sql_query_to_include_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
+#     sql_query = f"( SELECT {bubble_columns} FROM {db_name_or_subquery} WHERE NOT (-*insert*-) ) {table_name_from_filter}"
+#                                                                  # REFACTOR   ^  INTO ONE FUNCTION # TODO
+#     insert = ""                                                                                  #
+#     for tag in tag_list:                                                                         #
+#         print(tag)                                                                               #
+#         if insert != "": insert += " OR "                                                        #
+#         insert += f"'{tag}' = ANY({column})"                                                     #
+#                                                                                                  #
+#     sql_query = sql_query.replace('-*insert*-', insert)                                          #
+#                                                                                                  #
+#     return sql_query                                                                             #
+#                                                                                                  #
+#                                                                                                  #                              #
+# def construct_sql_query_to_include_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
 
-    column = filter_to_column_LUT[table_name_from_filter]
+#     column = filter_to_column_LUT[table_name_from_filter]
 
-    sql_query = f"( SELECT {bubble_columns} FROM {db_name_or_subquery} WHERE (-*insert*-) ) {table_name_from_filter}"
+#     sql_query = f"( SELECT {bubble_columns} FROM {db_name_or_subquery} WHERE (-*insert*-) ) {table_name_from_filter}"
 
-    insert = ""
-    for tag in tag_list:
-        print(tag)
-        if insert != "": insert += " OR "
-        insert += f"'{tag}' = ANY({column})"
+#     insert = ""
+#     for tag in tag_list:
+#         print(tag)
+#         if insert != "": insert += " OR "
+#         insert += f"'{tag}' = ANY({column})"
 
-    sql_query = sql_query.replace('-*insert*-', insert)
+#     sql_query = sql_query.replace('-*insert*-', insert)
 
-    return sql_query
+#     return sql_query
 
 
-# default_filters:
-# {'allergens': [],
-#  'ingredient_exc': [],
-#  'tags_exc': [],
-#  'tags_inc': [],
-#  'type_exc': [],
-#  'type_inc': []}
-# SELECT ri_id,ri_name,igd, tags FROM (
-#     SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM (
-#         SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE NOT ('gluten' = ANY(allergens) OR 'celery' = ANY(allergens))
-#     ) allergens_filtered
-# ) ingredients_unnested
-# WHERE igd LIKE '%beans%';
-def build_search_query_v1(search, default_filters):
+# # default_filters:
+# # {'allergens': [],
+# #  'ingredient_exc': [],
+# #  'tags_exc': [],
+# #  'tags_inc': [],
+# #  'type_exc': [],
+# #  'type_inc': []}
+# # SELECT ri_id,ri_name,igd, tags FROM (
+# #     SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM (
+# #         SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE NOT ('gluten' = ANY(allergens) OR 'celery' = ANY(allergens))
+# #     ) allergens_filtered
+# # ) ingredients_unnested
+# # WHERE igd LIKE '%beans%';
+# def build_search_query_v1(search, default_filters):
 
-    search_words = [ word.strip() for word in search.split(',') ]
+#     search_words = [ word.strip() for word in search.split(',') ]
 
-    bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
+#     bubble_columns = 'ri_id,user_rating,ri_name,tags,allergens,ingredients'
 
-    filter_sub_queries = 'exploded'
+#     filter_sub_queries = 'exploded'
 
-    if len(default_filters['allergens']) > 0:
-        filter_sub_queries = construct_sql_query_to_exclude_tags(default_filters['allergens'], bubble_columns, filter_sub_queries, 'allergens')
-        print("filter_sub_queries:", filter_sub_queries)
+#     if len(default_filters['allergens']) > 0:
+#         filter_sub_queries = construct_sql_query_to_exclude_tags(default_filters['allergens'], bubble_columns, filter_sub_queries, 'allergens')
+#         print("filter_sub_queries:", filter_sub_queries)
 
-    if len(default_filters['tags_exc']) > 0:
-        filter_sub_queries = construct_sql_query_to_exclude_tags(default_filters['tags_exc'], bubble_columns, filter_sub_queries, 'tags_exc')
-        print("filter_sub_queries:", filter_sub_queries)
+#     if len(default_filters['tags_exc']) > 0:
+#         filter_sub_queries = construct_sql_query_to_exclude_tags(default_filters['tags_exc'], bubble_columns, filter_sub_queries, 'tags_exc')
+#         print("filter_sub_queries:", filter_sub_queries)
 
-    if len(default_filters['tags_inc']) > 0:      #\\//#
-        filter_sub_queries = construct_sql_query_to_include_tags(default_filters['tags_inc'], bubble_columns, filter_sub_queries, 'tags_inc')
-                                                  #//\\#
-        print("filter_sub_queries:", filter_sub_queries)
+#     if len(default_filters['tags_inc']) > 0:      #\\//#
+#         filter_sub_queries = construct_sql_query_to_include_tags(default_filters['tags_inc'], bubble_columns, filter_sub_queries, 'tags_inc')
+#                                                   #//\\#
+#         print("filter_sub_queries:", filter_sub_queries)
 
-    #search_query = f"SELECT ri_id FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters WHERE -*insert*-;"
-    # returns duplicates! ^^
-    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters ) distict_ids WHERE -*insert*-;"
-    # added DISTINCT to remove duplicates
-    # SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM ( SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE ('vegan' = ANY(tags)) ) tags_inc ) all_filters) distict_ids WHERE (igd LIKE '%');
+#     #search_query = f"SELECT ri_id FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters WHERE -*insert*-;"
+#     # returns duplicates! ^^
+#     search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM {filter_sub_queries} ) all_filters ) distict_ids WHERE -*insert*-;"
+#     # added DISTINCT to remove duplicates
+#     # SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id,ri_name,tags, unnest(ingredients) igd FROM ( SELECT ri_id,user_rating,ri_name,tags,allergens,ingredients FROM exploded WHERE ('vegan' = ANY(tags)) ) tags_inc ) all_filters) distict_ids WHERE (igd LIKE '%');
 
-    insert = ""
-    for ingredient in search_words:
-        if insert != "": insert += " OR "
-        insert += f"(igd LIKE '%{ingredient}%')"
+#     insert = ""
+#     for ingredient in search_words:
+#         if insert != "": insert += " OR "
+#         insert += f"(igd LIKE '%{ingredient}%')"
 
-    search_query = search_query.replace('-*insert*-', insert)
+#     search_query = search_query.replace('-*insert*-', insert)
 
-    print("\n\n- - - - - Constructing Query - - - - S")
-    pprint(default_filters)
-    pprint(search_words)
-    print(insert)
-    print(search_query)
-    print("\n\n- - - - - Constructing Query - - E")
+#     print("\n\n- - - - - Constructing Query - - - - S")
+#     pprint(default_filters)
+#     pprint(search_words)
+#     print(insert)
+#     print(search_query)
+#     print("\n\n- - - - - Constructing Query - - E")
 
-    return search_query
+#     return search_query
 
-# return recipe with all the ingredients listed
-# olive oil, garlic, eggs
-def build_search_query_v2(search, default_filters):
+# # return recipe with all the ingredients listed
+# # olive oil, garlic, eggs
+# def build_search_query_v2(search, default_filters):
 
-    search_words = [ word.strip() for word in search.split(',') ]
+#     search_words = [ word.strip() for word in search.split(',') ]
 
-    if len(search_words) == 0:
-        return ''
+#     if len(search_words) == 0:
+#         return ''
 
-    def add_one_more_igdt(i):
-        return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%{i}%'))) "
+#     def add_one_more_igdt(i):
+#         return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%{i}%'))) "
 
-    # SELECT DISTINCT ri_id
-    # FROM (
-    #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters
-    # ) distinct_ids
-    # WHERE (igd LIKE '%olive oil%')
-    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%garlic%'))) 
-    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%eggs%'  )))
-    # ;
+#     # SELECT DISTINCT ri_id
+#     # FROM (
+#     #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters
+#     # ) distinct_ids
+#     # WHERE (igd LIKE '%olive oil%')
+#     # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%garlic%'))) 
+#     # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters WHERE (igd LIKE '%eggs%'  )))
+#     # ;
 
-    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
+#     search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) all_filters ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
 
-    for w in search_words:
-        search_query = search_query + add_one_more_igdt(w)
+#     for w in search_words:
+#         search_query = search_query + add_one_more_igdt(w)
 
-    search_query += ';'
+#     search_query += ';'
 
-    # print("\n\n- - - - - Constructing Query - - - - S")
-    # pprint(default_filters)
-    # pprint(search_words)
-    # print(insert)
-    # print(search_query)
-    # print("\n\n- - - - - Constructing Query - - E")
+#     # print("\n\n- - - - - Constructing Query - - - - S")
+#     # pprint(default_filters)
+#     # pprint(search_words)
+#     # print(insert)
+#     # print(search_query)
+#     # print("\n\n- - - - - Constructing Query - - E")
 
-    return search_query
+#     return search_query
 
-# return recipe with all the ingredients listed
-# olive oil, garlic, eggs
-# filter out ingredients that contain allergies in the user profile
-def build_search_query_v3(search, default_filters):
+# # return recipe with all the ingredients listed
+# # olive oil, garlic, eggs
+# # filter out ingredients that contain allergies in the user profile
+# def build_search_query_v3(search, default_filters):
 
-    search_words = [ word.strip() for word in search.split(',') ]
+#     search_words = [ word.strip() for word in search.split(',') ]
 
-    if len(search_words) == 0:
-        return ''
+#     if len(search_words) == 0:
+#         return ''
 
-    def add_one_more_igdt(i):
-        return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%{i}%'))) "
+#     def add_one_more_igdt(i):
+#         return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%{i}%'))) "
 
-    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
+#     search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
 
-    for w in search_words:
-        search_query = search_query + add_one_more_igdt(w)
+#     for w in search_words:
+#         search_query = search_query + add_one_more_igdt(w)
 
-    # SELECT DISTINCT ri_id
-    # FROM (
-    #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
-    # ) distinct_ids
-    # WHERE (igd LIKE '%olive oil%')
-    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
-    # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
-    # ;
+#     # SELECT DISTINCT ri_id
+#     # FROM (
+#     #     SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
+#     # ) distinct_ids
+#     # WHERE (igd LIKE '%olive oil%')
+#     # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
+#     # AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
+#     # ;
 
-    # add check for allergens
-    def wrap_allergy_qry(a):
-        return f"'{a}' = ANY(allergens)"
+#     # add check for allergens
+#     def wrap_allergy_qry(a):
+#         return f"'{a}' = ANY(allergens)"
 
-    if len(default_filters['allergens']) > 0:
-        allergy_exclude_qry_list = [ wrap_allergy_qry(a) for a in default_filters['allergens'] ]
-        # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
+#     if len(default_filters['allergens']) > 0:
+#         allergy_exclude_qry_list = [ wrap_allergy_qry(a) for a in default_filters['allergens'] ]
+#         # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
 
-        allergy_exclude_qry = ' OR '.join(allergy_exclude_qry_list)
-        # "'dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens)"
+#         allergy_exclude_qry = ' OR '.join(allergy_exclude_qry_list)
+#         # "'dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens)"
 
-        search_query = f"SELECT ri_id FROM recipes WHERE ri_id IN ( {search_query} ) AND NOT ( {allergy_exclude_qry} )"
+#         search_query = f"SELECT ri_id FROM recipes WHERE ri_id IN ( {search_query} ) AND NOT ( {allergy_exclude_qry} )"
 
-    # SELECT ri_id FROM recipes
-    # WHERE ri_id IN (
-    #     SELECT DISTINCT ri_id
-    #     FROM (
-    #         SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
-    #     ) distinct_ids
-    #     WHERE (igd LIKE '%olive oil%')
-    #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
-    #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
-    # )
-    # AND NOT ('dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens));
+#     # SELECT ri_id FROM recipes
+#     # WHERE ri_id IN (
+#     #     SELECT DISTINCT ri_id
+#     #     FROM (
+#     #         SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered
+#     #     ) distinct_ids
+#     #     WHERE (igd LIKE '%olive oil%')
+#     #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%garlic%'))) 
+#     #     AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%eggs%'  )))
+#     # )
+#     # AND NOT ('dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens));
 
-    search_query += ';'
+#     search_query += ';'
 
-    return search_query
+#     return search_query
 
 
 
 # return recipe with all the ingredients listed
 # olive oil, garlic, eggs
 # filter out ingredients that contain allergies in the user profile
+# def build_search_query_v4
 def build_search_query(search, default_filters):
 
     search_words = [ word.strip() for word in search.split(',') ]
@@ -896,18 +895,7 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
 
 # DATABASE_URL
 def get_user_info_dict_from_DB(uuid):
-    # TODO tag_sets - remove after test
-    #request_tables = ['default_filters','tag_sets']#,'usernames']
-    # get_filter_colums(from_central_source)
-    
-    # table = 'default_filters'
-    #filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
 
-    # changed
-    # table = 'tag_sets'
-    #filter_cols = ['allergens','ingredient_exc','tags','types']
-
-    # something like 
     request_table_w_cols = {
         'default_filters':['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc'],
         'tag_sets':['allergens','ingredient_exc','tags','types']
@@ -922,22 +910,6 @@ def get_user_info_dict_from_DB(uuid):
 
 
     tag_sets_and_filters = {}
-
-    # TODO - REMOVE WAS
-    # for table in request_tables:
-    #     tag_sets_and_filters[table] = {}
-    #     # SELECT * FROM default_filters WHERE uuid_user='014752da-b49d-4fb0-9f50-23bc90e44298';
-    #     sql_query = f"SELECT * FROM {table} WHERE uuid_user='{uuid}';"
-    #     print(f"\nTABLE {table} - SQL: {sql_query} < - - - - - < <")
-
-    #     #db_lines = helper_db_class_db.execute(sql_query).fetchall()  - returns list of RowProxy
-    #     #pprint(db_lines[0]['allergens'])
-
-    #     tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy
-
-    #     for col in filter_cols:
-    #         tag_sets_and_filters[table][col] = tagdata_for_table[col]
-
 
     for table, filter_cols in request_table_w_cols.items():
         tag_sets_and_filters[table] = {}
