@@ -42,4 +42,8 @@
     width: 100%;
   }
 
+  .form-check-input{
+    margin-left: -1.0rem;
+  }
+
 </style>

@@ -29,12 +29,70 @@
 searchButton = document.getElementById('but-recipe-search');
 searchButton.addEventListener('click', searchForRecipe);
 
+saveCheckedBtn = document.getElementById('but-return-checked');
+saveCheckedBtn.addEventListener('click', saveCheckedRcps);
+
+checkAllBtn = document.getElementById('but-check-all');
+checkAllBtn.addEventListener('click', checkAllRcps);
+
 
 searchFrom = document.getElementById('recipe-search-2-inrow');
 searchFrom.placeholder = 'search string';
 searchFrom.addEventListener('keyup', function(event) {   // act on hit return key
   if (event.key === "Enter") { searchForRecipe(); }
 });
+
+let rcpsToCollate = [];
+
+function checkBoxClicked(event) {
+    if (event.target.checked) {
+        rcpsToCollate.push(event.target.value);
+    } else {
+        let index = rcpsToCollate.indexOf(event.target.value);
+        if (index > -1) {
+            rcpsToCollate.splice(index, 1);
+        }
+    }
+}
+
+
+// for one
+// document.querySelector('.form-check-input').addEventListener('click', checkBoxClicked);
+// for many
+function addCheckboxListeners(){
+  let checkboxes = document.querySelectorAll('.form-check-input');
+  checkboxes.forEach(function(checkbox) {
+      checkbox.addEventListener('click', checkBoxClicked);
+  });  
+  // let checkboxLabels = document.querySelectorAll('.form-check-label');
+  // checkboxLabels.forEach(function(checkboxLabel) {
+  //   checkboxLabel.addEventListener('click', checkBoxClicked);
+  // });  
+}
+
+function checkAllRcps() {
+  let checkboxes = document.querySelectorAll('.form-check-input');
+  rcpsToCollate = [];
+  checkboxes.forEach(function(checkbox) {
+      checkbox.checked = true;      
+      rcpsToCollate.push(checkbox.value);
+  });    
+}
+
+function saveCheckedRcps(){
+  fetch( '/search', {
+    method: 'POST',                                             // method (default is GET)
+    headers: {'Content-Type': 'application/json' },             // JSON
+    body: JSON.stringify( { 'user':userUUID, 'saveCheckedRcps':rcpsToCollate } )      // Payload
+
+  }).then( function(response) {
+    return response.json();
+  }).then( function(saveChecked_response) {    
+    console.log('SCR----*----S');
+    console.log("AHEM:", saveChecked_response);
+    console.log('SCR----*----E');
+  })
+}
 
 
 function searchForRecipe (){
@@ -61,6 +119,7 @@ function searchForRecipe (){
     console.log('----*----');
     gallery = document.getElementById('rcp-gallery');
     gallery.innerHTML = gallery_html;
+    addCheckboxListeners();
     // how to something like . .
     // window.location.replace('/db_gallery', recipes=search_response);
     // window.location.replace('/db_gallery')
@@ -112,6 +171,10 @@ function renderRecipeCard(rcpInfo){
             <p class="card-text">${rcpInfo['description']}</p>
             ${html_stars}
             <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
+            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheck_${rcpInfo['ri_id']}">
+            <label class="form-check-label" for="flexCheck_${rcpInfo['ri_id']}">
+              Un/Label
+            </label>            
         </div>
   </div>`
 

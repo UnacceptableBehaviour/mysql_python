@@ -190,7 +190,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
             'username':'carter',
             'allergens': [ 'none_listed' ],
             'tags': [ 'none_listed' ],
-            'type': [ 'none_listed' ],
+            'types': [ 'none_listed' ],
             'servings': 0,
             'yield': '0g'
         }
@@ -206,7 +206,7 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         recipe_info['user_rating'] = round(float(stars),1)
         recipe_info['allergens'] = [ a.strip() for a in match.group(9).strip().rstrip(",").split(',') ]    # create list of strings
         recipe_info['tags'] = [ a.strip() for a in match.group(10).strip().rstrip(",").split(',') ]
-        recipe_info['type'] = [ a.strip() for a in match.group(11).strip().rstrip(",").split(',') ]
+        recipe_info['types'] = [ a.strip() for a in match.group(11).strip().rstrip(",").split(',') ]
         recipe_info['images'] = match.group(12).strip()
         recipe_info['lead_image'] = match.group(13).strip()
         recipe_info['username'] = match.group(14).strip()

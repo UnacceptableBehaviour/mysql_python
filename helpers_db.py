@@ -226,7 +226,7 @@ def return_recipe_dictionary():
         'allergens': [ 'none_listed' ],
         'tags': [ 'none_listed' ],
         'user_tags': [ 'none_listed' ],
-        'type': [ 'none_listed' ],
+        'types': [ 'none_listed' ],
 
         # SUB COMPONENT RECIPES
         # components:  { 'component name': recipe dictionary, . . . }
@@ -258,7 +258,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     # query db - the index from fields is used to retrive and alocate data to correct dictionary entry - -
     if fields == None:
         fields = ['id','ri_id','ri_name','description','method','notes','yield','units','servings','density','serving_size',
-                  'igdt_type','ingredients','allergens','type','tags','user_tags','lead_image','text_file',
+                  'igdt_type','ingredients','allergens','types','tags','user_tags','lead_image','text_file',
                   'n_En','n_Fa','n_Fs','n_Fm','n_Fp','n_Fo3','n_Ca','n_Su','n_Fb','n_St','n_Pr','n_Sa','n_Al']
 
     qry_string = ', '.join(fields)
@@ -313,7 +313,7 @@ def get_single_recipe_from_db_for_display_as_dict(ri_id_or_name, fields=None):
     # print(fields)
     print(f"----- updated_info: M")
     print(updated_info['tags'])
-    print(updated_info['type'])     
+    print(updated_info['types'])     
     print(updated_info['allergens'])
     print(f"----- updated_info: E")
     print(f"----- QUERY: helper_db_class_db: get_single_recipe_from_db_for_display_as_dict ---------E: {updated_info['ri_name']}")
@@ -366,7 +366,7 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 def get_gallery_info_for_display_as_list_of_dicts(list_of_recipe_ids=[]):
     recipe_list = []
 
-    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating', 'type']    
+    fields = ['ri_id', 'ri_name', 'lead_image', 'description', 'user_rating', 'types']    
 
     for ri_id in list_of_recipe_ids:
         print(f"getting: {ri_id}")
@@ -386,7 +386,7 @@ def get_all_recipe_ids():
 
     return ids
 
-
+# TODO - remove CHECK deprecated only used in build_search_query_v1
 filter_to_column_LUT = {'allergens': 'allergens',
                         'ingredient_exc': 'ingredients',
                         'tags_exc': 'tags',
@@ -394,7 +394,7 @@ filter_to_column_LUT = {'allergens': 'allergens',
                         'type_exc': 'user_tags', # SB type
                         'type_inc': 'user_tags'}
 
-
+# TODO - remove CHECK deprecated only used in build_search_query_v1
 def construct_sql_query_to_exclude_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
 
     column = filter_to_column_LUT[table_name_from_filter]
@@ -412,7 +412,7 @@ def construct_sql_query_to_exclude_tags(tag_list, bubble_columns, db_name_or_sub
     return sql_query                                                                             #
                                                                                                  #
                                                                                                  #
-#                                                                                                #
+# TODO - remove CHECK deprecated only used in build_search_query_v1                              #
 def construct_sql_query_to_include_tags(tag_list, bubble_columns, db_name_or_subquery, table_name_from_filter):
 
     column = filter_to_column_LUT[table_name_from_filter]
@@ -526,7 +526,7 @@ def build_search_query_v2(search, default_filters):
 # return recipe with all the ingredients listed
 # olive oil, garlic, eggs
 # filter out ingredients that contain allergies in the user profile
-def build_search_query_v2(search, default_filters):
+def build_search_query_v3(search, default_filters):
 
     search_words = [ word.strip() for word in search.split(',') ]
 
@@ -590,14 +590,17 @@ def build_search_query(search, default_filters):
 
     if len(search_words) == 0:
         return ''
-
+    
     def add_one_more_igdt(i):
         return f"AND (ri_id IN (SELECT ri_id FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered WHERE (igd LIKE '%{i}%'))) "
 
-    search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
+    if (len(search_words) == 1) and (search_words[0] == '*'):
+        search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd IS NOT NULL) " 
+    else:
+        search_query = f"SELECT DISTINCT ri_id FROM ( SELECT ri_id, igd FROM ( SELECT ri_id, unnest(ingredients) igd FROM exploded ) unfiltered ) distinct_ids WHERE (igd LIKE '%{search_words.pop(0)}%') "
 
-    for w in search_words:
-        search_query = search_query + add_one_more_igdt(w)
+        for w in search_words:
+            search_query = search_query + add_one_more_igdt(w)
 
     # SELECT DISTINCT ri_id
     # FROM (
@@ -627,7 +630,7 @@ def build_search_query(search, default_filters):
 
         search_query = search_query + f"AND NOT ( {exclude_qry} ) "
 
-    filter = 'type' # TODO aligh table column name to all type (better) or type_exc
+    filter = 'types'
     if (len(default_filters['type_exc']) > 0):
         exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters['type_exc'] ]
         # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
@@ -635,7 +638,8 @@ def build_search_query(search, default_filters):
         exclude_qry = ' OR '.join(exclude_qry_list)
         # "'dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens)"
 
-        search_query = search_query + f"AND NOT ( {exclude_qry} ) "
+        #search_query = search_query + f"AND NOT ( {exclude_qry} ) "
+        search_query = search_query + f"AND ( {exclude_qry} ) "
 
     # SELECT ri_id FROM recipes
     # WHERE ri_id IN (
@@ -673,6 +677,7 @@ def process_search(search, default_filters):
     db_lines = helper_db_class_db.execute(query).fetchall()
 
     pprint(db_lines)
+    print(f"No of hits: {len(db_lines)} <")
 
     # results are string change to ints
     #ids = [ int(number) for number in ids ] # TypeError: int() argument must be a string, a bytes-like object or a number, not 'RowProxy'
@@ -891,13 +896,25 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
 
 # DATABASE_URL
 def get_user_info_dict_from_DB(uuid):
-    request_tables = ['default_filters','tag_sets']#,'usernames']
+    # TODO tag_sets - remove after test
+    #request_tables = ['default_filters','tag_sets']#,'usernames']
     # get_filter_colums(from_central_source)
-    filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+    
+    # table = 'default_filters'
+    #filter_cols = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+
+    # changed
+    # table = 'tag_sets'
+    #filter_cols = ['allergens','ingredient_exc','tags','types']
+
+    # something like 
+    request_table_w_cols = {
+        'default_filters':['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc'],
+        'tag_sets':['allergens','ingredient_exc','tags','types']
+    }
 
     username = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
     if username == None: username = 'carter' # Place holder until logins implemented
-
 
     return_user_info = {'UUID':uuid, 'name':username}
 
@@ -906,16 +923,30 @@ def get_user_info_dict_from_DB(uuid):
 
     tag_sets_and_filters = {}
 
-    for table in request_tables:
+    # TODO - REMOVE WAS
+    # for table in request_tables:
+    #     tag_sets_and_filters[table] = {}
+    #     # SELECT * FROM default_filters WHERE uuid_user='014752da-b49d-4fb0-9f50-23bc90e44298';
+    #     sql_query = f"SELECT * FROM {table} WHERE uuid_user='{uuid}';"
+    #     print(f"\nTABLE {table} - SQL: {sql_query} < - - - - - < <")
+
+    #     #db_lines = helper_db_class_db.execute(sql_query).fetchall()  - returns list of RowProxy
+    #     #pprint(db_lines[0]['allergens'])
+
+    #     tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy
+
+    #     for col in filter_cols:
+    #         tag_sets_and_filters[table][col] = tagdata_for_table[col]
+
+
+    for table, filter_cols in request_table_w_cols.items():
         tag_sets_and_filters[table] = {}
+
         # SELECT * FROM default_filters WHERE uuid_user='014752da-b49d-4fb0-9f50-23bc90e44298';
         sql_query = f"SELECT * FROM {table} WHERE uuid_user='{uuid}';"
-        print(f"\nTABLE {table} - SQL: {sql_query} < - - - - - < <")
-
-        #db_lines = helper_db_class_db.execute(sql_query).fetchall()  - returns list of RowProxy
-        #pprint(db_lines[0]['allergens'])
-
-        tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy
+        print(f"\nTABLE {table} - SQL: {sql_query} < - - - - - < <")        
+        
+        tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy        
 
         for col in filter_cols:
             tag_sets_and_filters[table][col] = tagdata_for_table[col]
@@ -990,7 +1021,7 @@ def update_settings_tables_for_uuid(db, user_settings):
         # assemble into sql command
         # UPDATE tag_sets SET
         #                   ingredient_exc = '{"turkey", "caramelised apple", "knockwurst"}',
-        #                   tags_inc = '{"vegan","veggie"}'
+        #                   tags = '{"vegan","veggie"}'
         #                 WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
         sql_command = f"UPDATE {table_key} SET {column_update} WHERE uuid_user = '{uuid}';"
 
@@ -998,7 +1029,7 @@ def update_settings_tables_for_uuid(db, user_settings):
         db.execute(sql_command)
         print(f"***** SQL WRITE:\n{sql_command}\n\nRESULT: {db.commit()} <\n\n") # < < COMMIT
         # TODO - commit return None on success?
-        # how is failure report?
+        # how is failure reported?
 
 
 

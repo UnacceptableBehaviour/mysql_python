@@ -53,9 +53,9 @@ import random
 import urllib.parse
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
-import re           # regex
-import json         # JSON tools
-
+import re                   # regex
+import json                 # JSON tools
+from pathlib import Path    # Path tools
 
 # each app.route is an endpoint
 @app.route('/')
@@ -344,7 +344,7 @@ def settings():
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
 
-    sql_query = "SELECT DISTINCT unnest(type) AS all_types FROM recipes;"
+    sql_query = "SELECT DISTINCT unnest(types) AS all_types FROM recipes;"
     types = helper_db_class_db.execute(sql_query).fetchall()    # ret list of tuples [('serve_hot',),('serve_rt',),('lunchbox',), etc ]
     # print('=\ ')
     # pprint(types)
@@ -354,18 +354,16 @@ def settings():
     print('=/ ')
 
     # source of buttons to populate with settings from default_filters
-    user_info['tag_sets']['type_exc'] = types
-    # TODO H - remove ['tag_sets']['type_inc'] and ['tag_sets']['tags_inc']
-    # replace ['tag_sets']['type_exc'] with ['tag_sets']['type_all']
-    # replace ['tag_sets']['tags_exc'] with ['tag_sets']['tags_all']
-    user_info['tag_sets']['type_inc'] = types
+    user_info['tag_sets']['types'] = types
+    
     if (len(user_info['default_filters']['type_inc']) == 0) and (len(user_info['default_filters']['type_exc']) == 0):
-        user_info['default_filters']['type_exc'] = types
+        user_info['default_filters']['type_inc'] = types
 
     return render_template('settings_t.html', user_info=user_info)
 
 
 last_search_result_recipes = {}
+MISSLABELED_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json')
 
 @app.route('/search', methods=["GET", "POST"])
 def search_ingredient():
@@ -383,21 +381,35 @@ def search_ingredient():
             uuid =  search_request['user']
 
         if ('search' in search_request):
-            search = search_request['search']
+            search = search_request['search']            
             print("search_ingredient >>")
-            pprint(search)
+            pprint(search)        
+            user_info = get_user_info_dict_from_DB(uuid)
+            
+            ri_ids = process_search(search, user_info['default_filters'])
+
+            last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
+
+            return json.dumps(last_search_result_recipes), 200
+
+        elif ('saveCheckedRcps' in search_request):
+            removal_targets = {}
+            saveCheckedRcps = search_request['saveCheckedRcps']
+            # TODO this should be type_inc
+            filter_target = user_info['default_filters']['type_exc'][0]
+            removal_targets[filter_target] = saveCheckedRcps
+            print('removal_targets - - - S')
+            pprint(removal_targets)
+            removal_targets_json = json.dumps(removal_targets)
+            with open(MISSLABELED_FILE_JSON, 'w') as f:
+                f.write(removal_targets_json)
+            print('removal_targets - - - E')
+            return json.dumps(filter_target), 200
         else:
-            raise('Come on!!')
-        
-        user_info = get_user_info_dict_from_DB(uuid)
-
-        ri_ids = process_search(search, user_info['default_filters'])
-
-        last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
-
-        return json.dumps(last_search_result_recipes), 200
+            raise('Come on!!')                
 
     else:
+        # landed on search
         print(f"search_ingredient: {request.method}")
         pprint(request)
         print("- - - - s_i:" )

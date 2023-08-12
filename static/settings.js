@@ -95,7 +95,7 @@ function clickHandler(e) {
     
   } else if (e.target.id === 'btn_id_toggle_tags') {     
     // toggle is all element in tag_sets not in default_filters
-    let toggle = userInfo['tag_sets']['tags_exc'].filter(item => !userInfo['default_filters']['tags_exc'].includes(item));
+    let toggle = userInfo['tag_sets']['tags'].filter(item => !userInfo['default_filters']['tags_exc'].includes(item));
     
     // switch
     userInfo['default_filters']['tags_inc'] = userInfo['default_filters']['tags_exc'];
@@ -107,7 +107,7 @@ function clickHandler(e) {
   } else if (e.target.id === 'btn_id_toggle_types') { 
     
     // toggle is all element in tag_sets not in default_filters
-    let toggle = userInfo['tag_sets']['type_exc'].filter(item => !userInfo['default_filters']['type_exc'].includes(item));
+    let toggle = userInfo['tag_sets']['types'].filter(item => !userInfo['default_filters']['type_exc'].includes(item));
 
     // switch
     userInfo['default_filters']['type_inc'] = userInfo['default_filters']['type_exc'];
@@ -117,14 +117,14 @@ function clickHandler(e) {
     postUpdateSettingsToServer();
   } else if (e.target.id === 'btn_id_clear_type') { 
     // clear
-    userInfo['default_filters']['type_inc'] = userInfo['tag_sets']['type_exc'];
+    userInfo['default_filters']['type_inc'] = userInfo['tag_sets']['types'];
     userInfo['default_filters']['type_exc'] = [];
     fillInTagButtons();
     postUpdateSettingsToServer();
 
   } else if (e.target.id === 'btn_id_clear_tags') { 
     // clear
-    userInfo['default_filters']['tags_inc'] = userInfo['tag_sets']['tags_exc'];
+    userInfo['default_filters']['tags_inc'] = userInfo['tag_sets']['tags'];
     userInfo['default_filters']['tags_exc'] = [];
     fillInTagButtons();
     postUpdateSettingsToServer();

@@ -180,23 +180,27 @@ def create_sql_insert_tags_array_text(tags):
 
 # TODO DRY out - USE helpers_db.get_search_settings_dict()
 # single unified source of default tag sets
-def get_default_tag_sets_dictionary(state = 'with_defaults'):
+def get_default_filters_dictionary():
+    # defaults
+    default_filters = { 'allergens':[],
+                        'ingredient_exc':[],
+                        'tags_exc':[],
+                        'tags_inc':[],
+                        'type_exc':[],
+                        'type_inc':[],
+                        }
+
+    return default_filters
+
+def get_default_tag_sets_dictionary():
     # defaults
     tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','crustaceans','alcohol','celery','gluten','soya','sulphur_dioxide'],
                 'ingredient_exc': [],
-                'tags_exc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
-                'tags_inc': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],
-                'type_exc': [],
-                'type_inc': ['component','amuse','side','starter','fish','lightcourse','main','crepe','dessert','p4','cheese','comfort','low_cal','serve_cold','serve_rt','serve_warm','serve_hot']
+                'tags': ['vegan','veggie','cbs','chicken','pork','beef','seafood','shellfish','gluten_free','ns_pregnant'],                
+                'types': ['component','amuse','side','starter','fish','lightcourse','main','crepe','dessert','p4','cheese','comfort','low_cal','serve_cold','serve_rt','serve_warm','serve_hot']
                }
 
-    # clear lists
-    if state == 'empty':
-        for name_of_tagset in tag_sets:
-            tag_sets[name_of_tagset] = []
-
     return tag_sets
-
 
 def create_entry_in_db(db, table, entry):
 
@@ -217,8 +221,8 @@ def create_entry_in_db(db, table, entry):
         print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
     if 'tags' in entry:
         print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
-    if 'type' in entry:
-        print(f"----- type:{entry['type']} \n-------------------------------------------- ")
+    if 'types' in entry:
+        print(f"----- types:{entry['types']} \n-------------------------------------------- ")
 
 
     sql_string = f"INSERT INTO {table}"
@@ -255,7 +259,7 @@ def create_entry_in_db(db, table, entry):
             print(f"{header} is a NUMBER in g")
             data = data + f"{entry[header].rstrip('g')}, "
 
-        elif header == 'allergens' or header == 'tags' or header =='type':
+        elif header == 'allergens' or header == 'tags' or header =='types':
             print(f"{header} is a LIST of tags / strings")
             tag_to_insert = create_sql_insert_tags_array_text(entry[header])
             data = data + tag_to_insert
@@ -308,12 +312,12 @@ def drop_tables_for_fresh_start(data_base, tables):
     return
 
 def insert_empty_default_filters_for_user(db, uuid):
-    empty_default_filters = get_default_tag_sets_dictionary('empty')
+    empty_default_filters = get_default_filters_dictionary()
     insert_tags_for_table_for_user(db, uuid, 'default_filters', empty_default_filters)
 
 
 def insert_default_tag_sets_for_user(db, uuid):
-    tag_sets = get_default_tag_sets_dictionary('with_defaults')
+    tag_sets = get_default_tag_sets_dictionary()
     insert_tags_for_table_for_user(db, uuid, 'tag_sets', tag_sets)
 
 
