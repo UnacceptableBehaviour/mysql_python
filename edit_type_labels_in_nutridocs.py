@@ -37,8 +37,8 @@ help_string = '''
 -l          LIVE original docs are edited in place. 
             DEFAULT show intent
 
--a          ADD label to target docs
-            DEFAULT remove labels from doc type list
+-a          ADD labels to target docs
+            DEFAULT REMOVE labels from doc type list
 
 -h          This help
 '''
