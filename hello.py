@@ -78,9 +78,10 @@ def db_hello_world():
         #formatted_text = formatted_text + f" | {int(line.yield)} | {int(line.servings)} | {line.ri_name} | {line.lead_image} | <br>"
 
     print(f"\n\nProcess Query - rendering {len(db_lines)} recipes. . \n{formatted_text}\n")
+    print(f"\n\nFavs format - rendering {len(db_lines)} recipes. . \n{formatted_text}\n")
 
     #return render_template('data_return.html', lines=db_lines)
-    return render_template('show_all_recipe_images.html', recipes=db_lines)
+    return render_template('show_fav_rcp_cards.html', recipes=db_lines)
     #return f"Processed Query:<br>{formatted_text} <br>END"
 
 # synch / login route
