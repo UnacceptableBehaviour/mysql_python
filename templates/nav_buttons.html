@@ -33,10 +33,10 @@
 
     <body>
 
-        <button id='bt_home'>
-            <a href="{{url_for('db_hello_world')}}"><img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg"></a>
+        <button id='bt_gallery'>
+            <a href="{{url_for('db_gallery')}}"><img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg"></a>
 <!--            <img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg">
-            <a href="{{url_for('db_hello_world')}}"><i class="fas fa-seedling"></i></a>
+            <a href="{{url_for('db_gallery')}}"><i class="fas fa-image"></i></a>
 -->        </button>
 
         <button>
@@ -44,11 +44,11 @@
 <!--            <img src="static/PNG/pencil.png" alt="tick" srcset="static/SVG/pencil.svg">
             <a href="{{url_for('track_items')}}"><i class="fas fa-pen-alt"></i></a>
 -->        </button>
-        
-        <button id='bt_gallery'>
-            <a href="{{url_for('db_gallery')}}"><img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg"></a>
-<!--            <img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg">
-            <a href="{{url_for('db_gallery')}}"><i class="fas fa-image"></i></a>
+
+        <button id='bt_home'>
+            <a href="{{url_for('home_random_gallery')}}"><img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg"></a>
+        <!--            <img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg">
+            <a href="{{url_for('home_random_gallery')}}"><i class="fas fa-seedling"></i></a>
 -->        </button>
 
         <button>
@@ -59,7 +59,7 @@
 
         <button id='bt_db_snap'>
             <a href="{{url_for('diary_w_image_snap')}}"><img src="static/PNG/camera.png" alt="tick" srcset="static/SVG/camera.svg"></a>            
-<!--            <img src="static/PNG/check1.png" alt="tick" srcset="static/SVG/check1.svg">
+<!--            <img src="static/PNG/heart.png" alt="tick" srcset="static/SVG/heart.svg">
             <a href="{{url_for('diary_w_image_snap')}}"><i class="fas fa-camera"></i></a>            
 -->        </button>
         

@@ -343,7 +343,7 @@ NUTRIDOC_LIST = [
 
 # * next to done means superfluous image files removed
 ]
-#NUTRIDOC_LIST = ['y459']
+NUTRIDOC_LIST = ['y461']
 
 # re-run for label updates
 # ['y964', 'y443', 'y426', 'y446', 'y424', 'y957', 'y429', 'y976', 'y973', 'y967', 'y425', 'y444', 'y442', 'y460', 'y459', 'y968', 'y455', 'y441', 'y955', 'y963', 'y970', 'y448', 'y454', 'y958', 'y449', 'y458', 'y956', 'y453', 'y430', 'y959', 'y461', 'y954', 'y428', 'y965']

@@ -32,7 +32,8 @@ from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
 from helpers_db import process_search
-from helpers_db import get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
+from helpers_db import get_user_info_dict, get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
+
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
@@ -59,7 +60,7 @@ from pathlib import Path    # Path tools
 
 # each app.route is an endpoint
 @app.route('/')
-def db_hello_world():
+def home_random_gallery():
 
     all_recipes = helper_db_class_db.execute("SELECT yield, servings, ri_name, lead_image FROM recipes WHERE lead_image <> '';").fetchall()
 
@@ -371,6 +372,7 @@ def search_ingredient():
     global last_search_result_recipes # what the point of a global if it isn't implicitly global? TODO
     search = ''
     
+    # fallback data - TODO - CHECK if needed once search working
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
 
     # process search post - query database
@@ -380,32 +382,64 @@ def search_ingredient():
 
         if ('user' in search_request):
             uuid =  search_request['user']
+            print(f"UUID: {uuid} <")
 
         if ('search' in search_request):
             search = search_request['search']            
-            print("search_ingredient >>")
+            print("search_ingredient - - - - - > >")
             pprint(search)        
             user_info = get_user_info_dict_from_DB(uuid)
             
             ri_ids = process_search(search, user_info['default_filters'])
-
+            
+            print("search_result - - - - - > >")
             last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
+            #pprint(last_search_result_recipes)
 
             return json.dumps(last_search_result_recipes), 200
 
-        elif ('saveCheckedRcps' in search_request):
+        elif ('rcpsToUnlabel' in search_request) or ('rcpsShortList' in search_request):
             removal_targets = {}
-            saveCheckedRcps = search_request['saveCheckedRcps']
-            # TODO this should be type_inc
-            filter_target = user_info['default_filters']['type_exc'][0]
-            removal_targets[filter_target] = saveCheckedRcps
-            print('removal_targets - - - S')
-            pprint(removal_targets)
-            removal_targets_json = json.dumps(removal_targets)
-            with open(MISSLABELED_FILE_JSON, 'w') as f:
-                f.write(removal_targets_json)
-            print('removal_targets - - - E')
-            return json.dumps(filter_target), 200
+            filter_target = 'None'
+            rcpsToUnlabel = search_request['rcpsToUnlabel']
+            if len(user_info['default_filters']['type_inc']) > 0:
+                filter_target = user_info['default_filters']['type_inc'][0]
+                removal_targets[filter_target] = rcpsToUnlabel
+                print('removal_targets - - - S')
+                pprint(removal_targets)
+                removal_targets_json = json.dumps(removal_targets)
+                with open(MISSLABELED_FILE_JSON, 'w') as f:
+                    f.write(removal_targets_json)
+                print('removal_targets - - - E')
+
+        
+            # save favourite recipes to user settings
+            print('favourite_targets - - - S')            
+            favourite_targets = []
+            if len(search_request['rcpsShortList']) > 0:
+                user_info = get_user_info_dict_from_DB(uuid)
+                if 'fav_rcp_ids' in user_info:
+                    pprint("search_request['rcpsShortList']")
+                    pprint(search_request['rcpsShortList'])
+                    pprint("user_info['fav_rcp_ids']")
+                    pprint(user_info['fav_rcp_ids'])
+                    add_to_existing = search_request['rcpsShortList'] + user_info['fav_rcp_ids']
+                    favourite_targets = list(set(add_to_existing))
+                else:
+                    favourite_targets = list(set(search_request['rcpsShortList']))
+                pprint(user_info)
+                print('favourite_targets - - - M')
+                user_info.update({'UUID':uuid, 'fav_rcp_ids':favourite_targets})
+                pprint(user_info)
+                print('favourite_targets - - - M1')
+                # write settings to DB
+                update_user_info_dict(user_info)
+                print('favourite_targets - - - E')
+            
+            ret_object = {'filter_target':filter_target,
+                          'favourite_targets':len(favourite_targets) }
+            
+            return json.dumps(ret_object), 200
         else:
             raise('Come on!!')                
 

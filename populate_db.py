@@ -356,14 +356,15 @@ def main():
 
     # insert default_filters
     # create setings tables
-    user_settings_tables_templates = ['db_table_default_filters.sql','db_table_devices.sql','db_table_tag_sets.sql','db_table_user_devices.sql','db_table_usernames.sql']
+    user_settings_tables_templates = ['db_table_default_filters.sql','db_table_devices.sql','db_table_tag_sets.sql','db_table_user_devices.sql','db_table_usernames.sql','db_table_fav_rcp_ids.sql']
     # create recipes table
     # create exploded recipes table
     # create ingredients table
     recipe_table_templates = ['db_table_recipe_table_def.sql','db_table_recipe_exploded_table_def.sql','db_table_atomic_ingredients_table_def.sql']
 
-    settings_tables = ['default_filters','devices','tag_sets','user_devices','usernames']
+    settings_tables = ['default_filters','devices','tag_sets','user_devices','usernames','fav_rcp_ids']
     recipe_tables = ['recipes','exploded','atomic_ingredients']
+    # TODO initialize fav_rcp_ids fav_rcp_ids.sql
 
     template_folder = Path('/Users/simon/a_syllabus/lang/python/mysql_python/static/')
 

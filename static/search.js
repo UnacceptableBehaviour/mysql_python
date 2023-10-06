@@ -42,16 +42,34 @@ searchFrom.addEventListener('keyup', function(event) {   // act on hit return ke
   if (event.key === "Enter") { searchForRecipe(); }
 });
 
-let rcpsToCollate = [];
+var rcpsToUnlabel = [];
+var rcpsShortList = [];
 
 function checkBoxClicked(event) {
     if (event.target.checked) {
-        rcpsToCollate.push(event.target.value);
+      
+      if (event.target.id.includes('flexCheckSL_')){
+        let ri_id = event.target.id.replace('flexCheckSL_','');
+        rcpsShortList.push(ri_id);
+      } else {
+        rcpsToUnlabel.push(event.target.value);
+      }        
+    
     } else {
-        let index = rcpsToCollate.indexOf(event.target.value);
+      if (event.target.id.includes('flexCheckSL_')){
+        let ri_id = event.target.id.replace('flexCheckSL_','');
+        let index = rcpsShortList.indexOf(ri_id);
         if (index > -1) {
-            rcpsToCollate.splice(index, 1);
+          rcpsShortList.splice(index, 1);
         }
+
+        rcpsShortList.push(event.target.value);
+      } else {
+        let index = rcpsToUnlabel.indexOf(event.target.value);
+        if (index > -1) {
+            rcpsToUnlabel.splice(index, 1);
+        }
+      }
     }
 }
 
@@ -61,9 +79,11 @@ function checkBoxClicked(event) {
 // for many
 function addCheckboxListeners(){
   let checkboxes = document.querySelectorAll('.form-check-input');
+
   checkboxes.forEach(function(checkbox) {
       checkbox.addEventListener('click', checkBoxClicked);
   });  
+
   // let checkboxLabels = document.querySelectorAll('.form-check-label');
   // checkboxLabels.forEach(function(checkboxLabel) {
   //   checkboxLabel.addEventListener('click', checkBoxClicked);
@@ -72,10 +92,10 @@ function addCheckboxListeners(){
 
 function checkAllRcps() {
   let checkboxes = document.querySelectorAll('.form-check-input');
-  rcpsToCollate = [];
+  rcpsToUnlabel = [];
   checkboxes.forEach(function(checkbox) {
       checkbox.checked = true;      
-      rcpsToCollate.push(checkbox.value);
+      rcpsToUnlabel.push(checkbox.value);
   });    
 }
 
@@ -83,7 +103,9 @@ function saveCheckedRcps(){
   fetch( '/search', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
-    body: JSON.stringify( { 'user':userUUID, 'saveCheckedRcps':rcpsToCollate } )      // Payload
+    body: JSON.stringify( { 'user':userUUID, 
+                            'rcpsToUnlabel': rcpsToUnlabel,
+                            'rcpsShortList': rcpsShortList } )      // Payload
 
   }).then( function(response) {
     return response.json();
@@ -111,19 +133,15 @@ function searchForRecipe (){
     return response.json();
 
   }).then( function(search_response) {
-    console.log("AHEM:", search_response);
     console.log('----*----');
+    console.log("AHEM:", search_response);    
     //gallery_html = renderRecipeCard(search_response[0]);
     gallery_html = renderGalleryFromResult(search_response);
-    console.log(gallery_html);
+    //console.log(gallery_html);
     console.log('----*----');
     gallery = document.getElementById('rcp-gallery');
     gallery.innerHTML = gallery_html;
     addCheckboxListeners();
-    // how to something like . .
-    // window.location.replace('/db_gallery', recipes=search_response);
-    // window.location.replace('/db_gallery')
-    // window.location.href="district.php?dist="+dist;
   })
   //.catch(err){
   //  console.log("WTF", err);
@@ -171,10 +189,18 @@ function renderRecipeCard(rcpInfo){
             <p class="card-text">${rcpInfo['description']}</p>
             ${html_stars}
             <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
+            <div class="form-check">
             <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheck_${rcpInfo['ri_id']}">
             <label class="form-check-label" for="flexCheck_${rcpInfo['ri_id']}">
               Un/Label
             </label>            
+            </div>
+            <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheckSL_${rcpInfo['ri_id']}">
+            <label class="form-check-label" for="flexCheckSL_${rcpInfo['ri_id']}">
+              Add to List
+            </label>    
+            </div>
         </div>
   </div>`
 

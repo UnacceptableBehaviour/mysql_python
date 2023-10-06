@@ -1,49 +1,54 @@
-<style>
-  /*    tag
-      . class
-      # id
-      TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
-  */
-  #debug-recipe-search-table {
-    width: 80%;
-  }
-  #debug-recipe-search-table td {
-    text-align: center;
-  }
 
-  .recip-star-up-rating {
-    color: gold;
-  }
-  
-  .recip-star-down-rating {
-    color: #303030;
-  }
+/*    tag
+    . class
+    # id
+    TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
+*/
+#debug-recipe-search-table {
+  width: 80%;
+}
+#debug-recipe-search-table td {
+  text-align: center;
+}
 
-  body {
-    --title-font-size:1.5rem;
-    color: #222;
-  }
-  
-  #recipe-search-input-row {
-    padding-top: 15px;
-    padding-bottom: 15px;
-  }
-  
-  #page-display-title {
-    /* font-size: var(--title-font-size); */
-  }
-  
-  #but-recipe-search {
-    /* display: inline-block;
-    vertical-align: top; */
-    /* margin-top: calc(-1 * var(--title-font-size));  /* multiply var by -1 */
-  }
-  #recipe-search-chart-svg{
-    width: 100%;
-  }
+.recip-star-up-rating {
+  color: gold;
+}
 
-  .form-check-input{
-    margin-left: -1.0rem;
-  }
+.recip-star-down-rating {
+  color: #303030;
+}
 
-</style>
+body {
+  --title-font-size:1.5rem;
+  color: #222;
+}
+
+#recipe-search-input-row {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+
+#recipe-search-chart-svg{
+  width: 100%;
+}
+
+.form-check-input{
+  margin-left: -1.0rem;
+}
+.form-check {
+  width: 55%; 
+  float: left;
+}
+
+/* if the form-check is 100% z-index: 1; places the button above it so it can still be clicked*/
+button {
+  position: relative;
+  z-index: 1;
+}
+
+.card-body {
+  padding: 10px;
+}
+

@@ -30,6 +30,8 @@
       <div id="did_type_exc" class="container-fluid padding tag-div">
           <button id='btn_id_toggle_types' name='type_btn_toggle' value='type_toggle' class='btn btn-sm btn-outline-secondary'>TOGGLE</button>
           <button id='btn_id_clear_type' name='type_btn_clear' value='type_clear' class='btn btn-sm btn-outline-secondary'>CLEAR</button>
+          <button id='btn_id_intersection_type' name='type_btn_intersection' value='type_intersection' class='btn btn-sm btn-outline-secondary'>∩</button>
+          <button id='btn_id_union_type' name='type_btn_union' value='type_union' class='btn btn-sm btn-outline-secondary'>U</button>
           TYPES TO INCLUDE:
           {% for type in user_info['tag_sets']['types'] %}
           <button id='type_btn_id_{{type}}' name='type_btn_{{type}}' value='{{type}}' class='btn btn-sm btn-outline-secondary'>{{type}}</button>

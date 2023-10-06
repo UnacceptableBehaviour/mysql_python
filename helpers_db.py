@@ -684,7 +684,8 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         'name': 'Simon',
         'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'],
         'default_filters': get_search_settings_dict(True),
-        'tag_sets': get_search_settings_dict(True),
+        'tag_sets': get_search_settings_dict(True)
+        # TODO ADD 'fav_rcp_ids':[]
         }
 
     default_user_settings.update(user_settings)
@@ -729,10 +730,21 @@ def get_user_info_dict_from_DB(uuid):
         
         tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy        
 
+        print(f"table:{table}, filter_cols:")
+        pprint(filter_cols)
+        print('- - - / ')
         for col in filter_cols:
-            tag_sets_and_filters[table][col] = tagdata_for_table[col]
-
+            print(f"table:{table}, col:{col}")
+            tag_sets_and_filters[table][col] = tagdata_for_table[col]            
+    
     return_user_info.update(tag_sets_and_filters)
+    
+    sql_query = f"SELECT fav_rcp_ids FROM fav_rcp_ids WHERE uuid_user='{uuid}';"
+    print(f"\nSQL: {sql_query} < - - - - - < <")        
+    
+    favs_array = helper_db_class_db.execute(sql_query).fetchone()[0] # - returns RowProxy   
+
+    return_user_info['fav_rcp_ids'] = favs_array
 
     #pprint(return_user_info)
 
@@ -767,13 +779,13 @@ def get_user_info_name_uuid_dict(uuid):
 #
 # Typical entry (one of table list):
 #
-# 'default_filters': { 'allergens': [],
-#         ^            'ingredient_exc': ['coriander', 'bad sausage'],
-#         ^            'tags_exc': ['ns_pregnant'],
-#         ^            'tags_inc': [] },    ^
-#         ^              ^                  ^
-#         ^              ^                  ^
-#         ^           column_name       rows_data
+# 'tag_sets': { 'allergens': [],
+#     ^         'ingredient_exc': ['coriander', 'bad sausage'],
+#     ^         'tags_exc': ['ns_pregnant'],
+#     ^         'tags_inc': [] },    ^
+#     ^           ^                  ^
+#     ^           ^                  ^
+#     ^        column_name       rows_data
 #      table_key > dict of arrays
 #
 # DATABASE_URL
@@ -807,13 +819,25 @@ def update_settings_tables_for_uuid(db, user_settings):
         sql_command = f"UPDATE {table_key} SET {column_update} WHERE uuid_user = '{uuid}';"
 
         #print(f"TK:{table_key}\nROW:{column_update}\nSQL:{sql_command}")
-        db.execute(sql_command)
-        print(f"***** SQL WRITE:\n{sql_command}\n\nRESULT: {db.commit()} <\n\n") # < < COMMIT
+        print(f"***** SQL WRITE:\n{sql_command}\n\n")
+        db.execute(sql_command)    
+        print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
         # TODO - commit return None on success?
         # how is failure reported?
 
-
-
+    # Save favourites
+    # UPDATE fav_rcp_ids 
+    # SET fav_rcp_ids = ARRAY[622, 1256, 1037, 1145]
+    # WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
+    # or 
+    # for NEW user only
+    # sql_command = f"INSERT INTO fav_rcp_ids (uuid_user, fav_rcp_ids) VALUES ('{uuid}', {array_entry});" 
+    array_entry = 'ARRAY[' + ','.join([ f'{fav}' for fav in user_settings['fav_rcp_ids'] ]) + ']'
+    sql_command = f"UPDATE fav_rcp_ids SET fav_rcp_ids = {array_entry} WHERE uuid_user = '{uuid}';"
+    
+    print(f"***** SQL WRITE:\n{sql_command}\n\n")
+    db.execute(sql_command)    
+    print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
 
 
 # EG DB write
@@ -833,7 +857,7 @@ def update_user_info_dict(user_settings):
         return True
 
     except KeyError as e:
-        raise(DBAccessKeyError("get_user_info_name_uuid_dict ERROR", e))
+        raise(DBAccessKeyError("update_settings_tables_for_uuid ERROR", e))
         return None
 
 
