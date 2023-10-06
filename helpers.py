@@ -70,8 +70,7 @@ def get_csv_from_server_as_disctionary(url):
         except (ConnectionRefusedError, URLError):
             print('\n\nConnectionRefusedError: asset server must be serveing on HTTP  \
                 \nOpen terminal. \
-                \ncd python/assest_server \
-                \nhttp-server -p 8000 --cors \
+                \ncd python/assest_server; http-server -p 8000 --cors \
                 \nHit RETURN to continue . .')
             wait = input()
 
