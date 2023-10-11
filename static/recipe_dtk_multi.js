@@ -71,8 +71,6 @@ function recipeComponentFromName(obj, componentName, currentLevel = "components"
 
 
 
-var targetContainer;
-
 // TODO - some characte safety checks
 function idFromName(recipeNameString) {
   return recipeNameString.replaceAll(' ','-');
@@ -150,19 +148,19 @@ function addNameAndDescription(rc, r) {
   }
   
 }
- 
+
 //  IGDT_TYPE: UNCHECKED / DERIVED / ATOMIC / OTS / DTK
 //                 -1         0        1       2     3
-let IGD_IDX_TYPE = 0;
-let IGD_IDX_QTY  = 1;
-let IGD_IDX_EACH = 2;
-let IGD_IDX_NAME = 3;
+const IGD_IDX_TYPE = 0;
+const IGD_IDX_QTY  = 1;
+const IGD_IDX_EACH = 2;
+const IGD_IDX_NAME = 3;
 
-let IGD_TYPE_UNCHECKED = -1;
-let IGD_TYPE_ATOMIC    = 0;
-let IGD_TYPE_DERIVED   = 1;
-let IGD_TYPE_OTS       = 2;   // Off The Shelf
-let IGD_TYPE_DTK       = 3;   // Daily TracKer 
+const IGD_TYPE_UNCHECKED = -1;
+const IGD_TYPE_ATOMIC    = 0;
+const IGD_TYPE_DERIVED   = 1;
+const IGD_TYPE_OTS       = 2;   // Off The Shelf
+const IGD_TYPE_DTK       = 3;   // Daily TracKer 
 
 function addIngredients(rc, r){
   let el = document.createElement('div');
@@ -229,10 +227,14 @@ function addIngredients(rc, r){
 // ingredient R button click handler - add ingredient recipe to display.
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#improving_scrolling_performance_with_passive_listeners
 function expandIngredientToRecipeCard(event) {
-  let subcomponentName = event.target.getAttribute('value');
-  let elementId = idFromName(subcomponentName);
-  let recipeCard = document.getElementById(elementId);
-  let backTo = event.target.closest('.rcp-card').getAttribute('id'); 
+  const subcomponentName = event.target.getAttribute('value');
+  const elementId = idFromName(subcomponentName);
+  const recipeCard = document.getElementById(elementId);
+  const backTo = event.target.closest('.rcp-card').getAttribute('id'); 
+  const button = event.target;
+  //const targetContainer2 = button.closest('[id^="rcp-multi-target-"]') //.matches('.container-fluid');
+  const targetContainer = button.closest('[id^="recipe_dtk_multi_target"]') //.matches('.container-fluid');
+  
   
   console.log(`R Button CLICK <EXPAND> ${event.type} ${subcomponentName} - - - - - S`);
   console.log(`backTo: ${backTo}`);
@@ -241,12 +243,11 @@ function expandIngredientToRecipeCard(event) {
   
   if (recipeCard === null) {
     console.log(`Creating recipeCard: ID: ${elementId}`);
-    //let recipeObj = recipeObjectFromName(subcomponentName);         // dev stub
-    let recipeObj = recipeComponentFromName(compositeRecipe, subcomponentName, currentLevel = "components")     
+    //const recipeObj = recipeObjectFromName(subcomponentName);         // dev stub
+    const recipeObj = recipeComponentFromName(compositeRecipe, subcomponentName, currentLevel = "components")     
     
     recipeObj.back = backTo;  // embed return route in recipe
-    let recipeCardElement = createRecipeCard(recipeObj);    
-    //document.body.appendChild(recipeCardElement);
+    const recipeCardElement = createRecipeCard(recipeObj);        
     targetContainer.appendChild(recipeCardElement);
   } else {
     console.log(`Found recipeCard: ID: ${elementId}`);
@@ -418,7 +419,7 @@ function createRecipeCard(r) {
 function loadDTKRecipe(targetContainerID, recipe=rcp_guinea_dinner){
   console.log('Loading Recipe: X');
   
-  targetContainer = document.getElementById(targetContainerID);  
+  const targetContainer = document.getElementById(targetContainerID);  
 
   recipe.back = null;
   let htmlCard = createRecipeCard(recipe);
@@ -433,6 +434,10 @@ console.log(`==> ${compositeRecipe.ri_name} <==S`);
 console.log(compositeRecipe);
 console.log(`==> ${compositeRecipe.ri_name} <==E`);
 loadDTKRecipe('recipe_dtk_multi_target', compositeRecipe);
+
+
+
+
 
 //for static html test
 //
