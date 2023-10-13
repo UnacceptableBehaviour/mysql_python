@@ -289,6 +289,7 @@ help_info = '''
 > scrape.py -p                 # process process_nutridocs.py missing ONLY
 > scrape.py -f                 # process food_sets.py missing ONLY
 > scrape.py -c -d              # process cost_menu.rb & ccm_nutridoc_web.rb missing ONLY
+> scrape.py -m                 # process URLS from interrupted scrape ONLY
 
 
 -noprompt                           # don't ask - works with all options                                    
@@ -604,6 +605,13 @@ if __name__ == '__main__':
 #   USE following to over ride the dev verification warning
 #   xattr -d com.apple.quarantine /usr/local/bin/chromedriver
 #
+#
+# UPDATE Code so automatically pick up right driver
+# READ: https://www.selenium.dev/blog/2022/introducing-selenium-manager/
+# https://stackoverflow.com/questions/76461596/unable-to-use-selenium-webdriver-getting-two-exceptions/76463081#76463081
+# https://stackoverflow.com/questions/76453996/purpose-of-webdriver-manager/76455537#76455537
+#
+#          MANUAL UPDATE version - - \
 # On Chrome version change an update to chromedriver will be required:
 # install ChromeDriver: https://chromedriver.chromium.org/downloads (I installed 111)
 #   download relevant zip chromedriver_mac64.zip renamed chromedriver_mac64_111.zip
@@ -613,8 +621,6 @@ if __name__ == '__main__':
 #   % xattr -d com.apple.quarantine /usr/local/bin/chromedriver   # overs OS warning
 #   % run script as before!
 #
-#   ^^ AUTOMATE above with homebrew? ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ 
-#   https://stackoverflow.com/questions/46026987/selenium-gives-selenium-common-exceptions-webdriverexception-message-unknown
 #
 # Selenium Hello World
 # https://www.browserstack.com/guide/locators-in-selenium
