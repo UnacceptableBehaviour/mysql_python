@@ -359,6 +359,20 @@ def get_recipes_for_display_as_list_of_dicts(list_of_recipe_ids):
 
     return recipe_list
 
+def get_recipes_with_subcomponents_for_display_as_list_of_dicts(list_of_recipe_ids):
+    recipe_list = []
+
+    for ri_id in list_of_recipe_ids:
+        print(f"getting: {ri_id}")
+
+        recipe = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(int(ri_id))
+
+        print(f"got: {recipe['ri_name']}")
+
+        recipe_list.append( recipe )
+
+    return recipe_list
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -711,12 +725,13 @@ def get_user_info_dict_from_DB(uuid):
         'tag_sets':['allergens','ingredient_exc','tags','types']
     }
 
-    username = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+    usernameRowProxy = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+    username = usernameRowProxy[0]
     if username == None: username = 'carter' # Place holder until logins implemented
 
     return_user_info = {'UUID':uuid, 'name':username}
 
-    print(f"RETRIEVING FROM DB - {uuid} ( -o- )")
+    print(f"RETRIEVING FROM DB - {uuid} ( -o- ) - S")
 
 
     tag_sets_and_filters = {}
@@ -738,17 +753,12 @@ def get_user_info_dict_from_DB(uuid):
             tag_sets_and_filters[table][col] = tagdata_for_table[col]            
     
     return_user_info.update(tag_sets_and_filters)
-    
-    sql_query = f"SELECT fav_rcp_ids FROM fav_rcp_ids WHERE uuid_user='{uuid}';"
-    print(f"\nSQL: {sql_query} < - - - - - < <")        
-    
-    favs_array = helper_db_class_db.execute(sql_query).fetchone()[0] # - returns RowProxy   
 
-    return_user_info['fav_rcp_ids'] = favs_array
+    return_user_info['fav_rcp_ids'] = get_favs_from_DB(helper_db_class_db, uuid)
 
     #pprint(return_user_info)
 
-    print(f"RETRIEVING FROM DB - {uuid} ( -o- )")
+    print(f"RETRIEVING FROM DB - {uuid} ( -o- ) - E")
     return return_user_info
 
 
@@ -788,7 +798,57 @@ def get_user_info_name_uuid_dict(uuid):
 #     ^        column_name       rows_data
 #      table_key > dict of arrays
 #
-# DATABASE_URL
+#
+def get_favs_from_DB(db, uuid):
+    fav_recipes = []
+
+    sql_query = f"SELECT fav_rcp_id FROM fav_rcp_ids WHERE uuid_user='{uuid}';"
+    print(f"\nSQL: {sql_query} < - - - - - < <")        
+    
+    favs_db = db.execute(sql_query).fetchall() # - returns RowProxy   
+    pprint(favs_db)
+    if len(favs_db) > 0: pprint(favs_db[0][0])
+    pprint(len(favs_db))
+    if favs_db and len(favs_db) > 0:
+        fav_recipes = [ ri_id_tup[0] for ri_id_tup in favs_db ]
+
+    return fav_recipes
+
+
+def append_merge_favs_to_DB(db, user_settings):
+    # Save favourites
+    # INSERT INTO fav_rcp_ids 
+    # VALUES 
+    # ('014752da-b49d-4fb0-9f50-23bc90e44298', 112),
+    # ('014752da-b49d-4fb0-9f50-23bc90e44298', 999),
+    # ('014752da-b49d-4fb0-9f50-23bc90e44298', 331)
+    # ON CONFLICT (uuid_user, fav_rcp_id) DO NOTHING;
+
+    uuid = user_settings['UUID']
+    value_pairs = ','.join([ f"('{uuid}', {fav})" for fav in user_settings['fav_rcp_ids'] ])
+    sql_command = f"INSERT INTO fav_rcp_ids VALUES {value_pairs} ON CONFLICT (uuid_user, fav_rcp_id) DO NOTHING;"
+
+    print(f"***** SQL WRITE:\n{sql_command}\n\n")
+    db.execute(sql_command)    
+    print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
+
+
+def remove_favs_from_DB(db, uuid, recipe_ids):
+    # Remove favourites
+    # DELETE FROM fav_rcp_ids
+    # WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    # AND fav_rcp_id IN (613, 1566, 969);   
+
+    recipe_id_string = ','.join(recipe_ids)
+    sql_command = f"DELETE FROM fav_rcp_ids WHERE uuid_user = '{uuid}' AND fav_rcp_id IN ({recipe_id_string});"
+    
+    print(f"***** SQL WRITE:\n{sql_command}\n\n")
+    db.execute(sql_command)
+    result = db.commit()
+    print(f"RESULT: {result} <\n\n") # < < COMMIT
+    return result
+
+
 def update_settings_tables_for_uuid(db, user_settings):
     pprint(user_settings)
 
@@ -825,19 +885,7 @@ def update_settings_tables_for_uuid(db, user_settings):
         # TODO - commit return None on success?
         # how is failure reported?
 
-    # Save favourites
-    # UPDATE fav_rcp_ids 
-    # SET fav_rcp_ids = ARRAY[622, 1256, 1037, 1145]
-    # WHERE uuid_user = '014752da-b49d-4fb0-9f50-23bc90e44298';
-    # or 
-    # for NEW user only
-    # sql_command = f"INSERT INTO fav_rcp_ids (uuid_user, fav_rcp_ids) VALUES ('{uuid}', {array_entry});" 
-    array_entry = 'ARRAY[' + ','.join([ f'{fav}' for fav in user_settings['fav_rcp_ids'] ]) + ']'
-    sql_command = f"UPDATE fav_rcp_ids SET fav_rcp_ids = {array_entry} WHERE uuid_user = '{uuid}';"
-    
-    print(f"***** SQL WRITE:\n{sql_command}\n\n")
-    db.execute(sql_command)    
-    print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
+    append_merge_favs_to_DB(db, user_settings)
 
 
 # EG DB write

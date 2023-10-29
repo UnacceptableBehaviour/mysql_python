@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, redirect
 from werkzeug import serving
 import ssl
 
@@ -29,10 +29,12 @@ from timestamping import hr_readable_from_nix, roll_over_from_nix_time
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
+from helpers_db import get_recipes_with_subcomponents_for_display_as_list_of_dicts
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
 from helpers_db import process_search
-from helpers_db import get_user_info_dict, get_user_info_dict_from_DB, update_user_info_dict, get_search_settings_dict
+from helpers_db import get_user_info_dict, remove_favs_from_DB, get_user_info_dict_from_DB, update_user_info_dict
+from helpers_db import get_search_settings_dict
 
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
@@ -60,30 +62,11 @@ from pathlib import Path    # Path tools
 
 # each app.route is an endpoint
 @app.route('/')
-def home_random_gallery():
+def home():
+    # return redirect('synch_n_route')
+    #return redirect(url_for('home_list_of_favourites')) same as > return redirect('/favs')
+    return redirect('/favs')
 
-    all_recipes = helper_db_class_db.execute("SELECT yield, servings, ri_name, lead_image FROM recipes WHERE lead_image <> '';").fetchall()
-
-    formatted_text = "<br>"
-
-    # debug - delete
-    firstN = 20
-    db_lines = []
-    for i in range(firstN):
-        q_index = random.randint(0,len(all_recipes)-1)
-        db_lines.append(all_recipes.pop(q_index))
-
-    for line in db_lines:
-        pprint(line)
-        #print(f" | {round(line.yield, 0)} | {round(line.servings, 0)} | {line.ri_name} | {line.lead_image} | <br>")
-        #formatted_text = formatted_text + f" | {int(line.yield)} | {int(line.servings)} | {line.ri_name} | {line.lead_image} | <br>"
-
-    print(f"\n\nProcess Query - rendering {len(db_lines)} recipes. . \n{formatted_text}\n")
-    print(f"\n\nFavs format - rendering {len(db_lines)} recipes. . \n{formatted_text}\n")
-
-    #return render_template('data_return.html', lines=db_lines)
-    return render_template('show_fav_rcp_cards.html', recipes=db_lines)
-    #return f"Processed Query:<br>{formatted_text} <br>END"
 
 # synch / login route
 # load js that send devices uuid, user uuid, and most recent dtk (daily tracker)
@@ -200,6 +183,120 @@ def weigh_in():
     # draw chart - in .js
 
     return render_template('weigh_in_t.html', daily_tracker=dtk)
+
+
+@app.route('/favs', methods=["GET", "POST"])
+def home_list_of_favourites():
+    # from user device
+    passed_in_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    user_info = get_user_info_dict_from_DB(passed_in_uuid)
+
+    if request.method =='POST':
+        pprint(request)
+        favs_dict = request.get_json() # parse JSON into DICT
+        print('favs_dict')
+        pprint(favs_dict)
+        if 'ri_id' in favs_dict:
+            ri_id = favs_dict['ri_id']
+            print(f"REMOVING: {ri_id} from DB")
+            remove_favs_from_DB(helper_db_class_db, passed_in_uuid, [ri_id])
+
+        return json.dumps(ri_id), 200
+        
+    
+
+    #recipes = get_gallery_info_for_display_as_list_of_dicts(user_info['fav_rcp_ids'])
+    recipes = get_recipes_for_display_as_list_of_dicts(user_info['fav_rcp_ids'])
+
+    pprint(user_info)
+    
+    for r in recipes:
+        cals_p_srv = int(float(r['nutrinfo']['serving_size']) / 100 *  float(r['nutrinfo']['n_En']))
+        print(f"ri_id:{r['ri_id']}, \t{r['nutrinfo']['serving_size']}{r['nutrinfo']['units']} @ {r['nutrinfo']['n_En']}kcals per 100g, \tcals_p_srv:{cals_p_srv}\t{r['ri_name']}") #, 
+        r['nutrinfo']['cals_p_srv'] = cals_p_srv
+
+    print(f"\n\nFavs format - rendering {len(recipes)} recipes. . \n\n")    
+
+    return render_template('show_fav_rcp_cards.html', recipes=recipes)
+
+
+
+@app.route('/db_recipe_list', methods=["GET","POST"])
+def db_recipe_list():
+    if request.method =='POST':
+        return 
+
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
+
+    #recipes = get_gallery_info_for_display_as_list_of_dicts(user_info['fav_rcp_ids'])
+    #recipes = get_recipes_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
+    recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
+
+    return render_template("recipe_t.html", recipes=recipes)
+
+
+
+@app.route('/db_recipe_page', methods=["GET", "POST"])
+def db_recipe_page():
+
+    ri_id = 3202
+
+    # route from gallery or other recipe request routes
+    if request.method =='POST':
+        print("POST                            - - - < db_recipe_page - S = = = =*=*")
+        pprint(request.args.to_dict())
+        print("POST                            - - - < db_recipe_page - M = = = =*=*")
+        pprint(request)
+        print("POST                            - - - < db_recipe_page - E = = = =*=*")
+        if ('ri_id' in request.form):
+            ri_id = int(request.form['ri_id'])
+            print(f"POST ri_id: {ri_id} <")
+        else:
+            for key, val in request.form.items():
+                print(f"POST k: {key} - v: {val} <")
+                if re.match(r'gallery_button_', key):
+                    ri_id = int(val)
+
+
+    # incoming_dict = request.args.to_dict() # strange errors
+    # idict = dict(incoming_dict)
+    idict = dict(request.args)
+
+    if request.method =='GET':
+        print("GET                            - - - < db_recipe_page - idict")
+        # pprint(incoming_dict)
+        # ri_id = request.args.get('ri_id')
+        pprint(idict)
+        print('- - - idict')
+        ri_id = idict['ri_id']
+        print(f"ri_id: {ri_id}")
+
+        # if 'text' in incoming_dict:
+        #     ri_id = int(incoming_dict['text'])
+
+    #recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
+    recipe = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(int(ri_id))
+
+    recipes = [recipe]
+
+    print(f"- - RECIPE PAGE ID:{ri_id} - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
+    pprint(recipes)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+
+    return render_template("recipe_t.html", recipes=recipes)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/twonky_donuts', methods=["GET", "POST"])
@@ -621,50 +718,6 @@ def db_nutrients_compare():
 
     return render_template("nutrient_compare_page.html", headline=headline_py, recipes=recipes)
 
-
-
-@app.route('/db_recipe_page', methods=["GET", "POST"])
-def db_recipe_page():
-
-    ri_id = 3202
-
-    # route from gallery or other recipe request routes
-    if request.method =='POST':
-        print("POST                            - - - < db_recipe_page - S = = = =*=*")
-        pprint(request.args.to_dict())
-        print("POST                            - - - < db_recipe_page - M = = = =*=*")
-        pprint(request)
-        print("POST                            - - - < db_recipe_page - E = = = =*=*")
-        if ('ri_id' in request.form):
-            ri_id = int(request.form['ri_id'])
-            print(f"POST ri_id: {ri_id} <")
-        else:
-            for key, val in request.form.items():
-                print(f"POST k: {key} - v: {val} <")
-                if re.match(r'gallery_button_', key):
-                    ri_id = int(val)
-
-
-    incoming_dict = request.args.to_dict()
-
-    if request.method =='GET':
-        print("GET                            - - - < db_recipe_page")
-        pprint(incoming_dict)
-        pprint(request.value)
-        pprint(request.value)
-        if 'text' in incoming_dict:
-            ri_id = int(incoming_dict['text'])
-
-    #recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
-    recipe = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id)
-
-    recipes = [recipe]
-
-    print(f"- - RECIPE PAGE ID:{ri_id} - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
-    pprint(recipes)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    return render_template("recipe_t.html", recipes=recipes)
 
 
 @app.route('/buton_7', methods=["GET", "POST"])

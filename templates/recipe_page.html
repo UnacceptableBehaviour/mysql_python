@@ -1,11 +1,6 @@
 {% block content %}
 <div id='recipe_dtk_multi_target' class="container-fluid padding">
 	<div class="row padding">
-
-		<!-- if re-writing in JS . . ?
-        rename so there is a root variable tha allows multiple recipe
-        de-reference into the leaf?
-        -->
         <script>
           var recipes = {{ recipes|tojson }};                       // convert info using tojson filter
           console.log(`recipe_t JS ${recipes[0]['ri_name']} - inline CONCLUDED`);  // sanity check

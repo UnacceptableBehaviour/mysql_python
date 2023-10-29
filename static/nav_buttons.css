@@ -1,0 +1,12 @@
+
+#bt_home, #bt_nutes_compare {
+  background-color: #8BCE51;
+}
+
+#bt_gallery, #bt_db_recipe, #bt_nutes {
+  background-color: #B1D6E2;
+}
+
+.nav-but img {
+  height: 28px;
+}

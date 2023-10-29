@@ -51,9 +51,19 @@ function recipeObjectFromName(subcomponentName) {
   return ri_id_lookup[ri_id_from_name_lookup[subcomponentName]];
 }
 
-// dev setup - - - - E
+// dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
+// dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
+// dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
+// dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
 
-var compositeRecipe = recipes[0];  // passed in from filter
+
+var recipeToRender = {};               // use hash lookup instead of search
+recipes.forEach( r => {
+  recipeToRender[r.ri_id] = r;
+});
+function recipeObjectFromID(ri_id){
+  return recipeToRender[ri_id];
+}
 
 function recipeComponentFromName(obj, componentName, currentLevel = "components") {
   if (obj.hasOwnProperty(currentLevel)) {
@@ -78,9 +88,20 @@ function idFromName(recipeNameString) {
 
 
 function removeRecipeCard(event) {
-  let recipeCard = event.target.closest('.rcp-card');  
+  const recipeCard = event.target.closest('.rcp-card');
+  const parentId = recipeCard.parentElement.id;
+
   recipeCard.remove();  
+
+  // Tidy up . . Check if parent contains any other recipe cards
+  const otherCards = document.querySelectorAll(`#${parentId} .rcp-card`);
+
+  // If no other cards, remove the parent
+  if (otherCards.length === 0) {
+    document.querySelector(`#${parentId}`).remove();
+  }
 }
+
 
 const scrollToCard = function(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); };
 // 
@@ -232,9 +253,11 @@ function expandIngredientToRecipeCard(event) {
   const recipeCard = document.getElementById(elementId);
   const backTo = event.target.closest('.rcp-card').getAttribute('id'); 
   const button = event.target;
-  //const targetContainer2 = button.closest('[id^="rcp-multi-target-"]') //.matches('.container-fluid');
-  const targetContainer = button.closest('[id^="recipe_dtk_multi_target"]') //.matches('.container-fluid');
-  
+  const prePendId = 'rcp-multi-target-';
+  const targetContainer = button.closest(`[id^="${prePendId}"]`) //.matches('.container-fluid');
+  const recipeId = targetContainer.id.replace(prePendId,'');
+  //const targetContainer = button.closest('[id^="recipe_dtk_multi_target"]') //.matches('.container-fluid');
+  const compositeRecipe = recipeObjectFromID(recipeId);
   
   console.log(`R Button CLICK <EXPAND> ${event.type} ${subcomponentName} - - - - - S`);
   console.log(`backTo: ${backTo}`);
@@ -417,24 +440,33 @@ function createRecipeCard(r) {
 
 //export function loadDTKRecipe(targetContainerID, recipe=rcp_guinea_dinner){
 function loadDTKRecipe(targetContainerID, recipe=rcp_guinea_dinner){
-  console.log('Loading Recipe: X');
+  console.log(`Loading Recipe: ${recipe.ri_name}`);
+
+  const subContainer   = document.createElement('div');
+  subContainer.id = `rcp-multi-target-${recipe.ri_id}`
   
   const targetContainer = document.getElementById(targetContainerID);  
 
   recipe.back = null;
-  let htmlCard = createRecipeCard(recipe);
+  const htmlCard = createRecipeCard(recipe);
   
-  console.log(htmlCard);
+  //console.log(htmlCard);
+  subContainer.appendChild(htmlCard);
   
-  targetContainer.appendChild(htmlCard);
+  targetContainer.appendChild(subContainer);
   console.log('complete');  
 }
 
-console.log(`==> ${compositeRecipe.ri_name} <==S`);
-console.log(compositeRecipe);
-console.log(`==> ${compositeRecipe.ri_name} <==E`);
-loadDTKRecipe('recipe_dtk_multi_target', compositeRecipe);
 
+// var compositeRecipe = recipes[11];
+// console.log(`==> ${compositeRecipe.ri_name} <==S`);
+// console.log(compositeRecipe);
+// console.log(`==> ${compositeRecipe.ri_name} <==E`);
+// loadDTKRecipe('recipe_dtk_multi_target', compositeRecipe);
+
+recipes.forEach( r => {  
+  loadDTKRecipe('recipe_dtk_multi_target', r);
+});
 
 
 

@@ -363,8 +363,7 @@ def main():
     recipe_table_templates = ['db_table_recipe_table_def.sql','db_table_recipe_exploded_table_def.sql','db_table_atomic_ingredients_table_def.sql']
 
     settings_tables = ['default_filters','devices','tag_sets','user_devices','usernames','fav_rcp_ids']
-    recipe_tables = ['recipes','exploded','atomic_ingredients']
-    # TODO initialize fav_rcp_ids fav_rcp_ids.sql
+    recipe_tables = ['recipes','exploded','atomic_ingredients']    
 
     template_folder = Path('/Users/simon/a_syllabus/lang/python/mysql_python/static/')
 

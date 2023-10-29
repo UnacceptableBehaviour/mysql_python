@@ -6,68 +6,31 @@
 
 {% block content %}
 
-<div class="container">
+
+<div class="">
     {% for recipe in recipes %}
 
     <div class="recipe-card">
 
         <div class="image-container">
-          <img src="https://asset.server:8080/static/recipe/{{ recipe['lead_image'] }}"> 
+          <img src="https://asset.server:8080/static/recipe/{{ recipe['lead_image'] }}" value="{{ recipe['ri_id'] }}"> 
         </div>
       
         <div class="content">
           <h2 class="title">{{ recipe['ri_name'] }}</h2>
       
           <div class="info">
-            <p>recipe info line 1</p>
-            <p>recipe info line 2</p>
-            <p>recipe info line 3</p>
+            {{ recipe['nutrinfo']['serving_size'] }}{{ recipe['nutrinfo']['units'] }}  <p style="display: inline;">{{ recipe['nutrinfo']['n_En'] }}kcal/100g</p> = {{ recipe['nutrinfo']['cals_p_srv'] }}kcals
+            <!-- <p>{{ recipe['description'] }}</p> -->
           </div>
       
-          <button class="close">X</button>
+          <button class="close" value="{{ recipe['ri_id'] }}">X</button>
         </div>
       
       </div>    
     {% endfor %}
 </div>
 
+<script src='static/show_fav_rcp_cards.js'></script>
+
 {% endblock %}
-
-
-<div class="card mb-3" style="max-width: 540px;">
-    <div class="row g-0 d-flex">
-        <div class="col-md-2">
-            <!-- IMAGE APPEARS ABOVE text instead of to the left? -->
-            <image src="https://asset.server:8080/static/recipe/{{ recipe['lead_image'] }}" class="img-fluid rounded-start">
-        </div>
-        <div class="col-md-4">
-            <div class="card-body">
-                <h5 class="card-title">{{ recipe['ri_name'] }}</h5>                    
-                <h6 class="card-text">350g - 395kcal</h6>
-                <p class="card-text"><small class="text-muted">strong flat white w/ a fat sweet date - something sweet for after dinner</small></p>
-                <p class="card-text"><small class="text-muted">allergens: dairy</small></p>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- <h6 class="card-text">{{recipe['nutrinfo']['serving_size']}}{{recipe['nutrinfo']['n_En']}} - {{recipe['nutrinfo']['n_En']}}</h6> -->
-
-<div class="card mb-3" style="max-width: 540px;">
-    <div class="row g-0">
-        <div class="col-md-4">
-            <!-- IMAGE APPEARS ABOVE text instead of to the left? -->
-            <img src="https://asset.server:8080/static/recipe/20190128_140750_emergency broth lemon grass and chicken.jpg" class="img-fluid rounded-start">
-        </div>
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">emergency broth lemon grass and chicken</h5>                    
-                <h6 class="card-text">350g - 395kcal</h6>
-                <p class="card-text"><small class="text-muted">strong flat white w/ a fat sweet date - something sweet for after dinner</small></p>
-                <p class="card-text"><small class="text-muted">allergens: dairy</small></p>
-            </div>
-        </div>
-    </div>
-</div>
