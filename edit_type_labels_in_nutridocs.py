@@ -9,7 +9,8 @@ from food_sets import atomic_LUT
 from timestamping import nix_time_ms, hr_readable_w_nix_ms_from_nix
 import shutil
 
-NAS_PATH = Path('/Volumes/home/dtk_backups')
+NAS_PATH              = Path('/Volumes/home/dtk_backups')
+MISSLABELED_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json')
 
 opt_dict = {
     'verbose_mode':     True,
@@ -28,11 +29,18 @@ if '-a' in sys.argv:
     opt_dict['add_labels'] = True
 
 
-help_string = '''
+help_string = f'''\n\n\n
+HELP:\n
+Adds or removes type labels to a list of spcecified recipes found in MISSLABELED_FILE_JSON found @
+{MISSLABELED_FILE_JSON}
+
+This json file is generated from the results of the SEARCH page that have been checked
+and checked recipes SAVED. . . 
+
 - - - options - - - 
 -nb         NO document backup,
             DEFAULT is all docs backed up to
-            ''' + f"{NAS_PATH}" + '''
+            {NAS_PATH}
 
 -l          LIVE original docs are edited in place. 
             DEFAULT show intent
@@ -63,7 +71,6 @@ def backup_nutri_docs_recipes_to_NAS(source_file_list):
     
     shutil.copy(MISSLABELED_FILE_JSON, target_dir.joinpath(MISSLABELED_FILE_JSON.name))
 
-MISSLABELED_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json')
 
 #pprint(info_for_scrape_intermediate_file)
 
