@@ -698,8 +698,8 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         'name': 'Simon',
         'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'],
         'default_filters': get_search_settings_dict(True),
-        'tag_sets': get_search_settings_dict(True)
-        # TODO ADD 'fav_rcp_ids':[]
+        'tag_sets': get_search_settings_dict(True),
+        'fav_rcp_ids':[]
         }
 
     default_user_settings.update(user_settings)
@@ -726,9 +726,11 @@ def get_user_info_dict_from_DB(uuid):
     }
 
     usernameRowProxy = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
-    username = usernameRowProxy[0]
-    if username == None: username = 'carter' # Place holder until logins implemented
-
+    try:
+        username = usernameRowProxy[0]
+    except:
+        return create_user(uuid, {'name': 'carter'})
+        
     return_user_info = {'UUID':uuid, 'name':username}
 
     print(f"RETRIEVING FROM DB - {uuid} ( -o- ) - S")
