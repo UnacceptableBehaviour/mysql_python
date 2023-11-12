@@ -232,6 +232,9 @@ def db_recipe_list():
     #recipes = get_recipes_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
     recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
 
+    if len(user_info['fav_rcp_ids']) == 0:
+        recipes = [return_recipe_dictionary()]
+
     return render_template("recipe_t.html", recipes=recipes)
 
 

@@ -343,6 +343,16 @@ def insert_tags_for_table_for_user(db, uuid, table, tag_sets):
     db.execute(sql_command)
     db.commit()
 
+def insert_dev_user_into_usernames_table(db, uuid, user_name, table):
+    # create DB INSERT command
+    # INSERT INTO usernames (uuid_user, username)  VALUES ('uuid', 'user_name');
+
+    sql_command = f"INSERT INTO {table} (uuid_user, username)  VALUES ('{uuid}', '{user_name}');"
+
+    print(f"> - insert_dev_user_into_usernames_table - S\n{sql_command}\n> - insert_dev_user_into_usernames_table - E\n")
+    db.execute(sql_command)
+    db.commit()
+
 
 def main():
     # execute this query
@@ -380,8 +390,11 @@ def main():
 
     # insert default values into tag_sets
     uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    dev_user = 'carter'
     insert_default_tag_sets_for_user(db, uuid)
     insert_empty_default_filters_for_user(db, uuid)
+    insert_dev_user_into_usernames_table(db, uuid, dev_user, 'usernames')
+    
 
     # *** SEE TOP OF HELPERS FILE - FOR SERVER SETTING INFO ***
     # http-server -p 8000 --cors
