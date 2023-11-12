@@ -1,11 +1,13 @@
 
+import * as dtkChart from './dtk_chart.js';
 
-recordButton = document.getElementById('but-weigh-in-record');
+
+const recordButton = document.getElementById('but-weigh-in-record');
 recordButton.addEventListener('click', recordWeighInDetails);
 
-formWeight = document.getElementById('weigh-in-weight-inrow');
-formPCFat = document.getElementById('weigh-in-pc-fat-inrow');
-formPCWater = document.getElementById('weigh-in-pc-water-inrow');
+const formWeight = document.getElementById('weigh-in-weight-inrow');
+const formPCFat = document.getElementById('weigh-in-pc-fat-inrow');
+const formPCWater = document.getElementById('weigh-in-pc-water-inrow');
 
 var userUUID = dtk['dtk_user_info']['UUID'];
 
@@ -63,3 +65,8 @@ function recordWeighInDetails (){
     //window.location.replace('/weigh_in');
   });
 }
+
+
+const dtkCwgt = new dtkChart.DtkChartWithControls( "wic-wgt", "dtkChart_js", {selectedDataSources: ['dtk_weight', 'dtk_weight_av7']} );    
+const dtkClip = new dtkChart.DtkChartWithControls( "wic-lip", "dtkChart_js", {selectedDataSources: ['dtk_kg_fat','dtk_kg_fat_av7']} );
+const dtkCh20 = new dtkChart.DtkChartWithControls( "wic-h2o", "dtkChart_js", {selectedDataSources: ['dtk_kg_h2o', 'dtk_kg_h2o_av7']} );
