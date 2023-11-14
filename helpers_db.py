@@ -825,14 +825,17 @@ def append_merge_favs_to_DB(db, user_settings):
     # ('014752da-b49d-4fb0-9f50-23bc90e44298', 999),
     # ('014752da-b49d-4fb0-9f50-23bc90e44298', 331)
     # ON CONFLICT (uuid_user, fav_rcp_id) DO NOTHING;
+    if len(user_settings['fav_rcp_ids']) > 0:
+        uuid = user_settings['UUID']
+        value_pairs = ','.join([ f"('{uuid}', {fav})" for fav in user_settings['fav_rcp_ids'] ])
+        sql_command = f"INSERT INTO fav_rcp_ids VALUES {value_pairs} ON CONFLICT (uuid_user, fav_rcp_id) DO NOTHING;"
 
-    uuid = user_settings['UUID']
-    value_pairs = ','.join([ f"('{uuid}', {fav})" for fav in user_settings['fav_rcp_ids'] ])
-    sql_command = f"INSERT INTO fav_rcp_ids VALUES {value_pairs} ON CONFLICT (uuid_user, fav_rcp_id) DO NOTHING;"
+        print(f"***** SQL WRITE:\n{sql_command}\n\n")
+        db.execute(sql_command)    
+        print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
+    else:
+        print(f"RESULT: len(user_settings['fav_rcp_ids']) = {len(user_settings['fav_rcp_ids'])} <\n\n") # < < COMMIT
 
-    print(f"***** SQL WRITE:\n{sql_command}\n\n")
-    db.execute(sql_command)    
-    print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
 
 
 def remove_favs_from_DB(db, uuid, recipe_ids):
