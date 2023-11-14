@@ -62,6 +62,7 @@ def backup_nutri_docs_recipes_to_NAS(source_file_list):
         target_dir.mkdir(parents=True, exist_ok=True)
     else:
         print(f"FAILED TO CREATE BACKUP DIR:\n{target_dir}")
+        print('Check NAS backup directory visible . . .  navigate to it!\n[IE NAS connected, mounted, logged in!]')
         sys.exit(0)
 
     for f in source_file_list:
@@ -105,7 +106,7 @@ nutridocs_base_dir = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_cours
 file_LUT_v2 = get_nutridoc_list_rtf(nutridocs_base_dir)
 
 
-if opt_dict['backup_docs']:
+if opt_dict['backup_docs'] and opt_dict['edit_docs_live']:  # don'f backup unnecesarrily
     print('\n\nBacking up nutridocs . . .')
     source_file_list = list(file_LUT_v2.values())
     #pprint(source_file_list)    
