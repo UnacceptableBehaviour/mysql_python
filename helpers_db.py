@@ -437,8 +437,8 @@ def build_search_query(search, default_filters):
     def wrap_allergy_qry(item, filter_col):
         return f"'{item}' = ANY({filter_col})"
 
-    # type_exc, tags_exc
-    if (len(default_filters['allergens']) > 0) or (len(default_filters['type_exc']) > 0):
+    # type_inc, tags_exc
+    if (len(default_filters['allergens']) > 0) or (len(default_filters['type_inc']) > 0):
         search_query = f"SELECT ri_id FROM recipes WHERE ri_id IN ( {search_query} ) "
 
 
@@ -453,8 +453,8 @@ def build_search_query(search, default_filters):
         search_query = search_query + f"AND NOT ( {exclude_qry} ) "
 
     filter = 'types'
-    if (len(default_filters['type_exc']) > 0):
-        exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters['type_exc'] ]
+    if (len(default_filters['type_inc']) > 0):
+        exclude_qry_list = [ wrap_allergy_qry(a, filter) for a in default_filters['type_inc'] ]
         # ["'dairy' = ANY(allergens)", "'eggs' = ANY(allergens)", "'peanuts' = ANY(allergens)"]
 
         exclude_qry = ' OR '.join(exclude_qry_list)
@@ -659,32 +659,14 @@ def store_user_devices(userUUID, devFP):
         users_devices_db[userUUID][devFP['fp']] = devFP
 
 
-def get_search_settings_dict(empty=False):
-    # default_filters = {'allergens': [],   # exclude ALL
-    #              'tags_inc': [],          # include at least ONE - think about OR vs AND
-    #              'tags_exc': [],          # exclude ALL
-    #              'type_inc': [],          # include at least ONE - think about OR vs AND
-    #              'type_exc': [],          # exclude ALL
-    #              'ingredient_exc': [] }   # exclude ALL
-
+def get_search_settings_dict():
     default_filters = {
-        'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
-        'tags_inc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
-        'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
-        'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
-        'type_exc': [],
-        'ingredient_exc': [] }
-
-    if empty == True:
-        for filter_list in default_filters:
-            default_filters[filter_list] = []
-
-    # example user settings
-    # default_filters = {'allergens': ['eggs', 'seeds_mustard', 'gluten'],     # exclude ALL
-    #              'tags_inc': ['vegan', 'veggie', 'cbs'],                    # include at least ONE
-    #              'tags_exc': ['ns_pregnant'],                               # exclude ALL
-    #              'ingredient_exc': ['celery']                               # exclude ALL
-    #              }
+        'allergens': [],          # exclude ALL
+        'tags_inc':  [],          # include at least ONE - think about OR vs AND
+        'tags_exc':  [],          # exclude ALL
+        'type_exc':  [],          # include at least ONE - think about OR vs AND
+        'type_inc':  [],          # exclude ALL
+        'ingredient_exc': [] }    # exclude ALL
 
     return default_filters
 
@@ -697,8 +679,8 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298',  #uuid #str(uuid.uuid4()), # TODO comment back in and look up from unique name
         'name': 'Simon',
         'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'],
-        'default_filters': get_search_settings_dict(True),
-        'tag_sets': get_search_settings_dict(True),
+        'default_filters': get_search_settings_dict(),
+        'tag_sets': get_search_settings_dict(),
         'fav_rcp_ids':[]
         }
 
@@ -721,7 +703,7 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
 def get_user_info_dict_from_DB(uuid):
 
     request_table_w_cols = {
-        'default_filters':['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc'],
+        'default_filters':['allergens','ingredient_exc','tags_exc','tags_inc','type_inc','type_exc'],
         'tag_sets':['allergens','ingredient_exc','tags','types']
     }
 
@@ -859,7 +841,7 @@ def update_settings_tables_for_uuid(db, user_settings):
 
     uuid = user_settings['UUID']
 
-    #table_list = ['allergens','ingredient_exc','tags_exc','tags_inc','type_exc','type_inc']
+    #table_list = ['allergens','ingredient_exc','tags_exc','tags_inc','type_inc','type_exc']
     table_list = ['default_filters','tag_sets']
 
     for table_key in iter(user_settings):

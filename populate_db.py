@@ -57,7 +57,7 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 print("----- list.py ------------------------------------------------------------ importing")
 
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
-
+from helpers_db import get_search_settings_dict
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -178,20 +178,7 @@ def create_sql_insert_tags_array_text(tags):
 
     return sql_insert
 
-# TODO DRY out - USE helpers_db.get_search_settings_dict()
-# single unified source of default tag sets
-def get_default_filters_dictionary():
-    # defaults
-    default_filters = { 'allergens':[],
-                        'ingredient_exc':[],
-                        'tags_exc':[],
-                        'tags_inc':[],
-                        'type_exc':[],
-                        'type_inc':[],
-                        }
-
-    return default_filters
-
+# TODO - check this get fleshes out from DB contents at some point
 def get_default_tag_sets_dictionary():
     # defaults
     tag_sets = { 'allergens':['dairy','eggs','peanuts','nuts','seeds_lupin','seeds_sesame','seeds_mustard','fish','molluscs','crustaceans','alcohol','celery','gluten','soya','sulphur_dioxide'],
@@ -312,7 +299,7 @@ def drop_tables_for_fresh_start(data_base, tables):
     return
 
 def insert_empty_default_filters_for_user(db, uuid):
-    empty_default_filters = get_default_filters_dictionary()
+    empty_default_filters = get_search_settings_dict()
     insert_tags_for_table_for_user(db, uuid, 'default_filters', empty_default_filters)
 
 

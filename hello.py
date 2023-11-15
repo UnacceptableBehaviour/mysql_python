@@ -34,7 +34,6 @@ from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
 from helpers_db import process_search
 from helpers_db import get_user_info_dict, remove_favs_from_DB, get_user_info_dict_from_DB, update_user_info_dict
-from helpers_db import get_search_settings_dict
 
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
@@ -435,14 +434,6 @@ def settings():
             return json.dumps({}), 404
 
 
-    # default_filters = { # ADDITIONS LIKELY - USER DEFINED ESPECIALLY
-    #     'allergens': ['dairy', 'eggs', 'peanuts', 'nuts', 'seeds_lupin', 'seeds_sesame', 'seeds_mustard', 'fish', 'molluscs', 'shellfish', 'alcohol', 'celery', 'gluten', 'soya', 'sulphur_dioxide'],
-    #     'tags_inc': ['vegan', 'veggie', 'cbs', 'gluten_free'],
-    #     'tags_exc': ['vegan', 'veggie', 'cbs', 'chicken', 'pork', 'beef', 'seafood', 'shellfish', 'gluten_free', 'ns_pregnant'],
-    #     'type_inc': ['component', 'amuse', 'side', 'starter', 'fish', 'lightcourse', 'main', 'crepe', 'dessert', 'p4', 'cheese', 'comfort', 'low_cal', 'serve_cold', 'serve_rt', 'serve_warm', 'serve_hot'],
-    #     'type_exc': [],
-    #     'ingredient_exc': [] }
-
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
 
@@ -457,9 +448,6 @@ def settings():
 
     # source of buttons to populate with settings from default_filters
     user_info['tag_sets']['types'] = types
-    
-    if (len(user_info['default_filters']['type_inc']) == 0) and (len(user_info['default_filters']['type_exc']) == 0):
-        user_info['default_filters']['type_inc'] = types
 
     return render_template('settings_t.html', user_info=user_info)
 

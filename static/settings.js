@@ -45,8 +45,6 @@ function toggleTagTypeInCategory(button) {
   if (button.parentNode.id.includes('did_ingredient_exc')) { document.getElementById('add_igd_form').value = value; };
   
   
-  //console.log(`${tagTypeCat} - ${value} - ${userInfo['default_filters'][tagTypeCat]}`);
-  console.log(userInfo);
   postUpdateSettingsToServer();
 }
 
@@ -60,7 +58,7 @@ function clickHandler(e) {
   //console.log(e.target.parentNode.id);
   //console.log(e.target.parentNode.classList);  
   
-  if (e.target.id.includes('tag_btn_id_') || e.target.id.includes('type_btn_id_')) { // its a tag - toggle it
+  if (e.target.id.includes('tag_btn_id_') || e.target.id.includes('type_btn_id_')) { // its a tag/type button - toggle it
     toggleTagTypeInCategory(e.target);
     
   } else if (e.target.id.includes('_igd_btn_id')) {  // and an ingredients to exclude button
@@ -93,12 +91,11 @@ function clickHandler(e) {
     console.log(`IGD EXC = RELOAD /settings`);
     window.location.replace('/settings');
     
-  } else if (e.target.id === 'btn_id_toggle_tags') {     
+  } else if (e.target.id === 'btn_id_toggle_tags') {                  // tags_to_exclude! TOGGLE
     // toggle is all element in tag_sets not in default_filters
     let toggle = userInfo['tag_sets']['tags'].filter(item => !userInfo['default_filters']['tags_exc'].includes(item));
     
     // switch
-    userInfo['default_filters']['tags_inc'] = userInfo['default_filters']['tags_exc'];
     userInfo['default_filters']['tags_exc'] = toggle;
 
     fillInTagButtons();
@@ -107,24 +104,22 @@ function clickHandler(e) {
   } else if (e.target.id === 'btn_id_toggle_types') { 
     
     // toggle is all element in tag_sets not in default_filters
-    let toggle = userInfo['tag_sets']['types'].filter(item => !userInfo['default_filters']['type_exc'].includes(item));
+    let toggle = userInfo['tag_sets']['types'].filter(item => !userInfo['default_filters']['type_inc'].includes(item));
 
     // switch
-    userInfo['default_filters']['type_inc'] = userInfo['default_filters']['type_exc'];
-    userInfo['default_filters']['type_exc'] = toggle;
+    userInfo['default_filters']['type_inc'] = toggle;
 
     fillInTagButtons();
     postUpdateSettingsToServer();
+
   } else if (e.target.id === 'btn_id_clear_type') { 
     // clear
-    userInfo['default_filters']['type_inc'] = userInfo['tag_sets']['types'];
-    userInfo['default_filters']['type_exc'] = [];
+    userInfo['default_filters']['type_inc'] = [];
     fillInTagButtons();
     postUpdateSettingsToServer();
 
   } else if (e.target.id === 'btn_id_clear_tags') { 
     // clear
-    userInfo['default_filters']['tags_inc'] = userInfo['tag_sets']['tags'];
     userInfo['default_filters']['tags_exc'] = [];
     fillInTagButtons();
     postUpdateSettingsToServer();
@@ -146,7 +141,7 @@ function clickHandler(e) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 document.addEventListener('DOMContentLoaded', fillInTagButtons);
 
-function fillInTagButtons(e){
+function fillInTagButtons(_e){
     
   buttons = document.getElementsByTagName('button');
 
@@ -188,6 +183,7 @@ function fillInTagButtons(e){
 function postUpdateSettingsToServer(){
 
   // TODO - store setting locally - register with dtk_storage
+  console.log(userInfo);
 
   fetch( '/settings', {
     method: 'POST',                                             // method (default is GET)
