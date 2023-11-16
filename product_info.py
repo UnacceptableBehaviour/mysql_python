@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 
 import re
-#import sys
-#import itertools
 from pprint import pprint, pformat
 #from pathlib import Path
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager   
+
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
@@ -92,6 +93,13 @@ class ProductInfo:
         #return str(pprint(vars(self)))
         #print(json)
         return json
+
+    def get_chromedriver():
+        # After RTFM - https://github.com/SergeyPirogov/webdriver_manager
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+        return driver
+
 
 
     def remove_ingredients_title(self, i_string):
@@ -208,18 +216,11 @@ class ProductInfo:
             
             return round(float(str_g) * multiplier, 2) 
         # - - - - Helpers factor out where generic - - - E
+
         
         # register driver
         if ProductInfo.sbs_driver == None:
-            #ProductInfo.sbs_driver = webdriver.Chrome('chromedriver')
-            # options = webdriver.ChromeOptions()
-            # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # chrome_driver_binary = "/usr/local/bin/chromedriver"
-            #ProductInfo.sbs_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
-            
-            # from selenium 4.6 
-            ProductInfo.sbs_driver = webdriver.Chrome()
-            
+            ProductInfo.sbs_driver = ProductInfo.get_chromedriver()
 
         driver = ProductInfo.sbs_driver
 
@@ -564,12 +565,7 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.mrs_driver == None:
-            #ProductInfo.mrs_driver = webdriver.Chrome('chromedriver')
-            # options = webdriver.ChromeOptions()
-            # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # chrome_driver_binary = "/usr/local/bin/chromedriver"
-            # ProductInfo.mrs_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
-            ProductInfo.mrs_driver = webdriver.Chrome()  
+            ProductInfo.mrs_driver = ProductInfo.get_chromedriver()
 
         driver = ProductInfo.mrs_driver
 
@@ -968,12 +964,7 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.tsc_driver == None:
-            #ProductInfo.tsc_driver = webdriver.Chrome('chromedriver')
-            # options = webdriver.ChromeOptions()
-            # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # chrome_driver_binary = "/usr/local/bin/chromedriver"
-            # ProductInfo.tsc_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
-            ProductInfo.tsc_driver = webdriver.Chrome()  
+            ProductInfo.tsc_driver = ProductInfo.get_chromedriver() 
 
         driver = ProductInfo.tsc_driver
 
@@ -1384,12 +1375,7 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.asd_driver == None:
-            #ProductInfo.asd_driver = webdriver.Chrome('chromedriver')
-            # options = webdriver.ChromeOptions()
-            # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # chrome_driver_binary = "/usr/local/bin/chromedriver"
-            # ProductInfo.asd_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
-            ProductInfo.asd_driver = webdriver.Chrome()  
+            ProductInfo.asd_driver = ProductInfo.get_chromedriver() 
             
 
         driver = ProductInfo.asd_driver
@@ -1403,7 +1389,7 @@ class ProductInfo:
             'cookie_b':             [(By.CSS_SELECTOR, '#onetrust-accept-btn-handler'),
                                      (By.CSS_SELECTOR, '#onetrust-accept-btn-handler')],
             'product_title':        [(By.CSS_SELECTOR, '.pdp-main-details > div'),
-                                     (By.CSS_SELECTOR, '.pdp-main-details > div')],
+                                     (By.CSS_SELECTOR, '.pdp-main-details__title')],
             'package_qty_str':      [(By.CSS_SELECTOR,'.pdp-main-details__weight'),
                                      (By.CSS_SELECTOR,'.pdp-main-details__weight')],                                     
             'price_per_package':    [(By.CSS_SELECTOR, '.pdp-main-details__price-container'),
@@ -1801,12 +1787,7 @@ class ProductInfo:
         
         # register driver
         if ProductInfo.wtr_driver == None:
-            #ProductInfo.wtr_driver = webdriver.Chrome('chromedriver')
-            # options = webdriver.ChromeOptions()
-            # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # chrome_driver_binary = "/usr/local/bin/chromedriver"
-            # ProductInfo.wtr_driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)  
-            ProductInfo.wtr_driver = webdriver.Chrome()  
+            ProductInfo.wtr_driver = ProductInfo.get_chromedriver() 
 
         driver = ProductInfo.wtr_driver
 

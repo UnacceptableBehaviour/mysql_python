@@ -362,30 +362,36 @@ if __name__ == '__main__':
     if '-u' in sys.argv:  # problem URLS to test against
     #if True: # debugger
 
-        missing_items_to_process = {#'asd es multigrain sliced bread': 'https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-multigrain-sliced-loaf/1000383113960',
-                            'tsc cooked beetroot': 'https://www.tesco.com/groceries/en-GB/products/261808728',
-                            'flying pigs': 'https://www.sainsburys.co.uk/gol-ui/product/mr-porky-original-pork-scratchings-65g',                        
-                            'ald salt & pepper calamari': 'https://groceries.aldi.co.uk/en-GB/p-the-fishmonger-salt-pepper-calamari-225g/4088600518596',
-                            'thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
-                            'aunties sticky toffee pudding': 'https://www.sainsburys.co.uk/gol-ui/product/auntys-sticky-toffee-puddings-200g',
-                            'sbs roast beef': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-roast-beef-130g',
-                            'breaded ham': 'https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020',
-                            'champagne': 'https://groceries.asda.com/product/champagne/moet-chandon-imperial-brut-champagne/33171',
-                            'cooked thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
-                            'cracker': 'https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923',                        
-                            'haagen-dazs strawberry cheesecake ice cream': 'https://www.sainsburys.co.uk/gol-ui/product/h%C3%A4agen-dazs-ice-cream-strawberry-cheesecake-460ml',
-                            'lemon tart w pistachio icecream': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-tarte-au-citron--taste-the-difference-500g',
-                            'lindt salted caramel chocolate': 'https://www.sainsburys.co.uk/gol-ui/product/lindt-lindor-salted-caramel-200g',
-                            'niknaks': 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk',
-                            'red food colouring': 'https://www.tesco.com/groceries/en-GB/products/313749125',
-                            'red lentils': 'https://www.sainsburys.co.uk/gol-ui/product/ktc-red-lentils-1kg',
-                            'red wine vinegar': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-wine-vinegar--red-wine-500ml',
-                            'sbs ancient grain pave': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-ancient-grain-pave-taste-the-difference-400g',
-                            'sbs pastry twist': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-cheddar-cheese-twists-125g',
-                            'sbs pepperoni': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pepperoni-sampling-pack-42g',
-                            'sweet chilli sauce': 'https://www.sainsburys.co.uk/gol-ui/product/blue-dragon-original-thai-sweet-chilli-sauce-380g-6529621-p',                        
-                            '':'https://www.sainsburys.co.uk/gol-ui/product/activia-bio-yogurt-strawberry-4x125g', # come up ZERO energy but OK other!? Split tabel issue?
-                            }       
+        missing_items_to_process =  {
+            "asd korma paste": "https://groceries.asda.com/product/curry-pastes-coconut-milk/asda-korma-curry-paste/1000089048175",
+            "breaded ham": "https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020",
+            "cracker": "https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923"
+                                    }
+                            #{
+                            #'asd es multigrain sliced bread': 'https://groceries.asda.com/product/seeded-grains-bread/asda-extra-special-multigrain-sliced-loaf/1000383113960',
+                            # 'tsc cooked beetroot': 'https://www.tesco.com/groceries/en-GB/products/261808728',
+                            # 'flying pigs': 'https://www.sainsburys.co.uk/gol-ui/product/mr-porky-original-pork-scratchings-65g',                        
+                            # 'ald salt & pepper calamari': 'https://groceries.aldi.co.uk/en-GB/p-the-fishmonger-salt-pepper-calamari-225g/4088600518596',
+                            # 'thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                            # 'aunties sticky toffee pudding': 'https://www.sainsburys.co.uk/gol-ui/product/auntys-sticky-toffee-puddings-200g',
+                            # 'sbs roast beef': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-roast-beef-130g',
+                            # 'breaded ham': 'https://groceries.asda.com/product/ham-pork-slices/asda-10-slices-breaded-ham/910003011020',
+                            # 'champagne': 'https://groceries.asda.com/product/champagne/moet-chandon-imperial-brut-champagne/33171',
+                            # 'cooked thick smoked back bacon': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-thick-smoked-bacon-rashers-x6-300g',
+                            # 'cracker': 'https://groceries.asda.com/product/cream-crackers/asda-rosemary-crackers/1000311822923',                        
+                            # 'haagen-dazs strawberry cheesecake ice cream': 'https://www.sainsburys.co.uk/gol-ui/product/h%C3%A4agen-dazs-ice-cream-strawberry-cheesecake-460ml',
+                            # 'lemon tart w pistachio icecream': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-tarte-au-citron--taste-the-difference-500g',
+                            # 'lindt salted caramel chocolate': 'https://www.sainsburys.co.uk/gol-ui/product/lindt-lindor-salted-caramel-200g',
+                            # 'niknaks': 'https://www.sainsburys.co.uk/gol-ui/product/nik-naks-nice-spicy-crisps-6pk',
+                            # 'red food colouring': 'https://www.tesco.com/groceries/en-GB/products/313749125',
+                            # 'red lentils': 'https://www.sainsburys.co.uk/gol-ui/product/ktc-red-lentils-1kg',
+                            # 'red wine vinegar': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-wine-vinegar--red-wine-500ml',
+                            # 'sbs ancient grain pave': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-ancient-grain-pave-taste-the-difference-400g',
+                            # 'sbs pastry twist': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-cheddar-cheese-twists-125g',
+                            # 'sbs pepperoni': 'https://www.sainsburys.co.uk/gol-ui/product/sainsburys-pepperoni-sampling-pack-42g',
+                            # 'sweet chilli sauce': 'https://www.sainsburys.co.uk/gol-ui/product/blue-dragon-original-thai-sweet-chilli-sauce-380g-6529621-p',                        
+                            # '':'https://www.sainsburys.co.uk/gol-ui/product/activia-bio-yogurt-strawberry-4x125g', # come up ZERO energy but OK other!? Split tabel issue?
+                            # }       
 
         print('= = = Running scrape tests = = =')
 
