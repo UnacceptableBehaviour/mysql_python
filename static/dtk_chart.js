@@ -1170,7 +1170,7 @@ export class DtkChartWithControls {
     this.dtkChart.update(); // pass in state: 7day, 14d, 21d, 1m, 3m, 6m, 1y, 2y, plus new dimensions
 
     var periodWindowButtons = document.getElementById(`${chartName}-btn-period-window`);
-    periodWindowButtons.addEventListener('click', (e) => this.processUIEvents(e));
+    periodWindowButtons.addEventListener('click', (e) => this.processUIPeriodButtonEvents(e));
 
     // When you pass rafResizeCanvas to requestAnimationFrame, it’s being called without the context of 
     // DtkChartWithControls instance, so this inside resizeCanvas doesn’t refer to the DtkChart - bind(the object!)
@@ -1184,7 +1184,7 @@ export class DtkChartWithControls {
         requestAnimationFrame(rafResizeCanvas);
       }
     });
-
+    
   }
 
   createChartHtml(chartName, parent) {
@@ -1226,17 +1226,30 @@ export class DtkChartWithControls {
     document.getElementById(parent).appendChild(div);
   }
 
-  processUIEvents(e) {
+  isPeriodWindowSizeButton(e){
+    if (e.target.children.length > 0) {
+      return e.target.children[0].id.includes('but-win-set'); 
+    } else {
+      return false;
+    }
+  }
+
+  periodWindowSize(e){
+    return e.target.children[0].value
+  }
+
+  processUIPeriodButtonEvents(e) {
       console.log(`periodWindowButtons: ${e.target.id}`);
       console.log(e.target.value);
-      console.log(e);
-      if (e.target.id.includes('but-win-set')){
-          if (this.dtkChart.chartSettings.chartWidthDays != e.target.value){ // no repaint unless needed
-              this.dtkChart.chartSettings.chartWidthDays = e.target.value;        
-              console.log(`chSetgs.chartWidthDays: ${this.dtkChart.chartSettings.chartWidthDays}`);
-              this.dtkChart.update(); 
-          }
-      }
+      console.log(e.target);
+      if (this.isPeriodWindowSizeButton(e)){
+        if (this.dtkChart.chartSettings.chartWidthDays != this.periodWindowSize(e)){ // no repaint unless needed
+            this.dtkChart.chartSettings.chartWidthDays = this.periodWindowSize(e);        
+            console.log(`chSetgs.chartWidthDays: ${this.dtkChart.chartSettings.chartWidthDays}`);
+            this.dtkChart.update();
+            return
+        }
+      }         
       if (e.target.id === `${this.chartName}-but-win-mov-fwd`){
           console.log(`chSetgs.endIndex: ${this.dtkChart.chartSettings.endIndex} + this.dtkChart.chartSettings.chartWidthDays:${this.dtkChart.chartSettings.chartWidthDays}`);
           this.dtkChart.chartSettings.endIndex = parseInt(this.dtkChart.chartSettings.endIndex) + parseInt(this.dtkChart.chartSettings.chartWidthDays);
@@ -1248,7 +1261,8 @@ export class DtkChartWithControls {
           }            
           
           console.log(`chSetgs.endIndex: ${this.dtkChart.chartSettings.endIndex}`);
-          this.dtkChart.update(); 
+          this.dtkChart.update();
+          return
       }
       if (e.target.id === `${this.chartName}-but-win-mov-bak`){        
           console.log(`chSetgs.endIndex: ${this.dtkChart.chartSettings.endIndex} + this.dtkChart.chartSettings.chartWidthDays:${this.dtkChart.chartSettings.chartWidthDays}`);
@@ -1262,7 +1276,8 @@ export class DtkChartWithControls {
   
           console.log(`chSetgs.endIndex: ${this.dtkChart.chartSettings.endIndex}`);
           this.dtkChart.update();
-      }
+          return
+      }   
   };
 }
 
