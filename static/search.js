@@ -32,8 +32,12 @@ searchButton.addEventListener('click', searchForRecipe);
 saveCheckedBtn = document.getElementById('but-return-checked');
 saveCheckedBtn.addEventListener('click', saveCheckedRcps);
 
-checkAllBtn = document.getElementById('but-check-all');
-checkAllBtn.addEventListener('click', checkAllRcps);
+checkAllBtn = document.getElementById('but-check-all-lbl');
+checkAllBtn.addEventListener('click', checkAllRcpsLabel);
+
+checkAllBtn = document.getElementById('but-check-all-fav');
+checkAllBtn.addEventListener('click', checkAllRcpsFavs);
+
 
 
 searchFrom = document.getElementById('recipe-search-2-inrow');
@@ -48,16 +52,16 @@ var rcpsShortList = [];
 function checkBoxClicked(event) {
     if (event.target.checked) {
       
-      if (event.target.id.includes('flexCheckSL_')){
-        let ri_id = event.target.id.replace('flexCheckSL_','');
+      if (event.target.id.includes('flexCheckFAVS_')){
+        let ri_id = event.target.id.replace('flexCheckFAVS_','');
         rcpsShortList.push(ri_id);
       } else {
         rcpsToUnlabel.push(event.target.value);
       }        
     
     } else {
-      if (event.target.id.includes('flexCheckSL_')){
-        let ri_id = event.target.id.replace('flexCheckSL_','');
+      if (event.target.id.includes('flexCheckFAVS_')){
+        let ri_id = event.target.id.replace('flexCheckFAVS_','');
         let index = rcpsShortList.indexOf(ri_id);
         if (index > -1) {
           rcpsShortList.splice(index, 1);
@@ -90,12 +94,32 @@ function addCheckboxListeners(){
   // });  
 }
 
-function checkAllRcps() {
+
+
+
+
+function checkAllRcpsLabel(){
+  checkAllRcps('flexCheckLBL_');  
+}
+
+function checkAllRcpsFavs(){
+  checkAllRcps('flexCheckFAVS_');  
+}
+
+function checkAllRcps(checkType) {
   let checkboxes = document.querySelectorAll('.form-check-input');
   rcpsToUnlabel = [];
+  rcpsShortList = [];
   checkboxes.forEach(function(checkbox) {
-      checkbox.checked = true;      
-      rcpsToUnlabel.push(checkbox.value);
+    if (checkbox.id.includes(checkType)){
+      checkbox.checked = true;
+      if (checkType === 'flexCheckLBL_'){
+        rcpsToUnlabel.push(checkbox.value);
+      } else {
+        rcpsShortList.push(checkbox.value);
+      }
+      
+    }
   });    
 }
 
@@ -190,14 +214,14 @@ function renderRecipeCard(rcpInfo){
             ${html_stars}
             <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
             <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheck_${rcpInfo['ri_id']}">
-            <label class="form-check-label" for="flexCheck_${rcpInfo['ri_id']}">
+            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheckLBL_${rcpInfo['ri_id']}">
+            <label class="form-check-label" for="flexCheckLBL_${rcpInfo['ri_id']}">
               Un/Label
             </label>            
             </div>
             <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheckSL_${rcpInfo['ri_id']}">
-            <label class="form-check-label" for="flexCheckSL_${rcpInfo['ri_id']}">
+            <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheckFAVS_${rcpInfo['ri_id']}">
+            <label class="form-check-label" for="flexCheckFAVS_${rcpInfo['ri_id']}">
               Add to List
             </label>    
             </div>
