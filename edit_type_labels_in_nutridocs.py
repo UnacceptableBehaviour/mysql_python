@@ -340,7 +340,12 @@ for nut_id, rcp_list in remove_dict.items():
 
 for f, rcp_list in corrections_dict.items():
     print(f"\n{f.name} - {rcp_list}")
-print(f"\nRemoving label: {label}")
+
+if opt_dict['add_labels']:
+    print(f"\nADDING label: {label}")
+else:
+    print(f"\nREMOVING label: {label}")
+
 print('\n\n')
 
 if opt_dict['edit_docs_live']:
