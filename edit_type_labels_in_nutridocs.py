@@ -16,7 +16,8 @@ opt_dict = {
     'verbose_mode':     True,
     'backup_docs':      True,
     'edit_docs_live':   False,
-    'add_labels':       False
+    'add_labels':       False,
+    'sort_labels':      False
 }
 
 if '-nb' in sys.argv:
@@ -28,6 +29,8 @@ if '-l' in sys.argv:
 if '-a' in sys.argv:
     opt_dict['add_labels'] = True
 
+if '-sort' in sys.argv:
+    opt_dict['sort_labels'] = True
 
 help_string = f'''\n\n\n
 HELP:\n
@@ -47,6 +50,9 @@ and checked recipes SAVED. . .
 
 -a          ADD labels to target docs
             DEFAULT REMOVE labels from doc type list
+
+-sort       Sort type labels alphabetically - show results
+-sort -l    EDIT docs
 
 -h          This help
 '''
@@ -154,37 +160,39 @@ if opt_dict['backup_docs'] and opt_dict['edit_docs_live']:  # don'f backup unnec
 # for nut_id, rcp_list in remove_dict.items():
 #     corrections_dict[file_LUT_v2[nut_id]] = rcp_list
 
-def remove_labels_v4(label, corrections_dict):
-    for file, recipes in corrections_dict.items():
-        with open(file, 'r') as f:
-            content = f.read()
-        print(f">=- - - - scanning: {file.name}\nfor{recipes}\n\n")
-        for recipe in recipes:
-            pattern = re.compile(r'(------------------ for the {} \(.*?\).*?)(?=username:)'.format(recipe), re.DOTALL)
-            match = pattern.search(content)
-            if match:
-                print(f"found: {recipe} < {file.name}")
-                recipe_content = match.group(1)
-                print(f"recipe_content:\n{recipe_content}\n - - ")
-                print(f"group(0):\n{match.group(0)}\n - - ")
-                type_pattern = re.compile(r'(?<=\ntype: )(.*?)(?=\nlead_image:)', re.DOTALL)
-                type_match = type_pattern.search(recipe_content)
-                if type_match:
-                    type_content = type_match.group(1)
-                    print(f"type_content: {type_content} < pre {label}")
-                    type_content = type_content.replace(label, '')
-                    print(f"type_content: {type_content} < post")
-                    type_content = re.sub(r'^\s*,\s*\b', ' ', type_content)         # remove leading comma
-                    type_content = re.sub(r'(\s*,\s*,\s*)', ', ', type_content)     # remove label1, ,label2
-                    #type_content = re.sub(r'\b\s*,\s*\\', '\\\\', type_content)         # remove trailing comma
-                    recipe_content = recipe_content[:type_match.start(1)] + type_content + recipe_content[type_match.end(1):]
-                    print(recipe_content)
-                    print('- - - - \n\n')
-                content = content[:match.start(1)] + recipe_content + content[match.end(1):]
-        new_path = Path('./',file.name)
-        #with open(new_path, 'w') as f:
-        with open(file, 'w') as f:
-            f.write(content)
+# TODO REMOVE - REMOVE ALL DEPRECATED
+# deprecated - replaced by [edit_nutridoc_labels & add_remove_label]
+# def remove_labels_v4(label, corrections_dict):
+#     for file, recipes in corrections_dict.items():
+#         with open(file, 'r') as f:
+#             content = f.read()
+#         print(f">=- - - - scanning: {file.name}\nfor{recipes}\n\n")
+#         for recipe in recipes:
+#             pattern = re.compile(r'(------------------ for the {} \(.*?\).*?)(?=username:)'.format(recipe), re.DOTALL)
+#             match = pattern.search(content)
+#             if match:
+#                 print(f"found: {recipe} < {file.name}")
+#                 recipe_content = match.group(1)
+#                 print(f"recipe_content:\n{recipe_content}\n - - ")
+#                 print(f"group(0):\n{match.group(0)}\n - - ")
+#                 type_pattern = re.compile(r'(?<=\ntype: )(.*?)(?=\nlead_image:)', re.DOTALL)
+#                 type_match = type_pattern.search(recipe_content)
+#                 if type_match:
+#                     type_content = type_match.group(1)
+#                     print(f"type_content: {type_content} < pre {label}")
+#                     type_content = type_content.replace(label, '')
+#                     print(f"type_content: {type_content} < post")
+#                     type_content = re.sub(r'^\s*,\s*\b', ' ', type_content)         # remove leading comma
+#                     type_content = re.sub(r'(\s*,\s*,\s*)', ', ', type_content)     # remove label1, ,label2
+#                     #type_content = re.sub(r'\b\s*,\s*\\', '\\\\', type_content)         # remove trailing comma
+#                     recipe_content = recipe_content[:type_match.start(1)] + type_content + recipe_content[type_match.end(1):]
+#                     print(recipe_content)
+#                     print('- - - - \n\n')
+#                 content = content[:match.start(1)] + recipe_content + content[match.end(1):]
+#         new_path = Path('./',file.name)
+#         #with open(new_path, 'w') as f:
+#         with open(file, 'w') as f:
+#             f.write(content)
 
 # def remove_label(label, coma_separated_label_string):
 #     # Split the string into a list of labels
@@ -286,7 +294,65 @@ def edit_nutridoc_labels(label, corrections_dict, add=True):
             f.write(content)
 
 
+def sort_labels_a2z(file):
+    with open(file, 'r') as f:
+        content = f.read()
+    
+    print(f">=- - - - scanning: {file.name}\nfor recipes\n\n")
+    
+    # Find all rcps & type (multi)lines
+    pattern = r'(------------------ for the (.*?) \(([\s\S]*?))^type:([\s\S]*?)(?=^lead_image:)'
+        # g(1) everything before type:
+        # g(2) rcp name
+        # g(3) bits
+        # g(4) type tags
+    #type_lines = re.findall(pattern, content, re.M)
+    matches = re.finditer(pattern, content, re.M)
+    
+    #for line in type_lines: #pattern = r'(type: [^\n]+)\n'
+    for m in matches: #pattern = r'(type: [^\n]+)\n'
+        og_rcp = m.group(1) + 'type:' + m.group(4)
 
+        line = m.group(4)
+        line = re.sub(r'\\', '', line)
+        line = re.sub(r'\s', '', line)
+
+        # Extract labels 
+        labels = line.split(',')
+        
+        # Sort alphabetically 
+        labels.sort()
+        
+        # Join back into string
+        sorted_line = 'type: ' + ', '.join(labels) + '\\' +'\n'
+
+        rcp_sorted_types = m.group(1) + sorted_line 
+        
+        # Replace original line with sorted one
+        content = content.replace(og_rcp, rcp_sorted_types)
+
+        print('- - - - S')
+        pprint(m)
+        print(f"m:\t{m.group(4)}\n-\n{og_rcp}\n-\n{rcp_sorted_types}")
+        print('- - - - E')
+
+    #print(content)
+    if opt_dict['edit_docs_live']:        
+        with open(file, 'w') as f:
+            print(f"writing:\t{file}")
+            f.write(content)
+
+
+# single use code - once they're sorted they're sorted!
+if opt_dict['sort_labels'] == True:
+    # rtf control seqs r'(\\[\w\d]+)'
+    
+    # list all docs
+    for k,v in file_LUT_v2.items():
+        print(f"k:{k}\nv:{v}\n-")
+        sort_labels_a2z(v)
+
+    sys.exit(0)
 
 # to go from (passed to server from JS webIF)
 # incorrect_label_with_list
