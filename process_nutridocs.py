@@ -181,7 +181,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         if target_file_name == '':
             target_file_name = f"{root_date}_{get_zero_pad_6dig_count()}_{name}.txt"
 
-        print(f"{__file__} allergens for: {name} <")
+        if opt_dict['verbose_mode']: print(f"{__file__} allergens for: {name} <")
 
         nutridoc_i_list = parse_igdt_lines_into_igdt_list(ingredients)
 
@@ -253,7 +253,6 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
             print('> - - -')
 
     return [recipes_processed, missing_images, recipes_w_total_0g, recipes_with_non_zero_totals, available_recipe_images, missing_ingredients_list]
-
 
 NUTRIDOC_LIST = [
                 # 2019 * * *
@@ -339,17 +338,16 @@ NUTRIDOC_LIST = [
                 'y458',
                 'y459',
                 'y460',       # DONE 0621-0706 - 31/6
+                'y461',
+                'y462',
+                'y463',
+                'y464',
+                #'y465',                
 
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y461']
-
-# re-run for label updates
-# ['y964', 'y443', 'y426', 'y446', 'y424', 'y957', 'y429', 'y976', 'y973', 'y967', 'y425', 'y444', 'y442', 'y460', 'y459', 'y968', 'y455', 'y441', 'y955', 'y963', 'y970', 'y448', 'y454', 'y958', 'y449', 'y458', 'y956', 'y453', 'y430', 'y959', 'y461', 'y954', 'y428', 'y965']
-# ['y424', 'y443', 'y951', 'y957', 'y446', 'y453', 'y964', 'y429', 'y967', 'y954', 'y978', 'y442', 'y426', 'y966', 'y975', 'y977', 'y425', 'y444', 'y460', 'y459', 'y979', 'y968', 'y455', 'y963', 'y970', 'y454', 'y448', 'y458', 'y976', 'y958', 'y956', 'y959', 'y430', 'y973', 'y449', 'y955', 'y423', 'y461', 'y965', 'y441', 'y428']
-# ['y954', 'y443', 'y951', 'y957', 'y446', 'y964', 'y429', 'y967', 'y441', 'y458', 'y426', 'y425', 'y444', 'y442', 'y460', 'y459', 'y968', 'y422', 'y963', 'y970', 'y448', 'y454', 'y457', 'y958', 'y976', 'y956', 'y959', 'y430', 'y449', 'y453', 'y423', 'y461', 'y965', 'y428']
-# ['y443', 'y951', 'y446', 'y957', 'y429', 'y954', 'y425', 'y442', 'y444', 'y968', 'y970', 'y448', 'y454', 'y958', 'y959', 'y459', 'y449', 'y956', 'y430', 'y423', 'y461', 'y965', 'y973', 'y453', 'y428']
+NUTRIDOC_LIST = ['y440','y441','y442','y443']
 
 # got to homegrown
 
@@ -622,10 +620,10 @@ for fileset in files_to_process:
     # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
     #
     # # # # #
-    
+
     if opt_dict['generate_output_in_tmp_folders']:
         version_temp_assets_create_new_tmp_dirs(fileset[TMP_PATH], fileset[TMP_PATH_INCOMPLETE])
-    
+
     recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, opt_dict)
 
     if opt_dict['create_empty_templates_from_image_names']:
@@ -638,45 +636,48 @@ for fileset in files_to_process:
 
     processed_nutridocs[fileset[FILE_LOC].name] = recipes_and_missing_imgs
 
-    print(f"\nREPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
-    print(fileset[FILE_LOC].name,
-          f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes",
-          f"\nTEMPLATES FROM IMAGES: {len(available_recipe_images)}",
-          f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[MISSING_IMAGES])}\n{recipes_and_missing_imgs[MISSING_IMAGES]}",
-          f"\nMISSING SUB INGDTS: {len(recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST])}\n{recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST]}")
-    print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n")
+    if opt_dict['verbose_mode']:
+        print(f"\nREPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
+        print(fileset[FILE_LOC].name,
+            f"\nGENERATED: {len(recipes_and_missing_imgs[0])} recipes",
+            f"\nTEMPLATES FROM IMAGES: {len(available_recipe_images)}",
+            f"\nMISSING IMAGES: {len(recipes_and_missing_imgs[MISSING_IMAGES])}\n{recipes_and_missing_imgs[MISSING_IMAGES]}",
+            f"\nMISSING SUB INGDTS: {len(recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST])}\n{recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST]}")
+        print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n")
+    else:
+        print(f"DONE: {fileset[FILE_LOC].name}")
 
 # report
 missing_images_across_all_docs = {}
 missing_sub_ingredients_across_all_docs = {}
-print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
-#pprint(processed_nutridocs)
-print('^^processed_nutridocs^^')
-for name, nutri_doc_info in processed_nutridocs.items():
-    # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
+# print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
+# #pprint(processed_nutridocs)
+# print('^^processed_nutridocs^^')
+# for name, nutri_doc_info in processed_nutridocs.items():
+#     # all_recipes, miss_img, total_0g, complete_rcp = [],[],[],[]
 
-    print(fileset[FILE_LOC].name, f" -: {len(nutri_doc_info[RECIPES_PROCESSED])} recipes")
+#     print(fileset[FILE_LOC].name, f" -: {len(nutri_doc_info[RECIPES_PROCESSED])} recipes")
 
-    print(f"COMPLETE:       {len(nutri_doc_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
-    if opt_dict['verbose_mode']: print(nutri_doc_info[RECIPES_WITH_NON_ZERO_TOTALS])
+#     print(f"COMPLETE:       {len(nutri_doc_info[RECIPES_WITH_NON_ZERO_TOTALS])}  < < - - - - - - - - -<")
+#     if opt_dict['verbose_mode']: print(nutri_doc_info[RECIPES_WITH_NON_ZERO_TOTALS])
 
-    print(f"TOTAL 0g:       {len(nutri_doc_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")
-    if opt_dict['verbose_mode']: print(nutri_doc_info[INGREDIENTS_TOTAL_0G])
+#     print(f"TOTAL 0g:       {len(nutri_doc_info[INGREDIENTS_TOTAL_0G])}  < < - - - - - - - - -<")
+#     if opt_dict['verbose_mode']: print(nutri_doc_info[INGREDIENTS_TOTAL_0G])
 
-    print(f"TMPLT FRM IMG:  {len(nutri_doc_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")
-    if opt_dict['verbose_mode']: print(nutri_doc_info[AVAILABLE_RECIPE_IMAGES])
+#     print(f"TMPLT FRM IMG:  {len(nutri_doc_info[AVAILABLE_RECIPE_IMAGES])}  < < - - - - - - - - -<")
+#     if opt_dict['verbose_mode']: print(nutri_doc_info[AVAILABLE_RECIPE_IMAGES])
 
-    print(f"MISSING IMAGES: {len(nutri_doc_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
-    if opt_dict['verbose_mode']: print(nutri_doc_info[MISSING_IMAGES])
+#     print(f"MISSING IMAGES: {len(nutri_doc_info[MISSING_IMAGES])}  < < - - - - - - - - -<")
+#     if opt_dict['verbose_mode']: print(nutri_doc_info[MISSING_IMAGES])
 
-    print(f"MISSING SUB INGREDIENTS: {len(nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST])}  < < - - - - - - - - -<")
-    if opt_dict['verbose_mode']: print(nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST])
+#     print(f"MISSING SUB INGREDIENTS: {len(nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST])}  < < - - - - - - - - -<")
+#     if opt_dict['verbose_mode']: print(nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST])
 
-    print("\nMissing image recipe names:\n")
-    for i in nutri_doc_info[MISSING_IMAGES]:
-        print(i)
-    # missing_images_across_all_docs[name] = nutri_doc_info[MISSING_IMAGES]
-    # missing_sub_ingredients_across_all_docs[name] = nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST]
+#     print("\nMissing image recipe names:\n")
+#     for i in nutri_doc_info[MISSING_IMAGES]:
+#         print(i)
+#     # missing_images_across_all_docs[name] = nutri_doc_info[MISSING_IMAGES]
+#     # missing_sub_ingredients_across_all_docs[name] = nutri_doc_info[MISSING_SUB_INGREDIENTS_LIST]
 
 print("\n\n\nREPORT - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
 doc_name = 'y452_NUTRITEST_recipes_20211206-0108_xmas.rtf'
@@ -708,8 +709,9 @@ pprint(missing_images_across_all_docs)
 print('\n> Missing SUB INGREDIENTS across ALL docs - - - - - - - - - - - - - - - < < < < MISSING * * *')
 dump_missing_sub_ingredients_across_all_docs_to_JSON(missing_sub_ingredients_across_all_docs)
 
-nutridocs_found = get_nutridoc_list_rtf()
+
 if opt_dict['clean_old_files_NO_backup_inspect'] == True:
+    nutridocs_found = get_nutridoc_list_rtf()
     print("\n\n\n* * REMOVING * * empty folders from _courses_components & _nix_time_i_w_r_auto_tmp/0g backups.\n") 
     print(f"opt_dict['clean_old_files_NO_backup_HOT'] == {opt_dict['clean_old_files_NO_backup_HOT']}")
     print(f"opt_dict['clean_old_files_NO_backup_inspect'] == {opt_dict['clean_old_files_NO_backup_inspect']}")
@@ -741,31 +743,35 @@ if opt_dict['clean_old_files_NO_backup_inspect'] == True:
         print("Use: \n\tprocess_nutridocs.py -c -clean \n\nto HOT DELETE directories & contents.")
 
 
+if opt_dict['verbose_mode']:
+    print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
+    pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
+    # print("\n\n# # # # # # # # # # # errors['ots_ingredients_missing'] # # # # # # # # # # # S")    
+    # pprint(Counter(errors['ots_ingredients_missing']).most_common())
+    # pprint(Counter(errors['txt_title_NO_match_rcp']).most_common())
+    # 
+    # # SB easy to fix
+    #pprint(Counter(errors['ots_NO_url']).most_common())
+    # pprint(Counter(errors['derived_HAS_http_SB_ots']).most_common())
+    #pprint(Counter(errors['ndb_no_neg99']).most_common())
+    # pprint(Counter(errors['unknown_alias']).most_common())
+    # pprint(Counter(errors['items_not_triggering_TAGS']).most_common())
+    # 
+    # # wah?
+    # pprint(Counter(errors['derived_HAS_atomic_alias']).most_common())
+    # pprint(Counter(errors['derived_w_file_HAS_ndb_no']).most_common())
+    print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
+    # # print ALL errors
+    # for k in errors.keys():
+    #     print(f"> - - - - - {len(errors[k]):04} - {k}")
+    #     pprint(Counter(errors[k]).most_common())
+    for k in errors.keys():
+        print(k, len(errors[k]))
+    print("# # # # # # # # # # # errors.keys # # # # # # # # # # # E\n\n")
+else:
+    print(f"\nUse -v option 'verbose_mode' to enable errors['dead_ends_in_this_pass']\n")
 
-print("\n\n# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # S")    
-pprint(Counter(errors['dead_ends_in_this_pass']).most_common())
-# print("\n\n# # # # # # # # # # # errors['ots_ingredients_missing'] # # # # # # # # # # # S")    
-# pprint(Counter(errors['ots_ingredients_missing']).most_common())
-# pprint(Counter(errors['txt_title_NO_match_rcp']).most_common())
-# 
-# # SB easy to fix
-#pprint(Counter(errors['ots_NO_url']).most_common())
-# pprint(Counter(errors['derived_HAS_http_SB_ots']).most_common())
-#pprint(Counter(errors['ndb_no_neg99']).most_common())
-# pprint(Counter(errors['unknown_alias']).most_common())
-# pprint(Counter(errors['items_not_triggering_TAGS']).most_common())
-# 
-# # wah?
-# pprint(Counter(errors['derived_HAS_atomic_alias']).most_common())
-# pprint(Counter(errors['derived_w_file_HAS_ndb_no']).most_common())
-print("# # # # # # # # # # # errors['dead_ends_in_this_pass'] # # # # # # # # # # # E\n\n")
-# # print ALL errors
-# for k in errors.keys():
-#     print(f"> - - - - - {len(errors[k]):04} - {k}")
-#     pprint(Counter(errors[k]).most_common())
-for k in errors.keys():
-    print(k, len(errors[k]))
-print("# # # # # # # # # # # errors.keys # # # # # # # # # # # E\n\n")
+
 
 def print_urls_to_process():
     dict_of_urls_to_process = {}
@@ -824,5 +830,3 @@ with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'w') as f:
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
 if not opt_setting: print(help)
-# TODO
-# add -c(lean) option
