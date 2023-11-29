@@ -551,7 +551,7 @@ def nutridoc_scan_to_exploded_i_list_and_allergens(i_list, ri_name):
 
     exploded_i_list = [ remove_error(e) for e in list(set(exploded_i_list)) ]  # remove duplicates & error TODO errors should be logged on removal
 
-    allergens.update(get_allergens_for(exploded_i_list), False, opt_dict['verbose_mode'])    # catch rest
+    allergens.update(get_allergens_for(exploded_i_list, False, opt_dict['verbose_mode']))    # catch rest
     
     composite['i_list'] = exploded_i_list
     composite['allergens'] = allergens
