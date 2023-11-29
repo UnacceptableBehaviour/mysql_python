@@ -235,6 +235,10 @@ if opt_dict['backup_docs'] and opt_dict['edit_docs_live']:  # don'f backup unnec
 
 def add_remove_label(label, coma_separated_label_string, add=True):
     # type labels may be on multiple lines
+    # rtf control seqs r'(\\[\w\d]+)' - only control sequences in type tags are colour changes
+    # removal incosequential!
+    coma_separated_label_string = re.sub(r'(\\[\w\d]+)', '', coma_separated_label_string)
+
     # remove \n
     coma_separated_label_string = re.sub(r'\s', '', coma_separated_label_string)
     # remove rtf EOL character '\'
@@ -314,8 +318,9 @@ def sort_labels_a2z(file):
         og_rcp = m.group(1) + 'type:' + m.group(4)
 
         line = m.group(4)
-        line = re.sub(r'\\', '', line)
-        line = re.sub(r'\s', '', line)
+        line = re.sub(r'(\\[\w\d]+)', '', line) # remove rtf control seq
+        line = re.sub(r'\\', '', line)          # remove rtf EOL
+        line = re.sub(r'\s', '', line)          # remove white space
 
         # Extract labels 
         labels = line.split(',')
@@ -345,8 +350,16 @@ def sort_labels_a2z(file):
 
 # single use code - once they're sorted they're sorted!
 if opt_dict['sort_labels'] == True:
-    # rtf control seqs r'(\\[\w\d]+)'
-    
+    hard_coded_backup_before_using_F_sort_labels_a2z = True
+    if hard_coded_backup_before_using_F_sort_labels_a2z:
+        print('\n\nBacking up nutridocs . . .')
+        source_file_list = list(file_LUT_v2.values())
+        #pprint(source_file_list)    
+        backup_nutri_docs_recipes_to_NAS(source_file_list)
+        print('\n\nBACKUP HARDCODED sort_labels_a2z() may corrupt certaing recipes - probably old templates - MANUALLY ENABLE after backup - JUST DONE!')
+        
+        sys.exit(0)    
+
     # list all docs
     for k,v in file_LUT_v2.items():
         print(f"k:{k}\nv:{v}\n-")
