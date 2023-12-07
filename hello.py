@@ -200,9 +200,27 @@ def home_list_of_favourites():
             print(f"REMOVING: {ri_id} from DB")
             remove_favs_from_DB(helper_db_class_db, passed_in_uuid, [ri_id])
 
-        return json.dumps(ri_id), 200
+            return json.dumps(ri_id), 200
         
-    
+        if ('ri_names' in favs_dict) and ('save_label' in favs_dict):
+            type_label = favs_dict['save_label']
+            print('ri_names - - - S')
+            print(f"SAVING TYPES to JSON: {type_label} - ")
+            save_remove_targets = {}
+
+            save_remove_targets[type_label] = favs_dict['ri_names']            
+            pprint(save_remove_targets)
+
+            save_remove_targets_json = json.dumps(save_remove_targets)
+
+            with open(MISSLABELED_FILE_JSON, 'w') as f:
+                f.write(save_remove_targets_json)
+
+            print('ri_names - - - E')                        
+
+            return json.dumps(type_label), 200
+
+
 
     #recipes = get_gallery_info_for_display_as_list_of_dicts(user_info['fav_rcp_ids'])
     recipes = get_recipes_for_display_as_list_of_dicts(user_info['fav_rcp_ids'])
@@ -454,6 +472,8 @@ def settings():
 
 last_search_result_recipes = {}
 MISSLABELED_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json')
+FAV_TYPE_GROUPING_DIR = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF_LABELS')
+
 
 @app.route('/search', methods=["GET", "POST"])
 def search_ingredient():
@@ -483,6 +503,7 @@ def search_ingredient():
             print("search_result - - - - - > >")
             last_search_result_recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)
             #pprint(last_search_result_recipes)
+            print(f"SEARCH FOUND: {len(last_search_result_recipes)} results")
 
             return json.dumps(last_search_result_recipes), 200
 
@@ -490,10 +511,19 @@ def search_ingredient():
             removal_targets = {}
             filter_target = 'None'
             rcpsToUnlabel = search_request['rcpsToUnlabel']
-            if len(user_info['default_filters']['type_inc']) > 0:
-                filter_target = user_info['default_filters']['type_inc'][0]
-                removal_targets[filter_target] = rcpsToUnlabel
+            
+            if len(rcpsToUnlabel) > 0:
+                if len(user_info['default_filters']['type_inc']) > 1:
+                    filter_target = 'multiple_type_labels'
+
+                if len(user_info['default_filters']['type_inc']) == 1:
+                    filter_target = user_info['default_filters']['type_inc'][0]
+
+                if len(user_info['default_filters']['type_inc']) == 0:
+                    filter_target = search_request['alt_label']
+
                 print('removal_targets - - - S')
+                removal_targets[filter_target] = rcpsToUnlabel
                 pprint(removal_targets)
                 removal_targets_json = json.dumps(removal_targets)
                 with open(MISSLABELED_FILE_JSON, 'w') as f:

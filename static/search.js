@@ -26,21 +26,21 @@
 //(4 rows)
 
 
-searchButton = document.getElementById('but-recipe-search');
+var searchButton = document.getElementById('but-recipe-search');
 searchButton.addEventListener('click', searchForRecipe);
 
-saveCheckedBtn = document.getElementById('but-return-checked');
+var saveCheckedBtn = document.getElementById('but-return-checked');
 saveCheckedBtn.addEventListener('click', saveCheckedRcps);
 
-checkAllBtn = document.getElementById('but-check-all-lbl');
+var checkAllBtn = document.getElementById('but-check-all-lbl');
 checkAllBtn.addEventListener('click', checkAllRcpsLabel);
 
-checkAllBtn = document.getElementById('but-check-all-fav');
+var checkAllBtn = document.getElementById('but-check-all-fav');
 checkAllBtn.addEventListener('click', checkAllRcpsFavs);
 
 
 
-searchFrom = document.getElementById('recipe-search-2-inrow');
+var searchFrom = document.getElementById('recipe-search-2-inrow');
 searchFrom.placeholder = 'search string';
 searchFrom.addEventListener('keyup', function(event) {   // act on hit return key
   if (event.key === "Enter") { searchForRecipe(); }
@@ -124,10 +124,13 @@ function checkAllRcps(checkType) {
 }
 
 function saveCheckedRcps(){
+  let search = searchFrom.value;
+
   fetch( '/search', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
-    body: JSON.stringify( { 'user':userUUID, 
+    body: JSON.stringify( { 'user':userUUID,
+                            'alt_label': search,
                             'rcpsToUnlabel': rcpsToUnlabel,
                             'rcpsShortList': rcpsShortList } )      // Payload
 

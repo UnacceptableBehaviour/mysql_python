@@ -1,11 +1,22 @@
-{% extends 'nav_buttons.html' %}
+{% extends 'nav_buttons_thin.html' %}
 {% block header %}
 <link rel="stylesheet" href="{{ url_for( 'static', filename='show_fav_rcp_cards.css') }}">
 <!-- <link rel="stylesheet" href="{{ url_for( 'static', filename='show_fav_rcp_alt.css') }}"> -->
+<script>          
+  var favRecipes = {{ recipes|tojson }};
+  console.log(`show_fav_rcp_cards.html JS favRecipes[${favRecipes.length}] - inline`);  // sanity check
+  console.log(favRecipes[0]);
+</script>
 {% endblock %}
 
 {% block content %}
 
+<div id="type-save-dialogue">
+  <div class="input-group">
+    <input id='save-favs-label' class="form-control" type="text" placeholder='insert label . . .'>    
+    <button id='but-save-favs' type="button" class="btn btn-outline-success float-right">SAVE AS TYPE</button>  
+  </div>  
+</div>
 
 <div class="">
     {% for recipe in recipes %}
