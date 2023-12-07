@@ -602,12 +602,12 @@ def get_ingredients_from_component_file_and_CACHE_content(recipe_component_or_in
 #     return possible_err_string
 
 # TODO REMOVE
-def remove_error(possible_err_string):
+def remove_error(possible_err_string, dbg_print=False):
     #'unknown_component>alias_NF>coriander sauce|per 100g'
     # 'ots_i_miss>sherry vinegar'    
     e_list = possible_err_string.split('>')
     if len(e_list) > 1:
-        print(f"possible_err_string:{possible_err_string}")
+        if dbg_print: print(f"possible_err_string:{possible_err_string}")
         return e_list.pop().replace('<','')
     return possible_err_string
 
@@ -617,7 +617,7 @@ def remove_error(possible_err_string):
 # TODO check allergens for all ingredients not just OTS list
 def get_ingredients_as_text_list_R(recipe_component_or_ingredient, d=0, dbg_print=False): # takes str:name
     d += 1
-    rcoi = remove_error(recipe_component_or_ingredient)
+    rcoi = remove_error(recipe_component_or_ingredient, dbg_print)
     i_list = [f"unknown_component>{rcoi}<"]
     allergens = set()
     composite = {}
@@ -689,7 +689,7 @@ def get_exploded_ingredients_and_components_for_DB_from_name(comps_and_rcoi, d=0
 
     c_list, recipe_component_or_ingredient = comps_and_rcoi
 
-    rcoi = remove_error(recipe_component_or_ingredient) 
+    rcoi = remove_error(recipe_component_or_ingredient, dbg_print)
     i_list = [f"unknown_component>{rcoi}<"]
     
     if rcoi in atomic_LUT:
