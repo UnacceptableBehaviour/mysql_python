@@ -138,7 +138,7 @@ def log_exception(message, exception):
 # images:
 # lead_image: 20200101_063015_swiss breakfast.jpg
 # __end_recipe__
-def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt'):
+def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_name.txt', dbg_print=False):
     recipe_info = None
 
     # REGEX: allergens & tags below recipe
@@ -264,14 +264,15 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
         else:
             pprint(re.match(r'g', recipe_info['servings']))
 
-        print('- - - - - process_single_recipe_text_into_dictionary')
-        print(f"NAME: {recipe_info['ri_name']}")
-        print(f"SERVINGS: ({recipe_info['servings']})")
-        print(f"INGREDIENTS:\n")
-        pprint(i_list)
-        print(f"YIELD: {recipe_info['yield']}")
-        print(f"ALLERGENS: {' '.join(recipe_info['allergens'])}")
-        print(f"TAGS: {' '.join(recipe_info['tags'])}")
+        if dbg_print:
+            print('- - - - - process_single_recipe_text_into_dictionary')
+            print(f"NAME: {recipe_info['ri_name']}")
+            print(f"SERVINGS: ({recipe_info['servings']})")
+            print(f"INGREDIENTS:\n")
+            pprint(i_list)
+            print(f"YIELD: {recipe_info['yield']}")
+            print(f"ALLERGENS: {' '.join(recipe_info['allergens'])}")
+            print(f"TAGS: {' '.join(recipe_info['tags'])}")
 
         recipe_info['ingredients'] = i_list
 
@@ -283,14 +284,14 @@ def process_single_recipe_text_into_dictionary(recipe_text, dbg_file_name='file_
 
     return recipe_info
 
-def get_recipe_file_contents_from_asset_server(recipe_text_filename):
+def get_recipe_file_contents_from_asset_server(recipe_text_filename, dbg_print=False):
     recipe_text = 'FILE ACCESS ERROR: NO FILE or NO DATA IN FILE'
 
-    print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
+    if dbg_print: print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
     base_url = 'https://asset.server:8080/static/recipe/'
     base_url = 'http://127.0.0.1:8000/static/recipe/'
     url = f"{base_url}{recipe_text_filename}"
-    print(url)
+    if dbg_print: print(url)
 
     # IN  https://asset.server:8080/static/recipe/20190228_163410_monkfish and red pepper skewers.txt
     # url = url.replace(" ", "%20")          # WORKS
@@ -298,10 +299,10 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 
     # get recipe text from assest server
     url = urllib.parse.quote(url, safe='/:')  # WORKS - likely more robust
-    print(url)
+    if dbg_print: print(url)
 
     local_file_name = f"./scratch/{recipe_text_filename}"
-    print(local_file_name)
+    if dbg_print: print(local_file_name)
 
     try:
         ret_val = urllib.request.urlretrieve(url, local_file_name)
@@ -310,7 +311,7 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
         file_info  = Path(local_file_name)
 
         if file_info.is_file():
-            print(f"File exists: {file_info}")
+            print(f"File downloaded: {file_info}")
             f = open(local_file_name, 'r')              # load local file to work with
         else:
             print(f"File NOT PRESENT: {file_info}")
@@ -325,7 +326,7 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
         recipe_text = f"---- for the missing recipe (1)\n100\t ingredients\n  Total (0g)"
 
     finally:
-        print(f"RETRIEVED URL: finally segment")
+        if dbg_print: print(f"RETRIEVED URL: finally segment")
 
     return recipe_text
 
@@ -339,17 +340,16 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename):
 #                  - end of reipe denoted by marker __end_recipe__
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name):
+def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name, dbg_print=False):
     recipe_with_tags = {}
     recipe_info = {}
     recipies_and_subcomponents = []
 
-    orig_recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename)
-    print("------------------------------------------------------------ ORIGINAL --------")
-    print("------------------------------------------------------------------------------")
+    orig_recipe_text = get_recipe_file_contents_from_asset_server(recipe_text_filename, dbg_print)
+    if dbg_print: print("------------------------------------------------------------ ORIGINAL --------")
     # this text may have multiple components, only one of which might have tags!
-    print(orig_recipe_text)
-    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")
+    if dbg_print: print(orig_recipe_text)
+    if dbg_print: print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==S")
 
     # create list of recipes - these have optionally listed fields - 'tags:', 'allergens:', 'notes:', 'description:', 'stars:'
     for m in re.finditer( r'(^-+- for the (.*?) \(.*?__end_recipe__)', orig_recipe_text, re.MULTILINE | re.DOTALL ):
@@ -357,52 +357,17 @@ def get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_nam
         #                    name         whole component / recipe
 
 
-    # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # # add optionally listed tags: & allergens: fields to recipes found
-    # # go through recipe line by aline and pull out tags & allergens
-    # recipe_title = ''
-    # for line in iter(orig_recipe_text.splitlines()):
-    #     print(f"L: {line}")
-    #     # check for start of recipe
-    #     m = re.match( r'(^-+- for the (.*?) \()', line)
-    #     if m:
-    #         recipe_title = m.group(2)
-    #         print(f"RECORDING R:{recipe_title} <")
-    #         continue
-    #
-    #     # ADD processing for:
-    #     # notes: // multiline - later
-    #     # description:
-    #     # stars:
-    #     # allergens: dairy, eggs, peanuts, nuts, seeds_lupin, seeds_sesame, seeds_mustard, fish, molluscs, shellfish, alcohol, celery, gluten, soya, sulphur_dioxide
-    #     # tags: vegan, veggie, cbs, chicken, pork, beef, seafood, shellfish, gluten_free, ns_pregnant,
-    #     # type: amuse, side, starter, fish, lightcourse, main, crepe, dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
-    #
-    #     m = re.match( r'((^tags:)|(^allergens:)|(^description:)|(^stars:))', line)
-    #     if m:
-    #         recipe_with_tags[recipe_title] += f"\n{line}"
-    #         print(f"APPENDED R:{recipe_title} < {line}")
-    #
-    # print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==E")
-    #
-    # pprint(recipe_with_tags)
-
-    # for key in dict.iterkeys(): ...
-    # for value in dict.itervalues(): ...
-    # for key, value in dict.iteritems(): ...
-    #
     # recipe_with_tags now has tags!
     for title, recipe_text in recipe_with_tags.items():
-        print(recipe_text)
+        if dbg_print: print(recipe_text)
 
         # create a dictionary for each recipe / subcoponent
-        recipe_info = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename)
+        recipe_info = process_single_recipe_text_into_dictionary(recipe_text, recipe_text_filename, dbg_print)
 
         # collect components together and return a list of recipes
         recipies_and_subcomponents.append(recipe_info)
 
-    print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==EE")
-
+    if dbg_print: print("#* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * ^* * * <-==EE")
 
     return recipies_and_subcomponents
 
@@ -447,48 +412,48 @@ def ingredient_in_recipe_list(ingredient, recipies_and_subcomponents):
 # scans through the list of ingredients looking for subcompnents
 # marks with atomic (index 0) with a 1 to indicate a subcomponent
 # then recurive calls on that subcompnent to process its ingredients
-def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient):
+def mark_subcomponents(recipies_and_subcomponents, recipe_dict, search_ingredient, dbg_print=False):
 
     #recipe_dict['atomic'] = 0    # deprecated use igdt_type instead
     recipe_dict['igdt_type'] = IGD_TYPE_DERIVED # TODO ATOMIC BREAKS DB create 
 
-    print(f"\tFOUND: {recipe_dict['ri_name']} <")
+    if dbg_print: print(f"\tFOUND: {recipe_dict['ri_name']} <")
 
     # iterate through its ingredients and see if there is an entry for
     # that ingredient in the headline recipe ingredients list
     # if so it's a subcoponent, mark it and search it too                   *
 
     for i2, ingredient in enumerate(recipe_dict['ingredients']):
-        print(f"\t\ti2: {ingredient} <")
+        if dbg_print: print(f"\t\ti2: {ingredient} <")
 
         recipe_is_a_subcomponent = ingredient_in_recipe_list(ingredient, recipies_and_subcomponents)
 
         if recipe_is_a_subcomponent:        # found a subcomponent
-            print(f"\t\t\tSUB MARKED: {recipe_is_a_subcomponent['ri_name']} <")
+            if dbg_print: print(f"\t\t\tSUB MARKED: {recipe_is_a_subcomponent['ri_name']} <")
 
             recipe_dict['ingredients'][i2][ATOMIC_INDEX] = IGD_TYPE_DERIVED
 
             # check it's ingredients for sub components
-            mark_subcomponents(recipies_and_subcomponents, recipe_is_a_subcomponent, ingredient)
-            print(f"\t\t\tend of SC --< {recipe_is_a_subcomponent['ri_name']}")
+            mark_subcomponents(recipies_and_subcomponents, recipe_is_a_subcomponent, ingredient, dbg_print)
+            if dbg_print: print(f"\t\t\tend of SC --< {recipe_is_a_subcomponent['ri_name']}")
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcomponents, headline_recipe_name):
+def mark_ingredients_as_subcomponents_or_leave_as_atomic(recipies_and_subcomponents, headline_recipe_name, dbg_print=False):
 
-    print("== ENTER: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -     |")
-    pprint(recipies_and_subcomponents)
+    if dbg_print: print("== ENTER: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -     |")
+    if dbg_print: pprint(recipies_and_subcomponents)
 
     # find headline (recipe_name) recipe in list
     for i1, rcp in enumerate(recipies_and_subcomponents):
-        print(f"r_&_sc: {rcp['ri_name']} <")
+        if dbg_print: print(f"r_&_sc: {rcp['ri_name']} <")
 
         # look for headline recipe and start there
         if rcp['ri_name'] == headline_recipe_name:          # found headline recipe
-            mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[i1], headline_recipe_name)
+            mark_subcomponents(recipies_and_subcomponents, recipies_and_subcomponents[i1], headline_recipe_name, dbg_print)
 
-    print("== EXIT: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -      |")
+    if dbg_print: print("== EXIT: mark_ingredients_as_subcomponents_or_leave_as_atomic -      -      -      -      -      -      |")
     # if so call this function again passing in the subcomponent as the head
 
 
@@ -531,50 +496,54 @@ def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql
 # creates recipe dictionaries based on the csv column headers
 # and ingredients in the text files
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def create_list_of_recipes_and_components_from_recipe_id(sql_row):
+def create_list_of_recipes_and_components_from_recipe_id(sql_row, dbg_print=False):
 
     recipe_text_filename = sql_row['text_file']
     recipe_name = sql_row['ri_name']
 
-    components = get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name)
+    components = get_recipe_ingredients_and_yields_from_file(recipe_text_filename, recipe_name, dbg_print)
 
-    print(f"LIST:{type(components)} - - - - - - - - - - - - - - B E F O R E <*|*>")
-
-    for r in components:
-        print("r in components - - - - - - < S ")
-        pprint(r)
-        print("r in components - - - - - - < E ")
-
-    print(f" - - 'ri_name's - - ")
-
-    print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <S")
-    mark_ingredients_as_subcomponents_or_leave_as_atomic(components, recipe_name)
-    print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
-
-
-    print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
+    if dbg_print: print(f"LIST:{type(components)} - - - - - - - - - - - - - - B E F O R E <*|*>")
 
     for r in components:
-        print("r in components - - - - - - < S ")
-        pprint(r)
-        print("r in components - - - - - - < E ")
+        if dbg_print: print("r in components - - - - - - < S ")
+        if dbg_print: pprint(r)
+        if dbg_print: print("r in components - - - - - - < E ")
 
-    print(f" - - 'ri_name's - - ")
+    if dbg_print: print(f" - - 'ri_name's - - ")
 
-    print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <S {len(components)}")
+    if dbg_print: print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <S")
+    mark_ingredients_as_subcomponents_or_leave_as_atomic(components, recipe_name, dbg_print)
+    if dbg_print: print(f"RECURSING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
+
+
+    if dbg_print: print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
+
+    for r in components:
+        if dbg_print: print("r in components - - - - - - < S ")
+        if dbg_print: pprint(r)
+        if dbg_print: print("r in components - - - - - - < E ")
+
+    if dbg_print: print(f" - - 'ri_name's - - ")
+
+    if dbg_print: rint(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <S {len(components)}")
+    #
+    #
     # TODO ATOMIC - is this function doing anything? - it add Nutrinfo & fuck up ri_id # !?
     merge_nutrient_information_into_each_dictionary(components, recipe_name, sql_row)
-    print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
+    #
+    #
+    #
+    if dbg_print: print(f"MERGING = = = = = = = = = = = = - - - - - - - - - - - - - - <E")
 
-    print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
+    if dbg_print: print(f"LIST:{type(components)} - - - - - - - - - - - - - - A F T E R <*|*>")
 
     for r in components:
-        print("r in components - - - - - - < S ")
-        pprint(r)
-        print("r in components - - - - - - < E ")
+        if dbg_print: print("r in components - - - - - - < S ")
+        if dbg_print: pprint(r)
+        if dbg_print: print("r in components - - - - - - < E ")
 
-    print(f" - - 'ri_name's - - ")
-
+    if dbg_print: print(f" - - 'ri_name's - - ")
 
     return components
 

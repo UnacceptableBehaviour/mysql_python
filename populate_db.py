@@ -2,6 +2,29 @@
 
 import sys
 
+opt_dict = {
+    'verbose_mode':     False,
+}
+
+if '-v' in sys.argv:
+    opt_dict['verbose_mode'] = True
+
+
+help_string = f'''\n\n\n
+HELP:\n
+Look up food info details. . . 
+
+- - - options - - - 
+-v          Verbose mode turn on more diagnostics
+
+-h          This help
+'''
+
+if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
+    print(help_string)
+    sys.exit(0)
+
+
 # add profiling - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 from pycallgraph import PyCallGraph
 from pycallgraph.output import GraphvizOutput
@@ -54,8 +77,6 @@ import re
 import urllib.parse          # used to parse passwords into url format
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
-print("----- list.py ------------------------------------------------------------ importing")
-
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
 from helpers_db import get_search_settings_dict
 
@@ -67,13 +88,10 @@ from helpers_db import get_search_settings_dict
 # more here
 # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3/28154841
 
-
 # when is an empty  __init__.py file in the directory required?
 # when using packages
 # https://stackoverflow.com/questions/448271/what-is-init-py-for
 
-
-print("----- list.py ------------------------------------------------------------ DONE importing")
 
 # default
 #engine = db.create_engine('dialect+driver://user:pass@host:port/db')
@@ -110,7 +128,7 @@ if ( force_complete_rebuild == True ):
     # resizes images and copies both to asset server
     # also creates a CSV file with synopsis, and nutrition info for creating DB (done by this script)
     population_data = subprocess.check_output(['populate_asset_server.rb'])
-    print(population_data)
+    if opt_dict['verbose_mode']: print(population_data)
 else:
     print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
 
@@ -191,48 +209,49 @@ def get_default_tag_sets_dictionary():
 
 def create_entry_in_db(db, table, entry):
 
-    print(f"----- populate_db.py: create_entry_in_db: {table} -------------------------------------------- ")
-    if 'ri_id' in entry:
-        print(f"----- ri_id:{entry['ri_id']} -------------------------------------------- ")
-    if 'ri_name' in entry:
-        print(f"----- ri_name:{entry['ri_name']} -------------------------------------------- ")
-    if 'igdt_type' in entry:
-        print(f"----- igdt_type:{entry['igdt_type']} \n-------------------------------------------- ")
-    if 'ingredients' in entry:
-        print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
-    if 'description' in entry:
-        print(f"----- description:{entry['description']} \n-------------------------------------------- ")
-    if 'user_rating' in entry:
-        print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
-    if 'allergens' in entry:
-        print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
-    if 'tags' in entry:
-        print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
-    if 'types' in entry:
-        print(f"----- types:{entry['types']} \n-------------------------------------------- ")
+    if opt_dict['verbose_mode']: 
+        print(f"----- populate_db.py: create_entry_in_db: {table} -------------------------------------------- ")
+        if 'ri_id' in entry:
+            print(f"----- ri_id:{entry['ri_id']} -------------------------------------------- ")
+        if 'ri_name' in entry:
+            print(f"----- ri_name:{entry['ri_name']} -------------------------------------------- ")
+        if 'igdt_type' in entry:
+            print(f"----- igdt_type:{entry['igdt_type']} \n-------------------------------------------- ")
+        if 'ingredients' in entry:
+            print(f"----- ingredients:{entry['ingredients']} \n-------------------------------------------- ")
+        if 'description' in entry:
+            print(f"----- description:{entry['description']} \n-------------------------------------------- ")
+        if 'user_rating' in entry:
+            print(f"----- stars:{entry['user_rating']} \n-------------------------------------------- ")
+        if 'allergens' in entry:
+            print(f"----- allergens:{entry['allergens']} \n-------------------------------------------- ")
+        if 'tags' in entry:
+            print(f"----- tags:{entry['tags']} \n-------------------------------------------- ")
+        if 'types' in entry:
+            print(f"----- types:{entry['types']} \n-------------------------------------------- ")
 
 
     sql_string = f"INSERT INTO {table}"
     fields = "("
     data =  "("
     for header in entry:
-        print(f"{header} = {entry[header]} - class:{entry[header].__class__.__name__}")
+        if opt_dict['verbose_mode']: print(f"{header} = {entry[header]} - class:{entry[header].__class__.__name__}")
         fields = fields + f"{header}, "
 
         if header == 'ri_id' or header == 'serving_size':
-            print(f"{header} is an INT NUMBER")
+            if opt_dict['verbose_mode']: print(f"{header} is an INT NUMBER")
             data = data + f"{entry[header]}, "
 
         elif header == 'igdt_type':
-            print(f"{header} is an SMALL INT NUMBER")
+            if opt_dict['verbose_mode']: print(f"{header} is an SMALL INT NUMBER")
             data = data + f"{entry[header]}, "
 
         elif re.match(r'n_\w+', header ):
-            print(f"{header} is a NUMBER")
+            if opt_dict['verbose_mode']: print(f"{header} is a NUMBER")
             data = data + f"{entry[header]}, "
 
         elif header == 'ingredients':
-            print(f"{header} is a LIST of ingredients")
+            if opt_dict['verbose_mode']: print(f"{header} is a LIST of ingredients")
             if table == 'exploded':
                 ingredients_insert_text = create_sql_insert_exploded_ingredients_array_text(entry[header])
             else:
@@ -240,19 +259,19 @@ def create_entry_in_db(db, table, entry):
             
             data = data + ingredients_insert_text
             pprint(entry[header])
-            print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
+            if opt_dict['verbose_mode']: print(f"\n - - - - i - - - - \n{ingredients_insert_text}\n - - - - i - - - - ")
 
         elif header == 'yield':
-            print(f"{header} is a NUMBER in g")
+            if opt_dict['verbose_mode']: print(f"{header} is a NUMBER in g")
             data = data + f"{entry[header].rstrip('g')}, "
 
         elif header == 'allergens' or header == 'tags' or header =='types':
-            print(f"{header} is a LIST of tags / strings")
+            if opt_dict['verbose_mode']: print(f"{header} is a LIST of tags / strings")
             tag_to_insert = create_sql_insert_tags_array_text(entry[header])
             data = data + tag_to_insert
 
         else:
-            print(f"{header} is a STRING")
+            if opt_dict['verbose_mode']: print(f"{header} is a STRING")
             data = data + f"'{entry[header]}', "
 
 
@@ -262,9 +281,12 @@ def create_entry_in_db(db, table, entry):
 
     sql_string = f"{sql_string} {fields} VALUES {data};"
 
+    print('|')
     print(sql_string)
     db.execute(sql_string)
     db.commit()
+    print('/ - -')
+    print('.\n.\n.')
 
     #INSERT INTO recipes (rcp_id, image_filename, recipe_title, txt_ingredient_file, n_En, n_Fa, n_Fs, n_Fm, n_Fp, n_Fo3, n_Ca, n_Su, n_Fb, n_St, n_Pr, n_Sa, n_Al, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
     #INSERT INTO recipes (rcp_id, image_filename, recipe_title, serving_size) VALUES ('0', '20181226_174632_crispy prawn and vegetable risotto.jpg', 'crispy prawn and vegetable risotto', '20181226_174632_crispy prawn and vegetable risotto.txt', '137', '6.97', '2.74', '3.05', '0.51', '0.0', '11.83', '2.03', '1.02', '0.18', '6.96', '1.01', '0.0', '466');
@@ -273,7 +295,7 @@ def create_entry_in_db(db, table, entry):
 
 def create_table_in_database_from_sql_template(data_base, template_file):
     create_table_sql_command = ''
-    print(f"> - create_table_in_database_from_sql_template - S\n{template_file}")
+    print(f"\n> - create_table_in_database_from_sql_template - S\n{template_file}")
     
     with open(template_file) as sql_template:
         create_table_sql_command = sql_template.read()
@@ -281,7 +303,7 @@ def create_table_in_database_from_sql_template(data_base, template_file):
     db_lines = data_base.execute(create_table_sql_command)    
     data_base.commit()
 
-    print(f"\n{db_lines}\n> - create_table_in_database_from_sql_template - E\n")
+    if opt_dict['verbose_mode']: print(f"\n{db_lines}\n> - create_table_in_database_from_sql_template - E\n")
     return(db_lines)
 
 
@@ -290,9 +312,9 @@ def drop_tables_for_fresh_start(data_base, tables):
     for table in tables:
         sql_command = f"DROP TABLE IF EXISTS {table};"
 
-        print(f"SQL cmd: {sql_command} <")
+        print(f"\nSQL cmd: {sql_command} <")
 
-        print(f"> - drop_tables_for_fresh_start - S\n{sql_command}\n> - drop_tables_for_fresh_start - E\n")
+        if opt_dict['verbose_mode']: print(f"> - drop_tables_for_fresh_start - S\n{sql_command}\n> - drop_tables_for_fresh_start - E\n")
         data_base.execute(sql_command)
         data_base.commit()
 
@@ -410,15 +432,15 @@ def main():
         sql_row = sql_dict[entry]
         ri_id = int(sql_row['ri_id'])   # TOP level / master recipe ID - the ID in the CSV row!
 
-        print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
-        pprint(sql_row)
+        if opt_dict['verbose_mode']: print(f"> > > > SQL_ROW: C:{type(sql_row)} {sql_row['text_file']} - {sql_row['ri_name']} * * * * * * * * * * * * * * * * M - - -")
+        if opt_dict['verbose_mode']: pprint(sql_row)
         # create list of recipes (headline & sub components) to add into database
 
-        recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row)
+        recipes_from_id = create_list_of_recipes_and_components_from_recipe_id(sql_row, opt_dict['verbose_mode'])
 
-        print("\n|\n|\n|\n= = = = = =")
-        pprint(recipes_from_id)
-        print("\n= = = = = =\n|\n|\n|")
+        if opt_dict['verbose_mode']: print("\n|\n|\n|\n= = = = = =")
+        if opt_dict['verbose_mode']: pprint(recipes_from_id)
+        if opt_dict['verbose_mode']: print("\n= = = = = =\n|\n|\n|")
 
         #should put some exception handling around this
         for recipe in recipes_from_id:
@@ -441,7 +463,7 @@ def main():
         exploded_recipe_dict = create_exploded_recipe(sql_row)
         
         print(f"> > > > E X P L O D E D: {exploded_recipe_dict['ri_name']} {type(exploded_recipe_dict)} <    <    <    <    <    <    <    <    <     *")
-        pprint(exploded_recipe_dict)
+        if opt_dict['verbose_mode']: pprint(exploded_recipe_dict)
 
         create_entry_in_db(db, 'exploded', exploded_recipe_dict )
 
