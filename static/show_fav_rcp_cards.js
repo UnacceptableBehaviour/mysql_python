@@ -17,32 +17,31 @@ function saveFavsAsType(){
   let label = favsTypeLabelInput.value;  
   console.log(`saveFavsAsType: ${label}`);
 
-  const id_name_pairs = [];
-  const ri_ids = [];
+  // const id_name_pairs = [];
+  // const ri_ids = [];
   const ri_names = [];
 
   for (let i = 0; i < favRecipes.length; i++) {
   
     const recipe = favRecipes[i];
     
-    const entry = [recipe["ri_id"], recipe["ri_name"]];
+    //const entry = [recipe["ri_id"], recipe["ri_name"]];
     
-    ri_ids.push(recipe["ri_id"]);
+    //ri_ids.push(recipe["ri_id"]);       // TODO - comment back in for live DB insert
     ri_names.push(recipe["ri_name"]);
-    id_name_pairs.push(entry);
+    //id_name_pairs.push(entry);
   
-  }
-  
-  console.log(id_name_pairs);  
+  }  
 
   // post info to DB
   fetch( '/favs', {
     method: 'POST',                                             // method (default is GET)
     headers: {'Content-Type': 'application/json' },             // JSON
     body: JSON.stringify( { 'user':userUUID, 'save_label':label, 
-                            'ri_ids': ri_ids,
+                            //'ri_ids': ri_ids,
                             'ri_names': ri_names,
-                            'id_name_pairs': id_name_pairs,} )      // Payload
+                            //'id_name_pairs': id_name_pairs,
+                          } )      // Payload
 
   }).then( function(response) {
     return response.json();
