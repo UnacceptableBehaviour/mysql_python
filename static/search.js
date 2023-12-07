@@ -116,7 +116,8 @@ function checkAllRcps(checkType) {
       if (checkType === 'flexCheckLBL_'){
         rcpsToUnlabel.push(checkbox.value);
       } else {
-        rcpsShortList.push(checkbox.value);
+        let ri_id = checkbox.id.replace('flexCheckFAVS_','');
+        rcpsShortList.push(ri_id);
       }
       
     }
