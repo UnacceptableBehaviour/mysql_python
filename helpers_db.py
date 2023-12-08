@@ -715,7 +715,7 @@ def get_user_info_dict_from_DB(uuid):
         
     return_user_info = {'UUID':uuid, 'name':username}
 
-    print(f"RETRIEVING FROM DB - {uuid} ( -o- ) - S")
+    print(f"- - RETRIEVING FROM DB - {uuid} ( -o- ) - S")
 
 
     tag_sets_and_filters = {}
@@ -729,11 +729,11 @@ def get_user_info_dict_from_DB(uuid):
         
         tagdata_for_table = helper_db_class_db.execute(sql_query).fetchone() # - returns RowProxy        
 
-        print(f"table:{table}, filter_cols:")
-        pprint(filter_cols)
-        print('- - - / ')
+        # print(f"table:{table}, filter_cols:")
+        # pprint(filter_cols)
+        # print('- - - / ')
         for col in filter_cols:
-            print(f"table:{table}, col:{col}")
+            #print(f"table:{table}, col:{col}")
             tag_sets_and_filters[table][col] = tagdata_for_table[col]            
     
     return_user_info.update(tag_sets_and_filters)
@@ -742,7 +742,7 @@ def get_user_info_dict_from_DB(uuid):
 
     #pprint(return_user_info)
 
-    print(f"RETRIEVING FROM DB - {uuid} ( -o- ) - E")
+    print(f"- - RETRIEVING FROM DB - {uuid} ( -o- ) - E")
     return return_user_info
 
 

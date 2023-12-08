@@ -54,7 +54,7 @@ function checkBoxClicked(event) {
       
       if (event.target.id.includes('flexCheckFAVS_')){
         let ri_id = event.target.id.replace('flexCheckFAVS_','');
-        rcpsShortList.push(ri_id);
+        rcpsShortList.push(parseInt(ri_id));
       } else {
         rcpsToUnlabel.push(event.target.value);
       }        
@@ -66,8 +66,6 @@ function checkBoxClicked(event) {
         if (index > -1) {
           rcpsShortList.splice(index, 1);
         }
-
-        rcpsShortList.push(event.target.value);
       } else {
         let index = rcpsToUnlabel.indexOf(event.target.value);
         if (index > -1) {
@@ -108,8 +106,12 @@ function checkAllRcpsFavs(){
 
 function checkAllRcps(checkType) {
   let checkboxes = document.querySelectorAll('.form-check-input');
-  rcpsToUnlabel = [];
-  rcpsShortList = [];
+  if (checkType === 'flexCheckLBL_'){
+    rcpsToUnlabel = [];
+  }else{
+    rcpsShortList = [];
+  }
+  
   checkboxes.forEach(function(checkbox) {
     if (checkbox.id.includes(checkType)){
       checkbox.checked = true;
@@ -117,7 +119,7 @@ function checkAllRcps(checkType) {
         rcpsToUnlabel.push(checkbox.value);
       } else {
         let ri_id = checkbox.id.replace('flexCheckFAVS_','');
-        rcpsShortList.push(ri_id);
+        rcpsShortList.push(parseInt(ri_id));
       }
       
     }
