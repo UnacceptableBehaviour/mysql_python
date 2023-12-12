@@ -78,7 +78,7 @@ import urllib.parse          # used to parse passwords into url format
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
-from helpers_db import get_search_settings_dict
+from helpers_db import get_search_settings_dict, db_to_use, POSTGRES_DB_LOCAL, POSTGRES_DB_LOCAL_DOCKER, POSTGRES_DB_NAS 
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -111,12 +111,20 @@ from helpers_db import get_search_settings_dict
 #engine = create_engine('postgresql://root:meepmeep@localhost:3306/recipe_cs50')
 
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
-#engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
-#engine = create_engine('postgresql://simon:@localhost:5432/simon')  # database name different
-# docker container DB
-engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')  # database name different
-db = scoped_session(sessionmaker(bind=engine))
+
+if db_to_use == POSTGRES_DB_LOCAL:
+    #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
+    engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
+
+elif db_to_use == POSTGRES_DB_LOCAL_DOCKER:
+    engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
+
+elif db_to_use == POSTGRES_DB_NAS:
+    engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
+
 pprint(engine)
+db = scoped_session(sessionmaker(bind=engine))
+
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPULATION FEEDBACK - S")
 

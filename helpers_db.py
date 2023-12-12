@@ -28,14 +28,29 @@ import json                 # converting to json string from dict
 
 from pprint import pprint # giza a look
 
-print("----- helpers_db: attaching to DB ------------------------------------S")
+POSTGRES_DB_LOCAL        = 1
+POSTGRES_DB_LOCAL_DOCKER = 2
+POSTGRES_DB_NAS          = 3
+#db_to_use = POSTGRES_DB_LOCAL
+#db_to_use = POSTGRES_DB_LOCAL_DOCKER
+db_to_use = POSTGRES_DB_NAS
+
+print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-#engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different
-#engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
-engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
+
+if db_to_use == POSTGRES_DB_LOCAL:
+    #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
+    engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
+
+elif db_to_use == POSTGRES_DB_LOCAL_DOCKER:
+    engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
+
+elif db_to_use == POSTGRES_DB_NAS:
+    engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
+
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
-print("----- helpers_db: attaching to DB ------------------------------------E")
+print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
 
 # stub files for data
 from config_files import get_file_for_data_set
