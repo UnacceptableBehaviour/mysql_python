@@ -237,6 +237,7 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
 aliases = {}
 atomic_LUT = {}
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
+NUTRIENT_FILE_PATH_DOCKER = Path('./scratch/nutrinfo.txt')
 NUTRIENT_FILE_BACKUPS = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
 
 component_file_LUT = {}
@@ -364,9 +365,12 @@ errors = {
 def build_atomic_LUT(verbose=False): # build from z_product_nutrition_info.txt * * *  < <
 
     content = ''
-    with NUTRIENT_FILE_PATH.open('r') as f:
-        #content = f.readlines()
-        content = f.read()
+    try:        
+        with NUTRIENT_FILE_PATH.open('r') as f:
+            content = f.read()
+    except FileNotFoundError:
+        with NUTRIENT_FILE_PATH_DOCKER.open('r') as f:
+            content = f.read()
 
     # FIRST PASS to get all component names
     for m in re.finditer( r'--- for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):
