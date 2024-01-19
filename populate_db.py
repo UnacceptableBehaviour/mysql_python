@@ -78,7 +78,7 @@ import urllib.parse          # used to parse passwords into url format
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
-from helpers_db import get_search_settings_dict, db_to_use, POSTGRES_DB_LOCAL, POSTGRES_DB_LOCAL_DOCKER, POSTGRES_DB_NAS 
+from helpers_db import get_search_settings_dict, db_to_use, engine
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -112,16 +112,7 @@ from helpers_db import get_search_settings_dict, db_to_use, POSTGRES_DB_LOCAL, P
 
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
 
-if db_to_use == POSTGRES_DB_LOCAL:
-    #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
-    engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
-
-elif db_to_use == POSTGRES_DB_LOCAL_DOCKER:
-    engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
-
-elif db_to_use == POSTGRES_DB_NAS:
-    engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
-
+print(f"> > > > Populating DB: {db_to_use}")
 pprint(engine)
 db = scoped_session(sessionmaker(bind=engine))
 
@@ -480,6 +471,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print(f"\n> > > > > Populated DB: {db_to_use}")
+    pprint(engine)
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
 
