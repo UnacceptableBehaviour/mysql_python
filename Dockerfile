@@ -18,6 +18,7 @@ RUN python -m venv venv
 
 RUN . venv/bin/activate
 
+# move into requirements?
 RUN pip3 install psycopg2
 
 # strip this down to bare minimum

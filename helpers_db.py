@@ -29,8 +29,8 @@ import json                 # converting to json string from dict
 from pprint import pprint # giza a look
 
 #db_to_use = 'POSTGRES_DB_LOCAL'
-#db_to_use = 'POSTGRES_DB_LOCAL_DOCKER'
-db_to_use = 'POSTGRES_DB_NAS'
+db_to_use = 'POSTGRES_DB_DOCKER_OSX'
+#db_to_use = 'POSTGRES_DB_DOCKER_NAS'
 
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
 from sqlalchemy import create_engine
@@ -40,10 +40,10 @@ if db_to_use == 'POSTGRES_DB_LOCAL':
     #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
     engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
 
-elif db_to_use == 'POSTGRES_DB_LOCAL_DOCKER':
+elif db_to_use == 'POSTGRES_DB_DOCKER_OSX':
     engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
 
-elif db_to_use == 'POSTGRES_DB_NAS':
+elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
     engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
 
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
