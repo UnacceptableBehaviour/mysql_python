@@ -14,7 +14,7 @@ RUN python --version
 WORKDIR /mysql_python
 COPY . .
 
-RUN python -m venv venv
+#RUN python -m venv venv
 
 RUN . venv/bin/activate
 
