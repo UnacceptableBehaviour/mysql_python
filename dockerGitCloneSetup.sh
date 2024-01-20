@@ -1,6 +1,9 @@
 #!/usr/bin/env zsh
 
 # cd /a_syllabus/repos
+# curl https://github.com/UnacceptableBehaviour/mysql_python/blob/master/dockerGitCloneSetup.sh -o dockerGitCloneSetup.sh
+# chmod +x dockerGitCloneSetup.sh
+# or just copy file over!
 # then run me
 
 git clone https://github.com/UnacceptableBehaviour/mysql_python

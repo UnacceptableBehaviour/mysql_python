@@ -28,8 +28,22 @@ import json                 # converting to json string from dict
 
 from pprint import pprint # giza a look
 
+import psycopg2
+def create_database_if_not_exists(user, password, host, port, database):
+    conn = psycopg2.connect(user=user, password=password, host=host, port=port, database='postgres')
+    conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT 1 FROM pg_database WHERE datname='{database}';")
+    exists = cursor.fetchone()
+    if not exists:
+        cursor.execute(f"CREATE DATABASE {database};")
+    cursor.close()
+    conn.close()
+
+
 #db_to_use = 'POSTGRES_DB_LOCAL'
-db_to_use = 'POSTGRES_DB_DOCKER_OSX'
+#db_to_use = 'POSTGRES_DB_DOCKER_OSX'
+db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'
 #db_to_use = 'POSTGRES_DB_DOCKER_NAS'
 
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
@@ -41,7 +55,12 @@ if db_to_use == 'POSTGRES_DB_LOCAL':
     engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
 
 elif db_to_use == 'POSTGRES_DB_DOCKER_OSX':
-    engine = create_engine('postgresql://simon:loop@localhost:5432/cs50_recipes')
+    create_database_if_not_exists('simon', 'pool', 'localhost', '5432', 'cs50_recipes')
+    engine = create_engine('postgresql://simon:pool@localhost:5432/cs50_recipes')
+
+elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_OSX':
+    engine = create_engine('postgresql://simon:pool@postgres-container:5432/cs50_recipes')
+    #                                   container name ^
 
 elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
     engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')

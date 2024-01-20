@@ -18,12 +18,12 @@ from pprint import pprint # giza a look
 
 # serve files from http://192.168.1.13:8000/static/sql_recipe_data.csv  < HTTP ASSET SERVER
 # use http://127.0.0.1:8000 so SSL on main site doesn't block retrieval
-# > cd /a_syllabus/lang/python/repos/assest_server
+# > cd /a_syllabus/lang/python/repos/asset_server
 # > http-server -p 8000 --cors
 #
 # SSL asset.server
 # https://asset.server:8080                                             < HTTPS ASSET SERVER
-# > cd /a_syllabus/lang/python/repos/assest_server
+# > cd /a_syllabus/lang/python/repos/asset_server
 # > http-server  --cors -S -C ./scratch/asCerts/server.crt -K ./scratch/asCerts/server.key
 #
 # do we still need --cors Cross Origin headers since its SSL?
@@ -70,7 +70,7 @@ def get_csv_from_server_as_disctionary(url):
         except (ConnectionRefusedError, URLError):
             print('\n\nConnectionRefusedError: asset server must be serveing on HTTP  \
                 \nOpen terminal. \
-                \ncd python/assest_server; http-server -p 8000 --cors \
+                \ncd python/asset_server; http-server -p 8000 --cors \
                 \nHit RETURN to continue . .')
             wait = input()
 

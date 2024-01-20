@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    container_name: postgres-container
+    build:
+      context: ./docker_postgres
+      dockerfile: Dockerfile
+    volumes:
+      - /Users/simon/a_syllabus/lang/docker/postgres_data:/var/lib/postgresql/data
+    networks:
+      - dtk-network
+    environment:
+      - POSTGRES_USER=simon
+      - POSTGRES_PASSWORD=pool
+    ports:
+      - "5432:5432"
+
+  asset_server:
+    container_name: asset_server
+    build:
+      context: ../asset_server
+      dockerfile: Dockerfile
+    volumes:
+      - ../asset_server/:/asset_server
+    networks:
+      - dtk-network
+    ports:
+      - "8080:8080"      
+
+  dtk_health:
+    container_name: dtk_health
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    networks:
+      - dtk-network
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=hello.py
+    ports:
+      - "50015:50015"
+
+networks:
+  dtk-network:
+    driver: bridge
+    name: dtk-network
+
+
+# COMMAND BASICS
+
+# docker-compose build        # Build the images
+#                             # look for a docker-compose.yml file in the current directory,
+#                             # & build images for all the services defined based on their build configs.
+
+# docker-compose up -d        # run containers  -d runs in detached/background mode.
+
+# docker-compose down         # Stop the containers
+
+# docker-compose logs -f      # View logs from all containers
+# docker-compose exec app sh  # Shell into a container
+# docker-compose restart      # Restart all containers
