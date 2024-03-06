@@ -481,7 +481,8 @@ class ProductInfo:
                                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                     self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            if len(cols) > col_100: # make sure in range
+                                self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
@@ -895,7 +896,8 @@ class ProductInfo:
                                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                     self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            if len(cols) > col_100: # make sure in range
+                                self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
@@ -1302,7 +1304,8 @@ class ProductInfo:
                                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                     self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            if len(cols) > col_100: # make sure in range
+                                self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
@@ -1711,7 +1714,8 @@ class ProductInfo:
                                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                     self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            if len(cols) > col_100: # make sure in range
+                                self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
@@ -2162,7 +2166,8 @@ class ProductInfo:
                                     kj_to_kcal = int(float(kj_to_kcal) * 0.239006)
                                     self.nutrition_info[n_type] = int(kj_to_kcal)
                         else:
-                            self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
+                            if len(cols) > col_100: # make sure in range
+                                self.nutrition_info[n_type] = remove_g_and_less_than(cols[col_100])
             
             pprint(self.nutrition_info)
             
