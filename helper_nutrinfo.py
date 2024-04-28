@@ -5,7 +5,7 @@ import re
 import sys
 import json
 from pprint import pprint
-from config_files import get_file_for_data_set
+from config_files import get_config_or_data_file_path
 
 class Nutrients:
     NUTRI_KEY = 0
@@ -184,7 +184,7 @@ class ResourceLocked(NutriDictError):
 # Singleton interface for the NutrientsDB
 class NutrientsDB:
     #__nutrients_db_file = 'ingredient_db.json'
-    __nutrients_db_file = get_file_for_data_set('nutrients_txt_db')
+    __nutrients_db_file = get_config_or_data_file_path('nutrients_txt_db')
     __nutrients_db = {}
     __seek_misses = []
     __nutrients_loaded = False
@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
     t_dict = {}
     i_db = NutrientsDB.getInstance()
-    i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), t_dict)
+    i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), t_dict)
     print("t_dict")
     pprint(t_dict)
 

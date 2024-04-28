@@ -6,20 +6,29 @@ from pathlib import Path
 
 __iface_files = {}
 
-config_file = './scratch/config_files.json'
+
+config_file = './scratch/_docr_support/config_files.json'
 with open(config_file, 'r') as f:
     json_config = f.read()
     __iface_files = json.loads(json_config)
     print(f"Config files LOADED ({__iface_files.__len__()})")
 
+# deprecated DELETE
+# def get_config_or_data_file_path(data_set):
+#     if data_set in __iface_files:
+#         database_file = Path(__iface_files[data_set])
+#     else:
+#         raise(f"DATABASE stub ERROR: KeyError data_set key <{data_set}> doesn't exist")    
 
-def get_file_for_data_set(data_set):
-    if data_set in __iface_files:
-        database_file = Path(__iface_files[data_set])
+#     return database_file
+
+def get_config_or_data_file_path(file_key):
+    if file_key in __iface_files:
+        file_path = Path(__iface_files[file_key])
     else:
-        raise(f"DATABASE stub ERROR: KeyError data_set key <{data_set}> doesn't exist")    
+        raise(f"DATABASE stub ERROR: KeyError file_key key <{file_key}> doesn't exist")    
 
-    return database_file
+    return file_path
 
 
 if __name__ == '__main__':

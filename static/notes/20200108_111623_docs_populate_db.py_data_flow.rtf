@@ -208,8 +208,8 @@ table_sepcs: /mysql_python/\
 CSV file per line recipe: \
 name, image nutrinfo etc per line\
 LOCAL ASSET SERVER:\
-/repos/assest_server/static/recipe/*.jpg *.txt\
-/repos/assest_server/static/sql_recipe_data.csv\
+/repos/asset_server/static/recipe/*.jpg *.txt\
+/repos/asset_server/static/sql_recipe_data.csv\
 																			database: cs50_recipe\
 																			creates: recipes & exploded\
 \
@@ -217,7 +217,7 @@ LOCAL ASSET SERVER:\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardirnatural\partightenfactor0
 \cf4 																			/repos/mysql_python/static\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
-\cf4 																			/repos/assest_server/static/recipe\
+\cf4 																			/repos/asset_server/static/recipe\
 \
 																			LOCAL HEROKU \
 																			images\
@@ -237,7 +237,7 @@ LOCAL ASSET SERVER:\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\tx7956\tx9060\tx10241\tx11363\tx12485\tx13614\tx14790\tx15851\tx17008\tx18136\tx19258\tx20392\tx21547\tx22651\tx23820\tx24440\pardeftab543\pardirnatural\partightenfactor0
 \cf15 													Copy nutinfor text file to asset.server\cf4 \
 _courses_components/z_product_nutrition_info.txt\
-																			/assest_server/scratch/nutrinfo.txt\
+																			/asset_server/scratch/nutrinfo.txt\
 													WORKING WITH LOCAL FILESYSTEM (NO URLS)\
 													ISSUES:\
 													\cf17 Uses images to drive CSV population SB: use _i_w_r_auto_tmp/*.txt
@@ -257,10 +257,10 @@ in components/yXXX_component/_i_w_r_auto_tmp\
 /_courses_components/z_product_nutrition_info.txt\
 nutrition_db = load_nutrition_data\
 																			CSV file per line recipe: name, image nutrifo etc\
-																			/assest_server/static/sql_recipe_data.csv\
+																			/asset_server/static/sql_recipe_data.csv\
 \
 																			LOCAL ASSET SERVER: my_sql\
-																			/repos/assest_server/static/recipe\
+																			/repos/asset_server/static/recipe\
 \
 																			LOCAL HEROKU \
 																			images\

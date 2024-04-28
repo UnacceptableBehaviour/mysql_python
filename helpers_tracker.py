@@ -16,7 +16,7 @@ from helpers_db import get_daily_tracker, store_daily_tracker
 from helpers_db import ATOMIC_INDEX, QTY_IN_G_INDEX, SERVING_INDEX, INGREDIENT_INDEX, TRACK_NIX_TIME, IMAGE_INDEX, HTML_ID
 
 from helper_nutrinfo import i_db
-from config_files import get_file_for_data_set
+from config_files import get_config_or_data_file_path
 
 
 # TODO
@@ -34,10 +34,10 @@ def store_daily_tracker_to_DB(dtk = {}):
 
 
 def post_interface_file():
-    return get_file_for_data_set('dtk_recipe_txt')
+    return get_config_or_data_file_path('dtk_recipe_txt')
 
 def get_interface_file():
-    return get_file_for_data_set('dtk_nutrients_txt')
+    return get_config_or_data_file_path('dtk_nutrients_txt')
 
 
 # take dtk object and convert to daily tracker human readable record
@@ -175,7 +175,7 @@ def get_DTK_info_from_processing(dtk):
     dtk_nut_dict = {}
 
     # load nutrinfo
-    i_db.loadNutrientsFromTextFile(get_file_for_data_set('dtk_nutrients_txt'), dtk_nut_dict)
+    i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), dtk_nut_dict)
 
     return dtk_nut_dict[search_name]
 
@@ -231,6 +231,9 @@ def process_new_dtk_from_user(dtk_data):
     arg1 = f"{dtk_data['dtk_weight']}"
     arg2 = f"file={post_interface_file()}"
     data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-S")
+    print(data_from_nutriprocess)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-E")
 
     # import RESULT: just get nutrinfo for daily tracker for now.
     # will expect a fully processed DTK including subcomponents
@@ -283,7 +286,7 @@ def archive_dtk(dtk):
 
     archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}_{hr_readable_date_from_nix(serv_dtk['dtk_rcp']['dt_rollover'])}.json"
 
-    arch_target = Path(get_file_for_data_set("archive_path")).joinpath(archfile_name)
+    arch_target = Path(get_config_or_data_file_path("archive_path")).joinpath(archfile_name)
 
     with open(arch_target, 'w') as f:
         f.write(json.dumps(archive_dtk))

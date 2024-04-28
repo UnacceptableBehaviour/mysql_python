@@ -43,7 +43,7 @@ def create_database_if_not_exists(user, password, host, port, database):
 
 #db_to_use = 'POSTGRES_DB_LOCAL'
 #db_to_use = 'POSTGRES_DB_DOCKER_OSX'
-db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'
+db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'      # < < enable for full DockerMAC
 #db_to_use = 'POSTGRES_DB_DOCKER_NAS'
 
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
@@ -69,7 +69,7 @@ helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
 
 # stub files for data
-from config_files import get_file_for_data_set
+from config_files import get_config_or_data_file_path
 
 import uuid
 
@@ -588,7 +588,7 @@ def commit_dict_to_DB(db, data_set):
     set of dtk data for each use
     data_set key must be in .json config_file (config.py)
     '''
-    database_file = get_file_for_data_set(data_set)
+    database_file = get_config_or_data_file_path(data_set)
 
     with open(database_file, 'w') as f:
         #pprint(db)
@@ -612,7 +612,7 @@ def load_dict_data_from_DB(data_set):
     set of dtk data for each use
     data_set key must be in .json config_file (config.py)
     '''
-    database_file = get_file_for_data_set(data_set)
+    database_file = get_config_or_data_file_path(data_set)
 
     if database_file.exists():
         with open(database_file, 'r') as f:

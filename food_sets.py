@@ -14,6 +14,7 @@ from pathlib import Path
 from pprint import pprint
 
 from scrape_input_files import MISSING_INGREDIENTS_FILE_JSON_FSETS
+from config_files import get_config_or_data_file_path
 
 # returns True if they balance
 # TODO run check on ots_i_list before processing
@@ -236,16 +237,16 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
 
 aliases = {}
 atomic_LUT = {}
-NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
-NUTRIENT_FILE_PATH_DOCKER = Path('./scratch/nutrinfo.txt')
-NUTRIENT_FILE_BACKUPS = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
+NUTRIENT_FILE_PATH = get_config_or_data_file_path('nutrient_file_path') 
+NUTRIENT_FILE_PATH_DOCKER = get_config_or_data_file_path("nutrient_file_path_docker")
+NUTRIENT_FILE_BACKUPS = get_config_or_data_file_path("nutrient_file_backups")
 
 component_file_LUT = {}
-COMPONENT_DIR_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/')
+COMPONENT_DIR_PATH = get_config_or_data_file_path("component_dir_path")
 
 import json
 ots_I_set = set()
-OTS_INGREDIENTS_FOUND = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_ots_ingredients_found.json')
+OTS_INGREDIENTS_FOUND = get_config_or_data_file_path("ots_ingredients_found")
 if OTS_INGREDIENTS_FOUND.exists():
     with open(OTS_INGREDIENTS_FOUND, 'r') as f:
         content = f.read()
