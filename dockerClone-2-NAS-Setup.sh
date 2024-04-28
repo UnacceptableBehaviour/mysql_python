@@ -1,5 +1,10 @@
 #!/usr/bin/env zsh
 
+# before cloning - FIX so uses env var!!!!
+# in helpers_db.py
+# set db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS'
+# push to git
+
 # Make sure NAS mounted
 # cd /Volumes/docker/dtk-swarm-2/dtk_health
 # git clone https://github.com/UnacceptableBehaviour/mysql_python

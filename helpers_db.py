@@ -43,8 +43,9 @@ def create_database_if_not_exists(user, password, host, port, database):
 
 #db_to_use = 'POSTGRES_DB_LOCAL'
 #db_to_use = 'POSTGRES_DB_DOCKER_OSX'
-db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'      # < < enable for full DockerMAC
+#db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'      # < < enable for full DockerMAC
 #db_to_use = 'POSTGRES_DB_DOCKER_NAS'
+db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS'
 
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
 from sqlalchemy import create_engine
@@ -64,6 +65,12 @@ elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_OSX':
 
 elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
     engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
+
+elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS':
+    create_database_if_not_exists('postgres', 'snacktime', 'postgres-container-n', '6432', 'cs50_recipes')
+    engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:6432/cs50_recipes')
+    #                                           container name ^
+
 
 helper_db_class_db = scoped_session(sessionmaker(bind=engine))
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
