@@ -45,6 +45,7 @@ def create_database_if_not_exists(user, password, host, port, database):
 #db_to_use = 'POSTGRES_DB_DOCKER_OSX'
 #db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'      # < < enable for full DockerMAC
 #db_to_use = 'POSTGRES_DB_DOCKER_NAS'
+#db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX'
 db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS'
 
 print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
@@ -66,9 +67,14 @@ elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_OSX':
 elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
     engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
 
+elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX':
+    create_database_if_not_exists('postgres', 'snacktime', 'creativemateriel.synology.me', '7432', 'cs50_recipes')    
+    engine = create_engine('postgresql://postgres:snacktime@creativemateriel.synology.me:7432/cs50_recipes')
+
 elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS':
-    create_database_if_not_exists('postgres', 'snacktime', 'postgres-container-n', '6432', 'cs50_recipes')
-    engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:6432/cs50_recipes')
+    create_database_if_not_exists('postgres', 'snacktime', 'creativemateriel.synology.me', '7432', 'cs50_recipes')
+    engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:7432/cs50_recipes')    
+
     #                                           container name ^
 
 
