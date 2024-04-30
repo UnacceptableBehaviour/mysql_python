@@ -41,45 +41,50 @@ def create_database_if_not_exists(user, password, host, port, database):
     conn.close()
 
 
-#db_to_use = 'POSTGRES_DB_LOCAL'
-#db_to_use = 'POSTGRES_DB_DOCKER_OSX'
-#db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_OSX'      # < < enable for full DockerMAC
-#db_to_use = 'POSTGRES_DB_DOCKER_NAS'
-#db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX'
-db_to_use = 'POSTGRES_DB_DOCKER_INTERNAL_NAS'
+db_to_use_string = [
+'POSTGRES_DB_LOCAL',                            # 0 - OSX postgres server
+'POSTGRES_DB_DOCKER_OSX',                       # 1 - OSX Dockerfile solo container
+'POSTGRES_DB_DOCKER_INTERNAL_OSX',              # 2 - OSX docker-compose container OSX
+'POSTGRES_DB_DOCKER_NAS',                       # 3 - NAS Dockerfile solo container
+'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX',     # 4 - NAS docker-compose container location from OSX
+'POSTGRES_DB_DOCKER_INTERNAL_NAS'               # 5 - NAS docker-compose container OSX
+]
 
-print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
+engine = None
+helper_db_class_db = None
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-if db_to_use == 'POSTGRES_DB_LOCAL':
-    #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
-    engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
+def set_DB_connection(db_to_use):
+    global helper_db_class_db
+    print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
 
-elif db_to_use == 'POSTGRES_DB_DOCKER_OSX':
-    create_database_if_not_exists('simon', 'pool', 'localhost', '5432', 'cs50_recipes')
-    engine = create_engine('postgresql://simon:pool@localhost:5432/cs50_recipes')
+    if db_to_use == 'POSTGRES_DB_LOCAL':
+        #engine = create_engine(os.environ['DATABASE_URL'])      # pick up from environment - work local/heroku
+        engine = create_engine('postgresql://simon:@localhost:5432/cs50_recipes')  # database name different    
 
-elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_OSX':
-    engine = create_engine('postgresql://simon:pool@postgres-container:5432/cs50_recipes')
-    #                                   container name ^
+    elif db_to_use == 'POSTGRES_DB_DOCKER_OSX':
+        create_database_if_not_exists('simon', 'pool', 'localhost', '5432', 'cs50_recipes')
+        engine = create_engine('postgresql://simon:pool@localhost:5432/cs50_recipes')
 
-elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
-    engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
+    elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_OSX':
+        engine = create_engine('postgresql://simon:pool@postgres-container:5432/cs50_recipes')
+        #                                   container name ^
 
-elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX':
-    create_database_if_not_exists('postgres', 'snacktime', 'creativemateriel.synology.me', '7432', 'cs50_recipes')    
-    engine = create_engine('postgresql://postgres:snacktime@creativemateriel.synology.me:7432/cs50_recipes')
+    elif db_to_use == 'POSTGRES_DB_DOCKER_NAS':
+        engine = create_engine('postgresql://postgres:meepmeep@synologynas.local:6432/cs50_recipes')
 
-elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS':
-    create_database_if_not_exists('postgres', 'snacktime', 'creativemateriel.synology.me', '7432', 'cs50_recipes')
-    engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:7432/cs50_recipes')    
+    elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS_FROM_OSX':
+        create_database_if_not_exists('postgres', 'snacktime', 'creativemateriel.synology.me', '7432', 'cs50_recipes')    
+        engine = create_engine('postgresql://postgres:snacktime@creativemateriel.synology.me:7432/cs50_recipes')
 
-    #                                           container name ^
-
-
-helper_db_class_db = scoped_session(sessionmaker(bind=engine))
-print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
+    elif db_to_use == 'POSTGRES_DB_DOCKER_INTERNAL_NAS':
+        create_database_if_not_exists('postgres', 'snacktime', 'postgres-container-n', '5432', 'cs50_recipes')
+        engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:5432/cs50_recipes')    
+        #                                           container name ^
+    helper_db_class_db = scoped_session(sessionmaker(bind=engine))
+    print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
 
 # stub files for data
 from config_files import get_config_or_data_file_path

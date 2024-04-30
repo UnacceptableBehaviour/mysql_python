@@ -1,52 +1,63 @@
 version: '3.8'
 
 services:
+  asset_server:
+    container_name: asset_server-n
+    build:
+      context: ./asset_server
+      dockerfile: Dockerfile
+    volumes:
+      - /volume1/docker/dtk-swarm-2/asset_server:/asset_server
+    networks:
+      dtk-network:
+        aliases:
+          - asset.server
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+
 
   postgres:
-    container_name: postgres-container
-    build:
-      context: ./docker_postgres
-      dockerfile: Dockerfile
-    volumes:
-      - /Users/simon/a_syllabus/lang/docker/postgres_data:/var/lib/postgresql/data
-    networks:
-      - dtk-network
+    container_name: postgres-container-n
+    image: postgres:13-alpine
+    restart: always
     environment:
-      - POSTGRES_USER=simon
-      - POSTGRES_PASSWORD=pool
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=snacktime
+      - POSTGRES_DB=cs50_recipes
     ports:
-      - "5432:5432"
-
-  asset_server:
-    container_name: asset_server
-    build:
-      context: ../asset_server
-      dockerfile: Dockerfile
-    volumes:
-      - ../asset_server/:/asset_server
+      - "7432:5432"
     networks:
       - dtk-network
-    ports:
-      - "8080:8080"      
+    volumes: 
+      - /volume1/docker/dtk-swarm-2/postgres/data:/var/lib/postgresql/data
 
+     
   dtk_health:
-    container_name: dtk_health
+    container_name: dtk_health-n
     build:
-      context: ./
+      context: ./dtk_health/mysql_python
       dockerfile: Dockerfile
     networks:
       - dtk-network
     environment:
       - FLASK_ENV=development
       - FLASK_APP=hello.py
-      - DB_CONTAINER=postgres-container
+      - DB_CONTAINER=postgres-container-n
     ports:
       - "50015:50015"
+    depends_on:
+      - asset_server-n
+      - postgres-container-n
 
 networks:
   dtk-network:
     driver: bridge
     name: dtk-network
+
+volumes:
+  postgres:
+    driver: local      
 
 
 # COMMAND BASICS

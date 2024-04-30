@@ -35,6 +35,19 @@ from helpers_db import get_user_devices, store_user_devices, commit_User_Devices
 from helpers_db import process_search
 from helpers_db import get_user_info_dict, remove_favs_from_DB, get_user_info_dict_from_DB, update_user_info_dict
 
+from helpers_db import set_DB_connection, db_to_use_string
+
+db_container = os.getenv('DB_CONTAINER', 'localhost')
+print(f"POSTGRES CONTAINER: {db_container}")
+if db_container == 'postgres-container':    
+    set_DB_connection(db_to_use_string[2])
+elif db_container == 'postgres-container-n':
+    set_DB_connection(db_to_use_string[5])
+elif db_container == 'creativemateriel.synology.me':
+    set_DB_connection(db_to_use_string[4])
+else:
+    set_DB_connection(db_to_use_string[0])
+
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
 # to UPDATE ASSET SERVER and postgreSQL DB with current assets
