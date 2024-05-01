@@ -288,7 +288,7 @@ def get_recipe_file_contents_from_asset_server(recipe_text_filename, dbg_print=F
     recipe_text = 'FILE ACCESS ERROR: NO FILE or NO DATA IN FILE'
 
     if dbg_print: print("----- get_recipe_ingredients_and_yield -------------------------------------------------")
-    base_url = 'https://asset.server:8080/static/recipe/'
+    #base_url = 'https://asset.server:8080/static/recipe/'
     base_url = 'http://127.0.0.1:8000/static/recipe/'
     url = f"{base_url}{recipe_text_filename}"
     if dbg_print: print(url)

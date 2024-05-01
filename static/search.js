@@ -197,11 +197,9 @@ function renderRecipeCard(rcpInfo){
 
   // TODO - serve from environment
   //ASSET_ROOT = 'http://192.168.1.13:8000/'
-  ASSET_ROOT = 'https://asset.server:8080/'   // otherwise https fails - & no images
+  //ASSET_ROOT = 'https://asset.server:8080/'   // otherwise https fails - & no images
+  ASSET_ROOT = ''
   assets_url = `${ASSET_ROOT}static/recipe/`; // local dev
-
-  //ASSET_ROOT = ''
-  //assets_url = `${ASSET_ROOT}static/images/`; // heroku
 
   var html_stars = '';
   for ( var i = 0; i < 5; i++ ) {

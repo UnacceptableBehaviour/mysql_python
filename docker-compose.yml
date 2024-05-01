@@ -34,6 +34,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    volumes:
+      - ../asset_server/static/recipe:/mysql_python/static/recipe
     networks:
       - dtk-network
     environment:

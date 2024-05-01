@@ -38,6 +38,8 @@ services:
     build:
       context: ./dtk_health/mysql_python
       dockerfile: Dockerfile
+    volumes:
+      - /volume1/docker/dtk-swarm-2/asset_server/static/recipe:/mysql_python/static/recipe
     networks:
       - dtk-network
     environment:

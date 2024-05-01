@@ -114,8 +114,8 @@ function scrollToRecipe(event) {
 function addImage(rc, r) {
   let el = document.createElement('img');
   el.classList.add('rcp-image');
-  //el.src = `static/images/${r.lead_image}`;
-  el.src = `https://asset.server:8080/static/recipe/${r.lead_image}`;
+  el.src = `static/recipe/${r.lead_image}`;
+  //el.src = `https://asset.server:8080/static/recipe/${r.lead_image}`;
   rc.appendChild(el);
 }
 

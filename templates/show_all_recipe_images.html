@@ -11,7 +11,8 @@
     <p>{{ recipe['ri_id'] }} - {{ recipe['ri_name'] }} - {{ recipe['lead_image'] }}</p>
     <div class="gallery_image">
 
-        <image src="https://asset.server:8080/static/recipe/{{ recipe['lead_image'] }}" width='100%'>
+        <!-- <image src="https://asset.server:8080/static/recipe/{{ recipe['lead_image'] }}" width='100%'> -->
+            <image src="static/recipe/{{ recipe['lead_image'] }}" width='100%'>
     </div>
     <br>
     {% endfor %}
