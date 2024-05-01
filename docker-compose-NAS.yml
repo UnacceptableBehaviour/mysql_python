@@ -49,8 +49,8 @@ services:
     ports:
       - "50015:50015"
     depends_on:
-      - asset_server-n
-      - postgres-container-n
+      - asset_server
+      - postgres
 
 networks:
   dtk-network:
