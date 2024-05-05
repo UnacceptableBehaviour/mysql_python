@@ -2,6 +2,18 @@ version: '3.8'
 
 services:
 
+  asset_server:
+    container_name: asset_server
+    build:
+      context: ../asset_server
+      dockerfile: Dockerfile
+    volumes:
+      - ../asset_server/:/asset_server
+    networks:
+      - dtk-network
+    ports:
+      - "8080:8080"      
+
   postgres:
     container_name: postgres-container
     build:
@@ -17,18 +29,6 @@ services:
     ports:
       - "5432:5432"
 
-  asset_server:
-    container_name: asset_server
-    build:
-      context: ../asset_server
-      dockerfile: Dockerfile
-    volumes:
-      - ../asset_server/:/asset_server
-    networks:
-      - dtk-network
-    ports:
-      - "8080:8080"      
-
   dtk_health:
     container_name: dtk_health
     build:
@@ -36,6 +36,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../asset_server/static/recipe:/mysql_python/static/recipe
+      - /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_docr_support/archive:/mysql_python/scratch/_docr_support/archive      
     networks:
       - dtk-network
     environment:
