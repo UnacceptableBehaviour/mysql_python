@@ -230,7 +230,7 @@ def process_new_dtk_from_user(dtk_data):
     # fire up ccm_nutridoc_web.rb PROCESS DTK data
     arg1 = f"{dtk_data['dtk_weight']}"
     arg2 = f"file={post_interface_file()}"
-    data_from_nutriprocess = subprocess.check_call(["ccm_nutridoc_web.rb", arg1, arg2])
+    data_from_nutriprocess = subprocess.check_call(["./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-S")
     print(data_from_nutriprocess)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-E")
