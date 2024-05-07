@@ -46,7 +46,7 @@ elif db_container == 'postgres-container-n':
 elif db_container == 'creativemateriel.synology.me':
     set_DB_connection(db_to_use_string[4])
 else:
-    set_DB_connection(db_to_use_string[0])
+    set_DB_connection(db_to_use_string[1])
 
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
