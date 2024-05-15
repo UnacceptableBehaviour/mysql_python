@@ -58,6 +58,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 def set_DB_connection(db_to_use):
     global helper_db_class_db
+    global engine
     print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------S")
 
     if db_to_use == 'POSTGRES_DB_LOCAL':
@@ -83,7 +84,9 @@ def set_DB_connection(db_to_use):
         create_database_if_not_exists('postgres', 'snacktime', 'postgres-container-n', '5432', 'cs50_recipes')
         engine = create_engine('postgresql://postgres:snacktime@postgres-container-n:5432/cs50_recipes')    
         #                                           container name ^
+    print(f"engine: {engine}")
     helper_db_class_db = scoped_session(sessionmaker(bind=engine))
+    print(f"helper_db_class_db: {helper_db_class_db}")
     print(f"----- helpers_db: attaching to DB [{db_to_use}]------------------------------------E")
 
 # stub files for data

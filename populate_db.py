@@ -4,10 +4,21 @@ import sys
 
 opt_dict = {
     'verbose_mode':     False,
+    'db_docker_NAS':    True,
+    'db_docker_OSX':    False,
 }
 
 if '-v' in sys.argv:
     opt_dict['verbose_mode'] = True
+
+if '-nas' in sys.argv:
+    opt_dict['db_docker_NAS'] = True
+    opt_dict['db_docker_OSX'] = False
+
+if '-osx' in sys.argv:
+    opt_dict['db_docker_NAS'] = False
+    opt_dict['db_docker_OSX'] = True
+
 
 
 help_string = f'''\n\n\n
@@ -16,6 +27,8 @@ Look up food info details. . .
 
 - - - options - - - 
 -v          Verbose mode turn on more diagnostics
+-osx        use OSX DB
+-nas        use NAS DB  default
 
 -h          This help
 '''
@@ -58,7 +71,7 @@ from pathlib import Path
 # refresh the asset server with any new data
 import subprocess
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 # sessions
 # https://docs.sqlalchemy.org/en/latest/orm/session_basics.html
@@ -78,7 +91,7 @@ import urllib.parse          # used to parse passwords into url format
 url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
-from helpers_db import get_search_settings_dict, db_to_use, engine
+from helpers_db import get_search_settings_dict, set_DB_connection, db_to_use_string
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -112,9 +125,41 @@ from helpers_db import get_search_settings_dict, db_to_use, engine
 
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
 
-print(f"> > > > Populating DB: {db_to_use}")
+
+connection_string = db_to_use_string[4] # NAS - docker
+if opt_dict['db_docker_OSX'] == True:
+    # OSX - docker
+    connection_string = db_to_use_string[1]
+
+set_DB_connection(connection_string)
+
+from helpers_db import engine,helper_db_class_db
+
+print(f"> > > > Populating DB: {connection_string}")
 pprint(engine)
-db = scoped_session(sessionmaker(bind=engine))
+db = helper_db_class_db
+
+
+# # Check for other connections - IE flask server
+# #engine = create_engine('postgresql://postgres:snacktime@creativemateriel.synology.me:7432/cs50_recipes')
+
+# # Query to get the number of active connections
+# query = text("SELECT COUNT(*) FROM pg_stat_activity WHERE datname = 'cs50_recipes';")
+
+# # Execute the query
+# result = engine.execute(query)
+
+# # Fetch the first row (there should only be one row)
+# row = result.fetchone()
+
+# # The count is in the first column
+# num_connections = row[0]
+
+# # If there are other connections
+# if num_connections > 1:
+#     print(f"There are {num_connections - 1} other connections to the database.")
+#     input("Press Enter to continue after all users have saved their data and exited...")
+
 
 
 print("----- populate_asset_server.rb ----------------------------------------- ASSET SERVER POPULATION FEEDBACK - S")
@@ -471,7 +516,7 @@ def main():
 
 if __name__ == '__main__':
     main()
-    print(f"\n> > > > > Populated DB: {db_to_use}")
+    print(f"\n> > > > > Populated DB: {db_to_use_string[4]}")
     pprint(engine)
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
