@@ -790,6 +790,7 @@ function addItemToTableFromForm(e){
 
   console.log(dtk['dtk_rcp']['ingredients']);
   
+saveDailyTrackerToLocalStorage();
 }
 
 //
@@ -921,6 +922,8 @@ function clickHandler(e) {
     tableBody.removeChild(tableRow);
     
     invalidateYield();
+
+    saveDailyTrackerToLocalStorage();   // make data persistent when tabs change
   }
   
 }
@@ -1240,7 +1243,8 @@ function fetchUpdateDailyTrackerNutrients() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // build tracker table
-buildTableFromDailyTracker();
+loadDailyTrackerFromLocalStorage();
+
 
 
 var array = [0, 1, null, 2, "", 3, undefined, 3,,,,,, 4,, 4,, 5,, 6,,,,];
