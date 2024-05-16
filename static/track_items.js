@@ -482,6 +482,7 @@ function splitLineIntoQtyAndIngredient(newItem){
 //const SERVING_INDEX = 2;
 //const INGREDIENT_INDEX = 3;
 //const TRACK_NIX_TIME = 4;
+//const NO_NUTRINFO = 5;      << NEED to send from server / local storage
   
   //return [isIngredientAtomic(ingredient), qtyUnits, servings, (`${modifier} ${ingredient}`).trim()];
   return [isIngredientAtomic(newItem), qtyUnits, servings, (`${modifier} ${ingredient}`).trim(), new_timestamp];
@@ -671,11 +672,11 @@ function addRowToTable(table, ingredient_array){
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Traversing_an_HTML_table_with_JavaScript_and_DOM_Interfaces
 function buildTableFromDailyTracker(){
-  // load loacally stored dailyTracker
+  // load loacally stored dailyTracker  < already done
   
-  // compare to version from server
+  // compare to version from server - if newer update <<<
   
-  // render selected version
+  // render selected version  <<< where is this loaded?
   
   // get handle to table
   table = document.getElementById('table-tracked-items');
@@ -790,7 +791,7 @@ function addItemToTableFromForm(e){
 
   console.log(dtk['dtk_rcp']['ingredients']);
   
-saveDailyTrackerToLocalStorage();
+  saveDailyTrackerToLocalStorage();
 }
 
 //
@@ -1142,17 +1143,23 @@ function loadDailyTrackerFromLocalStorage(){
   lastSavedFile = window.localStorage.getItem('lastSavedFile');  
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) ); // key = content of lastSavedFile
   
-  //  
-  // TODO compare to dtk - select most recent - server side at the mo
-  //
-  dtk = dtkLocal
+  // if server side has archived & rolled over to fresh day prefer it instead
+  if (dtkLocal['dtk_rcp']['dt_rollover'] < dtk['dtk_rcp']['dt_rollover']) {
+    console.log('WARNING ROLLED OVER using FRESH server dtk');
+    console.log(`dtkLocal_ro: ${dtkLocal['dt_rollover']} < dtk_ro: ${dtk['dt_rollover']} = ${dtkLocal['dt_rollover'] < dtk['dt_rollover']}`);
+  } else {
+    console.log('loadDailyTrackerFromLocalStorage: LOADED ');
+    console.log(`dtkLocal_ro: ${dtkLocal['dt_rollover']} < dtk_ro: ${dtk['dt_rollover']} = ${dtkLocal['dt_rollover'] < dtk['dt_rollover']}`);
+    dtk = dtkLocal;
+  }
+  
   dtkState = 'yieldInvalid';
 
   console.log(`Loaded DTK = ${dtk} <<\n<<\n<<\n<<`);
-    
-  // rebuild it from dtk
+
   buildTableFromDailyTracker();
 }
+
 
 // post DTK for processing to...
 // fetch Nutrients
@@ -1244,7 +1251,6 @@ function fetchUpdateDailyTrackerNutrients() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // build tracker table
 loadDailyTrackerFromLocalStorage();
-
 
 
 var array = [0, 1, null, 2, "", 3, undefined, 3,,,,,, 4,, 4,, 5,, 6,,,,];

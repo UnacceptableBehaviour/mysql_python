@@ -157,15 +157,27 @@ def create_human_readable_DTK_spec(dtk):
 
 # awaiting implementation
 #
-def post_DTK_info_for_processing(dtk):
+def post_DTK_info_for_processing(dtk, archive=False):
     # create DTK
     dtk_spec = create_human_readable_DTK_spec(dtk)
 
-    # file it - post_interface_file() get the name of filee from
-    # a shared config file - a json file
-    with open(post_interface_file(), 'w') as i_face_out:
+    print(f"> - - post_DTK_info_for_processing - - - S\n{archive}\n ^ ^ ^ ^ ^ ")
+    pprint(dtk)
+    pprint(dtk_spec)
+
+    if (archive==False):
+        # file it - post_interface_file() get the name of file from config file - a json file
+        target_file = post_interface_file()
+
+    else: # archive it on roll over - TODO REMOVE this is to simplify dev 
+        hr_archive = archive.replace('.json', '.txt')
+        target_file = Path(get_config_or_data_file_path("archive_path")).joinpath(hr_archive)
+
+    with open(target_file, 'w') as i_face_out:
         i_face_out.write(dtk_spec)
         i_face_out.close()
+
+    print("> - - post_DTK_info_for_processing - - - E")
 
 
 def get_DTK_info_from_processing(dtk):
@@ -284,7 +296,7 @@ def archive_dtk(dtk):
         archive_dtk = dtk
         print("Archiving DEV directly")
 
-    archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}_{hr_readable_date_from_nix(serv_dtk['dtk_rcp']['dt_rollover'])}.json"
+    archfile_name = f"{archive_dtk['dtk_user_info']['UUID']}_{archive_dtk['dtk_user_info']['name']}_{serv_dtk['dtk_rcp']['dt_rollover']}_{hr_readable_date_from_nix(serv_dtk['dtk_rcp']['dt_date'])}.json"
 
     arch_target = Path(get_config_or_data_file_path("archive_path")).joinpath(archfile_name)
 
@@ -298,6 +310,9 @@ def archive_dtk(dtk):
     print(f"DEV:{dtk['dtk_user_info']['name']} - {dtk['dtk_user_info']['UUID']} - {dtk['dtk_rcp']['dt_last_update']}")
     print(f"ARC:{archive_dtk['dtk_user_info']['name']} - {archive_dtk['dtk_user_info']['UUID']} - {archive_dtk['dtk_rcp']['dt_last_update']}")
     pprint(archive_dtk)
+
+    # to allow inspection and cpoying to nutridocs for processing / analysis
+    post_DTK_info_for_processing(dtk, archfile_name)
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")
 
 
