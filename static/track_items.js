@@ -1,8 +1,8 @@
 var nutri_table = document.getElementById('nutri_taffic_table_main');
 // remove servings & buttons from nutritable - makes no sense for tracker
-document.getElementById('traffic_title_0').remove();
-document.getElementById('b_update_0').remove();
-document.getElementById('b_clear').remove();
+// document.getElementById('traffic_title_0').remove();
+// document.getElementById('b_update_0').remove();
+// document.getElementById('b_clear').remove();
 
 
 const ATOMIC_INDEX = 0;        // default value is 1 - TRUE
