@@ -40,6 +40,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /volume1/docker/dtk-swarm-2/asset_server/static/recipe:/mysql_python/static/recipe
+      - /volume1/docker/dtk-swarm-2/dtk_health/_docr_support:/mysql_python/scratch/_docr_support
       - /volume1/docker/dtk-swarm-2/dtk_health/archive:/mysql_python/scratch/_docr_support/archive
     networks:
       - dtk-network

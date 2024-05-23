@@ -63,5 +63,11 @@ networks:
 # docker-compose down         # Stop the containers
 
 # docker-compose logs -f      # View logs from all containers
-# docker-compose exec app sh  # Shell into a container
+
 # docker-compose restart      # Restart all containers
+
+                              # Shell into a container
+# docker exec -it dtk_health-n /bin/sh                          # if running
+# docker run -it --entrypoint /bin/sh dtk-swarm-2-dtk_health    # if not
+# docker run -it --entrypoint /bin/sh -v /volume1/docker/dtk-swarm-2/dtk_health/_docr_support:/mysql_python/scratch/_docr_support dtk-swarm-2-dtk_health
+# docker-compose run --entrypoint /bin/sh dtk_health            # using compose w/ service name
