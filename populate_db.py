@@ -6,6 +6,7 @@ opt_dict = {
     'verbose_mode':     False,
     'db_docker_NAS':    True,
     'db_docker_OSX':    False,
+    'clean_container':  False,
 }
 
 if '-v' in sys.argv:
@@ -19,6 +20,8 @@ if '-osx' in sys.argv:
     opt_dict['db_docker_NAS'] = False
     opt_dict['db_docker_OSX'] = True
 
+if '-r' in sys.argv:
+    opt_dict['clean_container'] = True
 
 
 help_string = f'''\n\n\n
@@ -29,6 +32,9 @@ Look up food info details. . .
 -v          Verbose mode turn on more diagnostics
 -osx        use OSX DB
 -nas        use NAS DB  default
+
+-r          clean container - remove all file and re-clone from git
+            user data left intact
 
 -h          This help
 '''
@@ -70,6 +76,7 @@ from pathlib import Path
 
 # refresh the asset server with any new data
 import subprocess
+import os
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -126,7 +133,7 @@ from helpers_db import get_search_settings_dict, set_DB_connection, db_to_use_st
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
 
 
-connection_string = db_to_use_string[4] # NAS - docker
+connection_string = db_to_use_string[4] # NAS - docker opt_dict['db_docker_NAS'] == True
 if opt_dict['db_docker_OSX'] == True:
     # OSX - docker
     connection_string = db_to_use_string[1]
@@ -518,6 +525,25 @@ if __name__ == '__main__':
     main()
     print(f"\n> > > > > Populated DB: {db_to_use_string[4]}")
     pprint(engine)
+    if opt_dict['clean_container'] == True:
+        print("CLEANING CONTAINER - removing all files and re-cloning from git")
+
+        # Define the command and directory
+        command = './dockerClone-2-NAS-Setup.sh'
+        directory = '/Volumes/docker/dtk-swarm-2/dtk_health'
+
+        # Change to the specified directory
+        os.chdir(directory)
+
+        # Run the command
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+        # If the command returned a non-zero exit status, raise an exception
+        if result.returncode != 0:
+            raise Exception(f'The command "{command}" failed with the following output:\n{result.stderr}')
+        
+        print(result.stdout)    # inspect the output - remove    
+
     # with PyCallGraph(output=graphviz, config=config):
     #     main()
 
