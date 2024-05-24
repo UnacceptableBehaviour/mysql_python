@@ -26,7 +26,8 @@ if '-r' in sys.argv:
 
 help_string = f'''\n\n\n
 HELP:\n
-Look up food info details. . . 
+Populate asset server from workflow - create CSV file for DB population
+Create DB from asset server . . . using CSV, & txt files.
 
 - - - options - - - 
 -v          Verbose mode turn on more diagnostics
@@ -175,11 +176,15 @@ print("----- populate_asset_server.rb ----------------------------------------- 
 force_complete_rebuild = True
 
 if ( force_complete_rebuild == True ):
+    from synch_assets_to_nas import sync_files_to_nas
     # .rb find txt recipes and jpgs of those recipes
     # resizes images and copies both to asset server
     # also creates a CSV file with synopsis, and nutrition info for creating DB (done by this script)
     population_data = subprocess.check_output(['populate_asset_server.rb'])
     if opt_dict['verbose_mode']: print(population_data)
+    
+    sync_files_to_nas()
+    #sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})
 else:
     print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
 
