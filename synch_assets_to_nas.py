@@ -65,7 +65,7 @@ def sync_files_to_nas(opts=opt_dict):
 
 
 if __name__ == '__main__':
-    #sync_files_to_nas(opt_dict)
-    sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})
+    sync_files_to_nas(opt_dict)
+    #sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})
     print("Done.")
     sys.exit(0)
