@@ -394,6 +394,108 @@ def get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id_or_na
     return return_recipe
 
 
+
+# # scan ingredients for subcomponents - recurse until ALL ATOMIC!
+# # return a list of components id's
+# def get_ri_ids_with_subcompnents_from_rcp_dict_as_list(rcp_dict):
+#     def flatten(lst):
+#         result = []
+#         for i in lst:
+#             if isinstance(i, list):
+#                 result.extend(flatten(i))
+#             else:
+#                 result.append(i)
+#         return result
+
+#     nested_list = [1, [2,[3,4],5],[6,7],8]
+#     flat_list = flatten(nested_list)
+#     print(flat_list)  # Output: [1, 2, 3, 4, 5, 6, 7, 8]
+
+#     return_list = []
+
+#     # get base recipe
+#     print(f"> - - - - - get_list {rcp_dict['ri_name']}")
+#     #pprint(rcp_dict)
+#     pprint(rcp_dict['ri_id'])
+
+#     return_list.append( rcp_dict['ri_id'] )
+
+#     # go through ingredients and load non-atomic (IE subcomponents) into components
+#     #for ingredient in return_recipe['ingredients']:
+#     for component in rcp_dict['components']:
+
+#         #subcomponents = get_ri_ids_with_subcompnents_from_rcp_dict_as_list(component)
+
+#         return_list.append(  get_ri_ids_with_subcompnents_from_rcp_dict_as_list(rcp_dict['components'][component]) )
+
+#         return_list = flatten(return_list)
+
+#     return return_list
+
+# def convert_tree_to_list_of_leaves_dict_components(rcp_tree):
+#     stack = list(rcp_tree['components'].values())  # Start with the components of the root
+#     leaf_list = []
+
+#     while stack:
+#         node = stack.pop()  # Get the next node
+#         if 'components' in node and node['components']:  # If the node has components
+#             stack.extend(node['components'].values())  # Add the components to the stack
+#         else:  # If the node has no components
+#             leaf_list.append(node)  # It's a leaf, so add it to the leaf list
+
+#     return leaf_list
+# TODO would it be better to add an unroll flag to the recipe dictionary and do this on the device?
+# as in in JS land?
+# def convert_tree_to_list_of_dict_components(tree):
+#     leaf_list = []
+
+#     def dfs(node):
+#         print(f"DFS: {node['ri_name']}")
+#         if 'components' in node and node['components']:  # If the node has components
+#             for child in node['components'].values():  # For each child
+#                 print(f"child: {child['ri_name']}")
+#                 dfs(child)  # Recurse on the child
+#         else:  # If the node has no components
+#             leaf_list.append(node)  # It's a leaf, so add it to the leaf list
+#             print(f"append: {node['ri_name']}")
+
+#     while 'components' in tree and tree['components']:
+#         dfs(tree)  # Start the DFS at the root
+
+#     return leaf_list
+
+def convert_tree_to_list_of_dict_components(tree):
+    leaf_list = []
+
+    def dfs(node, parent=None, key=None):
+        print(f"DFS: {node['ri_name']}")
+        if 'components' in node and node['components']:  # If the node has components
+            for child_key, child in list(node['components'].items()):  # For each child
+                print(f"child: {child['ri_name']}")
+                dfs(child, node, child_key)  # Recurse on the child
+        else:  # If the node has no components
+            leaf_list.append(node)  # It's a leaf, so add it to the leaf list
+            print(f"append: {node['ri_name']}")
+            if parent is not None:
+                parent['components'].pop(key)  # Remove the node from its parent's components
+
+    while 'components' in tree and tree['components']:
+        for root_key, root in list(tree['components'].items()):
+            dfs(root, tree, root_key)  # Start the DFS at the root
+
+    print(f">> ri_name: {tree['ri_name']}")
+    pprint(tree)
+    print(' - o - ')
+    
+
+    # add tree to the front of the list
+    #leaf_list.reverse() < NOPE
+    leaf_list.reverse()
+    leaf_list.append(tree)
+    leaf_list.reverse()
+
+    return leaf_list
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # get more than one recipe, for comparison for example
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

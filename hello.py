@@ -29,6 +29,8 @@ from timestamping import hr_readable_from_nix, roll_over_from_nix_time
 from helpers_db import get_all_recipe_ids, get_gallery_info_for_display_as_list_of_dicts, get_single_recipe_from_db_for_display_as_dict
 from helpers_db import get_recipes_for_display_as_list_of_dicts, toggle_filter, return_recipe_dictionary
 from helpers_db import get_single_recipe_with_subcomponents_from_db_for_display_as_dict, add_ingredient_w_timestamp
+#from helpers_db import get_ri_ids_with_subcompnents_from_rcp_dict_as_list
+from helpers_db import convert_tree_to_list_of_dict_components
 from helpers_db import get_recipes_with_subcomponents_for_display_as_list_of_dicts
 from helpers_db import get_daily_tracker, commit_DTK_DB, bootstrap_daily_tracker_create
 from helpers_db import get_user_devices, store_user_devices, commit_User_Devices_DB
@@ -250,7 +252,6 @@ def home_list_of_favourites():
     return render_template('show_fav_rcp_cards.html', recipes=recipes)
 
 
-
 @app.route('/db_recipe_list', methods=["GET","POST"])
 def db_recipe_list():
     if request.method =='POST':
@@ -465,7 +466,7 @@ def settings():
             return json.dumps({}), 404
 
 
-    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')   
     user_info.pop('devices', None) # setting per device? - Use case multi users using one account different devices.
 
     sql_query = "SELECT DISTINCT unnest(types) AS all_types FROM recipes;"
@@ -483,10 +484,45 @@ def settings():
     return render_template('settings_t.html', user_info=user_info)
 
 
+
+@app.route('/email_debug', methods=["GET", "POST"])
+def email_debug():
+    if request.method =='POST':
+        return 
+
+    # display all favs recipes
+    #user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
+    #recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
+    #if len(user_info['fav_rcp_ids']) == 0:
+    #    recipes = [return_recipe_dictionary()]
+
+    # pass this into route
+    ri_id = 927 
+    ri_id = 37
+    
+    # get all the sub components in the recipe
+    rcp_tree = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id)
+    #pprint(rcp_tree)
+
+    # # create ri_id list of the subcomponents
+    # ri_id_list = get_ri_ids_with_subcompnents_from_rcp_dict_as_list(rcp_tree)
+    # #ri_id_list = ['926']
+    # pprint(ri_id_list)
+    # # get all the subcomponents as rcp info
+    # recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(ri_id_list) 
+
+    recipes = convert_tree_to_list_of_dict_components(rcp_tree)    
+
+    print('> > > > - - - - - - > > > > - - - - - - > > > > - - - - - - > > > > - - - - - - S')
+    pprint(recipes)
+    print('> > > > - - - - - - > > > > - - - - - - > > > > - - - - - - > > > > - - - - - - E')
+    
+    return render_template('email_debug_t.html', recipes=recipes)
+
+
 last_search_result_recipes = {}
 MISSLABELED_FILE_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json')
 FAV_TYPE_GROUPING_DIR = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF_LABELS')
-
 
 @app.route('/search', methods=["GET", "POST"])
 def search_ingredient():
