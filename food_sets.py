@@ -1233,7 +1233,7 @@ crustaceans_subsets = {
     'lobster' : {'american lobster','rock lobster','spiny lobster','red lobster','canadian lobster'},
     'crayfish' : {'marron','koura'},
     'prawns' : {'tiger prawns','king prawns','cooked prawns','fresh prawns','fresh water prawns','tiger prawn',
-                'king prawn','cooked prawn','fresh prawn','fresh water prawn'}
+                'king prawn','cooked prawn','fresh prawn','fresh water prawn','argentinian prawns','argentinian prawn'}
 }
 def build_crustaceans_set():
     crustaceans = {'crustacean','crustaceans'}
