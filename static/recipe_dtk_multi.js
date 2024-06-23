@@ -133,12 +133,14 @@ function addImageNav(rc, r) {
     
   addImage(imgNav, r);
   
-  let removeB = document.createElement('button');
-  removeB.classList.add('btn', 'btn-outline-secondary', 'btn-sm', 'rbut-x');
-  removeB.textContent = 'X';
-  removeB.addEventListener('click', removeRecipeCard);
-  imgNav.appendChild(removeB);
-  
+  if (r.blog_post !== true) { // don't include the X button in blog posts
+    let removeB = document.createElement('button');
+    removeB.classList.add('btn', 'btn-outline-secondary', 'btn-sm', 'rbut-x');
+    removeB.textContent = 'X';
+    removeB.addEventListener('click', removeRecipeCard);
+    imgNav.appendChild(removeB);
+  }
+
   if (r.back !== null) {
     let bakB = document.createElement('button');
     bakB.classList.add('btn', 'btn-outline-secondary', 'btn-sm', 'rbut-bk');
@@ -190,7 +192,8 @@ function addIngredients(rc, r){
   // title - makes: Xg - Serves: N
   let elTitle = document.createElement('div');
   elTitle.classList.add('rcp-igds');
-  let innerHTML = `<span>Ingredients</span><span>Makes: ${r.nutrinfo.yield}${r.nutrinfo.units} - Serves: ${r.nutrinfo.servings}</span>`;
+  servingsText = (r.nutrinfo.servings === -1) ? '' : ` (${r.nutrinfo.servings})`;
+  let innerHTML = `<span>Ingredients</span><span>Makes: ${r.nutrinfo.yield}${r.nutrinfo.units}${servingsText}</span>`;
   elTitle.innerHTML = innerHTML;
   el.appendChild(elTitle);
   
@@ -204,23 +207,33 @@ function addIngredients(rc, r){
     // contsturct html for each ingredient line
     let elIgdLine = document.createElement('tr');
     let innerHTML = '';
-    innerHTML += '<td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete" style="">X</button></td>';
+
+    if (r.blog_post !== true) {
+      innerHTML += '<td class="col-but-all text-center"><button class="btn btn-danger btn-sm delete" style="">X</button></td>';
+    }
     innerHTML += `<td class="col-but-qty text-center">${r.ingredients[i][IGD_IDX_QTY]}</td>`;
 
     let insert = '';
     if (r.ingredients[i][IGD_IDX_EACH] !== '(0)') {
       insert = r.ingredients[i][IGD_IDX_EACH];
     }
+    
     innerHTML += `<td class="col-but-qty text-center">${insert}</td>`;
+    
     innerHTML += `<td class="col-but-ingdt">${r.ingredients[i][IGD_IDX_NAME]}</td>`;
-    innerHTML += '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right" style=""><img src="static/png/camera.png" alt="tick" srcset="static/svg/camera.svg"></button></td>';
-
+    
+    if (r.blog_post !== true) { 
+      innerHTML += '<td class="col-but-all"><button class="btn btn-secondary btn-sm snapshot float-right" style=""><img src="static/png/camera.png" alt="tick" srcset="static/svg/camera.svg"></button></td>';
+    } 
+    
     if (parseInt(r.ingredients[i][IGD_IDX_TYPE]) === IGD_TYPE_DERIVED) {
-      innerHTML += `<td class="col-but-all"><a class="rcp-r btn btn-sm btn-outline-secondary float-right" href="#" role="button" style="" value="${r.ingredients[i][IGD_IDX_NAME]}">R</a></td>`;
-      // call createRecipeCard(ri_id_lookup[ri_id])
-      // gallery
-      // <form action={{url_for('db_recipe_page')}} method='POST'>
-      // <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
+      if (r.blog_post !== true) {
+        innerHTML += `<td class="col-but-all"><a class="rcp-r btn btn-sm btn-outline-secondary float-right" href="#" role="button" style="" value="${r.ingredients[i][IGD_IDX_NAME]}">R</a></td>`;
+      } else {
+        let href_id = idFromName(r.ingredients[i][IGD_IDX_NAME]);
+        innerHTML += `<td class="col-but-all"><a class="rcp-r btn btn-sm btn-outline-secondary float-right" href="#${href_id}" role="button" style="opacity: 0.5;" value="${r.ingredients[i][IGD_IDX_NAME]}">(recipe below)</a></td>`;
+      }
+
     } else {
       innerHTML += '<td class="col-but-all"></td>';  
     }
@@ -432,8 +445,11 @@ function createRecipeCard(r) {
   addRecipeTextSections(recipeCard, r);
   
   //addNutrition(recipeCard, r);
-  
-  recipeCard.appendChild(document.createElement('hr')) // add separator
+  if (r.blog_post !== true) {
+    recipeCard.appendChild(document.createElement('hr')) // add separator
+  } else {
+    recipeCard.appendChild(document.createElement('br')) // add separator
+  }
 
   return recipeCard;
 }
@@ -444,6 +460,11 @@ function loadDTKRecipe(targetContainerID, recipe=rcp_guinea_dinner){
 
   const subContainer   = document.createElement('div');
   subContainer.id = `rcp-multi-target-${recipe.ri_id}`
+
+  // this shows up in the summary of blogger posts
+  const titleForBlog = document.createElement('title'); 
+  titleForBlog.textContent = recipe.description;
+  subContainer.appendChild(titleForBlog);
   
   const targetContainer = document.getElementById(targetContainerID);  
 
@@ -454,7 +475,7 @@ function loadDTKRecipe(targetContainerID, recipe=rcp_guinea_dinner){
   subContainer.appendChild(htmlCard);
   
   targetContainer.appendChild(subContainer);
-  console.log('complete');  
+  console.log('complete');
 }
 
 

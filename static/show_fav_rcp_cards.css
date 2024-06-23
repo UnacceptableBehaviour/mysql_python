@@ -81,10 +81,17 @@ body {
   font-size: 0.75em;  
 }
 
-.close {
+.blog-post {
   position: absolute;
   bottom: 0.1em;
-  right: 0.1em;
+  right: 1.8em;
+}
+
+
+.favs-close {
+  position: absolute;
+  bottom: 0.1em;
+  right: 0.3em;
 }
 
 p {

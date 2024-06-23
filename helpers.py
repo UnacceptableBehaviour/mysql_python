@@ -482,7 +482,7 @@ def merge_nutrient_information_into_each_dictionary(components, recipe_name, sql
             components[i] = {**r, **sql_row}
 
         else:
-            print(f">{r['ri_name']}< NOT PRESENT IN Nutrient Database * * *")
+            print(f">{r['ri_name']}< NOT PRESENT IN Nutrient Database * * * [does IMG name match RCP name?]")
 
         # print(f"merge_nutrient_information_into_each_dictionary:C-{i}")
         # components[i]['ri_id'] = db_id

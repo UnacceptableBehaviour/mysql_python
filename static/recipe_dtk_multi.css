@@ -207,4 +207,7 @@ table.nutrinfo-table td:nth-child(1) {                      /*  |  */
     width: 134px;                                           /*  < col width 120px but off set pushed text into next column */
 }
 
+html {
+    scroll-behavior: smooth;
+}
 

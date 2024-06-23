@@ -65,7 +65,7 @@ for (let i = 0; i < rcpImages.length; i++) {
   container.addEventListener('click', () => {
 
     const recipeId = container.getAttribute('value');
-    const url = `/db_recipe_page?ri_id=${recipeId}`;
+    const url = `/db_recipe_page?ri_id=${recipeId}`;    
 
     fetch(url)
     .then(response => {
@@ -80,7 +80,7 @@ for (let i = 0; i < rcpImages.length; i++) {
   });
 }
 
-const removeBtns = document.querySelectorAll('button.close');
+const removeBtns = document.querySelectorAll('button.favs-close');
 for (let i = 0; i < removeBtns.length; i++) {
   const container = removeBtns[i];
 
@@ -120,6 +120,31 @@ for (let i = 0; i < removeBtns.length; i++) {
 
   });  
 }
+
+const blogPostBtns = document.querySelectorAll('button.blog-post');
+for (let i = 0; i < blogPostBtns.length; i++) {
+  const container = blogPostBtns[i];
+
+  // USING GET TO DIPLAY RECIPE
+  container.addEventListener('click', () => {
+
+    const recipeId = container.getAttribute('value');
+    const url = `/email_debug?ri_id=${recipeId}`;
+
+    fetch(url)
+    .then(response => {
+      // check response
+      if(!response.ok) {
+        throw new Error('Error submitting form');
+      }      
+      window.location.href = url;     // show recipe
+    });
+  
+    console.log(`id:${recipeId} exit`);
+  });
+}
+
+
 
 {/* <div class="recipe-card">
 

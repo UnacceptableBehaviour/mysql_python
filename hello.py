@@ -484,34 +484,53 @@ def settings():
     return render_template('settings_t.html', user_info=user_info)
 
 
-
+#@app.route('<ri_id>', methods=["GET", "POST"]) 
+#def email_debug(ri_id):
 @app.route('/email_debug', methods=["GET", "POST"])
 def email_debug():
-    if request.method =='POST':
-        return 
+    ri_id = 1712    # prawns in garlic - default
 
-    # display all favs recipes
-    #user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')    
-    #recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(user_info['fav_rcp_ids']) 
-    #if len(user_info['fav_rcp_ids']) == 0:
-    #    recipes = [return_recipe_dictionary()]
+    # if request.method =='POST':
+    #     print("POST                            - - - < email_debug - S = = = =*=*")
+    #     pprint(request.json)
+    #     print("POST                            - - - < email_debug - M = = = =*=*")
+    #     pprint(request)
+    #     print("POST                            - - - < email_debug - E = = = =*=*")
+    #     if ('ri_id' in request.json):
+    #         ri_id = int(request.json['ri_id'])
+    #         print(f"POST ri_id: {ri_id} <")
+    #     else:
+    #         print(f"POST ri_id: NO PAYLOAD > email_debug <")
+    #         ri_id = 1175    #'egg prawn & chorizo wontan dumpling broth'
 
-    # pass this into route
-    ri_id = 927 
-    ri_id = 37
-    
+    if request.method =='GET':
+        idict = dict(request.args)
+        print("GET                            - - - < email_debug - idict")
+        if 'ri_id' in idict:
+            ri_id = idict['ri_id']
+            print(f"ri_id: {ri_id}")
+        else:
+            print(f"ri_id: DEFAULT: {ri_id}")
+
+
     # get all the sub components in the recipe
-    rcp_tree = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(ri_id)
+    rcp_tree = get_single_recipe_with_subcomponents_from_db_for_display_as_dict(int(ri_id))
     #pprint(rcp_tree)
 
-    # # create ri_id list of the subcomponents
-    # ri_id_list = get_ri_ids_with_subcompnents_from_rcp_dict_as_list(rcp_tree)
-    # #ri_id_list = ['926']
-    # pprint(ri_id_list)
-    # # get all the subcomponents as rcp info
-    # recipes = get_recipes_with_subcomponents_for_display_as_list_of_dicts(ri_id_list) 
+    recipes = convert_tree_to_list_of_dict_components(rcp_tree)
+    # remove DB misses & duplicates
+    seen = set()
+    def duplictate(name , seen):
+        if name in seen:
+            return True
+        seen.add(name)
+        return False
+    
+    recipes = [r for r in recipes if (r['ri_name'] != 'none_listed') and (not duplictate(r['ri_name'], seen))]
+    print(f"seen: {seen}")
 
-    recipes = convert_tree_to_list_of_dict_components(rcp_tree)    
+    # set blog_post flag to change rendering
+    recipes = [{**r, 'blog_post': True} for r in recipes]
 
     print('> > > > - - - - - - > > > > - - - - - - > > > > - - - - - - > > > > - - - - - - S')
     pprint(recipes)
