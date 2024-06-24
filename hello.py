@@ -40,15 +40,19 @@ from helpers_db import get_user_info_dict, remove_favs_from_DB, get_user_info_di
 from helpers_db import set_DB_connection, db_to_use_string
 
 db_container = os.getenv('DB_CONTAINER', 'localhost')
+app_title = 'DTK-U'
 print(f"POSTGRES CONTAINER: {db_container}")
 if db_container == 'postgres-container':    
     set_DB_connection(db_to_use_string[2])
+    app_title = 'DTK-DOC'    
 elif db_container == 'postgres-container-n':
     set_DB_connection(db_to_use_string[5])
+    app_title = 'DTK-NAS'
 elif db_container == 'creativemateriel.synology.me':
     set_DB_connection(db_to_use_string[4])
 else:
     set_DB_connection(db_to_use_string[1])
+    app_title = 'DTK-HEALTH'
 
 from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # / - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /
@@ -196,7 +200,7 @@ def weigh_in():
 
     # draw chart - in .js
 
-    return render_template('weigh_in_t.html', daily_tracker=dtk)
+    return render_template('weigh_in_t.html', app_title=app_title, daily_tracker=dtk)
 
 
 @app.route('/favs', methods=["GET", "POST"])
@@ -249,7 +253,7 @@ def home_list_of_favourites():
 
     print(f"\n\nFavs format - rendering {len(recipes)} recipes. . \n\n")    
 
-    return render_template('show_fav_rcp_cards.html', recipes=recipes)
+    return render_template('show_fav_rcp_cards.html', app_title=app_title, recipes=recipes)
 
 
 @app.route('/db_recipe_list', methods=["GET","POST"])
@@ -266,7 +270,7 @@ def db_recipe_list():
     if len(user_info['fav_rcp_ids']) == 0:
         recipes = [return_recipe_dictionary()]
 
-    return render_template("recipe_t.html", recipes=recipes)
+    return render_template("recipe_t.html", app_title=app_title, recipes=recipes)
 
 
 
@@ -317,7 +321,7 @@ def db_recipe_page():
     pprint(recipes)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
-    return render_template("recipe_t.html", recipes=recipes)
+    return render_template("recipe_t.html", app_title=app_title, recipes=recipes)
 
 
 
@@ -413,7 +417,7 @@ def buttons_inputs():
 
     print(f">-----> rendering: {data}")
 
-    return render_template('buttons_and_inputs.html', headline=headline_py, data=data, recipes=recipes)
+    return render_template('buttons_and_inputs.html', app_title=app_title, headline=headline_py, data=data, recipes=recipes)
 
 
 # @app.route('/db_gallery/<int:year>/<int:month>/<title>')
@@ -440,7 +444,7 @@ def db_gallery():
     # pprint(rcp_ids_20_off)
     # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
-    return render_template('gallery.html', recipes=recipes)
+    return render_template('gallery.html', app_title=app_title, recipes=recipes)
 
 
 
@@ -481,7 +485,7 @@ def settings():
     # source of buttons to populate with settings from default_filters
     user_info['tag_sets']['types'] = types
 
-    return render_template('settings_t.html', user_info=user_info)
+    return render_template('settings_t.html', app_title=app_title, user_info=user_info)
 
 
 #@app.route('<ri_id>', methods=["GET", "POST"]) 
@@ -536,7 +540,7 @@ def email_debug():
     pprint(recipes)
     print('> > > > - - - - - - > > > > - - - - - - > > > > - - - - - - > > > > - - - - - - E')
     
-    return render_template('email_debug_t.html', recipes=recipes)
+    return render_template('email_debug_t.html', app_title=app_title, recipes=recipes)
 
 
 last_search_result_recipes = {}
@@ -642,7 +646,7 @@ def search_ingredient():
         pprint(dbg_user_info)
 
     # GET route                                     # TODO implement --\
-    return render_template('search_t.html', recipes=last_search_result_recipes)
+    return render_template('search_t.html', app_title=app_title, recipes=last_search_result_recipes)
 
 
 @app.route('/buton_2', methods=["GET", "POST"])
@@ -696,7 +700,7 @@ def track_items():
         
 
 
-    return render_template('track_items.html', daily_tracker=dtk)
+    return render_template('track_items.html', app_title=app_title, daily_tracker=dtk)
 
 
 @app.route('/diary_w_image', methods=["GET", "POST"])
@@ -718,7 +722,7 @@ def diary_w_image_snap():
     print("> > > - - / ")
 
 
-    return render_template("image_capture.html", headline=headline_py, recipes=recipes, mobi=def_im)
+    return render_template("image_capture.html", app_title=app_title, headline=headline_py, recipes=recipes, mobi=def_im)
 
 
 # upload support - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -770,7 +774,7 @@ def upload_image_test():
 
             #return redirect(url_for('upload_image_test', files=files))
 
-    return render_template('upload_file.html', files=files)
+    return render_template('upload_file.html', app_title=app_title, files=files)
 
 
 
@@ -789,7 +793,7 @@ def db_nutrients():
     pprint(recipes)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
-    return render_template("nutrient_traffic_lights_page.html", headline=headline_py, recipes=recipes)
+    return render_template("nutrient_traffic_lights_page.html", app_title=app_title, headline=headline_py, recipes=recipes)
 
 
 @app.route('/db_nutrients_compare')
@@ -805,7 +809,7 @@ def db_nutrients_compare():
 
     headline_py = "Compare Nutrients fetch from DB"
 
-    return render_template("nutrient_compare_page.html", headline=headline_py, recipes=recipes)
+    return render_template("nutrient_compare_page.html", app_title=app_title, headline=headline_py, recipes=recipes)
 
 
 
