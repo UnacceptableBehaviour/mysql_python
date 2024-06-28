@@ -35,9 +35,13 @@ if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--hel
 import os
 import shutil
 
-def sync_files_to_nas(opts=opt_dict):
-    source_dir = opts['source_dir']
-    target_dir = opts['target_dir']
+def sync_files_to_nas(opts={}):
+    global opt_dict
+    opt_dict.update(opts)    # update the defaults with the passed in options
+                                    # then use the updated 
+
+    source_dir = opt_dict['source_dir']
+    target_dir = opt_dict['target_dir']
 
     # Check if target directory is mounted
     while not os.path.isdir(target_dir):
@@ -53,20 +57,37 @@ def sync_files_to_nas(opts=opt_dict):
     files_to_copy = [f for f in source_files if f not in target_files]
 
     # Copy these files to target directory
-    print(f"Copying . . .")
-    for f in files_to_copy:
-        if opts['verbose_mode']:
-            print(f"> {f}")
-        if opts['live_copy']:
-            shutil.copy2(os.path.join(source_dir, f), target_dir)
-            pass
+    total = len(files_to_copy)
+    print(f"Copying . . . {total} files")
+    err_count = 0
+    err_list = []
+    for n,f in enumerate(files_to_copy):
+        if opt_dict['verbose_mode']:
+            print(f"{n:04}/{total:04}> {f}")
+        else:
+            print('.', end='')  # show progress
+        if opt_dict['live_copy']:
+            try:
+                shutil.copy2(os.path.join(source_dir, f), target_dir)
+            except Exception as e:
+                print(f"Error copying {f}:\n{e}")
+                err_count += 1
+                err_list.append((f,e))
 
     print(f"\nCopied {len(files_to_copy)} files\n\tfrom {source_dir}\n\t\ to {target_dir}.")
+    if err_count:
+        print(f"Errors: {err_count}")
+        for f,e in err_list:
+            print(f"\t{f}:\n\t{e}")
 
 
 if __name__ == '__main__':
     sync_files_to_nas(opt_dict)
+    sync_files_to_nas({'live_copy':True,'verbose_mode':True})
     # TODO merge options passed in with defaults
-    #sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})    
-    print("Done.")
+    #sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})
+    if opt_dict['live_copy']:
+        print("Done.")
+    else:
+        print(help_string)
     sys.exit(0)

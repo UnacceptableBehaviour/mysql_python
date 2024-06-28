@@ -182,9 +182,10 @@ if ( force_complete_rebuild == True ):
     # also creates a CSV file with synopsis, and nutrition info for creating DB (done by this script)
     population_data = subprocess.check_output(['populate_asset_server.rb'])
     if opt_dict['verbose_mode']: print(population_data)
-    
-    sync_files_to_nas()
-    #sync_files_to_nas({'verbose_mode':opt_dict['verbose_mode']})
+        
+    sync_files_to_nas({'live_copy':True,'verbose_mode':True})
+    #sync_files_to_nas({'live_copy':True,'verbose_mode':opt_dict['verbose_mode']})
+
 else:
     print('NOT EXECUTING populate_asset_server.rb  * * * * * WARNING <<  force_complete_rebuild = False')
 

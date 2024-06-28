@@ -40,7 +40,7 @@ cd ..
 cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_docr_support/nutrinfo.txt ./_docr_support
 cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_docr_support/___LAB_RECIPE_SMALLEST_DTK_TEST.txt ./_docr_support
 # z_usersDTK_DB.json contains diary entries so don't overwrite it if it exists!
-# diary will persis across rebuilds
+# diary will persist across rebuilds
 if [ ! -f ./_docr_support/z_usersDTK_DB.json ]; then
     cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_docr_support/z_usersDTK_DB.json ./_docr_support
 fi
