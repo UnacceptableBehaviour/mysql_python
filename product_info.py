@@ -152,7 +152,8 @@ class ProductInfo:
             
         except Exception as exp:
             print('Expetion S')
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Expetion E')        
         print("#>> DA tags - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
         
@@ -261,7 +262,8 @@ class ProductInfo:
             except TimeoutException:
                 print("Loading took too much time!")
             except Exception as exp:
-                print(exp.msg)
+                if hasattr(exp, 'msg'):
+                    print(exp.msg)
                 print('Ingredients NOT FOUND')                
 
         # wait content load
@@ -274,7 +276,8 @@ class ProductInfo:
         except TimeoutException:
             print("Waiting for INGREDIENTS took too much time!")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Ingredients NOT FOUND')
         
         # self.product_name             Sainsbury's British Semi Skimmed Milk
@@ -306,7 +309,8 @@ class ProductInfo:
             if m: self.package_qty_str = m.group(1)
             
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.product_name NOT found!')         
         
         # self.price_per_package            £5.50 £2.21/kg  - can appear together
@@ -322,7 +326,8 @@ class ProductInfo:
             self.price_per_package = e.text.strip().replace('now\n','')   # TODO replace anything left of 'now\n' as in was $4.40 now £3
             self.package_in_g = 99999999
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_package NOT found!')
 
 
@@ -393,7 +398,8 @@ class ProductInfo:
             print('StopIteration: complete') # TODO - remove on refactor
 
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('ERROR processing item_info PAIRS - NOT found!')
 
         print('+>> item_info')
@@ -503,7 +509,8 @@ class ProductInfo:
             e = driver.find_element(By.CSS_SELECTOR, css_selector)
             self.price_per_measure = e.text.strip().replace('(','').replace(')','')
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_measure NOT found!')
             
         # self.supplier_item_code = ''
@@ -512,7 +519,8 @@ class ProductInfo:
             e = driver.find_element(By.CSS_SELECTOR, '#productSKU')
             self.supplier_item_code = e.text.strip()
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Sainburys'
@@ -636,7 +644,8 @@ class ProductInfo:
             print("# # # TIMEOUT> Waiting for Title took too much time!")
             cur = MOB if cur == DSK else MOB
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
@@ -650,7 +659,8 @@ class ProductInfo:
             except TimeoutException:
                 print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
             except Exception as exp:
-                print(exp.msg)
+                if hasattr(exp, 'msg'):
+                    print(exp.msg)
                 print('Title NOT FOUND - h2_tags')
 
         
@@ -671,7 +681,8 @@ class ProductInfo:
                     e = driver.find_element(*query['product_title'][cur])
                     self.product_name = e.text.strip()                
                 except Exception as exp:
-                    print(exp.msg)
+                    if hasattr(exp, 'msg'):
+                        print(exp.msg)
                     print('self.product_name NOT found! no h / h2 / or retry')
 
             # remove multipack X no
@@ -702,7 +713,8 @@ class ProductInfo:
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.product_name NOT found!')         
         
         # self.price_per_package            £5.50 £2.21/kg  - can appear together
@@ -722,7 +734,8 @@ class ProductInfo:
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_package NOT found!')
 
         
@@ -733,7 +746,8 @@ class ProductInfo:
             self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_measure NOT found!')
 
         # Product Description (TODO) & Infomation
@@ -753,7 +767,8 @@ class ProductInfo:
         try:            
             e_list = driver.find_elements(*query['item_info'][cur]) 
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
@@ -914,7 +929,8 @@ class ProductInfo:
         #     e = driver.find_element(*query['supplier_item_code'][cur])
         #     self.supplier_item_code = e.text.strip()
         # except Exception as exp:
-        #     print(exp.msg)
+        #    if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #     print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Morrisons'
@@ -1047,7 +1063,8 @@ class ProductInfo:
             print("# # # TIMEOUT> Waiting for Title took too much time!")
             cur = MOB if cur == DSK else MOB
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
@@ -1061,7 +1078,8 @@ class ProductInfo:
             except TimeoutException:
                 print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
             except Exception as exp:
-                print(exp.msg)
+                if hasattr(exp, 'msg'):
+                    print(exp.msg)
                 print('Title NOT FOUND - h2_tags')
 
         
@@ -1082,7 +1100,8 @@ class ProductInfo:
                     e = driver.find_element(*query['product_title'][cur])
                     self.product_name = e.text.strip()                
                 except Exception as exp:
-                    print(exp.msg)
+                    if hasattr(exp, 'msg'):
+                        print(exp.msg)
                     print('self.product_name NOT found! no h / h2 / or retry')
 
             # remove multipack X no
@@ -1113,7 +1132,8 @@ class ProductInfo:
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.product_name NOT found!')         
         
         # self.price_per_package            £5.50 £2.21/kg  - can appear together
@@ -1133,7 +1153,8 @@ class ProductInfo:
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_package NOT found!')
 
         
@@ -1144,7 +1165,8 @@ class ProductInfo:
             self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_measure NOT found!')
 
         # Product Description (TODO) & Infomation
@@ -1164,7 +1186,8 @@ class ProductInfo:
         try:            
             e_list = driver.find_elements(*query['item_info'][cur]) 
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
@@ -1322,7 +1345,8 @@ class ProductInfo:
         #     e = driver.find_element(*query['supplier_item_code'][cur])
         #     self.supplier_item_code = e.text.strip()
         # except Exception as exp:
-        #     print(exp.msg)
+        #                 if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #     print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Tesco'
@@ -1454,7 +1478,8 @@ class ProductInfo:
             print("# # # TIMEOUT> Waiting for Title took too much time!")
             cur = MOB if cur == DSK else MOB
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
@@ -1468,7 +1493,8 @@ class ProductInfo:
             except TimeoutException:
                 print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
             except Exception as exp:
-                print(exp.msg)
+                if hasattr(exp, 'msg'):
+                    print(exp.msg)
                 print('Title NOT FOUND - h2_tags')
 
         
@@ -1489,7 +1515,8 @@ class ProductInfo:
                     e = driver.find_element(*query['product_title'][cur])
                     product_title = e.text.strip()                
                 except Exception as exp:
-                    print(exp.msg)
+                    if hasattr(exp, 'msg'):
+                        print(exp.msg)
                     print('self.product_name NOT found! no h / h2 / or retry')
 
             product_title_sections = product_title.split('\n')
@@ -1524,7 +1551,8 @@ class ProductInfo:
                 print("INFO FROM TITLE  - - - - - - - - : E")
             
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.product_name NOT found!')         
         
         # self.price_per_package            £5.50 £2.21/kg  - can appear together
@@ -1542,7 +1570,8 @@ class ProductInfo:
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package] from >{e.text.strip()}<")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_package NOT found!')
 
         
@@ -1553,7 +1582,8 @@ class ProductInfo:
             self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_measure NOT found!')
 
         # Product Description (TODO) & Infomation
@@ -1573,7 +1603,8 @@ class ProductInfo:
         try:            
             e_list = driver.find_elements(*query['item_info'][cur]) 
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
@@ -1735,7 +1766,8 @@ class ProductInfo:
         #     e = driver.find_element(*query['supplier_item_code'][cur])
         #     self.supplier_item_code = e.text.strip()
         # except Exception as exp:
-        #     print(exp.msg)
+        #                 if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #     print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Asda'        
@@ -1868,7 +1900,8 @@ class ProductInfo:
             print("# # # TIMEOUT> Waiting for Title took too much time!")
             cur = MOB if cur == DSK else MOB
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('Title NOT FOUND')
             cur = MOB if cur == DSK else MOB
         
@@ -1883,7 +1916,8 @@ class ProductInfo:
             except TimeoutException:
                 print(f'# # # TIMEOUT> waiting for Title & QTY XPATH:')
             except Exception as exp:
-                print(exp.msg)
+                if hasattr(exp, 'msg'):
+                    print(exp.msg)
                 print('Title NOT FOUND - h2_tags')
 
         
@@ -1904,7 +1938,8 @@ class ProductInfo:
         #             e = driver.find_element(*query['product_title'][cur])
         #             product_title = e.text.strip()                
         #         except Exception as exp:
-        #             print(exp.msg)
+        #                         if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #             print('self.product_name NOT found! no h / h2 / or retry')
 
         #     product_title_sections = product_title.split('\n')
@@ -1939,7 +1974,8 @@ class ProductInfo:
         #     #     print("INFO FROM TITLE  - - - - - - - - : E")
             
         # except Exception as exp:
-        #     print(exp.msg)
+        #                 if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #     print('self.product_name NOT found!')         
 
 
@@ -1967,7 +2003,8 @@ class ProductInfo:
 
             print(f"Pkg QTY: {self.package_qty_str} [self.package_qty_str] from >{e.text.strip()}<")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.package_qty_str NOT found!')
 
         # self.price_per_package            £5.50 £2.21/kg  - can appear together
@@ -1985,7 +2022,8 @@ class ProductInfo:
             self.package_in_g = 99999999
             print(f"£/pkg: {self.price_per_package} [self.price_per_package] from >{e.text.strip()}<")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_package NOT found!')
 
         
@@ -1996,7 +2034,8 @@ class ProductInfo:
             self.price_per_measure = e.text.strip().replace('(','').replace(')','')
             print(f"£/unit: {self.price_per_measure} [self.price_per_measure]")
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             print('self.price_per_measure NOT found!')
 
         # Product Description (TODO) & Infomation
@@ -2016,7 +2055,8 @@ class ProductInfo:
         try:            
             e_list = driver.find_elements(*query['item_info'][cur]) 
         except Exception as exp:
-            print(exp.msg)
+            if hasattr(exp, 'msg'):
+                print(exp.msg)
             #pprint(exp)
             print('ERROR processing item_info PAIRS - NOT found!')
 
@@ -2184,7 +2224,8 @@ class ProductInfo:
         #     e = driver.find_element(*query['supplier_item_code'][cur])
         #     self.supplier_item_code = e.text.strip()
         # except Exception as exp:
-        #     print(exp.msg)
+        #                 if hasattr(exp, 'msg'):
+        #        print(exp.msg)
         #     print('self.supplier_item_code NOT found!')                    
             
         self.supplier_name      = 'Waitrose' 
