@@ -595,7 +595,14 @@ if __name__ == '__main__':
     
 
 
+
 # REFS
+#
+# Catalina NOT SUPPORTED ANY MORE! :(
+# 128.0.6613.85 < LAST Catalina supported update!
+# From 
+# https://storage.googleapis.com/chrome-for-testing-public/128.0.6613.84/mac-x64/chromedriver-mac-x64.zip
+#
 # Quick setup video for osx Catalina: https://www.youtube.com/watch?v=7R5n0sNSza
 # activate venv
 # pip install selenium

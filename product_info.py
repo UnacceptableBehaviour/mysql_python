@@ -96,7 +96,15 @@ class ProductInfo:
 
     def get_chromedriver():
         # After RTFM - https://github.com/SergeyPirogov/webdriver_manager
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        #driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        # After v 128.0.6613.84 Chrome no longer supports Catalina
+        # w/ mean Chrome doesn't get updated
+        # w/ means no requirement for ChromeDriverManager
+        # hardcoded path . . . :/
+        #
+        # Specify the path to the manually downloaded chromedriver
+        chromedriver_path = '/usr/local/bin/chromedriver'
+        driver = webdriver.Chrome(service=ChromeService(executable_path=chromedriver_path))
 
         return driver
 
