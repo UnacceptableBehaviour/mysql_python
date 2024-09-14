@@ -144,6 +144,8 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         if 'calories' in name: continue         # diary entry
         if 'recipe_name' in name: continue      # blank template
 
+        print(f'.{name}<',end='')
+
         target_path = fileset[TMP_PATH]         # reset target path in case changed to TMP_PATH_INCOMPLETE below
 
         recipes_processed.append(name)          # a dict would make search faster no? but for these numbers meh
@@ -202,7 +204,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
                     '__ingredients__' : ingredients.strip(),
                     '__total_yield__' : tot_yield,
                     '__method__' : method.strip().replace("'","''"),    # SQL escape for ' is '' 'x2 - - \
-                    '__description__' : description.strip(),                                              #
+                    '__description__' : description.strip().replace("'","''"),                                              #
                     '__notes__' : (str(notes).strip() + ('\n' + str(notes_after_serve)).strip()).replace("'","''"),  # if notes_after_serve existd put it on the next line!
                     '__stars__' : str(stars).strip(),
                     '__allergens__' : ', '.join(allergens),
@@ -301,8 +303,8 @@ NUTRIDOC_LIST = [
                 'y426',       #  DONE 0620-04 - 45/21: << TODO croquettes, salads, flatbread,      MISSING IMAGES: 3 ['packed lunch 20200621', 'tom & couscous em broth', 'em test broth']
                 'y427',       #       0705-18 - 29/2:  flat bread, baguettes, rhubarb tart
                 'y428',       #  DONE 0719-01 - 15/29:   < mustard chicken sequence, cardamom flatbreads
-                #               #       0801-14 - no nutridoc!?
-                 'y429',       #       0815-28 - 50/4:
+                #             #       0801-14 - no nutridoc!?
+                'y429',       #       0815-28 - 50/4:
                 'y430',       #  DONE 0829-11 - 50/26: salads roast burgers snacks bakes . . . TODO loads of good stuff!
                 'y431',       #       0912-25 - 4 /2:
                 'y432',       #  DONE 0929-09 - 15/42: loads of material!
@@ -342,13 +344,18 @@ NUTRIDOC_LIST = [
                 'y462',
                 'y463',
                 'y464',
-                #'y465',                
-
+                #'y465',
+                'y466',
+                'y467',
+                'y468',
+                'y469',
+                'y470',
+                'y471',
 
 # * next to done means superfluous image files removed
 ]
-NUTRIDOC_LIST = ['y440','y441','y442','y443']
-
+NUTRIDOC_LIST = ['y467']
+#NUTRIDOC_LIST = ['y457','y458','y459','y460','y461','y462','y463','y464']
 # got to homegrown
 
 # skipped
@@ -365,77 +372,87 @@ NUTRIDOC_LIST = ['y440','y441','y442','y443']
 # keto: late label?
 
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
-# y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0      
-# y421_NUTRITEST_recipes_20200411-24.rtf           52       2         50          3             0      
-# y422_NUTRITEST_recipes_20200425-08.rtf           45       40        5           3             4      
-# y423_NUTRITEST_recipes_20200509-22.rtf           58       49        9           0             3      
-# y424_NUTRITEST_recipes_20200523-05.rtf           48       37        11          3             2      
-# y425_NUTRITEST_recipes_20200606-19.rtf           51       46        5           2             6      
-# y426_NUTRITEST_recipes_20200620-04.rtf           65       46        19          4             3      
-# y427_NUTRITEST_recipes_20200705-18.rtf           32       30        2           3             29     
-# y428_NUTRITEST_recipes_20200719-31.rtf           44       15        29          0             3      
-# y429_NUTRITEST_recipes_20200815-28.rtf           54       50        4           1             47     
-# y430_NUTRITEST_recipes_20200829-11.rtf           76       50        26          0             3      
-# y431_NUTRITEST_recipes_20200912-25.rtf           6        4         2           0             6      
-# y432_NUTRITEST_recipes_20200926-09.rtf           57       15        42          1             3      
-# y433_NUTRITEST_recipes_20201010-23.rtf           50       12        38          0             1      
-# y434_NUTRITEST_recipes_20201024-06.rtf           37       36        1           1             36     
-# y435_NUTRITEST_recipes_20201107-20.rtf           0        0         0           0             0      
-# y436_NUTRITEST_recipes_20201121-04.rtf           0        0         0           0             0      
-# y437_NUTRITEST_recipes_20201205-18.rtf           28       0         28          0             0      
-# y438_NUTRITEST_recipes_20201219-0115.rtf         2        2         0           0             2      
-# y439_NUTRITEST_recipes_20210116-0212.rtf         23       0         23          0             0      
-# y440_NUTRITEST_recipes_20210213-0312.rtf         42       6         36          0             2      
-# y441_NUTRITEST_recipes_20210313-26.rtf           53       51        2           2             6      
-# y442_NUTRITEST_recipes_20210327-09.rtf           62       62        0           10            7      
-# y443_NUTRITEST_recipes_20210410-23.rtf           63       43        20          1             5      
-# y444_NUTRITEST_recipes_20210424-07.rtf           60       25        35          1             12     
-# y445_NUTRITEST_recipes_20210508-21.rtf           52       8         44          1             5      
-# y446_NUTRITEST_recipes_20210522-0618.rtf         77       20        57          0             3
+# y420_NUTRITEST_recipes_20200328-10.rtf           25       0         25          1             0                  0            
+# y421_NUTRITEST_recipes_20200411-24.rtf           48       6         42          0             1                  0            
+# y422_NUTRITEST_recipes_20200425-08.rtf           44       39        5           4             4                  0            
+# y423_NUTRITEST_recipes_20200509-22.rtf           58       49        9           0             3                  0            
+# y424_NUTRITEST_recipes_20200523-05.rtf           48       37        11          3             2                  0            
+# y425_NUTRITEST_recipes_20200606-19.rtf           51       46        5           1             6                  0            
+# y426_NUTRITEST_recipes_20200620-04.rtf           65       47        18          4             3                  0            
+# y427_NUTRITEST_recipes_20200705-18.rtf           32       30        2           1             28                 0            
+# y428_NUTRITEST_recipes_20200719-31.rtf           44       15        29          0             3                  0            
+# y429_NUTRITEST_recipes_20200815-28.rtf           53       51        2           17            5                  0            
+# y430_NUTRITEST_recipes_20200829-11.rtf           76       50        26          0             3                  0            
+# y431_NUTRITEST_recipes_20200912-25.rtf           6        4         2           0             6                  0            
+# y432_NUTRITEST_recipes_20200926-09.rtf           57       15        42          1             3                  0            
+# y433_NUTRITEST_recipes_20201010-23.rtf           49       12        37          0             0                  0            
+# y434_NUTRITEST_recipes_20201024-06.rtf           37       36        1           0             36                 0            
+# y435_NUTRITEST_recipes_20201107-20.rtf           0        0         0           0             0                  0            
+# y436_NUTRITEST_recipes_20201121-04.rtf           0        0         0           0             0                  0            
+# y437_NUTRITEST_recipes_20201205-18.rtf           28       0         28          0             0                  0            
+# y438_NUTRITEST_recipes_20201219-0115.rtf         2        2         0           0             2                  0            
+# y439_NUTRITEST_recipes_20210116-0212.rtf         23       0         23          0             0                  0            
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
-# y447_NUTRITEST_recipes_20210619-02.rtf           42       40        2           1             41     
-# y448_NUTRITEST_recipes_20210703-23.rtf           73       43        30          0             1      
-# y449_NUTRITEST_recipes_20210724-0820.rtf         77       53        24          0             7      
-# y450_NUTRITEST_recipes_20210821-1015.rtf         12       10        2           0             12     
-# y451_NUTRITEST_recipes_20211016-1205.rtf         9        8         1           0             9      
-# y452_NUTRITEST_recipes_20211206-0108_xmas.rtf    6        1         5           0             6      
-# y453_NUTRITEST_recipes_20220219-0930.rtf         99       67        32          8             11     
-# y454_NUTRITEST_recipes_20221001-31.rtf           40       38        2           17            1
-#
-# y457_NUTRITEST_recipes_20230215-0422.rtf         36       34        2       **  41  **        16                 26 
-# y458_NUTRITEST_recipes_20230424-0531.rtf         54       25        29          3             0                  0            
-# y459_NUTRITEST_recipes_20230601-21.rtf           34       32        2           29            1                  0            0            
-# y460_NUTRITEST_recipes_20230621-0706.rtf         37       31        6           2             5                  0  
-# y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           1             10     
-# y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3
-#
-# y954_NUTRITEST_recipes_20190214-28.rtf           48       43        5           14            10     
-# y955_NUTRITEST_recipes_20190301-14.rtf           33       33        0           15            4      
-# y956_NUTRITEST_recipes_20190315-28.rtf           48       38        10          0             4      
-# y957_NUTRITEST_recipes_20190329-11.rtf           32       31        1           1             0      
-# y958_NUTRITEST_recipes_20190412-25.rtf           40       33        7           3             1      
-# y959_NUTRITEST_recipes_20190426-09.rtf           36       17        19          6             2      
-# y960_NUTRITEST_recipes_20190510-23.rtf           34       27        7           1             1      
-# y961_NUTRITEST_recipes_20190524-06.rtf           57       41        16          1             1      
-# y962_NUTRITEST_recipes_20190607-20.rtf           19       18        1           9             0      
-# y963_NUTRITEST_recipes_20190621-04.rtf           19       15        4           0             0      
-# y964_NUTRITEST_recipes_20190705-18.rtf           46       46        0           23            0      
-# y965_NUTRITEST_recipes_20190719-01.rtf           58       39        19          4             3      
-# y966_NUTRITEST_recipes_20190802-15.rtf           80       61        19          3             5      
-# y967_NUTRITEST_recipes_20190816-29.rtf           40       32        8           4             2      
-# y968_NUTRITEST_recipes_20190830-12.rtf           89       72        17          5             4      
-# y969_NUTRITEST_recipes_20190913-1108.rtf         50       23        27          1             1
+# y440_NUTRITEST_recipes_20210213-0312.rtf         42       6         36          0             2                  0            
+# y441_NUTRITEST_recipes_20210313-26.rtf           52       50        2           3             6                  0            
+# y442_NUTRITEST_recipes_20210327-09.rtf           62       62        0           10            5                  0            
+# y443_NUTRITEST_recipes_20210410-23.rtf           63       43        20          0             5                  0            
+# y444_NUTRITEST_recipes_20210424-07.rtf           59       25        34          2             11                 0            
+# y445_NUTRITEST_recipes_20210508-21.rtf           50       8         42          2             3                  0            
+# y446_NUTRITEST_recipes_20210522-0618.rtf         77       20        57          0             3                  0            
+# y447_NUTRITEST_recipes_20210619-02.rtf           41       40        1           1             40                 0            
+# y448_NUTRITEST_recipes_20210703-23.rtf           73       43        30          0             1                  0            
+# y449_NUTRITEST_recipes_20210724-0820.rtf         76       53        23          0             6                  0            
+# y450_NUTRITEST_recipes_20210821-1015.rtf         11       10        1           0             11                 0            
+# y451_NUTRITEST_recipes_20211016-1205.rtf         8        8         0           0             8                  0            
+# y452_NUTRITEST_recipes_20211206-0108_xmas.rtf    6        1         5           0             6                  0            
+# y453_NUTRITEST_recipes_20220219-0930.rtf         97       68        29          6             9                  0            
+# y454_NUTRITEST_recipes_20221001-31.rtf           44       38        6           16            1                  0            
+# y455_NUTRITEST_recipes_20221101-30.rtf           57       54        3           7             39                 0            
+# y456_NUTRITEST_recipes_20221201-0214.rtf         18       15        3           0             18                 0            
+# y457_NUTRITEST_recipes_20230215-0422.rtf         80       39        41          0             15                 0            
+# y458_NUTRITEST_recipes_20230424-0531.rtf         54       27        27          3             0                  0            
+# y459_NUTRITEST_recipes_20230601-21.rtf           62       32        30          1             1                  0            
 # DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
-# y970_NUTRITEST_recipes_20191109-22.rtf           30       29        1           1             0      
-# y971_NUTRITEST_recipes_20191123-06.rtf           26       24        2           1             3      
-# y972_NUTRITEST_recipes_20191207-20.rtf           23       19        4           1             0      
-# y973_NUTRITEST_recipes_20191221-03.rtf           39       28        11          0             5      
-# y974_NUTRITEST_recipes_20200104-17.rtf           19       18        1           3             0      
-# y975_NUTRITEST_recipes_20200118-31.rtf           33       19        14          5             1      
-# y976_NUTRITEST_recipes_20200201-14.rtf           87       42        45          2             3      
-# y977_NUTRITEST_recipes_20200215-28.rtf           55       18        37          5             0      
-# y978_NUTRITEST_recipes_20200229-13.rtf           54       53        1           43            5      
-# y979_NUTRITEST_recipes_20200314-27.rtf           38       34        4           9             4   
+# y460_NUTRITEST_recipes_20230621-0706.rtf         37       31        6           1             4                  0            
+# y461_NUTRITEST_recipes_20230712-0810.rtf        104       69        35          0             0                  0            
+# y462_NUTRITEST_recipes_20230811-0923.rtf         36       36        0           0             36                 0            
+# y463_NUTRITEST_recipes_20230924-25.rtf           14       0         14          0             14                 0            
+# y464_NUTRITEST_recipes_20230929-1111.rtf         69       66        3           0             69                 0            
+# y465_NUTRITEST_recipes_20231112-1221.rtf         41       40        1           12            9                  0 
+# y466_NUTRITEST_recipes_20231220-0118.rtf         40       28        12          24            3                  0
+# y467_NUTRITEST_recipes_20240119-0305.rtf         97       16        81          0             1                  0 
+# y468_NUTRITEST_recipes_20240306-0415.rtf         49       45        4           26            4                  0
+
+# y951_NUTRITEST_recipes_20190101-18.rtf           79       71        8           0             10                 0            
+# y952_NUTRITEST_recipes_20190119-31.rtf           17       17        0           3             3                  0            
+# y954_NUTRITEST_recipes_20190214-28.rtf           48       42        6           10            12                 0            
+# y955_NUTRITEST_recipes_20190301-14.rtf           33       33        0           15            4                  0            
+# y956_NUTRITEST_recipes_20190315-28.rtf           46       37        9           0             4                  0            
+# y957_NUTRITEST_recipes_20190329-11.rtf           32       31        1           0             0                  0            
+# y958_NUTRITEST_recipes_20190412-25.rtf           40       33        7           2             0                  0            
+# y959_NUTRITEST_recipes_20190426-09.rtf           36       17        19          5             2                  0            
+# DOC_NAME                                        RECIPES  COMPLETE  TOTAL 0g  TMP FROM IMG  MISSING IMG
+# y960_NUTRITEST_recipes_20190510-23.rtf           34       27        7           2             1                  0            
+# y961_NUTRITEST_recipes_20190524-06.rtf           57       41        16          1             1                  0            
+# y962_NUTRITEST_recipes_20190607-20.rtf           19       18        1           9             0                  0            
+# y963_NUTRITEST_recipes_20190621-04.rtf           19       15        4           0             0                  0            
+# y964_NUTRITEST_recipes_20190705-18.rtf           46       46        0           23            0                  0            
+# y965_NUTRITEST_recipes_20190719-01.rtf           58       39        19          2             3                  0            
+# y966_NUTRITEST_recipes_20190802-15.rtf           82       64        18          3             5                  0            
+# y967_NUTRITEST_recipes_20190816-29.rtf           40       32        8           4             2                  0            
+# y968_NUTRITEST_recipes_20190830-12.rtf           88       72        16          4             6                  0            
+# y969_NUTRITEST_recipes_20190913-1108.rtf         50       23        27          1             1                  0            
+# y970_NUTRITEST_recipes_20191109-22.rtf           30       28        2           1             0                  0            
+# y971_NUTRITEST_recipes_20191123-06.rtf           26       24        2           0             3                  0            
+# y972_NUTRITEST_recipes_20191207-20.rtf           23       19        4           1             0                  0            
+# y973_NUTRITEST_recipes_20191221-03.rtf           39       28        11          0             5                  0            
+# y974_NUTRITEST_recipes_20200104-17.rtf           19       18        1           3             0                  0            
+# y975_NUTRITEST_recipes_20200118-31.rtf           33       19        14          5             1                  0            
+# y976_NUTRITEST_recipes_20200201-14.rtf           87       42        45          1             3                  0            
+# y977_NUTRITEST_recipes_20200215-28.rtf           55       18        37          4             0                  0            
+# y978_NUTRITEST_recipes_20200229-13.rtf           55       54        1           37            5                  0            
+# y979_NUTRITEST_recipes_20200314-27.rtf           38       34        4           7             4                  0  
 
 empty_recipe = '''
 ------------------ for the recipe_name (1)
@@ -535,6 +552,8 @@ No arguments:            Report status of files selected in NUTRIDOC_LIST
 
 -u                       Show URLs of missing OTS ingrediets
 
+-s y465 y420             Specify nutridocs to process. SB last of arguments EG:
+                         ./process_nutridocs.py -go -s y465 y420
 '''
 
 opt_dict = {
@@ -543,6 +562,7 @@ opt_dict = {
     'clean_old_files_NO_backup_inspect':  False,
     'clean_old_files_NO_backup_HOT':  False,
     'generate_output_in_tmp_folders':  False,
+    'specify_list_of_docs': None,
     'help': False
 }
 
@@ -555,12 +575,20 @@ if '-v' in sys.argv:
 if '-c' in sys.argv:
     opt_dict['clean_old_files_NO_backup_inspect'] = True
 
-if '-clean' in sys.argv:                            # TODO - implement
+if '-clean' in sys.argv:
     opt_dict['clean_old_files_NO_backup_inspect'] = True
     opt_dict['clean_old_files_NO_backup_HOT'] = True
 
 if '-go' in sys.argv:
     opt_dict['generate_output_in_tmp_folders'] = True
+
+if '-s' in sys.argv:
+    start_of_specify_list = sys.argv.index('-s') + 1
+    pre_filtered = sys.argv[start_of_specify_list:]
+
+    opt_dict['specify_list_of_docs'] = [v for v in pre_filtered if re.match(r'\w\d{3}', v)]
+
+    NUTRIDOC_LIST = opt_dict['specify_list_of_docs']
 
 if ('-h' in sys.argv) or ('--h' in sys.argv) or ('-help' in sys.argv) or ('--help' in sys.argv):
     opt_dict['help'] = True
@@ -627,7 +655,10 @@ for fileset in files_to_process:
     recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, opt_dict)
 
     if opt_dict['create_empty_templates_from_image_names']:
-        for recipe_name, image_file in available_recipe_images.items():
+        # Sort available_recipe_images by image_file
+        sorted_rcp_img_pairs = sorted(available_recipe_images.items(), key=lambda item: item[1])
+
+        for recipe_name, image_file in sorted_rcp_img_pairs:
             #print(recipe_name, image_file)
             template_img = empty_recipe.replace('recipe_name', recipe_name)
             template_img = template_img.replace('_li_', image_file)
@@ -645,7 +676,7 @@ for fileset in files_to_process:
             f"\nMISSING SUB INGDTS: {len(recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST])}\n{recipes_and_missing_imgs[MISSING_SUB_INGREDIENTS_LIST]}")
         print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \n")
     else:
-        print(f"DONE: {fileset[FILE_LOC].name}")
+        print(f"\n\nDONE: {fileset[FILE_LOC].name}") 
 
 # report
 missing_images_across_all_docs = {}
@@ -830,3 +861,6 @@ with open(MISSING_INGREDIENTS_FILE_JSON_PY, 'w') as f:
     
 opt_setting = [ v for k, v in opt_dict.items() if v]
 if not opt_setting: print(help)
+
+if opt_dict['specify_list_of_docs']:
+    print(f"\n* * * Nutridocs to process OVER-RIDEN by command line.\n      The following were processed: {opt_dict['specify_list_of_docs']}")
