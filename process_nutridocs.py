@@ -550,7 +550,7 @@ No arguments:            Report status of files selected in NUTRIDOC_LIST
                          
 -go                      Generate Output in tmp folders - for populate_db.py
 
--u                       Show URLs of missing OTS ingrediets
+-u                       Show URLs of missing OTS ingredients
 
 -s y465 y420             Specify nutridocs to process. SB last of arguments EG:
                          ./process_nutridocs.py -go -s y465 y420
