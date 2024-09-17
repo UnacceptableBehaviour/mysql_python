@@ -74,6 +74,14 @@ hr {
     border-color: pink;
     position: relative;
 }
+.rcp-image-nav img {
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1%;
+    border-radius: 6px;
+}
 .rcp-image {
     display: block;
     width: 100%;
@@ -82,6 +90,7 @@ hr {
     margin-top: 1%;
     border-radius: 6px;
 }
+
 /* READ */
 /* https://scotch.io/bar-talk/5-things-you-might-not-know-about-the-css-positioning-types */
 .rbut-bk, .rbut-x {
@@ -104,10 +113,6 @@ hr {
 }
 
 
-.rcp-igds-list{
-    
-}
-
 .l-just {
     text-align:left;
 }
@@ -119,15 +124,7 @@ hr {
 }
 
 
-.rcp-igds {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    font-size: 14px;
-    margin: 0px;
-    border: 1px;
-    padding: 15px 1px 1px 1px;
-}
+
 .rcp-tab-igds { 
     width: 100%;
 }
@@ -137,7 +134,7 @@ hr {
 }
 
 /* - - - - - headings - - - - - */
-.rcp-title, .rcp-name, .rcp-desc, .rcp-igds, .rcp-makes, .rcp-method, .rcp-method-title, .rcp-steps {
+.rcp-title, .rcp-name, .rcp-desc, .rcp-igds-title, .rcp-makes, .rcp-method, .rcp-method-title, .rcp-steps {
     font-weight: bold;
     font-size: 14px;
     margin: 0px;
@@ -153,8 +150,13 @@ hr {
     font-weight: normal;
     padding: 5px 1px 1px 1px;    
 }
+
+.rcp-igds-title {
+    display: flex;
+    justify-content: space-between;
+}
 .rcp-method-title {
-    padding: 1px 1px 1px 1px;    
+    padding: 1px 1px 1px 1px;
 }
 .rcp-steps {
     font-weight: normal;

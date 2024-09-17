@@ -56,6 +56,7 @@ function recipeObjectFromName(subcomponentName) {
 // dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
 // dev setup - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - E
 
+import SchemaRecipe from './schema_from_recipe.js';
 
 var recipeToRender = {};               // use hash lookup instead of search
 recipes.forEach( r => {
@@ -187,12 +188,13 @@ const IGD_TYPE_DTK       = 3;   // Daily TracKer
 
 function addIngredients(rc, r){
   let el = document.createElement('div');
-  el.classList.add('rcp-igds-list');
+  //el.classList.add('rcp-igds');   #TODO REMOVE ONCE email post complete
   
   // title - makes: Xg - Serves: N
   let elTitle = document.createElement('div');
-  elTitle.classList.add('rcp-igds');
-  servingsText = (r.nutrinfo.servings === -1) ? '' : ` (${r.nutrinfo.servings})`;
+
+  elTitle.classList.add('rcp-igds-title');
+  let servingsText = (r.nutrinfo.servings === -1) ? '' : ` (${r.nutrinfo.servings})`;
   let innerHTML = `<span>Ingredients</span><span>Makes: ${r.nutrinfo.yield}${r.nutrinfo.units}${servingsText}</span>`;
   elTitle.innerHTML = innerHTML;
   el.appendChild(elTitle);
@@ -439,7 +441,17 @@ function createRecipeCard(r) {
   
   recipeCard.setAttribute("id",idFromName(r.ri_name));
   recipeCard.classList.add('rcp-card');
-  
+
+  const schemaRecipe = new SchemaRecipe(r);
+
+  let schema = document.createElement('script');
+  schema.type = 'application/ld+json';  
+  schema.textContent = schemaRecipe.generateSchema();
+
+  if (r.blog_post === true) {
+    recipeCard.appendChild(schema);   // make it machine readable
+  }
+
   addImageNav(recipeCard, r);
   
   addRecipeTextSections(recipeCard, r);

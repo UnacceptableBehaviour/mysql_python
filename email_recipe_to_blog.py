@@ -116,7 +116,9 @@ def process_html_for_posting(html_path, sub_patterns):
     html_body = process_html_for_relative_links(html_body)
 
     # open blog-post.css and read it into a variable
-    with open(work_dir.joinpath('blog-post.css'), 'r') as f:
+    
+    
+    with open(Path('static/recipe_dtk_multi.css'), 'r') as f:
         css = f.read()
     
     html_body = re.sub(r'<body>', f"<body>\n <style>\n{css}\n</style>", html_body, flags=re.DOTALL)
@@ -159,6 +161,12 @@ def process_html_for_posting(html_path, sub_patterns):
     for key, img_set in img_lut['img_tags'].items():
         tagged_html_body = tagged_html_body.replace(img_set['html_img'], key)
         html_body = html_body.replace(img_set['html_img'], img_set['mail_cid'])
+
+    # add line in the last row table
+    # <tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/">Growing Local</a> for great locally produced veg using organic practices well worth signing up for!</td></tr></table>
+    tagged_html_body = tagged_html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
+    replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
+    tagged_html_body = replacement_text.join(tagged_html_body) # ','.join(['a', 'b']) -> 'a,b'
 
     img_lut['tagged_html'] = tagged_html_body
 
