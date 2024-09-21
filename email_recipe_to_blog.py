@@ -5,6 +5,7 @@ from pprint import pprint
 from pathlib import Path
 import re
 import json
+import time
 
 config_json_file = Path(f'scratch/_email/blog_email_config.json')
 with open(f'{config_json_file}', 'r') as f:
@@ -14,26 +15,33 @@ work_dir = Path(config['work_dir'])
 
 opt_dict = {
     'verbose_mode':         False,
-    'live_mail':            False,  # Set to True to mail to live blog
-    'test_mail':            True,   # Set to True to mail to test blog
+    'live_mail':            False,  # Set to True to mail to live blog -f
+    'test_mail':            True,   # Set to True to mail to test blog -a
     'id_specified':         False,
     'recipients':           [config['blog_mail_test']],
+    'leave_as_draft':        False,
     'specify_list_of_rcps': [],
 }
+blog_id = None
 
 if '-v' in sys.argv:
     opt_dict['verbose_mode'] = True
 
-if '-go' in sys.argv:
+if '-d' in sys.argv:
+    opt_dict['leave_as_draft'] = True
+
+if '-f' in sys.argv:
     opt_dict['live_mail'] = True
     opt_dict['recipients'] = [config['blog_mail_live']]     # send to LIVE blog
+    blog_id = config['FOODLAB_BLOD_ID']
 
 if '-e' in sys.argv:
     opt_dict['live_mail'] = True
     opt_dict['recipients'] = [config['blog_mail_email']]    # send to EMAIL
 
-if '-t' in sys.argv:
+if '-a' in sys.argv:
     opt_dict['live_mail'] = True                            # send to TEST blog
+    blog_id = config['AUTO_TEST_BLOG_ID']
 
 if '-i' in sys.argv:
     start_of_specify_list = sys.argv.index('-i') + 1
@@ -47,17 +55,20 @@ help_string = f'''\n\n\n
 HELP:\n
 Mail recipe to blog
 
-EG ./email_recipe_to_blog.py -v -go      # Verbose mode, mail recipe to live blog
+EG ./email_recipe_to_blog.py -v -f      # Verbose mode, mail recipe to foodlab live blog
 
 - - - options - - - 
 -v          Verbose mode turn on more diagnostics
--go         Go ahead and mail recipe to LIVE blog
--t          Mail recipe to TEST blog 
+-f          Go ahead and mail recipe to Foodlab LIVE blog
+-a          Mail recipe to Auto-test blog
+-e          Mail recipe to email
+
+-d          Leave as draft - DON'T PUBLISH
 
 -i 917      Specify ri_id to process. SB last of arguments
 
 EG:
-./email_recipe_to_blog.py -go -i 917    # Mail recipe 917 to live blog
+./email_recipe_to_blog.py -f -i 917    # Mail recipe 917 to live blog
 ./email_recipe_to_blog.py -e -i 917     # Mail recipe 917 to email
 
 -h          This help
@@ -76,6 +87,17 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+
+import os
+import traceback
+from google.oauth2 import credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+
+# If modifying these SCOPES, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/blogger']
+
 
 
 # replace ALL href='https://dtk.health:50015#prawn-cocktail'
@@ -164,13 +186,80 @@ def process_html_for_posting(html_path, sub_patterns):
 
     # add line in the last row table
     # <tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/">Growing Local</a> for great locally produced veg using organic practices well worth signing up for!</td></tr></table>
-    tagged_html_body = tagged_html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
-    replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
-    tagged_html_body = replacement_text.join(tagged_html_body) # ','.join(['a', 'b']) -> 'a,b'
+    html_body = html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
+    # print('table insert - - - - - S')
+    # pprint(tagged_html_body)
+    # print('table insert - - - - - M')
+    replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td colspan="8">If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
+    html_body = replacement_text.join(html_body) # ','.join(['a', 'b']) -> 'a,b'
 
     img_lut['tagged_html'] = tagged_html_body
 
     return (img_lut, html_body)
+
+
+# set image quality to 800px instead of 320px
+def update_image_size(content, new_size=800):
+    return content.replace('=s320', f'=s{new_size}')
+
+
+def update_post_image_sizes_title_and_publish(blog_id, target_post_title, service):
+    
+    target_post = None
+
+    try:
+        # cycle through the 1st 5 posts lookin for title matching post_title
+        while target_post == None:    
+            print(f"Looking for post: {target_post_title}")
+            # post might not have been processed yet so possible need to poll until it's present
+            draft_posts = service.posts().list(blogId=blog_id, fetchBodies=True, status='DRAFT').execute()
+            
+            #pprint(draft_posts_request)
+
+            for post in draft_posts.get('items', []):
+                print(f"Found: {post['title']}")
+                if post['title'] == target_post_title:
+                    content = post['content']
+                    target_post_id = post['id']
+                    updated_content = update_image_size(content)
+                    updated_title = post['title'].replace(' - script w css', '')
+                    post['title'] = updated_title
+                    post['content'] = updated_content
+                    
+                    # verbose mode
+                    print(f"  BLOG ID: [{blog_id}]")
+                    print(f"  {post['title']} [{target_post_id}] ({post['url']})")
+                    print(f"  {post['content']}")
+                    print(f"  {post['title']}")
+                    print('.\n.\n.\n')
+                    # Update the post
+                    updated_post = service.posts().update(blogId=blog_id, postId=target_post_id, body=post).execute()
+                    print(f"Post updated: {updated_post['url']}")
+                    print('.\n.\n.\n')
+
+                    if opt_dict['leave_as_draft'] == False:
+                        # Publish the post
+                        target_post = service.posts().publish(blogId=blog_id, postId=target_post_id).execute()
+                        #pprint(target_post) 
+                        print(f"Post published: {target_post['url']}")
+                        print('.\n.\n.\n')
+                    else:
+                        print(f"Post left as DRAFT: {target_post['url']}")
+                        print('.\n.\n.\n')
+                    
+                    break        
+            # wait before polling again
+            time.sleep(2)
+    
+    except Exception as e:
+        traceback.print_exc()
+        print(f'* * * ERROR * * * : {e}')
+
+    return target_post
+
+target_post_title = 'recipe: red pepper beef bao m - script w css'
+#['LIVE', 'DRAFT', 'SCHEDULED']
+target_post_state = 'LIVE'
 
 # connect to docker osx
 set_DB_connection(db_to_use_string[1])
@@ -279,6 +368,31 @@ if __name__ == '__main__':
         #pprint(body)
         pprint(asset_list)
         print(f"Sending email to {recipients}: {rcp[0]['ri_name']} - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
+
+        # Now we have the post & images on blogger we can update the post title & images resolution
+        creds = None
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists('token.json'):
+            with open('token.json', 'r') as token:
+                creds = credentials.Credentials.from_authorized_user_info(json.load(token), SCOPES)
+
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'scratch/_email/credentials.json', SCOPES)
+                creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open('token.json', 'w') as token:
+                token.write(creds.to_json())
+
+        service = build('blogger', 'v3', credentials=creds)
+        
+        update_post_image_sizes_title_and_publish(blog_id, subject, service)
 
 
     # See F_20240507_EMAIL_recipe_to_BLOG.rtf for config file info
