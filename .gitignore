@@ -9,3 +9,4 @@ geckodriver.log
 /static/uploads
 /.vscode
 recipe
+token.json
