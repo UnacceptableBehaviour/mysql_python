@@ -188,7 +188,6 @@ const IGD_TYPE_DTK       = 3;   // Daily TracKer
 
 function addIngredients(rc, r){
   let el = document.createElement('div');
-  //el.classList.add('rcp-igds');   #TODO REMOVE ONCE email post complete
   
   // title - makes: Xg - Serves: N
   let elTitle = document.createElement('div');
@@ -282,7 +281,7 @@ function expandIngredientToRecipeCard(event) {
   if (recipeCard === null) {
     console.log(`Creating recipeCard: ID: ${elementId}`);
     //const recipeObj = recipeObjectFromName(subcomponentName);         // dev stub
-    const recipeObj = recipeComponentFromName(compositeRecipe, subcomponentName, currentLevel = "components")     
+    const recipeObj = recipeComponentFromName(compositeRecipe, subcomponentName, "components")     
     
     recipeObj.back = backTo;  // embed return route in recipe
     const recipeCardElement = createRecipeCard(recipeObj);        
