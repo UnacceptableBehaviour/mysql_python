@@ -9,4 +9,6 @@ geckodriver.log
 /static/uploads
 /.vscode
 recipe
+
+# this file is credentials for google api - it's created after logging in w/ tf@g account
 token.json
