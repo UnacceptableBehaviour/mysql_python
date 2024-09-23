@@ -1034,6 +1034,22 @@ function getPlatformInfo(){ // https://stackoverflow.com/questions/3514784/what-
   return '_genericDevice';
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+  var storeDisplay = document.getElementById('store-display');
+  
+  var screenWidth = window.screen.width;
+  var screenHeight = window.screen.height;
+  var devicePixelRatio = window.devicePixelRatio;
+  var resolution = `${screenWidth} x ${screenHeight}`;
+  
+  storeDisplay.innerHTML = `
+    <p>Resolution: ${resolution}</p>
+    <p>Pixel Ratio: ${devicePixelRatio}</p>
+    <p>Screen Width: ${screenWidth}px</p>
+    <p>Screen Height: ${screenHeight}px</p>
+  `;
+});
+
 var lastSavedFile = '';
 // HARD code a bootstrap UUID
 var youAreWhoISayYouAre = '014752da-b49d-4fb0-9f50-23bc90e44298';

@@ -10,3 +10,30 @@
 .nav-but img {
   height: 28px;
 }
+
+/* Default styles for navigation buttons */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.nav-but {
+  flex: 1;
+  padding: 4px;
+  text-align: center;
+  font-size: 16px;
+  /* Adjust the width to ensure buttons fit in one row */
+  min-width: 40px;
+  /* border-radius: 4px; */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 600px) {
+  .nav-but {
+    padding: 4px;
+    font-size: 14px;
+    min-width: 40px;
+    /* border-radius: 4px; */
+  }
+}
