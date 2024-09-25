@@ -1,5 +1,12 @@
 {% block content %}
 
+<div class="container-fluid">
+  <h4 id='page-display-title'>
+    recipe search..
+  </h4>
+</div>
+
+
 <div  id='recipe-search-input-row' class="container-fluid">
   
   <div class="input-group">
@@ -10,18 +17,14 @@
 
 </div>
 
-<div class="container-fluid">
-  <h4 id='page-display-title'>
-    recipe search..    
-    <button id='but-recipe-search' type="button" class="btn btn-outline-danger float-right">SEARCH</button>  
-    <button id='but-return-checked' type="button" class="btn btn-outline-success float-right">SAVE</button>
-    <button id='but-check-all-lbl' type="button" class="btn btn-outline-primary float-right">✔︎ ALL LBL</button>
-    <button id='but-check-all-fav' type="button" class="btn btn-outline-primary float-right">✔︎ ALL FAV</button>    
-  </h4>
-  
+<div id='recipe-search-button-row' class="container-fluid">
+  <button id='but-recipe-search' type="button" class="btn btn-outline-danger float-right">SEARCH</button>
+  <button id='but-check-all-lbl' type="button" class="btn btn-outline-primary float-left">✔︎ ALL LBL</button>
+  <button id='but-check-all-fav' type="button" class="btn btn-outline-primary float-left">✔︎ ALL FAV</button>
+  <button id='but-return-checked' type="button" class="btn btn-outline-success float-left">SAVE</button>
 </div>
 
-<br>
+<div class="clearfix"></div>
 
 <div id="rcp-gallery" class="container-fluid padding"></div>
 
