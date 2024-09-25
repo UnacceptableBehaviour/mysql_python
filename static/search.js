@@ -39,10 +39,9 @@ var checkAllBtn = document.getElementById('but-check-all-fav');
 checkAllBtn.addEventListener('click', checkAllRcpsFavs);
 
 
-
-var searchFrom = document.getElementById('recipe-search-2-inrow');
-searchFrom.placeholder = 'search string';
-searchFrom.addEventListener('keyup', function(event) {   // act on hit return key
+var searchForm = document.getElementById('recipe-search-2-inrow');
+searchForm.placeholder = 'search string';
+searchForm.addEventListener('keyup', function(event) {   // act on hit return key
   if (event.key === "Enter") { searchForRecipe(); }
 });
 
@@ -127,7 +126,7 @@ function checkAllRcps(checkType) {
 }
 
 function saveCheckedRcps(){
-  let search = searchFrom.value;
+  let search = searchForm.value;
 
   fetch( '/search', {
     method: 'POST',                                             // method (default is GET)
@@ -149,7 +148,7 @@ function saveCheckedRcps(){
 
 function searchForRecipe (){
 
-  search = searchFrom.value;
+  search = searchForm.value;
 
   if (search === "") search ='%'; // match anything - just use filters & tags - TODO randomise for roulette!
 
@@ -256,3 +255,13 @@ function renderGalleryFromResult(recipeList){
 
   return html_gallery;
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  var dbg_1 = document.getElementById('dgb-s1');
+  if (dbg_1) {
+    dbg_1.textContent = userUUID;
+  }
+});
+
+console.log('UUID:', userUUID);
+//console.log('userInfo:', userInfo);
