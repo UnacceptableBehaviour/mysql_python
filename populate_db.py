@@ -100,6 +100,7 @@ url_encoded_pwd = urllib.parse.quote_plus("kx%jj5/g")
 
 from helpers import create_list_of_recipes_and_components_from_recipe_id, get_csv_from_server_as_disctionary, create_exploded_recipe
 from helpers_db import get_search_settings_dict, set_DB_connection, db_to_use_string
+from timestamping import nix_time_ms, hr_readable_from_nix
 
 # Relative '.' import only works if it's inside a package being imported
 # so
@@ -413,12 +414,11 @@ def insert_dev_user_into_usernames_table(db, uuid, user_name, table):
     # create DB INSERT command
     # INSERT INTO usernames (uuid_user, username)  VALUES ('uuid', 'user_name');
 
-    sql_command = f"INSERT INTO {table} (uuid_user, username)  VALUES ('{uuid}', '{user_name}');"
+    sql_command = f"INSERT INTO {table} (uuid_user, username, update_time_stamp)  VALUES ('{uuid}', '{user_name}', {nix_time_ms()});"
 
     print(f"> - insert_dev_user_into_usernames_table - S\n{sql_command}\n> - insert_dev_user_into_usernames_table - E\n")
     db.execute(sql_command)
     db.commit()
-
 
 def main():
     # execute this query

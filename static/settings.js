@@ -179,10 +179,10 @@ function fillInTagButtons(_e){
 
 
 
-
 function postUpdateSettingsToServer(){
 
   // TODO - store setting locally - register with dtk_storage
+  userInfo['update_time_stamp'] = Date.now(); // timeNowSinceEpoch
   console.log(userInfo);
 
   fetch( '/settings', {

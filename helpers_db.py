@@ -791,7 +791,8 @@ def create_user(uuid='014752da-b49d-4fb0-9f50-23bc90e44298', user_settings={}):
         'devices': ['dev1_fp_hash', 'dev2_fp_hash', 'dev3_fp_hash'],
         'default_filters': get_search_settings_dict(),
         'tag_sets': get_search_settings_dict(),
-        'fav_rcp_ids':[]
+        'fav_rcp_ids':[],
+        'update_time_stamp': nix_time_ms()
         }
 
     default_user_settings.update(user_settings)
@@ -817,16 +818,19 @@ def get_user_info_dict_from_DB(uuid):
         'tag_sets':['allergens','ingredient_exc','tags','types']
     }
 
-    usernameRowProxy = helper_db_class_db.execute(f"SELECT username FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+    usernameRowProxy = helper_db_class_db.execute(f"SELECT username, update_time_stamp FROM usernames WHERE uuid_user='{uuid}';").fetchone()
+
     try:
         username = usernameRowProxy[0]
+        update_time_stamp = usernameRowProxy[1]
     except:
         return create_user(uuid, {'name': 'carter'})
         
-    return_user_info = {'UUID':uuid, 'name':username}
+    return_user_info = {'UUID':uuid, 'name':username, 'update_time_stamp':update_time_stamp}
 
     print(f"- - RETRIEVING FROM DB - {uuid} ( -o- ) - S")
 
+    pprint(return_user_info)
 
     tag_sets_and_filters = {}
 
@@ -926,8 +930,24 @@ def append_merge_favs_to_DB(db, user_settings):
         db.execute(sql_command)    
         print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
     else:
-        print(f"RESULT: len(user_settings['fav_rcp_ids']) = {len(user_settings['fav_rcp_ids'])} <\n\n") # < < COMMIT
+        print(f"RESULT: No of fav_rcp_ids = {len(user_settings['fav_rcp_ids'])} <\n\n") # < < COMMIT
 
+
+def add_timestamp_to_user_DB(db, user_settings):
+    uuid = user_settings['UUID']
+    user_name = user_settings['name']
+    timestamp = user_settings['update_time_stamp']
+
+    sql_command = f"""
+    INSERT INTO usernames (uuid_user, username, update_time_stamp)
+    VALUES ('{uuid}', '{user_name}', {timestamp})
+    ON CONFLICT (uuid_user)
+    DO UPDATE SET username = EXCLUDED.username, update_time_stamp = EXCLUDED.update_time_stamp;
+    """
+
+    print(f"***** SQL WRITE:\n{sql_command}\n\n")
+    db.execute(sql_command)    
+    print(f"RESULT: {db.commit()} <\n\n") # < < COMMIT
 
 
 def remove_favs_from_DB(db, uuid, recipe_ids):
@@ -983,6 +1003,8 @@ def update_settings_tables_for_uuid(db, user_settings):
         # how is failure reported?
 
     append_merge_favs_to_DB(db, user_settings)
+
+    add_timestamp_to_user_DB(db, user_settings)
 
 
 # EG DB write
