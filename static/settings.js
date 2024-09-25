@@ -1,6 +1,10 @@
-
+//import { saveUserInfo } from '/static/dtk_storage.js';
 
 console.log('settings.js - START');
+//saveUserInfo(userInfo);
+
+console.log('userInfoLocal:');
+console.log(userInfoLocal);
 
 // go through user_info
 //for (tagCatergoryId in userInfo['default_filters']) {  
@@ -181,24 +185,9 @@ function fillInTagButtons(_e){
 
 function postUpdateSettingsToServer(){
 
-  // TODO - store setting locally - register with dtk_storage
-  userInfo['update_time_stamp'] = Date.now(); // timeNowSinceEpoch
-  console.log(userInfo);
+  updateUserInfoOnServer(userInfo)
 
-  fetch( '/settings', {
-    method: 'POST',                                             // method (default is GET)
-    headers: {'Content-Type': 'application/json' },             // JSON
-    body: JSON.stringify( { 'user':userUUID, 'user_info':userInfo } )      // Payload        
-  
-  }).then( function(response) {    
-    return response.json();
-  
-  }).then( function(jsonResp) {
-    //window.location.replace('/tracker');
-    //window.location.replace('/weigh_in');
-    console.log(`setting UPDATED? - ${jsonResp}`);
-  });  
-  
+
 }
 
 

@@ -452,10 +452,23 @@ def db_gallery():
 def settings():
 
     # POST route
-    if request.method =='POST':
-        settings = request.get_json() # parse JSON into DICT
+    if request.method == 'POST':
+        settings = request.get_json()  # parse JSON into DICT
 
-        if 'user_info' in settings:
+        if 'action' in settings and settings['action'] == 'retrieve':
+            # Retrieve user_info from DB
+            user_info = get_user_info_dict_from_DB(settings['user'])
+            user_info.pop('devices', None)  # setting per device? - Use case multi users using one account different devices.
+
+            sql_query = "SELECT DISTINCT unnest(types) AS all_types FROM recipes;"
+            types = helper_db_class_db.execute(sql_query).fetchall()  # ret list of tuples [('serve_hot',),('serve_rt',),('lunchbox',), etc ]
+            types = [t[0] for t in types if t[0].strip()]  # remove blanks
+            types.sort()
+            user_info['tag_sets']['types'] = types
+
+            return json.dumps({'user_info': user_info}), 200  # OK
+
+        elif 'user_info' in settings:
             print('/settings/POST:user_info:')
             pprint(settings['user_info'])
 
@@ -463,11 +476,11 @@ def settings():
             update_user_info_dict(settings['user_info'])
 
             # return all good
-            return json.dumps({}), 201 # created
+            return json.dumps({}), 201  # created
 
         else:
-            # return - couldnt find user_info!??
-            return json.dumps({}), 404
+            # return - couldn't find user_info!??
+            return json.dumps({}), 404  # not found
 
 
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')   

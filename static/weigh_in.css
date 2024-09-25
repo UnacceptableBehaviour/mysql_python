@@ -23,6 +23,7 @@ body {
 
 #page-display-title {
   /* font-size: var(--title-font-size); */
+  padding-right: 5px;
 }
 
 #but-weigh-in-record {

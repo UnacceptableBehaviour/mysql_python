@@ -91,10 +91,6 @@ function addCheckboxListeners(){
   // });  
 }
 
-
-
-
-
 function checkAllRcpsLabel(){
   checkAllRcps('flexCheckLBL_');  
 }
@@ -264,4 +260,59 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 console.log('UUID:', userUUID);
-//console.log('userInfo:', userInfo);
+console.log('userInfoLocal:', userInfoLocal);
+
+function showSearchFiltersAsButtons(){
+  let searchFilters = document.getElementById('search-filters');
+  let filterButtons = '';
+  // for (var i = 0; i < userInfoLocal.default_filters.length; i++){
+  //   filterButtons += `<button type="button" class="btn btn-outline-secondary">${userInfoLocal.default_filters[i]}</button>`;
+  // }
+  // iterate userInfoLocal.default_filters keys console each key & list of contents
+  for (const [key, value] of Object.entries(userInfoLocal.default_filters)) {
+    console.log(`${key}: ${value}`);
+    if (value.length > 0){
+      value.forEach(function(item){
+        let buttonId = `${key}:${item}`;
+        console.log(`${key}: ${item}`);
+        filterButtons += `<button type="button" id='${buttonId}' class="btn btn-outline-secondary">${item}</button>`;
+      });
+      // filterButtons += `<button type="button" class="btn btn-outline-secondary">${key}</button>`;
+    }
+    // filterButtons += `<button type="button" class="btn btn-outline-secondary">${key}</button>`;
+  }
+
+  searchFilters.innerHTML = searchFilters.innerHTML + filterButtons;
+}
+function addRemoveButtonClickHandlersForSearchFilters() {
+
+  for (const [key, value] of Object.entries(userInfoLocal.default_filters)) {
+    console.log(`${key}: ${value}`);
+    if (value.length > 0){
+      value.forEach( function(item){
+        let buttonId = `${key}:${item}`;
+        let button = document.getElementById(buttonId);
+        console.log(`${key}: ${item}`);
+        button.addEventListener('click', function() {
+          console.log(`clicked: ${buttonId}`);
+          // remove from userInfoLocal
+          let index = userInfoLocal.default_filters[key].indexOf(item);
+          if (index > -1) {
+            userInfoLocal.default_filters[key].splice(index, 1);
+          }
+          userInfoLocal['update_time_stamp'] = Date.now(); // timeNowSinceEpoch
+          // remove from DOM
+          button.remove();
+          // save userInfoLocal
+          //saveUserInfo(userInfoLocal);
+          updateUserInfoOnServer(userInfoLocal);
+        });
+      });
+    }  
+  }
+
+}
+
+fetchUserInfoFromServer();
+showSearchFiltersAsButtons();
+addRemoveButtonClickHandlersForSearchFilters();
