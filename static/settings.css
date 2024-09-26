@@ -1,55 +1,52 @@
-<style>
 
-  /*    tag
-      . class
-      # id      
-  */
-  /*
-  .container-fluid    - space out exclude divs 
-  .padding
-  buttons
-  
-  remove <br> 
-  */
-  body {
-    --title-font-size:1.5rem;
-    color: #222;
-  }
-  
-  #settings-container {
-    margin: 0.1rem;
-    padding: 0.1rem;
-  }
-  
-  .card {
-    margin: 0.2rem;
-    padding: 0.2rem;    
-  }
+/*    tag
+    . class
+    # id      
+*/
+/*
+.container-fluid    - space out exclude divs 
+.padding
+buttons
 
-  .tag-div{
-    margin-bottom: 1.2rem;
-  }
+remove <br> 
+*/
+body {
+  --title-font-size:1.5rem;
+  color: #222;
+}
 
-  .container-fluid {
-    padding-left: 0.1rem;
-    /* padding-top: 0.1rem;
-    padding-bottom: 0.1rem; on buttons! */
-  }
-  
-  .ftb_set {    /* present in list highlighted */
-    background-color: #B8DB0D;
-  }
-  .ftb_none {   /* NOT present in list, NOT highlighted */
-    background-color: #FFFFFF;
-  }
+#settings-container {
+  margin: 0.1rem;
+  padding: 0.1rem;
+}
+
+.card {
+  margin: 0.2rem;
+  padding: 0.2rem;    
+}
+
+.tag-div{
+  margin-bottom: 1.2rem;
+}
+
+.container-fluid {
+  padding-left: 0.1rem;
+  /* padding-top: 0.1rem;
+  padding-bottom: 0.1rem; on buttons! */
+}
+
+.ftb_set {    /* present in list highlighted */
+  background-color: #B8DB0D;
+}
+.ftb_none {   /* NOT present in list, NOT highlighted */
+  background-color: #FFFFFF;
+}
 
 
-  /*  TODO - remove w/ debug / dev   */
-  #debug-settings-table {
-    width: 80%;
-  }
-  #debug-settings-table td {
-    text-align: center;
-  }
-
-</style>
+/*  TODO - remove w/ debug / dev   */
+#debug-settings-table {
+  width: 80%;
+}
+#debug-settings-table td {
+  text-align: center;
+}
