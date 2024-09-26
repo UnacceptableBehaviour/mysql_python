@@ -585,7 +585,19 @@ def build_search_query(search, default_filters):
     # )
     # AND NOT ('dairy' = ANY(allergens) OR 'eggs' = ANY(allergens) OR 'peanuts' = ANY(allergens));
 
-    search_query += ';'
+    #search_query += ';'
+    # Add ordering by the number of ingredients
+    search_query = f"""
+    SELECT filtered_results.ri_id
+    FROM (
+        {search_query}
+    ) AS filtered_results
+    JOIN exploded ON filtered_results.ri_id = exploded.ri_id
+    ORDER BY (
+        SELECT COUNT(*)
+        FROM unnest(exploded.ingredients) AS igd
+    );
+    """
 
     return search_query
 
