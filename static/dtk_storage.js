@@ -61,6 +61,17 @@ function loadUserInfo() {
   }
 }
 
+// maybe use lodash to do deep copy?
+// https://lodash.com/docs/4.17.15#cloneDeep
+// the user info is a simple object, so JSON.parse(JSON.stringify(obj)) is a good way to deep copy it.
+function deepCopy(obj) {
+  const copy = JSON.parse(JSON.stringify(obj));
+  if (copy.update_time_stamp) {
+    copy.update_time_stamp = parseInt(copy.update_time_stamp, 10);
+  }
+  return copy;
+}
+
 // Save userInfo to local storage
 function saveUserInfo(callerUserInfo = null) {
   console.log(`saveUserInfo: ${callerUserInfo.default_filters.type_inc}`);
@@ -68,7 +79,7 @@ function saveUserInfo(callerUserInfo = null) {
   if (callerUserInfo) {  // update userInfoLocal if newer
     if (callerUserInfo['update_time_stamp'] > userInfoLocal['update_time_stamp']){
       console.log(`callerUserInfo - more recent - SAVING`);
-      userInfoLocal = callerUserInfo;
+      userInfoLocal = deepCopy(callerUserInfo);
     }
   } 
   localStorage.setItem('userInfo', JSON.stringify(userInfoLocal));
