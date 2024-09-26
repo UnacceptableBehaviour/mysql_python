@@ -2,7 +2,11 @@
 
 {% block header %}
 <link rel="stylesheet" href="{{ url_for( 'static', filename='gallery.css') }}">
-
+<script>
+    function submitForm(ri_id) {
+        document.getElementById('form-' + ri_id).submit();
+    }
+</script>
 <!--<script src="https://use.fontawesome.com/releases/v5.7.0/js/all.js"></script>-->
 {% endblock %}
 
@@ -13,35 +17,23 @@
 
 <div class="container-fluid padding">
     <div class="row padding">
-        <!--  -->
-        <!-- <div class="card-columns"> -->
-        <!-- <div class="card-deck"> -->
-        <!-- <div class="card-group"> good way to compare recipes? -->
         <div class="card-columns">
-            <form action={{url_for('db_recipe_page')}} method='POST'>
-                {% for recipe_info in recipes %}
-                <!-- <div class="col-md-12"> </div>-->
-                    <!-- <div class="card" style="width:180px"> -->
-                    <div class="card">
-                        <!-- <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipe_info['lead_image']}}"></img> -->
-                        <img class="card-img-top" src="static/recipe/{{recipe_info['lead_image']}}"></img>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
-                            <p class="card-text">{{ recipe_info['description'] }}</p>
-                            <!-- (recipe_info['user_rating']|int) user_rating is a float use a filter to covert to int -->
-                            {% for stars in range((recipe_info['user_rating']|int)) %}
-                            <!--<i class="fa fa-star recip-star-up-rating"></i>-->
-                            <img src="static/png/star.png" alt="tick" srcset="static/svg/star.svg" class="recip-star-up-rating">
-                            {% endfor %}
-                            {% for stars in range(5 - (recipe_info['user_rating']|int)) %}
-                            <!--<i class="fa fa-star recip-star-down-rating"></i>-->
-                            <img src="static/png/star.png" alt="tick" srcset="static/svg/star.svg" class="recip-star-down-rating">
-                            {% endfor %}
-                            <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
-                        </div>
+            {% for recipe_info in recipes %}
+                <div class="card">
+                    <div class="image-container">
+                        <img class="card-img-top" src="static/recipe/{{recipe_info['lead_image']}}" onclick="submitForm({{ recipe_info['ri_id'] }})"></img>
+                        <h5 class="rcp-rating">{{ recipe_info['user_rating']|round(1) }}</h5>
+                        <img class="card-img-top-fav" src="static/svg/fav-heart-holow.svg">                        
                     </div>
-                {% endfor %}
-            </form>
+                    <div class="card-body">
+                        <h6 class="card-title">{{ recipe_info['ri_name'] }}</h6>
+                        <!-- <p class="card-text">{{ recipe_info['description'] }}</p> -->
+                    </div>
+                    <form id="form-{{ recipe_info['ri_id'] }}" action="/db_recipe_page" method="POST" style="display: none;">
+                        <input type="hidden" name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}">
+                    </form>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>
