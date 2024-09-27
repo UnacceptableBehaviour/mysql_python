@@ -691,8 +691,6 @@ function buildTableFromDailyTracker(){
     console.log(`<tbody> ADDED [${table.getAttribute('id')}]`);
   }
   
-  
-  
   console.log('> >  building table < < - - - - S');
   console.log(dtk);
   console.log(dtk['dtk_rcp']['ingredients']);
