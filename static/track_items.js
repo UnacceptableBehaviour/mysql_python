@@ -1160,7 +1160,7 @@ function loadDailyTrackerFromLocalStorage(){
   dtkLocal = JSON.parse( window.localStorage.getItem(lastSavedFile) ); // key = content of lastSavedFile
   
   // if server side has archived & rolled over to fresh day prefer it instead
-  if (dtkLocal) && (dtkLocal['dtk_rcp']['dt_rollover'] < dtk['dtk_rcp']['dt_rollover']) {
+  if ((dtkLocal) && (dtkLocal['dtk_rcp']['dt_rollover'] < dtk['dtk_rcp']['dt_rollover'])) {
     console.log('WARNING ROLLED OVER using FRESH server dtk');
     console.log(`dtkLocal_ro: ${dtkLocal['dt_rollover']} < dtk_ro: ${dtk['dt_rollover']} = ${dtkLocal['dt_rollover'] < dtk['dt_rollover']}`);
   } else {
