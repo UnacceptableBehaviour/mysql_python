@@ -1,22 +1,9 @@
 
-/*    tag
-    . class
-    # id
-    TODO - this file - none of the css file appear to do anything! - unless conetnt is includedin html!!
-*/
 #debug-recipe-search-table {
   width: 80%;
 }
 #debug-recipe-search-table td {
   text-align: center;
-}
-
-.recip-star-up-rating {
-  color: gold;
-}
-
-.recip-star-down-rating {
-  color: #303030;
 }
 
 body {
@@ -70,7 +57,83 @@ button {
   z-index: 1;
 }
 
-.card-body {
-  padding: 10px;
+
+.image-container {
+  position: relative;
 }
 
+.rcp-rating {
+margin: 0px;
+position: absolute;
+bottom: 3px;
+right: 3px;
+background-color: rgba(0, 0, 0, 0.3); /* Optional: Add a background for better readability */
+color: rgb(251, 255, 144); /* Optional: Change text color for better readability */
+padding: 2px 5px; /* Optional: Add some padding */
+border-radius: 3px; /* Optional: Add some border radius */
+}
+
+.card-img-top-fav {
+position: absolute;
+bottom: 6px;
+left: 6px;
+width: 12%;
+filter: brightness(0) saturate(0%) invert(70%) sepia(100%) saturate(1000%) hue-rotate(1deg) brightness(95%) contrast(200%) opacity(0.6);
+}
+
+.card-columns .card {
+  margin-bottom: 5px;
+}
+
+.card-body h6 {
+  margin: 0px;
+}
+
+.card-columns {
+  column-count: 5;
+  column-gap: 5px;
+}
+
+.card-body {
+  padding: 5px;
+}
+
+/* @media (min-width: 400px) {
+  .card-columns {
+      -webkit-column-count: 2;
+      -moz-column-count: 2;
+      column-count: 2;
+  }
+} */
+
+@media (min-width: 400px) {
+.card-columns {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+}
+}
+
+@media (min-width: 550px) {
+  .card-columns {
+      -webkit-column-count: 3;
+      -moz-column-count: 3;
+      column-count: 3;
+  }
+}
+
+@media (min-width: 650px) {
+  .card-columns {
+      -webkit-column-count: 4;
+      -moz-column-count: 4;
+      column-count: 4;
+  }
+}
+
+@media (min-width: 850px) {
+  .card-columns {
+      -webkit-column-count: 5;
+      -moz-column-count: 5;
+      column-count: 5;
+  }
+}

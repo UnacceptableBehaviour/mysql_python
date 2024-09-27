@@ -426,6 +426,7 @@ def buttons_inputs():
 
 @app.route('/db_gallery')
 def db_gallery():
+    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
 
     # do this in pages when larger db - use JS to reload
     ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
@@ -444,7 +445,7 @@ def db_gallery():
     # pprint(rcp_ids_20_off)
     # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
-    return render_template('gallery.html', app_title=app_title, recipes=recipes)
+    return render_template('gallery.html', app_title=app_title, user_info=user_info, recipes=recipes)
 
 
 
@@ -595,7 +596,9 @@ def search_ingredient():
         elif ('rcpsToUnlabel' in search_request) or ('rcpsShortList' in search_request):
             removal_targets = {}
             filter_target = 'None'
-            rcpsToUnlabel = search_request['rcpsToUnlabel']
+            rcpsToUnlabel = []
+            if ('rcpsToUnlabel' in search_request):
+                rcpsToUnlabel = search_request['rcpsToUnlabel']
             
             if len(rcpsToUnlabel) > 0:
                 if len(user_info['default_filters']['type_inc']) > 1:
@@ -626,8 +629,19 @@ def search_ingredient():
                     pprint(search_request['rcpsShortList'])
                     pprint("user_info['fav_rcp_ids']")
                     pprint(user_info['fav_rcp_ids'])
-                    add_to_existing = search_request['rcpsShortList'] + user_info['fav_rcp_ids']
-                    favourite_targets = list(set(add_to_existing))
+                    if 'toggle_favs' in search_request:
+                        if search_request['toggle_favs']: # true toggle them
+                            for item in search_request['rcpsShortList']:
+                                if item in user_info['fav_rcp_ids']:
+                                    # If item is in both lists, remove it from user_info['fav_rcp_ids']
+                                    user_info['fav_rcp_ids'].remove(item)
+                                else:
+                                    # If item is in search_request['rcpsShortList'] but not in user_info['fav_rcp_ids'], add it
+                                    user_info['fav_rcp_ids'].append(item)
+                    else:
+                        add_to_existing = search_request['rcpsShortList'] + user_info['fav_rcp_ids']
+                        favourite_targets = list(set(add_to_existing))
+
                 else:
                     favourite_targets = list(set(search_request['rcpsShortList']))
                 pprint(user_info)

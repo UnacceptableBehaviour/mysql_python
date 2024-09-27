@@ -1025,7 +1025,8 @@ def update_settings_tables_for_uuid(db, user_settings):
 # UPDATE tag_sets
 def update_user_info_dict(user_settings):
     uuid = user_settings['UUID']
-
+    user_settings['update_time_stamp'] = nix_time_ms()
+    
     try:
         # local filesystem
         user_db[uuid].update(user_settings)

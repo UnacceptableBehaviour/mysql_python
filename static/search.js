@@ -174,43 +174,17 @@ function searchForRecipe (){
 }
 
 function renderRecipeCard(rcpInfo){
-  //<div class="card">
-  //    <img class="card-img-top" src="https://asset.server:8080/static/recipe/{{recipe_info['lead_image']}}"></img>
-  //    <div class="card-body">
-  //        <h5 class="card-title">{{ recipe_info['ri_name'] }}</h5>
-  //        <p class="card-text">{{ recipe_info['description'] }}</p>
-  //        <!-- (recipe_info['user_rating']|int) user_rating is a float use a filter to covert to int -->
-  //        {% for stars in range((recipe_info['user_rating']|int)) %}
-  //        <i class="fa fa-star recip-star-up-rating"></i>
-  //        {% endfor %}
-  //        {% for stars in range(5 - (recipe_info['user_rating']|int)) %}
-  //        <i class="fa fa-star recip-star-down-rating"></i>
-  //        {% endfor %}
-  //        <button type='submit' name="gallery_button_{{ recipe_info['ri_id'] }}" value="{{ recipe_info['ri_id'] }}" class="btn btn-outline-secondary float-right">Show!</button>
-  //    </div>
-  //</div>
-
-  // TODO - serve from environment
-  //ASSET_ROOT = 'http://192.168.1.13:8000/'
-  //ASSET_ROOT = 'https://asset.server:8080/'   // otherwise https fails - & no images
   ASSET_ROOT = ''
   assets_url = `${ASSET_ROOT}static/recipe/`; // local dev
 
-  var html_stars = '';
-  for ( var i = 0; i < 5; i++ ) {
-    if ( i+1 <= parseInt(rcpInfo['user_rating']) ) {                          // gold star
-      html_stars += '<i class="fa fa-star recip-star-up-rating"></i>';
-    } else {                                                              // black star
-      html_stars += '<i class="fa fa-star recip-star-down-rating"></i>';
-    }
-  }
-
   html_card = `<div class="card">
-        <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
+        <div class="image-container">
+          <img class="card-img-top" src="${assets_url}${rcpInfo['lead_image']}"></img>
+          <h5 class="rcp-rating">${parseFloat(rcpInfo['user_rating']).toFixed(1)}</h5>
+        </div>
         <div class="card-body">
             <h5 class="card-title">${rcpInfo['ri_name']}</h5>
             <p class="card-text">${rcpInfo['description']}</p>
-            ${html_stars}
             <button type='submit' name="gallery_button_${ rcpInfo['ri_id'] }" value="${ rcpInfo['ri_id'] }" class="btn btn-outline-secondary float-right">Show!</button>
             <div class="form-check">
             <input class="form-check-input" type="checkbox" value="${rcpInfo['ri_name']}" id="flexCheckLBL_${rcpInfo['ri_id']}">
