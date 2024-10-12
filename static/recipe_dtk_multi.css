@@ -91,6 +91,18 @@ hr {
     border-radius: 6px;
 }
 
+/* add border radiu to corners of image & caption - leave bottom of img square */
+.blog-post-caption-img img {
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.blog-post-caption-img table {
+    border-radius: 6px;
+} 
+
 /* READ */
 /* https://scotch.io/bar-talk/5-things-you-might-not-know-about-the-css-positioning-types */
 .rbut-bk, .rbut-x {

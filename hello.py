@@ -4,8 +4,11 @@ from flask import Flask, render_template, request, send_from_directory, redirect
 from werkzeug import serving
 import ssl
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
+# Add additional template directories
+# for non source controlled templates - CSA support
+app.jinja_loader.searchpath.append('scratch/_csa')
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # for file upload

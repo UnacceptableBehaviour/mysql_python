@@ -184,14 +184,16 @@ def process_html_for_posting(html_path, sub_patterns):
         tagged_html_body = tagged_html_body.replace(img_set['html_img'], key)
         html_body = html_body.replace(img_set['html_img'], img_set['mail_cid'])
 
-    # add line in the last row table
-    # <tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/">Growing Local</a> for great locally produced veg using organic practices well worth signing up for!</td></tr></table>
-    html_body = html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
-    # print('table insert - - - - - S')
-    # pprint(tagged_html_body)
-    # print('table insert - - - - - M')
-    replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td colspan="8">If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
-    html_body = replacement_text.join(html_body) # ','.join(['a', 'b']) -> 'a,b'
+    if 'blog-post-caption-img' not in html_body: # banner already in post
+        # add line in the last row table
+        # <tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/">Growing Local</a> for great locally produced veg using organic practices well worth signing up for!</td></tr></table>
+        html_body = html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
+        # print('table insert - - - - - S')
+        # pprint(tagged_html_body)
+        # print('table insert - - - - - M')
+        replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td colspan="8">If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
+        html_body = replacement_text.join(html_body) # ','.join(['a', 'b']) -> 'a,b'
+        # print('table insert - - - - - E')
 
     img_lut['tagged_html'] = tagged_html_body
 
@@ -244,7 +246,7 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                         print(f"Post published: {target_post['url']}")
                         print('.\n.\n.\n')
                     else:
-                        print(f"Post left as DRAFT: {target_post['url']}")
+                        print(f"Post left as DRAFT: {target_post_title}")
                         print('.\n.\n.\n')
                     
                     break        
