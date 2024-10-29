@@ -251,7 +251,7 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                     
                     break        
             # wait before polling again
-            time.sleep(2)
+            time.sleep(3)
     
     except Exception as e:
         traceback.print_exc()
