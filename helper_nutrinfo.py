@@ -323,7 +323,7 @@ if __name__ == '__main__':
     print(f"Seek Misses:\n{NutrientsDB.list_seek_misses()}")
 
     t_dict = {}
-    i_db = NutrientsDB.getInstance()
+    #i_db = NutrientsDB.getInstance() 
     i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), t_dict)
     print("t_dict")
     pprint(t_dict)
@@ -331,6 +331,14 @@ if __name__ == '__main__':
     for igdt in iter(i_db):
         print(igdt)
 
+    # typical diet day
+    i_list = ['halfwaterc', 'qcelectro', 'banana', 'honeydew melon', 
+     'preserved herring', 'coffee', 'dcx', 'red grapes', 'veg noodle oyster stirfry',
+     'aubergine & red lentils stack', 'seared smoked haddock', 'coffee',
+     'medjool dates', 'tea', 'gibberish', 'cartifloeur']
+    for i in i_list:
+        print(f"--: {i} :-")
+        pprint( ingredient_db.get(i) )
 
 
 

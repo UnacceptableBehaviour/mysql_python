@@ -7,6 +7,7 @@ document.getElementById('traffic_title_0').style.display = 'none';
 document.getElementById('b_update_0').style.display = 'none';
 document.getElementById('b_clear').style.display = 'none';
 
+// index defs for ingredients list in rcp
 const ATOMIC_INDEX = 0;        // default value is 1 - TRUE
 const QTY_IN_G_INDEX = 1;
 const SERVING_INDEX = 2;
@@ -14,6 +15,7 @@ const INGREDIENT_INDEX = 3;
 const TRACK_NIX_TIME = 4;
 const IMG_ID = 5;
 const HTML_ID = 6;
+
 const NO_TIME = -1;
 const ATOMIC = 1;
 const RCP_IN_DB = 0;

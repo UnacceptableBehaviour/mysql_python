@@ -64,7 +64,8 @@ from helpers_db import helper_db_class_db # THE DATABASE  < - - - \
 # \ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - < 
 
 from helpers_tracker import get_daily_tracker_from_DB, store_daily_tracker_to_DB, post_DTK_info_for_processing, post_interface_file
-from helpers_tracker import get_DTK_info_from_processing, process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
+from helpers_tracker import process_new_dtk_from_user, archive_dtk, dtk_timestamp_rolled_over
+#from helpers_tracker import get_DTK_info_from_processing
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker

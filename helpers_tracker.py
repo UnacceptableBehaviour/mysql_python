@@ -14,6 +14,7 @@ from timestamping import hr_readable_date_from_nix, time24h_from_nix_time
 
 from helpers_db import get_daily_tracker, store_daily_tracker
 from helpers_db import ATOMIC_INDEX, QTY_IN_G_INDEX, SERVING_INDEX, INGREDIENT_INDEX, TRACK_NIX_TIME, IMAGE_INDEX, HTML_ID
+from food_sets import IGD_TYPE_NO_INFO
 
 from helper_nutrinfo import i_db
 from config_files import get_config_or_data_file_path
@@ -188,6 +189,10 @@ def get_DTK_info_from_processing(dtk):
 
     # load nutrinfo
     i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), dtk_nut_dict)
+    
+    print(f"> - - get_DTK_info_from_processing - - - > {search_name} < S")
+    pprint(dtk_nut_dict[search_name])
+    print("> - - get_DTK_info_from_processing - - - E")
 
     return dtk_nut_dict[search_name]
 
@@ -225,49 +230,156 @@ def get_DTK_info_from_processing(dtk):
 #                                                   |
 #   load file <- - - - - - iface_file <- - - write it back
 #   |
+#   merge it into the dtk_dta and send it back
+#   
+#   ^ ^ ^ ^ ^ DEPRECATED REMOVE ALL CODE USING IFACE FILE 
 #
+#  Much simpler to iterate over the dtk['dtk_rcp']['ingredients'] and get
+#  the nutrient info from the i_db
+#  A lot faster can be done in a method and not ruby or interface file required!
+#  More robust becau unknown ingredients can be highlighted
 #
-#
+
+# get_qty_in_nanograms_from_string_as_float
+def get_qty_in_grams_from_string_as_float(qty_str):
+    # TODO convert_all_qty_to_nano_g - for vitamins and minerals
+    # look fo unit of measure and return float
+    return float(qty_str.split('g')[0])
+
+# def empty_nutridict():
+#     return  {'igdt_type': 'dtk',
+#             'n_Al': 0.0,
+#             'n_Ca': 0.0,
+#             'n_En': 0.0,
+#             'n_Fa': 0.0,
+#             'n_Fb': 0.0,
+#             'n_Fm': 0.0,
+#             'n_Fo3':0.0,
+#             'n_Fp': 0.0,
+#             'n_Fs': 0.0,
+#             'n_Pr': 0.0,
+#             'n_Sa': 0.0,
+#             'n_St': 0.0,
+#             'n_Su': 0.0,
+#             'name': '',
+#             'ots_ingredients': '__igdts__',
+#             'serving_size': 0.0,
+#             'servings': 1.0,
+#             'yield': 0.0}
 
 def process_new_dtk_from_user(dtk_data):
     uuid = dtk_data['dtk_user_info']['UUID']
 
     # update DB
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - P_submitted_DTK S")
+    # TODO do this for all nutrient not just traffic lights
+    # break out into f()
+    tot_cals = 0
+    tot_weight = 0
+    tot_fat = 0
+    tot_saturates = 0
+    tot_sugars = 0
+    tot_salt = 0
+    multiplier = 0.0
+    for index, i in enumerate(dtk_data['dtk_rcp']['ingredients']):
+        nutri_info = i_db.get(i[INGREDIENT_INDEX])  # pull nutrient info from DB
+        print(f"nutri_info - - - d {i[INGREDIENT_INDEX]}")
+        pprint(nutri_info)
+        print("nutri_info - - - E")
+        if nutri_info == None:
+            # set i[ATOMIC_INDEX] = IGD_TYPE_NO_INFO
+            dtk_data['dtk_rcp']['ingredients'][index][ATOMIC_INDEX] = str(IGD_TYPE_NO_INFO)
+            print(f"WARNING - NO NUTRIENT INFO FOR {i[INGREDIENT_INDEX]}")
+            continue
+        else:
+            multiplier = get_qty_in_grams_from_string_as_float(i[QTY_IN_G_INDEX]) / 100
+            if 'n_En' in nutri_info:
+                i_cals = nutri_info['n_En'] * multiplier
+                tot_cals += i_cals
+            
+            i_weight = get_qty_in_grams_from_string_as_float(i[QTY_IN_G_INDEX])
+            tot_weight += i_weight
+            
+            if 'n_Fa' in nutri_info:
+                i_fat = nutri_info['n_Fa'] * multiplier
+                tot_fat += i_fat
+            
+            if 'n_Sa' in nutri_info:
+                i_saturates = nutri_info['n_Sa'] * multiplier
+                tot_saturates += i_saturates
 
-    # export DTK for PROCESSING
-    # as nutridoc entry
-    post_DTK_info_for_processing(dtk_data)
+            if 'n_Su' in nutri_info:
+                i_sugars = nutri_info['n_Su'] * multiplier
+                tot_sugars += i_sugars
 
-    # fire up ccm_nutridoc_web.rb PROCESS DTK data
-    arg1 = f"{dtk_data['dtk_weight']}"
-    arg2 = f"file={post_interface_file()}"
-    data_from_nutriprocess = subprocess.check_call(["./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-S")
-    print(data_from_nutriprocess)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-E")
-
-    # import RESULT: just get nutrinfo for daily tracker for now.
-    # will expect a fully processed DTK including subcomponents
-    # TODO
-    nutridata = get_DTK_info_from_processing(dtk_data)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    # TODO - 1st
-    # Make robust - if a single item is NO NUTIRIENT DATA
-    # nothing is returned because DTK in for day FAILS
-    # Highlight missing items, but total the known ones
-
+            if 'n_St' in nutri_info:
+                i_salt = nutri_info['n_St'] * multiplier
+                tot_salt += i_salt
+    
+    nutridata = {}
+    nutridata['n_En'] = int(tot_cals)
+    nutridata['n_Fa'] = round(tot_fat, 1)
+    nutridata['n_Sa'] = round(tot_saturates, 1)
+    nutridata['n_Su'] = round(tot_sugars, 1)
+    nutridata['n_St'] = round(tot_salt, 1)
+    nutridata['yield'] = round(tot_weight, 1)
+    nutridata['serving_size'] = 100 # round(tot_weight, 1)
+    nutridata['servings'] = 1
+    
 
     # merge nutrinfo into DTK and send it back!
     dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
+    # TODO REMOVE - user uuid etc shoul come in with the data
     dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
-    #pprint(dtk_data)
+    pprint(dtk_data)
     store_daily_tracker_to_DB(dtk_data)   # ram & disc
     #commit_DTK_DB()            # disc
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - P_submitted_DTK E")
     return(dtk_data)
+
+    #print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
+    # # export DTK for PROCESSING
+    # # as nutridoc entry
+    
+    # post_DTK_info_for_processing(dtk_data)
+    #     # create human readable version of DTK
+    #     #  "dtk_recipe_txt":    "./scratch/_docr_support/___LAB_RECIPE_SMALLEST_DTK_TEST.txt",
+
+    #     #  "dtk_nutrients_txt": "./scratch/_docr_support/z_product_nutrition_info_autogen_DTK_cal.txt"
+
+    # # fire up ccm_nutridoc_web.rb PROCESS DTK data
+    # arg1 = f"{dtk_data['dtk_weight']}"
+    # arg2 = f"file={post_interface_file()}"
+    # data_from_nutriprocess = subprocess.check_call(["./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-S")
+    # print(data_from_nutriprocess)
+    # for igd_list in dtk_data['dtk_rcp']['ingredients']:
+    #     pprint(igd_list[0])
+    #     print(f"{str(igd_list[QTY_IN_G_INDEX]).rjust(8)} - {igd_list[INGREDIENT_INDEX]}")
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-E")
+
+    # # import RESULT: just get nutrinfo for daily tracker for now.
+    # # will expect a fully processed DTK including subcomponents
+    # # TODO
+    # nutridata = get_DTK_info_from_processing(dtk_data)
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+
+    # # TODO - 1st
+    # # Make robust - if a single item is NO NUTIRIENT DATA
+    # # nothing is returned because DTK in for day FAILS
+    # # Highlight missing items, but total the known ones
+
+
+    # # merge nutrinfo into DTK and send it back!
+    # dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
+    # dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
+    # #pprint(dtk_data)
+    # store_daily_tracker_to_DB(dtk_data)   # ram & disc
+    # #commit_DTK_DB()            # disc
+    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
+
+    # return(dtk_data)
 
 
 

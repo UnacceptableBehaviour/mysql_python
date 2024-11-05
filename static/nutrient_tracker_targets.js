@@ -81,8 +81,39 @@ function fill_and_format_column(nutrinfo, side){
   
 }
 
+// TODO fix magic numbers
+// import from relevant file
+const IGD_TYPE_NO_INFO = -2;  // recipe_dtk_multi.js
+//const ATOMIC_INDEX = 0;       // track_items.js
+//const INGREDIENT_INDEX = 3;   // track_items.js
+
+function highlight_unknown_items(dtkRcp){
+  let dtkTable = document.getElementById('table-tracked-items');
+  
+  console.log(dtkTable);
+
+  // cycle through dtkRcp["ingredients"][0]
+  // if find -2 then fine row in dtkTable where dtkRow.cells[4].textContent == dtkRcp["ingredients"][0][i]
+  // and set background colour to red
+  for (let i = 0; i < dtkRcp.ingredients.length; i++){
+    if (parseInt(dtkRcp.ingredients[i][ATOMIC_INDEX]) === IGD_TYPE_NO_INFO) { // found unknoown item
+      let dtkRcpItem = dtkRcp.ingredients[i][INGREDIENT_INDEX];
+      console.log(`Unknown - I:${i}: ${dtkRcpItem}`);
+      
+      // if it's in the table highlight it
+      for (let row = 0; row < dtkTable.rows.length; row++){
+        let dtkTableRow = dtkTable.rows[row];
+        let dtkTableItem = dtkTableRow.cells[4].textContent;
+        if (dtkRcpItem === dtkTableItem) {        
+          dtkTableRow.style.backgroundColor = '#FFEAC5';
+          console.log(`HIGH LIGHT > I:${row}: ${dtkTableItem}`);
+        }
+      }
+    }
+  }
 
 
+}
 
 // pass a nutrints object in to function and let the helpers to the rest!
 function fill_in_nutrients_table() {
@@ -110,6 +141,8 @@ function fill_in_nutrients_table() {
         console.log(`recipes.forEach side:${side} <`);
         
         fill_and_format_column(recipe.nutrinfo, side);
+
+        highlight_unknown_items(recipe);
 
         side += 1;
       }

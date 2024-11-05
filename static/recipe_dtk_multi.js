@@ -180,6 +180,7 @@ const IGD_IDX_QTY  = 1;
 const IGD_IDX_EACH = 2;
 const IGD_IDX_NAME = 3;
 
+const IGD_TYPE_NO_INFO   = -2;  // should match def in food_sets.py
 const IGD_TYPE_UNCHECKED = -1;
 const IGD_TYPE_ATOMIC    = 0;
 const IGD_TYPE_DERIVED   = 1;

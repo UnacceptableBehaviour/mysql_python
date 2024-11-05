@@ -284,11 +284,13 @@ def save_ots_ingredients_found():
 #  'txtfile': '',
 #  'url': ''}
 
+IGD_TYPE_NO_INFO   = -2
 IGD_TYPE_UNCHECKED = -1
 IGD_TYPE_ATOMIC    = 0
 IGD_TYPE_DERIVED   = 1
 IGD_TYPE_OTS       = 2   # Off The Shelf
-IGD_TYPE_DTK       = 3   # Daily TracKer 
+IGD_TYPE_DTK       = 3   # Daily TracKer
+
 
 def get_igdt_type(ri_name):
     igdt_type = IGD_TYPE_UNCHECKED
@@ -303,7 +305,9 @@ def get_igdt_type(ri_name):
             igdt_type = IGD_TYPE_DERIVED
         
         if igdt_type_text == 'ots':
-            igdt_type = IGD_TYPE_OTS    
+            igdt_type = IGD_TYPE_OTS
+    else:
+        igdt_type = IGD_TYPE_NO_INFO
 
     return igdt_type
 

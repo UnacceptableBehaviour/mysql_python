@@ -110,7 +110,7 @@ class DBWriteError(DBHelperError):
     '''Key not in DB'''
     pass
 
-from food_sets import IGD_TYPE_DERIVED
+from food_sets import IGD_TYPE_DERIVED, IGD_TYPE_NO_INFO, IGD_TYPE_OTS, IGD_TYPE_DTK
 
 # indexes for ingredients row
 ATOMIC_INDEX = 0                    # default value is 1 - TRUE
@@ -190,6 +190,7 @@ add_ingredient_w_timestamp.last_time_stamp = nix_time_ms()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # //  IGDT_TYPE: UNCHECKED / ATOMIC / DERIVED / OTS / DTK
 # //                 -1         0        1       2     3
+# add IGD_TYPE_NO_INFO   = -2;   
 # let IGD_TYPE_UNCHECKED = -1;
 # let IGD_TYPE_ATOMIC    = 0;
 # let IGD_TYPE_DERIVED   = 1;
