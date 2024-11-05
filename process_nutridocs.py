@@ -114,6 +114,7 @@ RECIPES_WITH_NON_ZERO_TOTALS = 3
 AVAILABLE_RECIPE_IMAGES = 4
 MISSING_SUB_INGREDIENTS_LIST = 5
 def produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, opt_dict={}):
+    print(f"\n- - Q0: ><")
     recipes_processed = []
     missing_images = []
     recipes_w_total_0g = []
@@ -136,7 +137,7 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
 
     # create regex
     PATTERN  = re.compile(r"------------------ for the (.*?) \((.*?)\)(.*?)$(.*?)Total\s*\((.*?)\)(.*?)^description:(.*?)^notes:(.*?)^stars:(.*?)^type:(.*?)^lead_image:(.*?)username:(.*?)$", re.M | re.S)
-
+    print(f"\n- - Q1: ><")
     # scan text for recipes
     for match in PATTERN.finditer(costing_section):
         name, serving_info, notes_after_serve, ingredients, tot_yield, method, description, notes, stars, type_tag, lead_image, username = match.groups()
@@ -237,11 +238,13 @@ def produce_recipe_txts_from_costing_section(costing_section, fileset, available
         # & DB of some description - ORM later in pipeline
         if opt_dict['generate_output_in_tmp_folders']:
             # write the recipe to folder
+            print(f'f',end='')
             with place_txt_file.open('w') as f:
                 f.write(rcp)
 
         #if image exist copy it over
         if lead_image != '' and lead_image != '_li_':
+            print(f'i',end='')
             if opt_dict['generate_output_in_tmp_folders']:
                 copy2(source_img_file, place_img_file)
 
@@ -622,15 +625,15 @@ print('\n')
 # process Nutridocs into text & image pairs initial stage in pipeline
 for fileset in files_to_process:
     nutridoc_dir = fileset[TMP_PATH].parent
-
+    print(f"\n- - P1: ><") 
     # convert file from RTF to txt
     nutridoc_text = get_text_content_of_file(fileset[FILE_LOC])
     #print(nutridoc_text) # save txt here: fileset[NEW_FILE_PATH]
-
+    print(f"\n- - P2: ><") 
     costing_section = get_costing_section_from_main_doc(nutridoc_text)
     if opt_dict['verbose_mode']: print(costing_section)
 
-
+    print(f"\n- - P3: >{nutridoc_dir}<") 
     # GET list of available recipe IMAGES format: date_time_recipe.jpg
     #   EG: 20200428_181655_fried chicken coating pancakes.jpg
     available_recipe_images = {}
@@ -648,12 +651,13 @@ for fileset in files_to_process:
     # insert image into text / NOT could be brittle if rtf file has any formatting in template like bold due to rtf markdown 
     #
     # # # # #
-
+    print(f"\n- - P4: ><")
     if opt_dict['generate_output_in_tmp_folders']:
         version_temp_assets_create_new_tmp_dirs(fileset[TMP_PATH], fileset[TMP_PATH_INCOMPLETE])
-
+    
+    print(f"\n- - P5: ><")
     recipes_and_missing_imgs = produce_recipe_txts_from_costing_section(costing_section, fileset, available_recipe_images, opt_dict)
-
+    print(f"\n- - P6: ><")
     if opt_dict['create_empty_templates_from_image_names']:
         # Sort available_recipe_images by image_file
         sorted_rcp_img_pairs = sorted(available_recipe_images.items(), key=lambda item: item[1])
@@ -664,9 +668,10 @@ for fileset in files_to_process:
             template_img = template_img.replace('_li_', image_file)
             print(template_img)
 
-
+    print(f"\n- - P7: ><")
     processed_nutridocs[fileset[FILE_LOC].name] = recipes_and_missing_imgs
 
+    print(f"\n- - P8: ><")
     if opt_dict['verbose_mode']:
         print(f"\nREPORT: = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = \ ")
         print(fileset[FILE_LOC].name,
