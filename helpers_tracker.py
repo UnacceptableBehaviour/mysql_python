@@ -156,8 +156,10 @@ def create_human_readable_DTK_spec(dtk):
 
     return test_text_1 + test_text_2 + test_text_3 + test_text_4
 
-# awaiting implementation
-#
+
+# DEPRECATED
+# called at end archive_dtk - to create a human readable version of the DTK
+# or for ruby background processing
 def post_DTK_info_for_processing(dtk, archive=False):
     # create DTK
     dtk_spec = create_human_readable_DTK_spec(dtk)
@@ -180,40 +182,6 @@ def post_DTK_info_for_processing(dtk, archive=False):
 
     print("> - - post_DTK_info_for_processing - - - E")
 
-
-def get_DTK_info_from_processing(dtk):
-    # just loaf info for dtk
-    search_name = dtk['dtk_rcp']['ri_name']
-
-    dtk_nut_dict = {}
-
-    # load nutrinfo
-    i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), dtk_nut_dict)
-    
-    print(f"> - - get_DTK_info_from_processing - - - > {search_name} < S")
-    pprint(dtk_nut_dict[search_name])
-    print("> - - get_DTK_info_from_processing - - - E")
-
-    return dtk_nut_dict[search_name]
-
-    # return {'density': 1,
-    #         'n_Al': 0,
-    #         'n_Ca': 0,
-    #         'n_En': 100,
-    #         'n_Fa': 15.0,
-    #         'n_Fb': 0,
-    #         'n_Fm': 0,
-    #         'n_Fo3': 10.0,
-    #         'n_Fp': 0,
-    #         'n_Fs': 5,
-    #         'n_Pr': 0,
-    #         'n_Sa': 2,
-    #         'n_St': 2,
-    #         'n_Su': 12,
-    #         'serving_size': 200,
-    #         'servings': 2,
-    #         'units': 'g',
-    #         'yield': '400g'}
 
 
 # updated dtk package arrived from user
@@ -323,7 +291,7 @@ def process_new_dtk_from_user(dtk_data):
     nutridata['n_Su'] = round(tot_sugars, 1)
     nutridata['n_St'] = round(tot_salt, 1)
     nutridata['yield'] = round(tot_weight, 1)
-    nutridata['serving_size'] = 100 # round(tot_weight, 1)
+    nutridata['serving_size'] = 100 # use by traffic light to scale nutrients - set to 100 for DTK
     nutridata['servings'] = 1
     
 
@@ -335,51 +303,19 @@ def process_new_dtk_from_user(dtk_data):
     store_daily_tracker_to_DB(dtk_data)   # ram & disc
     #commit_DTK_DB()            # disc
 
+    # # fire up ccm_nutridoc_web.rb PROCESS DTK data - DEPRACATED
+    # # potentially use this to create JSON for nutridoc w/ costing & nutrients
+    # arg1 = f"{dtk_data['dtk_weight']}"
+    # arg2 = f"file={post_interface_file()}"
+    # # inline slow
+    # #data_from_nutriprocess = subprocess.check_call(["./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
+    # # BACK GROUND Fire off a separate process to create some info file for access later
+    # subprocess.Popen(["ruby", "./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
+
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - P_submitted_DTK E")
     return(dtk_data)
 
-    #print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - R")
-    # # export DTK for PROCESSING
-    # # as nutridoc entry
-    
-    # post_DTK_info_for_processing(dtk_data)
-    #     # create human readable version of DTK
-    #     #  "dtk_recipe_txt":    "./scratch/_docr_support/___LAB_RECIPE_SMALLEST_DTK_TEST.txt",
 
-    #     #  "dtk_nutrients_txt": "./scratch/_docr_support/z_product_nutrition_info_autogen_DTK_cal.txt"
-
-    # # fire up ccm_nutridoc_web.rb PROCESS DTK data
-    # arg1 = f"{dtk_data['dtk_weight']}"
-    # arg2 = f"file={post_interface_file()}"
-    # data_from_nutriprocess = subprocess.check_call(["./scratch/_ruby_scripts/ccm_nutridoc_web.rb", arg1, arg2])
-    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-S")
-    # print(data_from_nutriprocess)
-    # for igd_list in dtk_data['dtk_rcp']['ingredients']:
-    #     pprint(igd_list[0])
-    #     print(f"{str(igd_list[QTY_IN_G_INDEX]).rjust(8)} - {igd_list[INGREDIENT_INDEX]}")
-    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - RO-E")
-
-    # # import RESULT: just get nutrinfo for daily tracker for now.
-    # # will expect a fully processed DTK including subcomponents
-    # # TODO
-    # nutridata = get_DTK_info_from_processing(dtk_data)
-    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    # # TODO - 1st
-    # # Make robust - if a single item is NO NUTIRIENT DATA
-    # # nothing is returned because DTK in for day FAILS
-    # # Highlight missing items, but total the known ones
-
-
-    # # merge nutrinfo into DTK and send it back!
-    # dtk_data['dtk_rcp']['nutrinfo'].update( nutridata ) # <<
-    # dtk_data['dtk_user_info'] = {'UUID': '014752da-b49d-4fb0-9f50-23bc90e44298', 'name': 'Simon'}
-    # #pprint(dtk_data)
-    # store_daily_tracker_to_DB(dtk_data)   # ram & disc
-    # #commit_DTK_DB()            # disc
-    # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    # return(dtk_data)
 
 
 
