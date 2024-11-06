@@ -39,10 +39,7 @@ from food_sets import get_exploded_ingredients_and_components_for_DB_from_name
 # print(IGD_TYPE_DERIVED)
 
 # indexes for ingredients row
-ATOMIC_INDEX = 0                    # default value is 1 - TRUE
-QTY_IN_G_INDEX = 1
-SERVING_INDEX = 2
-INGREDIENT_INDEX = 3
+from magic_numbers import ATOMIC_INDEX, QTY_IN_G_INDEX, SERVING_INDEX, INGREDIENT_INDEX, TRACK_NIX_TIME, IMAGE_INDEX, HTML_ID
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

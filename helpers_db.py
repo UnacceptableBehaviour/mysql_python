@@ -14,6 +14,8 @@ import re
 import copy                 # copy.deepcopy()
 import os
 
+from pathlib import Path
+from helpers_HR_dtk import create_human_readable_DTK_spec
 from datetime import datetime
 #datetime.now()
 
@@ -113,13 +115,8 @@ class DBWriteError(DBHelperError):
 from food_sets import IGD_TYPE_DERIVED, IGD_TYPE_NO_INFO, IGD_TYPE_OTS, IGD_TYPE_DTK
 
 # indexes for ingredients row
-ATOMIC_INDEX = 0                    # default value is 1 - TRUE
-QTY_IN_G_INDEX = 1
-SERVING_INDEX = 2
-INGREDIENT_INDEX = 3
-TRACK_NIX_TIME = 4
-IMAGE_INDEX = 5
-HTML_ID = 6
+from magic_numbers import ATOMIC_INDEX, QTY_IN_G_INDEX, SERVING_INDEX, INGREDIENT_INDEX, TRACK_NIX_TIME, IMAGE_INDEX, HTML_ID
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # using decorators to implement static vars
@@ -757,7 +754,7 @@ def store_daily_tracker(dtk):
 
 
         # to allow inspection and cpoying to nutridocs for processing / analysis
-        update_dtk_HR_file = Path(get_config_or_data_file_path('archive_path')).joinpath(f'_dtk_latest_update_{hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])}.txt')
+        update_dtk_HR_file = Path(get_config_or_data_file_path('archive_path')).joinpath(f"_dtk_latest_update_{hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])}.txt")
         dtk_spec = create_human_readable_DTK_spec(dtk)
         with open(update_dtk_HR_file, 'w') as dtk_update_file:
             dtk_update_file.write(dtk_spec)
