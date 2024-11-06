@@ -237,8 +237,9 @@ def process_OTS_i_string_into_allergens_and_base_ingredients(i_string, ri_name='
 
 aliases = {}
 atomic_LUT = {}
+# this file is ground truth - it is the source of all ingredient information
+# 'nutrients_txt_db' is copied from here or simoultaneously generated
 NUTRIENT_FILE_PATH = get_config_or_data_file_path('nutrient_file_path') 
-NUTRIENT_FILE_PATH_DOCKER = get_config_or_data_file_path("nutrient_file_path_docker")
 NUTRIENT_FILE_BACKUPS = get_config_or_data_file_path("nutrient_file_backups")
 
 component_file_LUT = {}
@@ -374,8 +375,8 @@ def build_atomic_LUT(verbose=False): # build from z_product_nutrition_info.txt *
         with NUTRIENT_FILE_PATH.open('r') as f:
             content = f.read()
     except FileNotFoundError:
-        with NUTRIENT_FILE_PATH_DOCKER.open('r') as f:
-            content = f.read()
+        raise FileNotFoundError(f"File not found: {NUTRIENT_FILE_PATH}")
+        
 
     # FIRST PASS to get all component names
     for m in re.finditer( r'--- for the nutrition information(.*?)\((.*?)\).*?ingredients:(.*?)$.*?igdt_type:(.*?)$', content, re.MULTILINE | re.DOTALL ):

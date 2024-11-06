@@ -34,12 +34,6 @@ def store_daily_tracker_to_DB(dtk = {}):
     return store_daily_tracker(dtk)
 
 
-def post_interface_file():
-    return get_config_or_data_file_path('dtk_recipe_txt')
-
-def get_interface_file():
-    return get_config_or_data_file_path('dtk_nutrients_txt')
-
 
 # take dtk object and convert to daily tracker human readable record
 def create_DTK_textcomponent(dtk, dtk_mode=True):
@@ -157,30 +151,6 @@ def create_human_readable_DTK_spec(dtk):
     return test_text_1 + test_text_2 + test_text_3 + test_text_4
 
 
-# DEPRECATED
-# called at end archive_dtk - to create a human readable version of the DTK
-# or for ruby background processing
-def post_DTK_info_for_processing(dtk, archive=False):
-    # create DTK
-    dtk_spec = create_human_readable_DTK_spec(dtk)
-
-    print(f"> - - post_DTK_info_for_processing - - - S\n{archive}\n ^ ^ ^ ^ ^ ")
-    pprint(dtk)
-    pprint(dtk_spec)
-
-    if (archive==False):
-        # file it - post_interface_file() get the name of file from config file - a json file
-        target_file = post_interface_file()
-
-    else: # archive it on roll over - TODO REMOVE this is to simplify dev 
-        hr_archive = archive.replace('.json', '.txt')
-        target_file = Path(get_config_or_data_file_path("archive_path")).joinpath(hr_archive)
-
-    with open(target_file, 'w') as i_face_out:
-        i_face_out.write(dtk_spec)
-        i_face_out.close()
-
-    print("> - - post_DTK_info_for_processing - - - E")
 
 
 
@@ -360,7 +330,10 @@ def archive_dtk(dtk):
     pprint(archive_dtk)
 
     # to allow inspection and cpoying to nutridocs for processing / analysis
-    post_DTK_info_for_processing(dtk, archfile_name)
+    dtk_spec = create_human_readable_DTK_spec(dtk)
+    with open(arch_target.replace('.json','_last_post.txt'), 'w') as dtk_arc_file:
+        dtk_arc_file.write(dtk_spec)
+
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")
 
 

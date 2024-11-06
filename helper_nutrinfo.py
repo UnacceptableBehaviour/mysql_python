@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
     t_dict = {}
     #i_db = NutrientsDB.getInstance() 
-    i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('dtk_nutrients_txt'), t_dict)
+    i_db.loadNutrientsFromTextFile(get_config_or_data_file_path('nutrients_txt_db'), t_dict)    
     print("t_dict")
     pprint(t_dict)
 

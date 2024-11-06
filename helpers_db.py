@@ -754,6 +754,14 @@ def store_daily_tracker(dtk):
         dtk['dtk_rcp']['dt_last_update'] = nix_time_ms()
         daily_tracker_db[str(dtk['dtk_user_info']['UUID'])] = dtk
         commit_DTK_DB()
+
+
+        # to allow inspection and cpoying to nutridocs for processing / analysis
+        update_dtk_HR_file = Path(get_config_or_data_file_path('archive_path')).joinpath(f'_dtk_latest_update_{hr_readable_date_from_nix(dtk['dtk_rcp']['dt_date'])}.txt')
+        dtk_spec = create_human_readable_DTK_spec(dtk)
+        with open(update_dtk_HR_file, 'w') as dtk_update_file:
+            dtk_update_file.write(dtk_spec)
+
         #pprint(dtk)
         return True
     except KeyError:
