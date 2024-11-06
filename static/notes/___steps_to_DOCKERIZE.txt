@@ -1,0 +1,158 @@
+ ./scratch/nutrinfo.txt ./scratch/___LAB_RECIPE_SMALLEST_DTK_TEST.txt ./scratch/z_product_nutrition_info_autogen_DTK_cal.txt ./scratch/z_usersDTK_DB.json ./scratch/z_users_DB.json ./scratch/z_users_devices_DB.json
+
+cd /Users/simon/a_syllabus/repos
+git clone https://github.com/UnacceptableBehaviour/mysql_python
+
+cd mysql_python
+python -m venv venv
+. venv/bin/activate                    # .pe
+pip install -r requirements.txt
+
+./hello.py
+# test run show config .json file missing
+
+# copy 'unmanaged' private config files over - from original repo
+# config files, SSL certs etc
+cd /Users/simon/a_syllabus/lang/python/mysql_python
+cp ./scratch/nutrinfo.txt ./scratch/___LAB_RECIPE_SMALLEST_DTK_TEST.txt ./scratch/z_product_nutrition_info_autogen_DTK_cal.txt ./scratch/z_usersDTK_DB.json ./scratch/z_users_DB.json ./scratch/z_users_devices_DB.json ./scratch/config_files.json ./scratch/server.crt ./scratch/server.key /Users/simon/a_syllabus/repos/mysql_python/scratch
+
+# more up to date version of ./scratch/nutrinfo.txt
+cp /Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt /Users/simon/a_syllabus/repos/mysql_python/scratch/nutrinfo.txt
+
+
+# git push from MAIN latest DB stuff - git pull for latest to repo/container build
+# check DB up running - connection issue NOW working! FAVS & ALL! : )
+
+#                   build container in cloned repos directory
+#                            |
+cd /Users/simon/a_syllabus/repos/mysql_python
+
+docker build . -t dtk_health
+
+
+# amended code to fall back to ./scratch/nutrinfo.txt in food_sets.py
+# SHOULD AUTO UPDATE ./scratch/nutrinfo.txt                             << TODO infrastucture fix COPY on update
+
+# expose port from container
+docker run -it --name dtk_container -p 50015:50015 dtk_health
+
+-d  for detatched
+docker run -it \
+-e FLASK_ENV=development -e FLASK_APP=hello.py \
+--name dtk_container \
+--network=host \
+-p50015:50015 \
+--mount type=bind,source="/Users/simon/a_syllabus/lang/python/mysql_python/scratch/scratch",target=/mysql_python/scratch \
+--mount type=bind,source="/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/y949_tracker_archive",target=/mysql_python/scratch/archive \
+dtk_health
+
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Container summary
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+I have 3 Dockerfile for images and containers:
+    docker-compose build        
+    docker-compose up           # then run them
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Container 1: asset_server
+Dockerfile:
+FROM node
+
+RUN npm install --global http-server
+
+WORKDIR /asset_server
+
+# cors no HTTPS
+#EXPOSE 8000
+#ENTRYPOINT ["http-server","-p","8000","--cors"]
+
+# http-server  --cors -S -C ./scratch/asCerts/server.crt -K ./scratch/asCerts/server.key
+EXPOSE 8080
+ENTRYPOINT ["http-server","--cors","-p","8080","-S","-C","./scratch/asCerts/server.crt","-K","./scratch/asCerts/server.key"]
+
+Build with: docker build . -t asset_server
+Run with: docker run -d --name map_assets --mount type=bind,source="$(pwd)",target=/asset_server -p8080:8080 asset_server
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Container 2: postgres-rcp:13-custom
+Dockerfile:
+FROM postgres:13
+
+EXPOSE 5432
+
+ENV POSTGRES_USER simon
+ENV POSTGRES_PASSWORD pool
+
+VOLUME /var/lib/postgresql/data
+
+CMD ["postgres"]
+
+Build with: docker build -t postgres-rcp:13-custom .
+Run with: docker run -p 5432:5432 postgres-rcp:13-custom
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Container 3: dtk_health
+Dockerfile:
+FROM alpine
+
+WORKDIR /
+
+RUN apk update
+RUN apk add nano git
+RUN apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk add --no-cache py3-pip
+
+RUN python --version
+
+WORKDIR /mysql_python
+COPY . .
+
+RUN . venv/bin/activate
+
+# move into requirements?
+RUN pip3 install psycopg2
+
+RUN pip install -r requirements.txt
+
+EXPOSE 50015
+ENTRYPOINT ["./hello.py"]
+
+
+Build with: 
+cd repos
+git clone https://github.com/UnacceptableBehaviour/mysql_python
+cd mysql_python
+docker build . -t dtk_health
+
+Run with:
+docker run -e FLASK_ENV=development -e FLASK_APP=hello.py \
+--name dtk_container \
+--network=host \
+-p50015:50015 \
+dtk_health
+
+This is what I'd like to do:
+I'd like to bring all three up on the same network using a docker-compose.yml file
+And for the domains 
+dtk.health
+asset.server
+to resolve to the containers
+dtk_health
+asset_server
+respectively.
+
+--mount type=bind,source="/Users/simon/a_syllabus/lang/python/mysql_python/scratch/scratch",target=/mysql_python/scratch \
+--mount type=bind,source="/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/y949_tracker_archive",target=/mysql_python/scratch/archive \
+
+
+
+Route FAVS [https://dtk.health:50015/favs] - error 
+    When entering a label & pressing save:
+        File "/mysql_python/hello.py", line 216, in home_list_of_favourites
+    dtk_health          |     with open(MISSLABELED_FILE_JSON, 'w') as f:
+    dtk_health          | FileNotFoundError: [Errno 2] No such file or directory: '/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_incorrectly_labeled_WEBIF.json'
+
+    This is really a data wrangling tool and not reqiured for the docker FLASK_APP 
+     it should detect and fail gracefully - or do something useful like taggin the FAVS

@@ -330,100 +330,6 @@ def db_recipe_page():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/twonky_donuts', methods=["GET", "POST"])
-def buttons_inputs():
-    headline_py = "Sending data back . . ."
-    recipes = []
-    rx = '*'
-    rxD = '*'
-    arr_get = ['A','B','C','D']
-    arr_post = ['L','M','N','O']
-    data = {}
-
-    incoming_dict = request.args.to_dict()          # for method=GET - contents of query string which is part of URL after question mark
-    print(f">-----> requesting: {type(request)}")
-    pprint(incoming_dict)
-
-    if request.method =='GET':
-        #rx = request.form["var_in_url_g"]
-        rx = request.form.get("var_in_url_g") # NO WORK - USE dictionary for GET - this for POST only?
-
-        if 'var_in_url_g' in incoming_dict:
-            rxD = incoming_dict['var_in_url_g']
-
-        bt_val = request.form.get("button_p")
-
-        for key, val in incoming_dict.items():
-            print(f"GET k: {key} - v: {val} <")
-            if re.match(r'btn_arr_', key):
-                print("MATCH")
-                data['button_keypad_GET'] = arr_get[int(val)]     # you can only press one button at a time!
-
-        print(f"GET request.form.get: {rx}")
-        print(f"GET rxD = incoming_dict['var_in_url_p']: {rxD}")
-        print(f"GET request.form.get( button_g ): {bt_val}")
-        pprint(incoming_dict)
-
-
-    if request.method =='POST':
-        rx = request.form.items()
-        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
-        pprint(request.form)
-        print(f"rx['tag_btn_create']{type(rx)}")
-        print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-        for key, val in request.form.items():
-            print(f"POST k: {key} - v: {val} <")
-
-            if key == 'create_tag_button' and val != '':
-                print(f"MATCH - ADDING: {val} to TAGS")
-                new_tag = val.lower().replace(" ", "_")
-                data['tags'].append(new_tag)
-                data['chosen_tag_filters'].append(new_tag)
-
-
-            # process button array POST
-            if re.match(r'btn_arr_', key):
-                print("MATCH - but ARR")
-                data['button_keypad_POST'] = arr_post[int(val)]     # you can only press one button at a time!
-
-            # process TAG buttond
-            if re.match(r'tag_btn_', key):
-                tag_filter = key.replace('tag_btn_', '')
-                toggle_filter(data['chosen_tag_filters'], tag_filter)
-                data['chosen_tag_filters_string'] = ', '.join(data['chosen_tag_filters'])
-                print(f"MATCH - but TAG: {data['chosen_tag_filters_string']}")
-
-
-        #if 'var_in_url_p' in incoming_dict:         # use for GET
-        #    rxD = incoming_dict['var_in_url_p']
-
-        bt_val = request.form.get("button_p")
-
-        print(f"POST request.form: {type(rx)}")
-        print(f"POST request.form: {rx}")
-        print(f"POST rxD = incoming_dict['var_in_url_p']: {rxD}")
-        print(f"POST request.form.get( button_p ): {bt_val}")
-        pprint(incoming_dict)
-
-    data['data'] = f"POST: {rx} - dict:{rxD}"
-
-    print(f">-----> rendering: {data}")
-
-    return render_template('buttons_and_inputs.html', app_title=app_title, headline=headline_py, data=data, recipes=recipes)
-
-
 # @app.route('/db_gallery/<int:year>/<int:month>/<title>')
 # def db_gallery(year, month, title):
 #     pass
@@ -680,17 +586,6 @@ def search_ingredient():
     return render_template('search_t.html', app_title=app_title, recipes=last_search_result_recipes)
 
 
-@app.route('/buton_2', methods=["GET", "POST"])
-def button_2():
-    return render_template('data_return.html', lines=[f"BUTTON 2"])
-
-@app.route('/buton_3', methods=["GET", "POST"])
-def button_3():
-    headline_py = 'Page title . .'
-    recipes = []
-    return render_template("data_return.html", headline=headline_py, recipes=recipes, lines=[f"BUTTON 3"])
-
-
 
         # TRACK ITEMS
 @app.route('/tracker', methods=["GET", "POST"])
@@ -809,44 +704,6 @@ def upload_image_test():
 
 
 
-
-@app.route('/db_nutrients', methods=["GET", "POST"])
-def db_nutrients():
-    headline_py = 'Nutrients from PostgreSQL'
-
-    ri_id = 3301
-
-    recipe = get_single_recipe_from_db_for_display_as_dict(ri_id)
-
-    recipes = [recipe]
-
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
-    pprint(recipes)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    return render_template("nutrient_traffic_lights_page.html", app_title=app_title, headline=headline_py, recipes=recipes)
-
-
-@app.route('/db_nutrients_compare')
-def db_nutrients_compare():
-    BEEF_BRISKET_BROTH = 3402
-    LEMON_GRASS_CHICKEN = 2001
-
-    recipes = get_recipes_for_display_as_list_of_dicts( [BEEF_BRISKET_BROTH, LEMON_GRASS_CHICKEN] )
-
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - *-* \\")
-    pprint(recipes)
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
-
-    headline_py = "Compare Nutrients fetch from DB"
-
-    return render_template("nutrient_compare_page.html", app_title=app_title, headline=headline_py, recipes=recipes)
-
-
-
-@app.route('/buton_7', methods=["GET", "POST"])
-def button_7():
-    return render_template('data_return.html', lines=[f"BUTTON 7"])
 
 # https://flask.palletsprojects.com/en/0.12.x/patterns/favicon/
 @app.route('/favicon.ico')

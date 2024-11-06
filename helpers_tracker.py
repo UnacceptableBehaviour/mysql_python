@@ -189,7 +189,7 @@ def archive_dtk(dtk):
 
     # to allow inspection and cpoying to nutridocs for processing / analysis
     dtk_spec = create_human_readable_DTK_spec(dtk)
-    with open(arch_target.replace('.json','_last_post.txt'), 'w') as dtk_arc_file:
+    with open(str(arch_target).replace('.json','_last_post.txt'), 'w') as dtk_arc_file:
         dtk_arc_file.write(dtk_spec)
     print("------------------+------------------+ a r c h i v i n g +------------------+------------------ E")
 
