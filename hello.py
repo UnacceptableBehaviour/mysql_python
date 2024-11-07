@@ -339,7 +339,7 @@ def db_gallery():
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
 
     # do this in pages when larger db - use JS to reload
-    ri_ids = get_all_recipe_ids() # get_next_page_recipe_ids()
+    ri_ids = process_search('', user_info['default_filters'])   # '' - empty search = find all
 
     # debug - delete
     firstN = 20
