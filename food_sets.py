@@ -239,7 +239,8 @@ aliases = {}
 atomic_LUT = {}
 # this file is ground truth - it is the source of all ingredient information
 # 'nutrients_txt_db' is copied from here or simoultaneously generated
-NUTRIENT_FILE_PATH = get_config_or_data_file_path('nutrient_file_path') 
+NUTRIENT_FILE_PATH = get_config_or_data_file_path('nutrient_file_path')
+NUTRIENT_FILE_PATH_DOCKER = get_config_or_data_file_path("nutrient_file_path_docker")
 NUTRIENT_FILE_BACKUPS = get_config_or_data_file_path("nutrient_file_backups")
 
 component_file_LUT = {}
@@ -373,9 +374,13 @@ def build_atomic_LUT(verbose=False): # build from z_product_nutrition_info.txt *
     content = ''
     try:        
         with NUTRIENT_FILE_PATH.open('r') as f:
-            content = f.read()
+            content = f.read()                    
     except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {NUTRIENT_FILE_PATH}")
+        try:
+            with NUTRIENT_FILE_PATH_DOCKER.open('r') as f:
+                content = f.read()
+        except FileNotFoundError:        
+            raise FileNotFoundError(f"File not found: {NUTRIENT_FILE_PATH}")
         
 
     # FIRST PASS to get all component names
