@@ -31,6 +31,9 @@ mkdir scratch/_ruby_scripts     # currently empty
 #cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_ruby_scripts/foodlab_tools.rb ./scratch/_ruby_scripts
 #cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/_ruby_scripts/recipe.rb ./scratch/_ruby_scripts
 
+# copy current data over - unmanaged - autogenrated file
+cp /Users/simon/a_syllabus/lang/python/mysql_python/static/dtk_data.js ./static
+
 # deprecated - REMOVE - Reverse proxy now does the SSL stuff
 cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/server.crt ./scratch
 cp /Users/simon/a_syllabus/lang/python/mysql_python/scratch/server.key ./scratch
