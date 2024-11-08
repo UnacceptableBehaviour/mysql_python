@@ -339,6 +339,7 @@ def db_gallery():
     user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
 
     # do this in pages when larger db - use JS to reload
+
     ri_ids = process_search('', user_info['default_filters'])   # '' - empty search = find all
 
     # debug - delete
@@ -348,11 +349,21 @@ def db_gallery():
         q_index = random.randint(0,len(ri_ids)-1)
         rcp_ids_20_off.append(ri_ids.pop(q_index))
 
+    rcp_ids_20_off = rcp_ids_20_off + [1974,1596,63,1982,991]
+
     #recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)  # show WHOLE DB!!! :/
     recipes = get_gallery_info_for_display_as_list_of_dicts(rcp_ids_20_off)  # show 20 random! :)
     # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
-    # pprint(recipes)
+    #     #pprint(recipes)    
+    # pprint(recipes[0])
     # pprint(rcp_ids_20_off)
+    for n,r in enumerate(rcp_ids_20_off):
+         if r in user_info['fav_rcp_ids']:
+             recipes[n]['ri_fav'] = True
+    #         print(f"fav: {recipes[n]['ri_name']} - {r}")
+    #         dbg_r = n
+
+    # pprint(recipes[dbg_r])
     # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - /")
 
     return render_template('gallery.html', app_title=app_title, user_info=user_info, recipes=recipes)
@@ -477,7 +488,8 @@ def search_ingredient():
     search = ''
     
     # fallback data - TODO - CHECK if needed once search working
-    user_info = get_user_info_dict_from_DB('014752da-b49d-4fb0-9f50-23bc90e44298')
+    passed_in_uuid = '014752da-b49d-4fb0-9f50-23bc90e44298'
+    user_info = get_user_info_dict_from_DB(passed_in_uuid)
 
     # process search post - query database
     # get all recipes with search criterea
@@ -542,12 +554,15 @@ def search_ingredient():
                     if 'toggle_favs' in search_request:
                         if search_request['toggle_favs']: # true toggle them
                             for item in search_request['rcpsShortList']:
+                                print(f"toggling: {item}")
                                 if item in user_info['fav_rcp_ids']:
                                     # If item is in both lists, remove it from user_info['fav_rcp_ids']
                                     user_info['fav_rcp_ids'].remove(item)
+                                    remove_favs_from_DB(helper_db_class_db, passed_in_uuid, [str(item)])
                                 else:
                                     # If item is in search_request['rcpsShortList'] but not in user_info['fav_rcp_ids'], add it
                                     user_info['fav_rcp_ids'].append(item)
+                                favourite_targets = list(set(user_info['fav_rcp_ids']))
                     else:
                         add_to_existing = search_request['rcpsShortList'] + user_info['fav_rcp_ids']
                         favourite_targets = list(set(add_to_existing))
