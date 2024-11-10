@@ -347,12 +347,10 @@ def db_gallery():
     rcp_ids_20_off = []
     for i in range(firstN):
         q_index = random.randint(0,len(ri_ids)-1)
-        rcp_ids_20_off.append(ri_ids.pop(q_index))
+        rcp_ids_20_off.append(ri_ids.pop(q_index))    
 
-    rcp_ids_20_off = rcp_ids_20_off + [1974,1596,63,1982,991]
-
-    #recipes = get_gallery_info_for_display_as_list_of_dicts(ri_ids)  # show WHOLE DB!!! :/
     recipes = get_gallery_info_for_display_as_list_of_dicts(rcp_ids_20_off)  # show 20 random! :)
+
     # print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \\")
     #     #pprint(recipes)    
     # pprint(recipes[0])
