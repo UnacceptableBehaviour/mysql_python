@@ -146,7 +146,7 @@ function searchForRecipe (){
 
   search = searchForm.value;
 
-  if (search === "") search ='%'; // match anything - just use filters & tags - TODO randomise for roulette!
+  if (search === "") search ='%'; // match anything - just use filters & tags
 
   // post info to DB
   fetch( '/search', {
@@ -159,7 +159,14 @@ function searchForRecipe (){
 
   }).then( function(search_response) {
     console.log('----*----');
-    console.log("AHEM:", search_response);    
+    const searchHits = search_response ? search_response.length : 0;
+    console.log("AHEM:", search_response);
+
+    const dbgS3 = document.getElementById('dgb-s3');
+    if (dbgS3) { dbgS3.textContent = `#Hits:[${searchHits}]`; };
+    const titleResult = document.getElementById('results-count');
+    if (titleResult) { titleResult.textContent = `[${searchHits}]`; };
+
     //gallery_html = renderRecipeCard(search_response[0]);
     gallery_html = renderGalleryFromResult(search_response);
     //console.log(gallery_html);
