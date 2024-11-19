@@ -123,10 +123,24 @@ sub_patterns = [
     r'<html>',
     r'<\/html>',
     r'<head>.*?<\/head>',
-    r'<script.*?<\/script>',
-    r'<script>.*<\/script>',
+    r'<script>\s+var recipes.*?</script>',
+    r' <script.*?type=\"module\".*?</script>',
     r'<!--.*?-->',
 ]
+
+# remove - jinja2 template data passing
+# <script> var recipes = ... </script>
+# <script>\s+var recipes.*?</script>                            # regex
+
+# remove - html builder script
+# <script type="module" src="https://dtk.health:50015/static/recipe_dtk_multi.js"></script>
+# <script.*?type=\"module\".*?</script>                         # regex
+
+# keep - embedded schema.org info
+# <script type="application/ld+json"> ...  </script>
+# <script.*?type=\"application/ld\+json\">.*?</script>          # regex
+
+
 
 def process_html_for_posting(html_path, sub_patterns):
 
@@ -153,7 +167,14 @@ def process_html_for_posting(html_path, sub_patterns):
     img_lut['img_tags'] = {}
     img_lut['source_file'] = str(html_path)
     # scan html with regex class=\"rcp-image\"\s*?src=['\"](.*?)['\"]> to get all the images
-    image_list = re.findall(r'class=\"rcp-image\"\s*?src=[\'\"](.*?)[\'\"]>', html_body)
+    #image_list = re.findall(r'class=\"rcp-image\"\s*?src=[\'\"](.*?)[\'\"]>', html_body)
+    # match img, alt, title attributes
+    #image_list = re.findall(r'class=\"rcp-image\"\s*?src=[\'\"](.*?)[\'\"]\s*?alt=[\'\"](.*?)[\'\"]\s*?title=[\'\"](.*?)[\'\"]>', html_body)
+    image_list = re.findall(r'class=\"rcp-image\"\s*?src=[\'\"](.*?)[\'\"]\s*?alt=.*?>', html_body)
+    print("image_list - - - - - - S")
+    for image in image_list:
+        pprint(image)
+    print("image_list - - - - - - E")
     url_list = [re.sub('&amp;', '&', image) for image in image_list]
     file_list = [re.sub('%20', ' ', image) for image in url_list]
     count = 0
@@ -183,17 +204,20 @@ def process_html_for_posting(html_path, sub_patterns):
     for key, img_set in img_lut['img_tags'].items():
         tagged_html_body = tagged_html_body.replace(img_set['html_img'], key)
         html_body = html_body.replace(img_set['html_img'], img_set['mail_cid'])
+    
+    print('> - - - - - - - - - - - - Adding banner image - - - - - - - - - - - - < S')
+    # tack on banner image
+    BANNER_HTML = Path('./scratch/_csa/csa_seasonal_cauliflower_fb.html').read_text()
+    if '</body>' in html_body:
+        # Perform the replacement
+        html_body = html_body.replace('</body>', BANNER_HTML + '\n</body>')
+    else:
+        print("Warning: </body> tag not found in html_body")
 
-    if 'blog-post-caption-img' not in html_body: # banner already in post
-        # add line in the last row table
-        # <tr><td></td></tr><tr><td>If you are in Hereford check out <a href="https://growinglocal.org.uk/">Growing Local</a> for great locally produced veg using organic practices well worth signing up for!</td></tr></table>
-        html_body = html_body.rsplit('</table>', 1)   # split at table tag - return list of 2 strings - table tag not in either
-        # print('table insert - - - - - S')
-        # pprint(tagged_html_body)
-        # print('table insert - - - - - M')
-        replacement_text = '<tr><td></td></tr><tr><td></td></tr><tr><td colspan="8">If you are in Hereford check out <a href="https://growinglocal.org.uk/this-weeks-veg/">Growing Local</a> for great locally produced veg using organic practices well worth <a href="https://growinglocal.org.uk/join-our-csa/">signing up for!</a></td></tr></table>'
-        html_body = replacement_text.join(html_body) # ','.join(['a', 'b']) -> 'a,b'
-        # print('table insert - - - - - E')
+    print(BANNER_HTML)
+    print('\n|\n|\n|\n|\n|\n')
+    print(html_body)
+    print('> - - - - - - - - - - - - Adding banner image - - - - - - - - - - - - < E')
 
     img_lut['tagged_html'] = tagged_html_body
 
@@ -248,6 +272,7 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                     else:
                         print(f"Post left as DRAFT: {target_post_title}")
                         print('.\n.\n.\n')
+                        target_post = 'DRAFT'
                     
                     break        
             # wait before polling again

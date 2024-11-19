@@ -116,6 +116,8 @@ function addImage(rc, r) {
   let el = document.createElement('img');
   el.classList.add('rcp-image');
   el.src = `static/recipe/${r.lead_image}`;
+  el.alt = r.description;  // Add alt tag
+  el.title = r.ri_name;    // Add title tag
   //el.src = `https://asset.server:8080/static/recipe/${r.lead_image}`;
   rc.appendChild(el);
 }
