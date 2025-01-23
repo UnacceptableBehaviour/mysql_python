@@ -342,19 +342,6 @@ def search(search_term):
         if re.search(search_term, i):
             dump_atomic_LUT(i)
 
-
-
-def build_file_LUT():
-    file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
-    for f in file_list:
-        m = re.search(r'\d{8}_\d{6}_(.*?).txt', str(f))
-        if m:
-            #print(f"{m.group(1)} - {f.name}")
-            component_file_LUT[m.group(1)] = f
-            # cache file & log rcoi/ri_name mismatch
-            get_ingredients_from_component_file_and_CACHE_content(m.group(1)) 
-
-
 errors = {
     'txt_title_NO_match_rcp':[],        # = collected by code (if hash # next to error type)
     'derived_w_file_HAS_ndb_no':[],     #
@@ -366,8 +353,32 @@ errors = {
     'unknown_alias':[],                 #
     'dead_ends_in_this_pass': [],
     'items_not_triggering_TAGS' :[],
-    'expected_derived_atomic_no_file': []
+    'expected_derived_atomic_no_file': [],
+    'ri_name_is_a_duplicate':[]
 }
+
+rcp_file_duplicates = {}
+def build_file_LUT():
+    file_list = COMPONENT_DIR_PATH.glob('*_NUTRITEST_recipes_*/_i_w_r_auto_tmp/*.txt')
+    for f in file_list:
+        m = re.search(r'\d{8}_\d{6}_(.*?).txt', str(f))
+        if m:
+            ri_name = m.group(1)
+            # check for collisions / duplicates & store them
+            if ri_name in component_file_LUT:
+                errors['ri_name_is_a_duplicate'].append(ri_name)
+                doc_id = re.search(r'y\d{3}', str(f)).group(0) if re.search(r'y\d{3}', str(f)) else None
+                if ri_name in rcp_file_duplicates:                    
+                    rcp_file_duplicates[ri_name].append((doc_id,f.name))
+                else:
+                    # get original entry and store it with collision
+                    doc_id_0 = re.search(r'y\d{3}', str(component_file_LUT[ri_name])).group(0) if re.search(r'y\d{3}', str(component_file_LUT[ri_name])) else None                    
+                    rcp_file_duplicates[ri_name] = [(doc_id_0, component_file_LUT[ri_name].name ),(doc_id,f.name)]
+            else:                
+                component_file_LUT[ri_name] = f
+            # cache file & log rcoi/ri_name mismatch
+            get_ingredients_from_component_file_and_CACHE_content(ri_name) 
+
 
 def build_atomic_LUT(verbose=False): # build from z_product_nutrition_info.txt * * *  < <
 
@@ -885,7 +896,7 @@ cheese_subsets = {
     'soft-ripened cheese' : {'brie','camembert','cambozola','goats cheese','chavroux goats cheese'},       # bloomy rind
     'semi-soft cheese' : {'havarti','muenster','munster','jarlsberg','chaumes','red leicester'},
     'washed-rind cheese' : {'limburger','taleggio','epoisses','alsatian munster'},
-    'blue cheese' : {'roquefort','stilton','gorgonzola','sweet gorgonzola','danish blue', 'st agur'},
+    'blue cheese' : {'roquefort','stilton','gorgonzola','sweet gorgonzola','danish blue', 'st agur', 'montagnolo affine', 'cheese montagnolo affine'},
     'semi-hard cheese' : {'cheddar','gouda','mature gouda','edam','monterey jack','emmental','swiss','gruyere','extra mature cheddar',
                           'mature cheddar','mild cheddar','leerdammer light cheese','leerdammer'},
     'hard cheese' : {'parmesan','parmigiano-reggiano','asiago','pecorino','manchego',},
@@ -2235,7 +2246,8 @@ if __name__ == '__main__':
         if c not in CACHE_recipe_component_or_ingredient:
             get_ingredients_from_component_file_and_CACHE_content(c)          # get & cache
         if c in CACHE_recipe_component_or_ingredient:
-            print(CACHE_recipe_component_or_ingredient[c])
+            print(f"from: {str(component_file_LUT[c]).replace('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components','')}")
+            print(CACHE_recipe_component_or_ingredient[c])            
         else:
             print(f"I:'{c}' HAS NO FILE - atomic?:")
             if c in atomic_LUT: print(f"{atomic_LUT[c]['igdt_type']}")
@@ -2249,9 +2261,43 @@ if __name__ == '__main__':
     print(f"\n>--- atomic_LUT[{rcoi}] - - \ ")
     pprint(atomic_LUT[rcoi])
 
+    # compare notes
+    #CACHE_recipe_component_or_ingredient
+    #atomic_LUT
+    #component_file_LUT
+    
+    # Initialize a Counter to keep track of doc_no frequencies
+    doc_no_counter = Counter()
+    doc_no_rcp_list = {}
+    atomic_LUT_miss = 0
 
+    print(f"Recipes NOT in atomicLUT:\natomicLUT: {len(atomic_LUT)}\ncomponent_file_LUT: {len(component_file_LUT)}")
+    for k,v in component_file_LUT.items():
+        if k not in atomic_LUT:
+            # use a regex to extra the y\d\d\d y438 part of pathe: /Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/y438_NUTRITEST_recipes_20201219-0115/_i_w_r_auto_tmp/20201219_000141_beef broth & cavolo nero.txt
+            m = re.search(r'y\d\d\d', str(v))
+            doc_no = m.group(0) if m else 'NO_DOC_NO'
+            print(f"{k}\n\t{v.name}\n\t{doc_no}\n\t{str(v).replace('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components','')}")
+            atomic_LUT_miss +=1
+            doc_no_counter[doc_no] += 1
+            if doc_no not in doc_no_rcp_list:
+                doc_no_rcp_list[doc_no] = [k]
+            else:
+                doc_no_rcp_list[doc_no].append(k)
 
-    print('\n'*25 + '\nSearch?')
+    print(f"atomic_LUT_miss: {atomic_LUT_miss}")
+    print("\nDocument Number Frequencies (Highest First):")
+    for doc_no, count in doc_no_counter.most_common():
+        print(f"{doc_no}: {count}")
+    pprint(doc_no_rcp_list)
+    print(f"\nDuplicates found for  ri_name:")
+    pprint(rcp_file_duplicates)
+    print()    
+    menu_assemble_arg = [ k.replace('y','') for k,v in doc_no_rcp_list.items() ]
+    print(f"\nmenu_assembly -m {menu_assemble_arg}")
+
+    print('\n'*15 + '\nSearch?')
+
     while(True):
         yn = input('Continue ingredient/(n)\n')
         if (yn=='') or (yn.strip().lower() == 'n'): sys.exit(0)
