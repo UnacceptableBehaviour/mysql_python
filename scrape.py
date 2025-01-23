@@ -42,8 +42,9 @@ MI_FILES = {'-c': MISSING_INGREDIENTS_FILE_JSON,          # cost_menu.rb
 
 # target
 NUTRIENT_FILE_PATH = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info.txt')
-NUTRINFO_BACKUP_DIR = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_bak')
+NUTRINFO_BACKUP_DIR = Path('/Volumes/home/dtk_backups/product_nutrition_info_bak') # was _courses_components/z_product_nutrition_info_bak - too noisy on search!
 URL_CACHE_ALREADY_RETRIEVED_JSON = Path('/Users/simon/Desktop/supperclub/foodlab/_MENUS/_courses_components/z_product_nutrition_info_URL_CACHE.json')
+
 
 url_cache = {}
 if URL_CACHE_ALREADY_RETRIEVED_JSON.exists():
@@ -69,6 +70,11 @@ def save_urls_still_to_process():
 
 
 def backup_file_with_nix_timestamp(file_path, backup_dir=NUTRINFO_BACKUP_DIR):
+
+    while not os.path.exists(backup_dir):
+        print(f"* * * The path {backup_dir}  is NOT mounted * * *")
+        yn = input('Connect to backup server to proceed then . . .  press any key').strip().lower()
+
     nutri_file = Path(file_path).name
     nix_t = nix_time_ms()
     backup_name = f"{hr_readable_from_nix(nix_t).replace(' ','_')}_{nix_t}_{nutri_file}"
