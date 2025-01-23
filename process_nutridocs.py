@@ -362,7 +362,7 @@ NUTRIDOC_LIST = ['y467']
 # got to homegrown
 
 # skipped
-# breakfast(418), brunch(1193), comfort(1013), component(1123), ferment(unclear definition)
+# breakfast(418), comfort(1013), component(1123), ferment(unclear definition)
 # lightcourse(1007), keto (7 - late addition)
 # (lightcourse was 1007 - got as far as: harissa ribs & mixed roast veg when I realised that the label removed was lunch not lightcourse - tits!)
 
@@ -465,7 +465,7 @@ description:
 notes:
 stars: 1
 type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
-pizza, sauce, supplement, beverage, snack, breakfast, brunch, homegrown, salad, soup,
+pizza, sauce, supplement, beverage, snack, breakfast, homegrown, salad, soup,
 preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
 dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
@@ -479,7 +479,7 @@ description:
 notes:
 stars: 1
 type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
-pizza, sauce, supplement, beverage, snack, breakfast, brunch, homegrown, salad, soup,
+pizza, sauce, supplement, beverage, snack, breakfast, homegrown, salad, soup,
 preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
 dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
 lead_image: _li_
