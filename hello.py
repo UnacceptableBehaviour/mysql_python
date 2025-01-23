@@ -536,7 +536,7 @@ def search_ingredient():
                 removal_targets_json = json.dumps(removal_targets)
                 with open(MISSLABELED_FILE_JSON, 'w') as f:
                     f.write(removal_targets_json)
-                print('removal_targets - - - E')
+                print(f'removal_targets - - - E Count=[{len(removal_targets[next(iter(removal_targets))])}]')
 
         
             # save favourite recipes to user settings
