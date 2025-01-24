@@ -27,11 +27,11 @@
           <img src="static/recipe/{{ recipe['lead_image'] }}" value="{{ recipe['ri_id'] }}"> 
         </div>
       
-        <div class="content">
+        <div class="card-content">
           <h2 class="title">{{ recipe['ri_name'] }}</h2>
-      
+          <br>
           <div class="info">
-            {{ recipe['nutrinfo']['serving_size'] }}{{ recipe['nutrinfo']['units'] }}  <p style="display: inline;">{{ recipe['nutrinfo']['n_En'] }}kcal/100g</p> = {{ recipe['nutrinfo']['cals_p_srv'] }}kcals
+            {{ recipe['nutrinfo']['serving_size'] }}{{ recipe['nutrinfo']['units'] }} @ {{ recipe['nutrinfo']['n_En'] }}kcal/100g = <p class="total-cals" style="display: inline;">{{ recipe['nutrinfo']['cals_p_srv'] }}kcals</p>
             <!-- <p>{{ recipe['description'] }}</p> -->
           </div>
       

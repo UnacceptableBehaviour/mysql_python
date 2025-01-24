@@ -65,7 +65,7 @@ body {
   /* object-position: 50% 50%; */
 }
 
-.content {
+.card-content {
   width: 70%;
   position: relative;
 }

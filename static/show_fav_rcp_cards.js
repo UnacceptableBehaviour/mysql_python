@@ -152,7 +152,7 @@ for (let i = 0; i < blogPostBtns.length; i++) {
     <img src="https://asset.server:8080/static/recipe/20200822_151526_nectarine salsa.jpg" value="1644"> 
   </div>
 
-  <div class="content">
+  <div class="card-content">
     <h2 class="title">nectarine salsa</h2>
 
     <div class="info">
