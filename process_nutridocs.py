@@ -464,10 +464,7 @@ empty_recipe = '''
 description:
 notes:
 stars: 1
-type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
-pizza, sauce, supplement, beverage, snack, breakfast, homegrown, salad, soup,
-preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
-dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+type: amuse, bao, beverage, bread, breakfast,  burger, cheese, comfort, component, condiment, crepe, dessert, dough, ferment, fish, helldiet, hmtakeout, homegrown, icecream, lightcourse, low_cal, lunchbox, main, p4, pasta, pie, pizza, preserve, salad, sandwich, sauce, serve_cold, serve_hot, serve_rt, serve_warm, side, snack, soup, starter, supplement, sushi, takeout
 lead_image: _li_
 username: carter snapdragonpics
 
@@ -478,10 +475,7 @@ empty_lower_template = '''
 description:
 notes:
 stars: 1
-type: ferment, lunchbox, hmtakeout, takeout, dough, bread, pasta, sandwich, burger,
-pizza, sauce, supplement, beverage, snack, breakfast, homegrown, salad, soup,
-preserve, component, amuse, side, starter, sushi, fish, lightcourse, bao, main, crepe,
-dessert, p4, cheese, comfort, low_cal, serve_cold, serve_rt, serve_warm, serve_hot
+type: amuse, bao, beverage, bread, breakfast,  burger, cheese, comfort, component, condiment, crepe, dessert, dough, ferment, fish, helldiet, hmtakeout, homegrown, icecream, lightcourse, low_cal, lunchbox, main, p4, pasta, pie, pizza, preserve, salad, sandwich, sauce, serve_cold, serve_hot, serve_rt, serve_warm, side, snack, soup, starter, supplement, sushi, takeout
 lead_image: _li_
 username: carter snapdragonpics
 
