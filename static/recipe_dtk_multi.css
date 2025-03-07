@@ -139,6 +139,7 @@ hr {
 
 .rcp-tab-igds { 
     width: 100%;
+    font-size: 16px;        
 }
 .rcp-tab-igds img {
     width: 80%;
@@ -148,10 +149,14 @@ hr {
 /* - - - - - headings - - - - - */
 .rcp-title, .rcp-name, .rcp-desc, .rcp-igds-title, .rcp-makes, .rcp-method, .rcp-method-title, .rcp-steps {
     font-weight: bold;
-    font-size: 15px;
+    font-size: 16px;
     margin: 0px;
     border: 1px;
     padding: 15px 1px 1px 1px;
+}
+/* - - - - - headings - - - - - */
+.rcp-name, .rcp-igds-title, .rcp-method-title {
+    font-size: 17px;
 }
 /* - - - - - specialisations of above */
 .rcp-name, .rcp-desc {
