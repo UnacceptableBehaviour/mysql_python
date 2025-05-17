@@ -207,7 +207,7 @@ def process_html_for_posting(html_path, sub_patterns):
     
     print('> - - - - - - - - - - - - Adding banner image - - - - - - - - - - - - < S')
     # tack on banner image
-    BANNER_HTML = Path('./scratch/_csa/csa_seasonal_cauliflower_fb.html').read_text()
+    BANNER_HTML = Path('./scratch/_csa/csa_seasonal_may_polytunnel.html').read_text()
     if '</body>' in html_body:
         # Perform the replacement
         html_body = html_body.replace('</body>', BANNER_HTML + '\n</body>')
