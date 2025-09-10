@@ -8,10 +8,21 @@ RUN apk add nano git
 # add libpq to support psychopg2
 RUN apk add --no-cache postgresql-libs
 RUN apk add postgresql-dev gcc python3-dev musl-dev 
-RUN apk add --no-cache py3-pip
 
 # Install Ruby and necessary dependencies
-RUN apk add --no-cache build-base ruby ruby-bundler ruby-dev ruby-irb ruby-rake ruby-io-console ruby-bigdecimal ruby-json libstdc++ tzdata postgresql-dev
+RUN apk add --no-cache \
+    build-base \
+    ruby \
+    ruby-bundler \
+    ruby-dev \
+    ruby-rake \
+    libstdc++ \
+    tzdata \
+    postgresql-dev \
+    py3-pip \
+    python3-dev \
+    musl-dev \
+    gcc
 
 RUN echo 'export RUBYLIB=/mysql_python/scratch/_ruby_scripts' >> ~/.shrc
 
