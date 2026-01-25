@@ -241,6 +241,7 @@ def home_list_of_favourites():
             type_label = favs_dict['save_label']
             print('ri_names - - - S')
             print(f"SAVING TYPES to JSON: {type_label} - ")
+            print(f"to: {MISSLABELED_FILE_JSON}")
             save_remove_targets = {}
 
             save_remove_targets[type_label] = favs_dict['ri_names']            
