@@ -97,6 +97,12 @@ class Nutrients:
             nutridict_for_pass['ots_ingredients'] = m.group(5).strip()
             nutridict_for_pass['igdt_type'] = m.group(6).strip()
 
+            # print(f"|\n|\n|\n|\n{name}\n|\n|\n|\n|\n|")
+            # # print the whole match string
+            # print(f"|\n|\n|\n|\n")
+            # pprint(m.groups())
+            # print(f"|\n|\n|\n|\n")
+
             if ('ml' in m.group(4)):
                 nutridict_for_pass['yield'] = float(m.group(4).replace('ml', ''))
                 nutridict_for_pass['units'] = 'ml'
