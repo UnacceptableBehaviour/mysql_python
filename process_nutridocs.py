@@ -457,19 +457,33 @@ NUTRIDOC_LIST = ['y467']
 # y978_NUTRITEST_recipes_20200229-13.rtf           55       54        1           37            5                  0            
 # y979_NUTRITEST_recipes_20200314-27.rtf           38       34        4           7             4                  0  
 
-empty_recipe = '''
------------------- for the recipe_name (1)
+# empty_recipe = '''
+# ------------------ for the recipe_name (1)
+# 180m		coffee												# notes, comments
+# 													Total (0g)
+# description:
+# notes:
+# stars: 1
+# type: amuse, bao, beverage, bread, breakfast,  burger, cheese, comfort, component, condiment, crepe, dessert, dough, ferment, fish, helldiet, hmtakeout, homegrown, icecream, lightcourse, low_cal, lunchbox, main, p4, pasta, pie, pizza, preserve, salad, sandwich, sauce, serve_cold, serve_hot, serve_rt, serve_warm, side, snack, soup, starter, supplement, sushi, takeout
+# lead_image: _li_
+# username: carter snapdragonpics
+
+
+# '''
+empty_recipe = '''------------------ for the recipe_name (1)
 180m		coffee												# notes, comments
 													Total (0g)
 description:
 notes:
 stars: 1
-type: amuse, bao, beverage, bread, breakfast,  burger, cheese, comfort, component, condiment, crepe, dessert, dough, ferment, fish, helldiet, hmtakeout, homegrown, icecream, lightcourse, low_cal, lunchbox, main, p4, pasta, pie, pizza, preserve, salad, sandwich, sauce, serve_cold, serve_hot, serve_rt, serve_warm, side, snack, soup, starter, supplement, sushi, takeout
-lead_image: _li_
+type: bread, breakfast, chc, component, crepe, dessert, dough, fish, homegrown, icecream, main, p4, pasta, pie, pizza, salad, sauce, serve_cold, serve_hot, serve_rt, serve_warm, soup, veg
+type: amuse, bao, beverage, bread, breakfast,  burger, cheese, comfort, component, condiment, crepe, dessert, dough, ferment, fish, helldiet, hmtakeout, homegrown, icecream, ingredient, lightcourse, low_cal, lunchbox, main, p4, pasta, pie, pizza, preserve, salad, sandwich, sauce, serve_cold, serve_hot, serve_rt, serve_warm, side, snack, soup, starter, supplement, sushi, takeout
+lead_image: 
 username: carter snapdragonpics
 
 
 '''
+
 
 empty_lower_template = '''
 description:
