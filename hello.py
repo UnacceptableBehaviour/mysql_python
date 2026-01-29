@@ -99,7 +99,9 @@ from pathlib import Path    # Path tools
 def home():
     # return redirect('synch_n_route')
     #return redirect(url_for('home_list_of_favourites')) same as > return redirect('/favs')
-    return redirect('/favs')
+    #return redirect('/favs')
+    return redirect('/search')
+
 
 
 # synch / login route
