@@ -153,12 +153,11 @@ def process_html_for_posting(html_path, sub_patterns):
 
     # open blog-post.css and read it into a variable
     
-    
-    with open(Path('static/recipe_dtk_multi.css'), 'r') as f:
-        css = f.read()
-    
-    html_body = re.sub(r'<body>', f"<body>\n <style>\n{css}\n</style>", html_body, flags=re.DOTALL)
-
+    # blogger removes the CSS from the emailed post so we have to add it back in manually
+    # from the blogger API in update_post_image_sizes_title_and_publish()
+    # with open(Path('static/recipe_dtk_multi.css'), 'r') as f:
+    #     css = f.read()
+  
     # mkdir for image file if it doesn't exist
     this_post_img_path = work_dir.joinpath(f"{html_path.stem}_files")
     this_post_img_path.mkdir(exist_ok=True)
@@ -228,8 +227,15 @@ def process_html_for_posting(html_path, sub_patterns):
 def update_image_size(content, new_size=800):
     return content.replace('=s320', f'=s{new_size}')
 
+def get_CSS_for_post():
+    # read the CSS file
+    css_file_path = Path('static/recipe_dtk_multi.css')
+    with open(css_file_path, 'r') as f:
+        css_content = f.read()
+    return css_content
 
-def update_post_image_sizes_title_and_publish(blog_id, target_post_title, service):
+
+def update_post_image_sizes_title_and_publish(blog_id, target_post_title, service, polling_time_out_in_seconds=180):
     
     target_post = None
 
@@ -247,7 +253,10 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                 if post['title'] == target_post_title:
                     content = post['content']
                     target_post_id = post['id']
+                    
                     updated_content = update_image_size(content)
+                    updated_content = f"\n<style>{get_CSS_for_post()}</style>\n\n" + updated_content
+
                     updated_title = post['title'].replace(' - script w css', '')
                     post['title'] = updated_title
                     post['content'] = updated_content
@@ -258,6 +267,7 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                     print(f"  {post['content']}")
                     print(f"  {post['title']}")
                     print('.\n.\n.\n')
+                    
                     # Update the post
                     updated_post = service.posts().update(blogId=blog_id, postId=target_post_id, body=post).execute()
                     print(f"Post updated: {updated_post['url']}")
@@ -275,8 +285,11 @@ def update_post_image_sizes_title_and_publish(blog_id, target_post_title, servic
                         target_post = 'DRAFT'
                     
                     break        
+            
+            print(f"Waiting for {polling_time_out_in_seconds} secs for blogger to SHOW POST - - - S")
             # wait before polling again
-            time.sleep(3)
+            time.sleep(polling_time_out_in_seconds)
+            print(f"Done - time to update post - - - - - - E")            
     
     except Exception as e:
         traceback.print_exc()
@@ -387,6 +400,9 @@ if __name__ == '__main__':
                 smtp_server.sendmail(sender, recipients, msg.as_string())
             
             print("Message sent!")
+            # print("\n\nMessage sent!\n|\n|\n / - - - - - - - - - - S\n")
+            # print(body)
+            # print("\n\nMessage sent!|\n|\n \ - - - - - - - - - - E\n")
 
             return msg
 
@@ -395,6 +411,17 @@ if __name__ == '__main__':
         #pprint(body)
         pprint(asset_list)
         print(f"Sending email to {recipients}: {rcp[0]['ri_name']} - - - - - - - - - - - - - - - - - - - - - - - - - - - - E")
+        if config['blog_mail_email'] in opt_dict['recipients']:
+            print(f"\n\nPost sent to {config['blog_mail_email']} \n\n")
+            sys.exit(0) # if we are just sending to email then exit here - no need to update post on blogger
+
+
+        wait_for_X_secs = 60
+        wait_for_X_secs = 180 # - give blogger time to process the email & post - avoid triggering CAPTCHA by polling too fast
+        wait_for_X_secs = 120
+        print(f"Waiting for {wait_for_X_secs} secs for blogger to process email - - - S")
+        time.sleep(wait_for_X_secs)
+        print(f"Done - time to update post - - - - - - E")
 
         # Now we have the post & images on blogger we can update the post title & images resolution
         creds = None
@@ -419,7 +446,7 @@ if __name__ == '__main__':
 
         service = build('blogger', 'v3', credentials=creds)
         
-        update_post_image_sizes_title_and_publish(blog_id, subject, service)
+        update_post_image_sizes_title_and_publish(blog_id, subject, service, wait_for_X_secs)
 
 
     # See F_20240507_EMAIL_recipe_to_BLOG.rtf for config file info
